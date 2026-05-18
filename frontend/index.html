@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABSTORAGES AI Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
+  <header class="portal-header">
+    <div class="header-brand">
+      <div class="brand-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect x="1" y="1" width="26" height="26" rx="4" stroke="#00e87a" stroke-width="1.5"/>
+          <path d="M7 14h14M14 7l7 7-7 7" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="brand-name">ABSTORAGES</span>
+      </div>
+      <div class="brand-sub">AI Portal · Logistics Solutions</div>
+    </div>
+
+    <nav class="portal-nav">
+      <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn" data-tab="sara">SARA</button>
+      <button class="nav-btn" data-tab="sofia">SOFIA</button>
+    </nav>
+
+    <div class="header-status">
+      <div class="status-dot" id="redis-status" title="Redis"></div>
+      <div class="status-dot online" id="server-status" title="Servidor"></div>
+      <span class="status-label" id="status-text">Conectado</span>
+    </div>
+  </header>
+
+  <!-- ─── MAIN ──────────────────────────────────────────────────────────── -->
+  <main class="portal-main">
+
+    <!-- ─── DASHBOARD ───────────────────────────────────────────────────── -->
+    <section class="tab-panel active" id="tab-dashboard">
+
+      <!-- Métricas -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+              <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <div class="metric-value" id="metric-folios-activos">—</div>
+            <div class="metric-label">Folios Activos</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon amber">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <div class="metric-value" id="metric-folios-hoy">—</div>
+            <div class="metric-label">Folios Hoy</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <div class="metric-value" id="metric-proveedores">—</div>
+            <div class="metric-label">Proveedores Activos</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon red">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="metric-body">
+            <div class="metric-value" id="metric-alertas">—</div>
+            <div class="metric-label">Alertas Activas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agentes + Actividad -->
+      <div class="dashboard-grid">
+
+        <!-- Agentes resumen -->
+        <div class="dashboard-col">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Agentes IA</span>
+              <span class="badge green">2 activos</span>
+            </div>
+            <div class="agent-cards">
+              <div class="agent-summary-card" id="btn-goto-sara" role="button">
+                <div class="agent-avatar sara">S</div>
+                <div class="agent-info">
+                  <div class="agent-name">SARA</div>
+                  <div class="agent-role">AI Vendedora</div>
+                  <div class="agent-status-text">Ventas · Cotización · Cierre</div>
+                </div>
+                <div class="agent-cta">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="agent-summary-card" id="btn-goto-sofia" role="button">
+                <div class="agent-avatar sofia">S</div>
+                <div class="agent-info">
+                  <div class="agent-name">SOFIA</div>
+                  <div class="agent-role">AI Planner</div>
+                  <div class="agent-status-text">Operaciones · GPS · Folios</div>
+                </div>
+                <div class="agent-cta">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline de folios -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Pipeline de Servicios</span>
+              <button class="btn-ghost btn-sm" id="btn-refresh-folios">Actualizar</button>
+            </div>
+            <div class="pipeline-stages">
+              <div class="pipeline-stage" data-estatus="PENDIENTE">
+                <div class="stage-label">PENDIENTE</div>
+                <div class="stage-count" id="stage-pendiente">0</div>
+              </div>
+              <div class="pipeline-stage" data-estatus="EN_BUSQUEDA">
+                <div class="stage-label">EN BÚSQUEDA</div>
+                <div class="stage-count" id="stage-busqueda">0</div>
+              </div>
+              <div class="pipeline-stage" data-estatus="PROGRAMADO">
+                <div class="stage-label">PROGRAMADO</div>
+                <div class="stage-count" id="stage-programado">0</div>
+              </div>
+              <div class="pipeline-stage" data-estatus="EN_PROCESO">
+                <div class="stage-label">EN PROCESO</div>
+                <div class="stage-count amber" id="stage-proceso">0</div>
+              </div>
+              <div class="pipeline-stage" data-estatus="ENTREGADO">
+                <div class="stage-label">ENTREGADO</div>
+                <div class="stage-count blue" id="stage-entregado">0</div>
+              </div>
+              <div class="pipeline-stage" data-estatus="CONCLUIDO">
+                <div class="stage-label">CONCLUIDO</div>
+                <div class="stage-count green" id="stage-concluido">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actividad en tiempo real -->
+        <div class="dashboard-col">
+          <div class="panel panel-stretch">
+            <div class="panel-header">
+              <span class="panel-title">Actividad en Tiempo Real</span>
+              <div class="live-indicator">
+                <span class="live-dot"></span>
+                <span>LIVE</span>
+              </div>
+            </div>
+            <div class="activity-log" id="activity-log">
+              <div class="activity-empty">
+                <span class="mono text-2">Conectando al stream de actividad...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ─── SARA ─────────────────────────────────────────────────────────── -->
+    <section class="tab-panel" id="tab-sara">
+      <div class="agent-workspace">
+
+        <!-- Sidebar SARA -->
+        <aside class="agent-sidebar">
+          <div class="agent-profile sara">
+            <div class="profile-avatar sara">S</div>
+            <div class="profile-info">
+              <div class="profile-name">SARA</div>
+              <div class="profile-role">AI Vendedora · 24/7</div>
+            </div>
+            <div class="profile-badge online">●</div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-label">Capacidades</div>
+            <ul class="capability-list">
+              <li>Prospectar clientes nuevos</li>
+              <li>Cotizar rutas y tarifas</li>
+              <li>Negociar contratos</li>
+              <li>Dar seguimiento a leads</li>
+              <li>Recuperar clientes inactivos</li>
+              <li>Publicar órdenes a SOFIA</li>
+            </ul>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-label">Sesión</div>
+            <div class="session-id mono text-2" id="sara-session-id">Generando...</div>
+          </div>
+
+          <button class="btn-ghost btn-full btn-sm" id="sara-new-session">Nueva sesión</button>
+          <button class="btn-danger btn-full btn-sm" id="sara-clear-chat">Limpiar chat</button>
+        </aside>
+
+        <!-- Chat SARA -->
+        <div class="agent-chat">
+          <div class="chat-messages" id="sara-messages">
+            <div class="message assistant">
+              <div class="message-avatar sara">S</div>
+              <div class="message-bubble">
+                <p>¡Hola! Soy <strong>SARA</strong>, la AI Vendedora de ABSTORAGES Logistics Solutions.</p>
+                <p>Estoy lista para prospectar clientes, generar cotizaciones, negociar contratos y cerrar ventas. ¿En qué te puedo ayudar?</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <textarea
+              id="sara-input"
+              class="chat-input"
+              placeholder="Escribe tu mensaje a SARA..."
+              rows="1"
+            ></textarea>
+            <button class="btn-send" id="sara-send" aria-label="Enviar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ─── SOFIA ─────────────────────────────────────────────────────────── -->
+    <section class="tab-panel" id="tab-sofia">
+      <div class="agent-workspace">
+
+        <!-- Sidebar SOFIA -->
+        <aside class="agent-sidebar">
+          <div class="agent-profile sofia">
+            <div class="profile-avatar sofia">S</div>
+            <div class="profile-info">
+              <div class="profile-name">SOFIA</div>
+              <div class="profile-role">AI Planner · 24/7</div>
+            </div>
+            <div class="profile-badge online">●</div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-label">Capacidades</div>
+            <ul class="capability-list">
+              <li>Buscar transportistas disponibles</li>
+              <li>Confirmar condiciones y anticipo</li>
+              <li>Monitoreo GPS de viajes</li>
+              <li>Control de documentación ABCONTROL</li>
+              <li>Gestión de folios y estatus</li>
+              <li>Protocolos de seguridad y siniestros</li>
+            </ul>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-label">Sesión</div>
+            <div class="session-id mono text-2" id="sofia-session-id">Generando...</div>
+          </div>
+
+          <button class="btn-ghost btn-full btn-sm" id="sofia-new-session">Nueva sesión</button>
+          <button class="btn-danger btn-full btn-sm" id="sofia-clear-chat">Limpiar chat</button>
+        </aside>
+
+        <!-- Chat SOFIA -->
+        <div class="agent-chat">
+          <div class="chat-messages" id="sofia-messages">
+            <div class="message assistant">
+              <div class="message-avatar sofia">S</div>
+              <div class="message-bubble">
+                <p>Hola, soy <strong>SOFIA</strong>, la AI Planner de ABSTORAGES Logistics Solutions.</p>
+                <p>Gestiono la operación completa: busco transportistas, monitoreo viajes por GPS, coordino documentación ABCONTROL y manejo los folios de servicio. ¿Qué necesitas?</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <textarea
+              id="sofia-input"
+              class="chat-input"
+              placeholder="Escribe tu mensaje a SOFIA..."
+              rows="1"
+            ></textarea>
+            <button class="btn-send" id="sofia-send" aria-label="Enviar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/sara.js"></script>
+  <script src="js/sofia.js"></script>
+</body>
+</html>
