@@ -189,7 +189,8 @@ const Sara = (() => {
 
   function scrollToBottom(containerId) {
     const el = document.getElementById(containerId);
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
   }
 
   // Markdown mínimo: negrita, cursiva, código, listas

@@ -1,343 +1,596 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ABSTORAGES AI Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script>
+    // Restore theme before first paint
+    (function() {
+      const t = localStorage.getItem('abs-theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
+
   <!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
   <header class="portal-header">
     <div class="header-brand">
-      <div class="brand-logo">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <rect x="1" y="1" width="26" height="26" rx="4" stroke="#00e87a" stroke-width="1.5"/>
-          <path d="M7 14h14M14 7l7 7-7 7" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="brand-name">ABSTORAGES</span>
-      </div>
-      <div class="brand-sub">AI Portal · Logistics Solutions</div>
+      <img src="/img/logo.png" alt="ABSTORAGES" class="header-logo"/>
     </div>
 
-    <nav class="portal-nav">
-      <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
-      <button class="nav-btn" data-tab="sara">SARA</button>
-      <button class="nav-btn" data-tab="sofia">SOFIA</button>
-    </nav>
+    <!-- Center: agent status pills -->
+    <div class="header-agents">
+      <div class="agent-pill sara">
+        <span class="agent-pill-dot"></span>
+        SARA
+        <span class="pill-label">Activa</span>
+      </div>
+      <span class="pill-sep">·</span>
+      <div class="agent-pill sofia">
+        <span class="agent-pill-dot"></span>
+        SOFIA
+        <span class="pill-label">Activa</span>
+      </div>
+    </div>
 
-    <div class="header-status">
-      <div class="status-dot" id="redis-status" title="Redis"></div>
-      <div class="status-dot online" id="server-status" title="Servidor"></div>
-      <span class="status-label" id="status-text">Conectado</span>
+    <!-- Right -->
+    <div class="header-right">
+      <div class="header-status">
+        <div class="status-dot online" id="server-status" title="Servidor"></div>
+        <span class="status-label" id="status-text">Conectado</span>
+      </div>
+      <div class="header-user" id="header-user">
+        <div class="header-user-dot" id="header-user-dot"></div>
+        <span class="header-user-name" id="header-user-name"></span>
+        <button class="btn-logout" id="btn-logout" title="Cerrar sesión">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" title="Cambiar tema">
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button class="btn-portal" id="btn-open-portal">
+        Ver Portal
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <!-- ─── MAIN ──────────────────────────────────────────────────────────── -->
-  <main class="portal-main">
+  <!-- ─── COMMAND LAYOUT ────────────────────────────────────────────────── -->
+  <main class="command-layout">
 
-    <!-- ─── DASHBOARD ───────────────────────────────────────────────────── -->
-    <section class="tab-panel active" id="tab-dashboard">
-
-      <!-- Métricas -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
-              <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
-              <line x1="8" y1="12" x2="16" y2="12"/>
-            </svg>
-          </div>
-          <div class="metric-body">
-            <div class="metric-value" id="metric-folios-activos">—</div>
-            <div class="metric-label">Folios Activos</div>
-          </div>
+    <!-- ── SARA COLUMN ──────────────────────────────────────────────────── -->
+    <div class="cmd-col cmd-sara">
+      <div class="cmd-col-head sara">
+        <div class="cmd-avatar sara">S</div>
+        <div class="cmd-agent-info">
+          <div class="cmd-name">SARA</div>
+          <div class="cmd-sub">AI Vendedora · 24/7</div>
         </div>
-
-        <div class="metric-card">
-          <div class="metric-icon amber">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
+        <div class="cmd-col-actions">
+          <button class="cmd-action-btn" id="sara-new-session" title="Nueva sesión">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
             </svg>
-          </div>
-          <div class="metric-body">
-            <div class="metric-value" id="metric-folios-hoy">—</div>
-            <div class="metric-label">Folios Hoy</div>
-          </div>
+          </button>
+          <button class="cmd-action-btn" id="sara-clear-chat" title="Limpiar chat">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6M14 11v6"/>
+              <path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
         </div>
+      </div>
+      <span id="sara-session-id" style="display:none;"></span>
 
-        <div class="metric-card">
-          <div class="metric-icon blue">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="metric-body">
-            <div class="metric-value" id="metric-proveedores">—</div>
-            <div class="metric-label">Proveedores Activos</div>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon red">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </div>
-          <div class="metric-body">
-            <div class="metric-value" id="metric-alertas">—</div>
-            <div class="metric-label">Alertas Activas</div>
+      <div class="chat-messages" id="sara-messages">
+        <div class="message assistant">
+          <div class="message-avatar sara">S</div>
+          <div class="message-bubble">
+            <p>¡Hola! Soy <strong>SARA</strong> de ABSTORAGES.</p>
+            <p>¿Cómo puedo ayudarte?</p>
           </div>
         </div>
       </div>
 
-      <!-- Agentes + Actividad -->
-      <div class="dashboard-grid">
-
-        <!-- Agentes resumen -->
-        <div class="dashboard-col">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Agentes IA</span>
-              <span class="badge green">2 activos</span>
-            </div>
-            <div class="agent-cards">
-              <div class="agent-summary-card" id="btn-goto-sara" role="button">
-                <div class="agent-avatar sara">S</div>
-                <div class="agent-info">
-                  <div class="agent-name">SARA</div>
-                  <div class="agent-role">AI Vendedora</div>
-                  <div class="agent-status-text">Ventas · Cotización · Cierre</div>
-                </div>
-                <div class="agent-cta">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </div>
-              </div>
-
-              <div class="agent-summary-card" id="btn-goto-sofia" role="button">
-                <div class="agent-avatar sofia">S</div>
-                <div class="agent-info">
-                  <div class="agent-name">SOFIA</div>
-                  <div class="agent-role">AI Planner</div>
-                  <div class="agent-status-text">Operaciones · GPS · Folios</div>
-                </div>
-                <div class="agent-cta">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pipeline de folios -->
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Pipeline de Servicios</span>
-              <button class="btn-ghost btn-sm" id="btn-refresh-folios">Actualizar</button>
-            </div>
-            <div class="pipeline-stages">
-              <div class="pipeline-stage" data-estatus="PENDIENTE">
-                <div class="stage-label">PENDIENTE</div>
-                <div class="stage-count" id="stage-pendiente">0</div>
-              </div>
-              <div class="pipeline-stage" data-estatus="EN_BUSQUEDA">
-                <div class="stage-label">EN BÚSQUEDA</div>
-                <div class="stage-count" id="stage-busqueda">0</div>
-              </div>
-              <div class="pipeline-stage" data-estatus="PROGRAMADO">
-                <div class="stage-label">PROGRAMADO</div>
-                <div class="stage-count" id="stage-programado">0</div>
-              </div>
-              <div class="pipeline-stage" data-estatus="EN_PROCESO">
-                <div class="stage-label">EN PROCESO</div>
-                <div class="stage-count amber" id="stage-proceso">0</div>
-              </div>
-              <div class="pipeline-stage" data-estatus="ENTREGADO">
-                <div class="stage-label">ENTREGADO</div>
-                <div class="stage-count blue" id="stage-entregado">0</div>
-              </div>
-              <div class="pipeline-stage" data-estatus="CONCLUIDO">
-                <div class="stage-label">CONCLUIDO</div>
-                <div class="stage-count green" id="stage-concluido">0</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Actividad en tiempo real -->
-        <div class="dashboard-col">
-          <div class="panel panel-stretch">
-            <div class="panel-header">
-              <span class="panel-title">Actividad en Tiempo Real</span>
-              <div class="live-indicator">
-                <span class="live-dot"></span>
-                <span>LIVE</span>
-              </div>
-            </div>
-            <div class="activity-log" id="activity-log">
-              <div class="activity-empty">
-                <span class="mono text-2">Conectando al stream de actividad...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div class="chat-input-area">
+        <button class="btn-mic" id="sara-mic" title="Hablar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <textarea id="sara-input" class="chat-input" placeholder="Escribe a SARA..." rows="1"></textarea>
+        <button class="btn-send" id="sara-send" aria-label="Enviar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
       </div>
-    </section>
+    </div>
 
-    <!-- ─── SARA ─────────────────────────────────────────────────────────── -->
-    <section class="tab-panel" id="tab-sara">
-      <div class="agent-workspace">
+    <!-- ── CONTROL DE MANDO ──────────────────────────────────────────────── -->
+    <div class="cmd-center">
 
-        <!-- Sidebar SARA -->
-        <aside class="agent-sidebar">
-          <div class="agent-profile sara">
-            <div class="profile-avatar sara">S</div>
-            <div class="profile-info">
-              <div class="profile-name">SARA</div>
-              <div class="profile-role">AI Vendedora · 24/7</div>
-            </div>
-            <div class="profile-badge online">●</div>
+      <div class="cmd-center-head">
+        <div class="cmd-center-title">Control de Mando</div>
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          <span>LIVE</span>
+        </div>
+      </div>
+
+      <!-- Mini metrics -->
+      <div class="cmd-metrics">
+        <div class="cmd-metric green">
+          <div class="cmd-metric-val" id="metric-folios-activos">—</div>
+          <div class="cmd-metric-label">Folios Activos</div>
+        </div>
+        <div class="cmd-metric amber">
+          <div class="cmd-metric-val" id="metric-folios-hoy">—</div>
+          <div class="cmd-metric-label">Folios Hoy</div>
+        </div>
+        <div class="cmd-metric blue">
+          <div class="cmd-metric-val" id="metric-proveedores">—</div>
+          <div class="cmd-metric-label">Proveedores</div>
+        </div>
+        <div class="cmd-metric red">
+          <div class="cmd-metric-val" id="metric-alertas">—</div>
+          <div class="cmd-metric-label">Alertas</div>
+        </div>
+      </div>
+
+      <!-- Pipeline -->
+      <div class="cmd-pipeline-wrap">
+        <div class="cmd-section-label">
+          Pipeline de Servicios
+          <button class="btn-ghost btn-sm" id="btn-refresh-folios" style="padding:2px 8px;font-size:10px;">↺</button>
+        </div>
+        <div class="cmd-pipeline-stages">
+          <div class="cmd-pipe-stage">
+            <div class="cmd-pipe-count" id="stage-pendiente">0</div>
+            <div class="cmd-pipe-label">Pendiente</div>
           </div>
-
-          <div class="sidebar-section">
-            <div class="sidebar-label">Capacidades</div>
-            <ul class="capability-list">
-              <li>Prospectar clientes nuevos</li>
-              <li>Cotizar rutas y tarifas</li>
-              <li>Negociar contratos</li>
-              <li>Dar seguimiento a leads</li>
-              <li>Recuperar clientes inactivos</li>
-              <li>Publicar órdenes a SOFIA</li>
-            </ul>
+          <div class="cmd-pipe-stage">
+            <div class="cmd-pipe-count" id="stage-busqueda">0</div>
+            <div class="cmd-pipe-label">Búsqueda</div>
           </div>
-
-          <div class="sidebar-section">
-            <div class="sidebar-label">Sesión</div>
-            <div class="session-id mono text-2" id="sara-session-id">Generando...</div>
+          <div class="cmd-pipe-stage">
+            <div class="cmd-pipe-count" id="stage-programado">0</div>
+            <div class="cmd-pipe-label">Programado</div>
           </div>
-
-          <button class="btn-ghost btn-full btn-sm" id="sara-new-session">Nueva sesión</button>
-          <button class="btn-danger btn-full btn-sm" id="sara-clear-chat">Limpiar chat</button>
-        </aside>
-
-        <!-- Chat SARA -->
-        <div class="agent-chat">
-          <div class="chat-messages" id="sara-messages">
-            <div class="message assistant">
-              <div class="message-avatar sara">S</div>
-              <div class="message-bubble">
-                <p>¡Hola! Soy <strong>SARA</strong>, la AI Vendedora de ABSTORAGES Logistics Solutions.</p>
-                <p>Estoy lista para prospectar clientes, generar cotizaciones, negociar contratos y cerrar ventas. ¿En qué te puedo ayudar?</p>
-              </div>
-            </div>
+          <div class="cmd-pipe-stage amber">
+            <div class="cmd-pipe-count" id="stage-proceso">0</div>
+            <div class="cmd-pipe-label">En Proceso</div>
           </div>
-
-          <div class="chat-input-area">
-            <textarea
-              id="sara-input"
-              class="chat-input"
-              placeholder="Escribe tu mensaje a SARA..."
-              rows="1"
-            ></textarea>
-            <button class="btn-send" id="sara-send" aria-label="Enviar">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="22" y1="2" x2="11" y2="13"/>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-              </svg>
-            </button>
+          <div class="cmd-pipe-stage blue">
+            <div class="cmd-pipe-count" id="stage-entregado">0</div>
+            <div class="cmd-pipe-label">Entregado</div>
+          </div>
+          <div class="cmd-pipe-stage green">
+            <div class="cmd-pipe-count" id="stage-concluido">0</div>
+            <div class="cmd-pipe-label">Concluido</div>
           </div>
         </div>
-
       </div>
-    </section>
 
-    <!-- ─── SOFIA ─────────────────────────────────────────────────────────── -->
-    <section class="tab-panel" id="tab-sofia">
-      <div class="agent-workspace">
+      <!-- Alertas Predictivas (solo admin) -->
+      <div class="cmd-alerts admin-only">
+        <div class="cmd-section-label">
+          Alertas Predictivas
+          <span class="cmd-alert-badge" id="cmd-alert-count">0</span>
+          <span style="margin-left:auto;font-size:9px;color:var(--texto3);">IA · Tiempo real</span>
+        </div>
+        <div class="cmd-alert-list" id="cmd-alert-list">
+          <div class="cmd-alert-empty">Analizando patrones...</div>
+        </div>
+      </div>
 
-        <!-- Sidebar SOFIA -->
-        <aside class="agent-sidebar">
-          <div class="agent-profile sofia">
-            <div class="profile-avatar sofia">S</div>
-            <div class="profile-info">
-              <div class="profile-name">SOFIA</div>
-              <div class="profile-role">AI Planner · 24/7</div>
-            </div>
-            <div class="profile-badge online">●</div>
-          </div>
-
-          <div class="sidebar-section">
-            <div class="sidebar-label">Capacidades</div>
-            <ul class="capability-list">
-              <li>Buscar transportistas disponibles</li>
-              <li>Confirmar condiciones y anticipo</li>
-              <li>Monitoreo GPS de viajes</li>
-              <li>Control de documentación ABCONTROL</li>
-              <li>Gestión de folios y estatus</li>
-              <li>Protocolos de seguridad y siniestros</li>
-            </ul>
-          </div>
-
-          <div class="sidebar-section">
-            <div class="sidebar-label">Sesión</div>
-            <div class="session-id mono text-2" id="sofia-session-id">Generando...</div>
-          </div>
-
-          <button class="btn-ghost btn-full btn-sm" id="sofia-new-session">Nueva sesión</button>
-          <button class="btn-danger btn-full btn-sm" id="sofia-clear-chat">Limpiar chat</button>
-        </aside>
-
-        <!-- Chat SOFIA -->
-        <div class="agent-chat">
-          <div class="chat-messages" id="sofia-messages">
-            <div class="message assistant">
-              <div class="message-avatar sofia">S</div>
-              <div class="message-bubble">
-                <p>Hola, soy <strong>SOFIA</strong>, la AI Planner de ABSTORAGES Logistics Solutions.</p>
-                <p>Gestiono la operación completa: busco transportistas, monitoreo viajes por GPS, coordino documentación ABCONTROL y manejo los folios de servicio. ¿Qué necesitas?</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="chat-input-area">
-            <textarea
-              id="sofia-input"
-              class="chat-input"
-              placeholder="Escribe tu mensaje a SOFIA..."
-              rows="1"
-            ></textarea>
-            <button class="btn-send" id="sofia-send" aria-label="Enviar">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="22" y1="2" x2="11" y2="13"/>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-              </svg>
-            </button>
+      <!-- Activity log (solo admin) -->
+      <div class="cmd-activity admin-only">
+        <div class="cmd-section-label">
+          Actividad en Tiempo Real
+          <div class="live-indicator" style="margin-left:auto;">
+            <span class="live-dot"></span>
           </div>
         </div>
-
+        <div class="activity-log" id="activity-log">
+          <div class="activity-empty">
+            <span class="mono text-2">Conectando al stream...</span>
+          </div>
+        </div>
       </div>
-    </section>
+
+      <button class="cmd-portal-btn" id="btn-open-portal-2">
+        Ver Portal Completo
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- ── SOFIA COLUMN ──────────────────────────────────────────────────── -->
+    <div class="cmd-col cmd-sofia">
+      <div class="cmd-col-head sofia">
+        <div class="cmd-avatar sofia">S</div>
+        <div class="cmd-agent-info">
+          <div class="cmd-name">SOFIA</div>
+          <div class="cmd-sub">AI Planner · 24/7</div>
+        </div>
+        <div class="cmd-col-actions">
+          <button class="cmd-action-btn" id="sofia-new-session" title="Nueva sesión">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+            </svg>
+          </button>
+          <button class="cmd-action-btn" id="sofia-clear-chat" title="Limpiar chat">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6M14 11v6"/>
+              <path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <span id="sofia-session-id" style="display:none;"></span>
+
+      <div class="chat-messages" id="sofia-messages">
+        <div class="message assistant">
+          <div class="message-avatar sofia">S</div>
+          <div class="message-bubble">
+            <p>¡Hola! Soy <strong>SOFIA</strong> de ABSTORAGES, del equipo de operaciones.</p>
+            <p>¿Cómo puedo ayudarte?</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <button class="btn-mic" id="sofia-mic" title="Hablar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <textarea id="sofia-input" class="chat-input" placeholder="Escribe a SOFIA..." rows="1"></textarea>
+        <button class="btn-send" id="sofia-send" aria-label="Enviar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
   </main>
 
+  <!-- ─── PORTAL OVERLAY ──────────────────────────────────────────────────── -->
+  <div class="portal-overlay" id="portal-overlay">
+    <div class="portal-overlay-panel">
+
+      <div class="portal-overlay-head">
+        <button class="btn-close-portal" id="btn-close-portal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver al Control de Mando
+        </button>
+        <div class="portal-overlay-title">Portal ABSTORAGES</div>
+        <div class="header-status" style="margin-left:auto;">
+          <div class="status-dot" id="redis-status" title="Redis"></div>
+        </div>
+      </div>
+
+      <div class="portal-overlay-body">
+
+        <!-- Tarifario Dinámico (solo admin) -->
+        <div class="tariff-bar admin-only">
+          <div class="tariff-header">
+            <span class="tariff-title">Tarifario Dinámico</span>
+            <span class="tariff-live">● LIVE</span>
+            <span class="tariff-updated" id="tariff-updated"></span>
+          </div>
+          <div class="tariff-metrics">
+            <div class="tariff-metric">
+              <div class="tariff-label">Diesel</div>
+              <div class="tariff-val" id="tariff-diesel">—</div>
+            </div>
+            <div class="tariff-metric">
+              <div class="tariff-label">Demanda</div>
+              <div class="tariff-val" id="tariff-demand">—</div>
+            </div>
+            <div class="tariff-metric">
+              <div class="tariff-label">Multiplicador</div>
+              <div class="tariff-val text-amber" id="tariff-mult">—</div>
+            </div>
+            <div class="tariff-rutas-wrap">
+              <div class="tariff-label" style="margin-bottom:6px;">Precios de referencia (mercado actual)</div>
+              <div class="tariff-rutas" id="tariff-rutas"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs de agentes (solo admin) -->
+        <div class="kpi-grid admin-only">
+
+          <!-- SARA KPIs -->
+          <div class="kpi-panel sara kpi-clickable" onclick="KpiDetail.open('sara')" title="Ver detalle de SARA">
+            <div class="kpi-panel-header">
+              <div class="kpi-agent-avatar sara">S</div>
+              <div>
+                <div class="kpi-agent-name">SARA</div>
+                <div class="kpi-agent-sub">Performance comercial</div>
+              </div>
+              <div class="kpi-live-dot sara"></div>
+            </div>
+
+            <div class="kpi-cards">
+              <div class="kpi-card">
+                <div class="kpi-value green" id="kpi-sara-llamadas">—</div>
+                <div class="kpi-label">Llamadas hoy</div>
+                <div class="kpi-sub" id="kpi-sara-llamadas-sub"></div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-value green" id="kpi-sara-altas">—</div>
+                <div class="kpi-label">Clientes dados de alta</div>
+                <div class="kpi-sub">Este mes</div>
+              </div>
+              <div class="kpi-card kpi-card-wide">
+                <div class="kpi-venta-row">
+                  <div>
+                    <div class="kpi-value green" id="kpi-sara-venta">—</div>
+                    <div class="kpi-label">Venta del mes</div>
+                  </div>
+                  <div class="kpi-vs">vs</div>
+                  <div>
+                    <div class="kpi-value muted" id="kpi-sara-meta">—</div>
+                    <div class="kpi-label">Meta</div>
+                  </div>
+                  <div id="kpi-sara-progreso-wrap">
+                    <div class="kpi-pct" id="kpi-sara-pct">—</div>
+                    <div class="kpi-label">Cumplimiento</div>
+                  </div>
+                </div>
+                <div class="kpi-bar-track">
+                  <div class="kpi-bar-fill green" id="kpi-sara-bar" style="width:0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kpi-pipeline-title">Estatus de prospectos</div>
+            <div class="kpi-pipeline" id="kpi-sara-pipeline"></div>
+          </div>
+
+          <!-- SOFIA KPIs -->
+          <div class="kpi-panel sofia kpi-clickable" onclick="KpiDetail.open('sofia')" title="Ver detalle de SOFIA">
+            <div class="kpi-panel-header">
+              <div class="kpi-agent-avatar sofia">S</div>
+              <div>
+                <div class="kpi-agent-name">SOFIA</div>
+                <div class="kpi-agent-sub">Performance operativa</div>
+              </div>
+              <div class="kpi-live-dot sofia"></div>
+            </div>
+
+            <div class="kpi-cards">
+              <div class="kpi-card">
+                <div class="kpi-value blue" id="kpi-sofia-proveedores">—</div>
+                <div class="kpi-label">Proveedores dados de alta</div>
+                <div class="kpi-sub">Este mes</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-value blue" id="kpi-sofia-servicios-dia">—</div>
+                <div class="kpi-label">Servicios colocados</div>
+                <div class="kpi-sub">Hoy</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-value blue" id="kpi-sofia-servicios-mes">—</div>
+                <div class="kpi-label">Servicios colocados</div>
+                <div class="kpi-sub">Este mes</div>
+              </div>
+            </div>
+
+            <div class="kpi-pipeline-title">Pipeline de servicios activos</div>
+            <div class="kpi-pipeline" id="kpi-sofia-pipeline"></div>
+          </div>
+
+        </div>
+
+        <!-- Mapa GPS -->
+        <div class="gps-section">
+          <div class="gps-section-header">
+            <div>
+              <span class="panel-title">Unidades en Ruta</span>
+              <span id="gps-counter" style="margin-left:12px;"></span>
+            </div>
+            <div class="live-indicator"><span class="live-dot"></span><span>LIVE</span></div>
+          </div>
+          <div class="gps-layout">
+            <div id="gps-map"></div>
+            <div class="gps-sidebar">
+              <div class="gps-sidebar-title">Flota activa</div>
+              <div id="gps-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Últimos leads capturados (solo admin) -->
+        <div class="leads-section admin-only">
+          <div class="leads-header">
+            <span class="panel-title">Últimos leads capturados</span>
+            <span class="leads-updated" id="leads-updated"></span>
+          </div>
+          <div class="leads-scroll-wrap">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th>HACE</th>
+                  <th>NOMBRE</th>
+                  <th>EMPRESA</th>
+                  <th>RUTA</th>
+                  <th>CARGA</th>
+                  <th>PESO</th>
+                  <th>TEL</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="leads-tbody">
+                <tr><td colspan="8" class="leads-empty">Cargando leads...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── KPI DETAIL OVERLAY ──────────────────────────────────────────────── -->
+  <div class="kpi-overlay" id="kpi-overlay">
+    <div class="kpi-detail-panel" id="kpi-detail-panel">
+      <div class="kd-header" id="kd-header">
+        <button class="kd-back" onclick="KpiDetail.close()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver
+        </button>
+        <div class="kd-title-block">
+          <div class="kpi-agent-avatar" id="kd-avatar"></div>
+          <div>
+            <div class="kd-name" id="kd-name"></div>
+            <div class="kd-sub" id="kd-sub"></div>
+          </div>
+        </div>
+        <div class="kd-filters" id="kd-filters"></div>
+      </div>
+      <div class="kd-body" id="kd-body"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/gps-map.js"></script>
+  <script src="js/kpi-detail.js"></script>
   <script src="js/sara.js"></script>
   <script src="js/sofia.js"></script>
+  <script src="js/features.js"></script>
+
+  <script>
+    // ── Roles & sesión ──────────────────────────────────────────────────────
+    (async () => {
+      try {
+        const me = await fetch('/api/me').then(r => r.json());
+        const body = document.body;
+        body.setAttribute('data-role', me.role);
+
+        // Header: nombre + color por rol
+        const dot  = document.getElementById('header-user-dot');
+        const name = document.getElementById('header-user-name');
+        if (dot && name) {
+          name.textContent = me.nombre;
+          dot.className = 'header-user-dot role-' + me.role;
+        }
+
+        // Ajustar columnas según rol
+        if (me.role === 'transportista') {
+          // Transportista: enfoca columna SOFIA, oculta columna SARA
+          document.querySelector('.cmd-sara')?.classList.add('hidden-role');
+          // Mueve SOFIA al centro lógico expandiendo el grid
+          document.querySelector('.command-layout')?.classList.add('layout-single-right');
+        } else if (me.role === 'cliente') {
+          // Cliente: enfoca columna SARA, oculta columna SOFIA
+          document.querySelector('.cmd-sofia')?.classList.add('hidden-role');
+          document.querySelector('.command-layout')?.classList.add('layout-single-left');
+        }
+
+        // Ocultar "Ver Portal" para roles externos si portal está vacío
+        if (me.role !== 'admin') {
+          const portalBody = document.querySelector('.portal-overlay-body');
+          if (portalBody) {
+            const hasContent = portalBody.querySelectorAll(':not(.admin-only)').length > 2;
+            if (!hasContent) {
+              document.getElementById('btn-open-portal')?.classList.add('hidden-role');
+              document.getElementById('btn-open-portal-2')?.classList.add('hidden-role');
+            }
+          }
+        }
+      } catch(e) {
+        window.location.href = '/login';
+      }
+    })();
+
+    // ── Logout ──────────────────────────────────────────────────────────────
+    document.getElementById('btn-logout')?.addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login';
+    });
+
+    // ── Theme toggle ────────────────────────────────────────────────────────
+    const html = document.documentElement;
+    const themeBtn = document.getElementById('theme-toggle');
+
+    function setTheme(t) {
+      html.setAttribute('data-theme', t);
+      localStorage.setItem('abs-theme', t);
+    }
+
+    themeBtn.addEventListener('click', () => {
+      setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    // ── Portal overlay ──────────────────────────────────────────────────────
+    function openPortal() {
+      document.getElementById('portal-overlay').classList.add('open');
+    }
+    function closePortal() {
+      document.getElementById('portal-overlay').classList.remove('open');
+    }
+
+    document.getElementById('btn-open-portal').addEventListener('click', openPortal);
+    document.getElementById('btn-open-portal-2').addEventListener('click', openPortal);
+    document.getElementById('btn-close-portal').addEventListener('click', closePortal);
+
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePortal();
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "admin-001",
+    "nombre": "Admin ABSTORAGES",
+    "email": "admin@abstorages.com",
+    "password": "abstorages2025",
+    "role": "admin"
+  },
+  {
+    "id": "cliente-001",
+    "nombre": "Rafael Garza",
+    "empresa": "Bonafont",
+    "email": "rafael@bonafont.com",
+    "password": "cliente123",
+    "role": "cliente",
+    "folios": ["ABST-000101"]
+  },
+  {
+    "id": "op-001",
+    "nombre": "Juan Hernández",
+    "email": "juan@op.com",
+    "password": "operador123",
+    "role": "transportista",
+    "placa": "GDL-8821",
+    "viajes": ["ABST-000101"]
+  }
+]

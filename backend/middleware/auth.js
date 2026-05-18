@@ -1,23 +1,28 @@
-require('dotenv').config();
+const sessions = require('../services/sessions');
 
-function basicAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
+const PUBLIC_PATHS = ['/login', '/api/login', '/api/logout', '/webhook/whatsapp', '/favicon.ico'];
 
-  if (!authHeader || !authHeader.startsWith('Basic ')) {
-    res.set('WWW-Authenticate', 'Basic realm="ABSTORAGES AI Portal"');
-    return res.status(401).json({ error: 'Autenticación requerida' });
-  }
-
-  const base64 = authHeader.slice(6);
-  const decoded = Buffer.from(base64, 'base64').toString('utf8');
-  const [username, password] = decoded.split(':');
-
-  if (username === process.env.PORTAL_USERNAME && password === process.env.PORTAL_PASSWORD) {
-    return next();
-  }
-
-  res.set('WWW-Authenticate', 'Basic realm="ABSTORAGES AI Portal"');
-  return res.status(401).json({ error: 'Credenciales inválidas' });
+function parseCookie(header, name) {
+  if (!header) return null;
+  const match = header.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
+  return match ? match[1] : null;
 }
 
-module.exports = basicAuth;
+function auth(req, res, next) {
+  if (PUBLIC_PATHS.some(p => req.path === p || req.path.startsWith(p + '?'))) return next();
+
+  const sessionId = parseCookie(req.headers.cookie, 'abs_session');
+  const user = sessions.get(sessionId);
+
+  if (!user) {
+    const wantsHtml = req.headers.accept?.includes('text/html') && req.method === 'GET';
+    return wantsHtml
+      ? res.redirect('/login')
+      : res.status(401).json({ error: 'No autenticado' });
+  }
+
+  req.user = user;
+  next();
+}
+
+module.exports = auth;

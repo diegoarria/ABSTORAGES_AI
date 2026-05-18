@@ -6,7 +6,7 @@
   <title>ABSTORAGES — AI Simulator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     /* ── TOKENS ─────────────────────────────────────────────── */
     :root {
@@ -35,7 +35,7 @@
       --t2: #7e8899;
       --t3: #4a5568;
 
-      --sans: 'Syne', sans-serif;
+      --sans: 'Poppins', sans-serif;
       --mono: 'DM Mono', monospace;
       --r: 10px;
       --r2: 14px;
@@ -102,18 +102,18 @@
       display: flex; align-items: center;
     }
     .h-logo-img {
-      height: 30px;
+      height: 38px;
       width: auto;
       display: block;
       background: #fff;
       border-radius: 6px;
-      padding: 4px 10px;
+      padding: 5px 12px;
       box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 2px 12px rgba(0,0,0,.4);
     }
     .h-sep { width: 1px; height: 20px; background: var(--br2); margin: 0 18px; }
     .h-title {
       font-size: 12px; font-weight: 600; color: var(--t2);
-      letter-spacing: .06em;
+      letter-spacing: 0.01em;
     }
 
     /* center: agent pills */
@@ -127,7 +127,7 @@
       border-radius: 100px;
       font-size: 12px; font-weight: 700;
       border: 1px solid;
-      letter-spacing: .04em;
+      letter-spacing: 0.01em;
     }
     .h-agent-pill.sara {
       background: var(--g10);
@@ -176,7 +176,7 @@
 
     .sc-label {
       font-family: var(--mono); font-size: 9px; font-weight: 500;
-      color: var(--t3); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--t3); letter-spacing: 0.03em; text-transform: uppercase;
       white-space: nowrap; flex-shrink: 0;
     }
 
@@ -267,11 +267,11 @@
     .panel.sofia .p-avatar { background: var(--b10); color: var(--b); border: 1px solid var(--b18); box-shadow: 0 0 20px rgba(74,158,255,.12); }
 
     .p-info { flex:1 }
-    .p-name { font-size: 17px; font-weight: 800; letter-spacing:.04em; line-height:1; }
+    .p-name { font-size: 17px; font-weight: 800; letter-spacing:0.01em; line-height:1; }
     .panel.sara  .p-name { color: var(--g); text-shadow: 0 0 20px rgba(0,232,122,.25); }
     .panel.sofia .p-name { color: var(--b); text-shadow: 0 0 20px rgba(74,158,255,.25); }
 
-    .p-role { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-top: 3px; letter-spacing:.06em; }
+    .p-role { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-top: 3px; letter-spacing:0.01em; }
 
     .p-status { display:flex; align-items:center; gap:6px; }
     .p-status-dot {
@@ -291,7 +291,7 @@
     .p-tag {
       font-family: var(--mono); font-size: 9px; font-weight: 500;
       padding: 2px 8px; border-radius: 4px;
-      letter-spacing:.05em;
+      letter-spacing:0.01em;
     }
     .panel.sara  .p-tag { background: var(--g10); color: rgba(0,232,122,.7); border: 1px solid rgba(0,232,122,.12); }
     .panel.sofia .p-tag { background: var(--b10); color: rgba(74,158,255,.7); border: 1px solid rgba(74,158,255,.12); }
@@ -340,7 +340,7 @@
 
     .msg-name {
       font-family: var(--mono); font-size: 9px; color: var(--t3);
-      letter-spacing: .06em; padding: 0 4px;
+      letter-spacing: 0.01em; padding: 0 4px;
     }
     .panel.sara  .msg.assistant .msg-name { color: rgba(0,232,122,.5); }
     .panel.sofia .msg.assistant .msg-name { color: rgba(74,158,255,.5); }
@@ -474,7 +474,7 @@
 
     .bus-top-label {
       font-family: var(--mono); font-size: 8px; color: var(--t3);
-      letter-spacing:.1em; text-transform:uppercase;
+      letter-spacing:0.02em; text-transform:uppercase;
       writing-mode: vertical-rl; user-select:none;
     }
 
@@ -516,14 +516,14 @@
       font-family: var(--mono); font-size: 8px;
       color: var(--t3); text-align:center;
       writing-mode: vertical-rl;
-      letter-spacing:.06em; transition: color .3s;
+      letter-spacing:0.01em; transition: color .3s;
       user-select:none; word-break:break-all;
     }
     .bus-folio.fire { color: var(--am); font-weight:500; }
 
     .bus-bottom-label {
       font-family: var(--mono); font-size: 8px; color: var(--t3);
-      letter-spacing:.1em; text-transform:uppercase;
+      letter-spacing:0.02em; text-transform:uppercase;
       writing-mode: vertical-rl; user-select:none;
     }
 
@@ -547,6 +547,41 @@
       0%   { opacity:1; transform:translateY(0) translateX(var(--dx)) scale(1); }
       100% { opacity:0; transform:translateY(40px) translateX(calc(var(--dx)*2)) scale(0.2); }
     }
+
+    /* ── WAR ROOM STEPS ────────────────────────────────────────────── */
+    .warroom-steps {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 14px;
+      background: rgba(74,158,255,.04);
+      border-bottom: 1px solid rgba(74,158,255,.12);
+    }
+    .warroom-steps.active { display: flex; }
+    .wr-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--t2);
+      opacity: 0;
+      transform: translateX(-6px);
+      animation: wrStepIn .3s ease forwards;
+    }
+    @keyframes wrStepIn {
+      to { opacity:1; transform:translateX(0); }
+    }
+    .wr-step.done  { color: var(--b); }
+    .wr-step.active-step { color: var(--t1); }
+    .wr-icon {
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; flex-shrink: 0;
+    }
+    .wr-icon.pending { border: 1px solid var(--br3); color: var(--t3); }
+    .wr-icon.running { background: var(--b18); border: 1px solid var(--b); color: var(--b); animation: wrSpin .8s linear infinite; }
+    .wr-icon.done    { background: rgba(0,232,122,.12); border: 1px solid var(--g30); color: var(--g); }
+    @keyframes wrSpin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -635,7 +670,7 @@
         <div class="msg-av sara">S</div>
         <div class="msg-body">
           <span class="msg-name">SARA · AI Vendedora</span>
-          <div class="bubble"><p>¡Hola! Soy <strong>SARA</strong>, la AI Vendedora de ABSTORAGES Logistics Solutions.</p><p>Estoy lista para prospectar, cotizar, negociar y cerrar servicios de transporte. ¿En qué te puedo ayudar?</p></div>
+          <div class="bubble"><p>¡Hola! Soy <strong>SARA</strong> de ABSTORAGES.</p><p>¿Cómo puedo ayudarte?</p></div>
         </div>
       </div>
     </div>
@@ -694,12 +729,15 @@
       <span id="sofia-notif-txt"></span>
     </div>
 
+    <!-- War room: pasos de ejecución de SOFIA -->
+    <div class="warroom-steps" id="warroom-steps"></div>
+
     <div class="msgs" id="sofia-msgs">
       <div class="msg assistant">
         <div class="msg-av sofia">S</div>
         <div class="msg-body">
           <span class="msg-name">SOFIA · AI Planner</span>
-          <div class="bubble"><p>Soy <strong>SOFIA</strong>, la AI Planner de ABSTORAGES.</p><p>Estoy escuchando el canal Redis. Cuando SARA cierre una venta, recibiré el evento <code>nueva_orden</code> y ejecutaré el flujo de colocación automáticamente.</p></div>
+          <div class="bubble"><p>¡Hola! Soy <strong>SOFIA</strong> de ABSTORAGES, del equipo de operaciones.</p><p>¿Cómo puedo ayudarte?</p></div>
         </div>
       </div>
     </div>

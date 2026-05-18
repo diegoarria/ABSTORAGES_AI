@@ -199,13 +199,67 @@ const Sim = (() => {
     }, 3500);
   }
 
+  // ─── WAR ROOM — pasos de SOFIA en tiempo real ────────────────────────────
+  const SOFIA_STEPS = [
+    { label: 'Recibiendo nueva_orden del canal Redis...' },
+    { label: 'Validando folio y datos del cliente' },
+    { label: 'Consultando proveedores disponibles' },
+    { label: 'Verificando unidades ABCONTROL' },
+    { label: 'Generando propuesta de asignación' },
+  ];
+
+  async function showWarRoomSteps() {
+    const panel = document.getElementById('warroom-steps');
+    if (!panel) return;
+
+    panel.innerHTML = '';
+    panel.classList.add('active');
+
+    for (let i = 0; i < SOFIA_STEPS.length; i++) {
+      const step = document.createElement('div');
+      step.className = 'wr-step';
+      step.style.animationDelay = `${i * 180}ms`;
+      step.innerHTML = `
+        <div class="wr-icon pending" id="wr-icon-${i}">○</div>
+        <span id="wr-lbl-${i}">${SOFIA_STEPS[i].label}</span>`;
+      panel.appendChild(step);
+    }
+
+    for (let i = 0; i < SOFIA_STEPS.length; i++) {
+      await delay(400 + i * 350);
+      const icon = document.getElementById(`wr-icon-${i}`);
+      const lbl  = document.getElementById(`wr-lbl-${i}`);
+      if (!icon) continue;
+      icon.className = 'wr-icon running';
+      icon.textContent = '↻';
+      lbl?.parentElement?.classList.add('active-step');
+      await delay(600);
+      icon.className = 'wr-icon done';
+      icon.textContent = '✓';
+      lbl?.parentElement?.classList.remove('active-step');
+      lbl?.parentElement?.classList.add('done');
+    }
+  }
+
+  async function hideWarRoomSteps() {
+    const panel = document.getElementById('warroom-steps');
+    if (panel) {
+      panel.classList.remove('active');
+      await delay(400);
+      panel.innerHTML = '';
+    }
+  }
+
   // ─── AUTO REACCION SOFIA ──────────────────────────────────────────────────
   async function autoSofiaReaccion(folio) {
-    const msgSofia = `Acabo de recibir una nueva orden de SARA. Folio: ${folio}. Ejecuta el Paso 1 del Flujo Primario: confirma recepción del requerimiento y describe brevemente los próximos 2 pasos que harás para colocar el servicio.`;
+    const msgSofia = `Acabo de recibir una nueva orden de SARA. Folio: ${folio}. Ejecuta el Paso 1 del Flujo Primario: confirma recepción, nombra al cliente, y describe los próximos 3 pasos concretos que ejecutarás para colocar el servicio.`;
 
+    await delay(400);
+    showWarRoomSteps(); // no awaiteamos — corre en paralelo mientras SOFIA piensa
     await delay(800);
-    agregarMsg('sofia', 'user', `[sistema] nueva_orden: ${folio}`);
+    agregarMsg('sofia', 'user', `[sistema] nueva_orden recibida: ${folio}`);
     await streamRespuesta('sofia', msgSofia);
+    await hideWarRoomSteps();
   }
 
   // ─── DETECCIÓN CIERRE ─────────────────────────────────────────────────────
@@ -287,8 +341,8 @@ const Sim = (() => {
     sofiaSession = genId();
     folioCount = 1;
 
-    agregarMsg('sara', 'assistant', '¡Hola! Soy **SARA**, la AI Vendedora de ABSTORAGES. ¿En qué te puedo ayudar?');
-    agregarMsg('sofia', 'assistant', 'Soy **SOFIA**, la AI Planner. Escuchando el event bus — en cuanto SARA cierre una venta, actúo automáticamente.');
+    agregarMsg('sara', 'assistant', '¡Hola! Soy **SARA** de ABSTORAGES. ¿Cómo puedo ayudarte?');
+    agregarMsg('sofia', 'assistant', '¡Hola! Soy **SOFIA** de ABSTORAGES, del equipo de operaciones. ¿Cómo puedo ayudarte?');
   }
 
   // ─── MARKDOWN BÁSICO ──────────────────────────────────────────────────────
