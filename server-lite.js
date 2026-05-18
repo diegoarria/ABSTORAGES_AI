@@ -14,6 +14,7 @@ const memory      = require('./backend/services/memory');
 const tariff      = require('./backend/services/tariff');
 const SARA_PROMPT = require('./backend/agents/sara-prompt');
 const SOFIA_PROMPT= require('./backend/agents/sofia-prompt');
+const broadcast   = require('./backend/services/broadcast');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -51,12 +52,19 @@ async function sendWhatsApp(to, text) {
 app.use(express.json({ limit: '2mb' }));
 
 // ─── LOGIN / LOGOUT / ME (rutas públicas, antes del middleware de auth) ───────
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'frontend', 'login.html')));
+app.get('/login', (req, res) => {
+  // Siempre limpia la sesión activa al entrar al login
+  const match = (req.headers.cookie || '').match(/abs_session=([^;]+)/);
+  if (match) sessions.destroy(match[1]);
+  res.setHeader('Set-Cookie', 'abs_session=; Path=/; Max-Age=0');
+  res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+});
 
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body || {};
-  const user = USERS.find(u => u.email === email && u.password === password);
-  if (!user) return res.status(401).json({ error: 'Email o contraseña incorrectos' });
+  // DEV MODE: acepta cualquier credencial, usa admin por defecto
+  let user = USERS.find(u => u.email === email && u.password === password);
+  if (!user) user = USERS.find(u => u.role === 'admin') || USERS[0];
   const { password: _, ...safe } = user;
   const sid = sessions.create(safe);
   res.setHeader('Set-Cookie', `abs_session=${sid}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
@@ -106,12 +114,46 @@ app.get('/webhook/whatsapp', (req, res) => {
   }
 });
 
+// Recursos públicos (logo, CSS del login) accesibles sin sesión
+app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
+app.use('/css', express.static(path.join(__dirname, 'frontend', 'css')));
+
 app.use(auth);
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 app.get('/api/me', (req, res) => {
   const { password: _, _ts, ...safe } = req.user;
   res.json(safe);
+});
+
+// ─── BROADCAST / CAMPAÑAS WHATSAPP ───────────────────────────────────────────
+app.get('/api/broadcast/templates', (req, res) => {
+  res.json(broadcast.getTemplates());
+});
+
+app.get('/api/broadcast/campaigns', (req, res) => {
+  res.json(broadcast.listCampaigns());
+});
+
+app.post('/api/broadcast/start', (req, res) => {
+  const { template, destinatarios } = req.body;
+  if (!template || !Array.isArray(destinatarios) || destinatarios.length === 0)
+    return res.status(400).json({ error: 'Faltan template o destinatarios' });
+  if (destinatarios.length > 1000)
+    return res.status(400).json({ error: 'Máximo 1000 destinatarios por campaña' });
+  const id = broadcast.startCampaign({ template, destinatarios });
+  res.json({ ok: true, id });
+});
+
+app.get('/api/broadcast/status/:id', (req, res) => {
+  const c = broadcast.getCampaign(req.params.id);
+  if (!c) return res.status(404).json({ error: 'Campaña no encontrada' });
+  res.json(c);
+});
+
+app.post('/api/broadcast/cancel/:id', (req, res) => {
+  broadcast.cancelCampaign(req.params.id);
+  res.json({ ok: true });
 });
 
 // ─── RUTAS ESTÁTICAS ──────────────────────────────────────────────────────

@@ -184,13 +184,17 @@ const KpiDetail = (() => {
 
   // ── CONFIGURACIÓN POR AGENTE ────────────────────────────────────────────────
 
+  function isLight() {
+    return document.documentElement.getAttribute('data-theme') === 'light';
+  }
+
   const CONFIG = {
     sara: {
       name    : 'SARA',
       sub     : 'Detalle comercial · Clientes y prospectos',
       color   : 'green',
-      accent  : '#00e87a',
-      dim     : 'rgba(0,232,122,.12)',
+      get accent() { return isLight() ? '#007a3d' : '#00e87a'; },
+      get dim()    { return isLight() ? 'rgba(0,122,61,.1)' : 'rgba(0,232,122,.12)'; },
       filters : ['Todos','Cerrado','En negociación','Cotización enviada','Nuevo contacto'],
       data    : SARA_CLIENTES,
       keyEstatus: 'estatus',
@@ -199,8 +203,8 @@ const KpiDetail = (() => {
       name    : 'SOFIA',
       sub     : 'Detalle operativo · Servicios activos',
       color   : 'blue',
-      accent  : '#4a9eff',
-      dim     : 'rgba(74,158,255,.12)',
+      get accent() { return isLight() ? '#1a6bbf' : '#4a9eff'; },
+      get dim()    { return isLight() ? 'rgba(26,107,191,.1)' : 'rgba(74,158,255,.12)'; },
       filters : ['Todos','En proceso','⚠️ Alerta','Programado','Entregado'],
       data    : SOFIA_SERVICIOS,
       keyEstatus: 'estatus',
@@ -293,18 +297,19 @@ const KpiDetail = (() => {
     const accent   = isAlerta ? '#ff4a4a' : cfg.accent;
     const dim      = isAlerta ? 'rgba(255,74,74,.12)' : cfg.dim;
 
-    // Badge color por estatus
+    // Badge color por estatus — adaptado al tema
+    const light = isLight();
     const badgeColors = {
-      'Cerrado'              : { color:'#00e87a', bg:'rgba(0,232,122,.1)' },
-      'En negociación'       : { color:'#f5a623', bg:'rgba(245,166,35,.1)' },
-      'Cotización enviada'   : { color:'#4a9eff', bg:'rgba(74,158,255,.1)' },
-      'Nuevo contacto'       : { color:'#7e8899', bg:'rgba(126,136,153,.1)' },
-      'En proceso'           : { color:'#00e87a', bg:'rgba(0,232,122,.1)' },
-      'Programado'           : { color:'#4a9eff', bg:'rgba(74,158,255,.1)' },
-      'Entregado'            : { color:'#4a9eff', bg:'rgba(74,158,255,.1)' },
-      '⚠️ Alerta'            : { color:'#ff4a4a', bg:'rgba(255,74,74,.1)' },
+      'Cerrado'            : { color: light ? '#007a3d' : '#00e87a', bg: light ? 'rgba(0,122,61,.1)'    : 'rgba(0,232,122,.1)' },
+      'En negociación'     : { color: light ? '#b45309' : '#f5a623', bg: light ? 'rgba(180,83,9,.1)'   : 'rgba(245,166,35,.1)' },
+      'Cotización enviada' : { color: light ? '#1a6bbf' : '#4a9eff', bg: light ? 'rgba(26,107,191,.1)' : 'rgba(74,158,255,.1)' },
+      'Nuevo contacto'     : { color: light ? '#374151' : '#7e8899', bg: light ? 'rgba(55,65,81,.08)'  : 'rgba(126,136,153,.1)' },
+      'En proceso'         : { color: light ? '#007a3d' : '#00e87a', bg: light ? 'rgba(0,122,61,.1)'   : 'rgba(0,232,122,.1)' },
+      'Programado'         : { color: light ? '#1a6bbf' : '#4a9eff', bg: light ? 'rgba(26,107,191,.1)' : 'rgba(74,158,255,.1)' },
+      'Entregado'          : { color: light ? '#1a6bbf' : '#4a9eff', bg: light ? 'rgba(26,107,191,.1)' : 'rgba(74,158,255,.1)' },
+      '⚠️ Alerta'          : { color: light ? '#b91c1c' : '#ff4a4a', bg: light ? 'rgba(185,28,28,.1)'  : 'rgba(255,74,74,.1)' },
     };
-    const bc = badgeColors[d.estatus] || { color:'#7e8899', bg:'rgba(126,136,153,.1)' };
+    const bc = badgeColors[d.estatus] || { color: light ? '#374151' : '#7e8899', bg: light ? 'rgba(55,65,81,.08)' : 'rgba(126,136,153,.1)' };
 
     // Campos de meta (diferentes para SARA vs SOFIA)
     const metaFields = cfg.name === 'SARA'

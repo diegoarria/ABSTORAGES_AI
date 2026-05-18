@@ -166,13 +166,16 @@ const Sofia = (() => {
     const messages = document.getElementById('sofia-messages');
     const div = document.createElement('div');
     div.className = 'message assistant';
-    div.innerHTML = `
-      <div class="message-avatar sofia">S</div>
-      <div class="message-bubble" id="sofia-stream-bubble"></div>
-    `;
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar sofia';
+    avatar.textContent = 'S';
+    div.appendChild(avatar);
+    div.appendChild(bubble);
     messages.appendChild(div);
     scrollToBottom('sofia-messages');
-    return document.getElementById('sofia-stream-bubble');
+    return bubble;
   }
 
   function agregarMensajeError(texto) {
@@ -212,7 +215,9 @@ const Sofia = (() => {
   function scrollToBottom(containerId) {
     const el = document.getElementById(containerId);
     if (!el) return;
-    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    }));
   }
 
   function renderMarkdown(text) {

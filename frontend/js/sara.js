@@ -144,13 +144,16 @@ const Sara = (() => {
     const messages = document.getElementById('sara-messages');
     const div = document.createElement('div');
     div.className = 'message assistant';
-    div.innerHTML = `
-      <div class="message-avatar sara">S</div>
-      <div class="message-bubble" id="sara-stream-bubble"></div>
-    `;
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar sara';
+    avatar.textContent = 'S';
+    div.appendChild(avatar);
+    div.appendChild(bubble);
     messages.appendChild(div);
     scrollToBottom('sara-messages');
-    return document.getElementById('sara-stream-bubble');
+    return bubble;
   }
 
   function agregarMensajeError(agente, texto) {
@@ -190,7 +193,10 @@ const Sara = (() => {
   function scrollToBottom(containerId) {
     const el = document.getElementById(containerId);
     if (!el) return;
-    requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+    // Doble RAF: el primer frame aplica el DOM, el segundo lee scrollHeight ya actualizado
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    }));
   }
 
   // Markdown mínimo: negrita, cursiva, código, listas

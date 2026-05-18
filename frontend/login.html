@@ -69,6 +69,10 @@
       padding: 36px 32px;
       box-shadow: 0 24px 64px rgba(0,0,0,.5);
     }
+    [data-theme="light"] .card {
+      box-shadow: 0 8px 40px rgba(0,0,0,.1);
+      border-color: var(--br2);
+    }
 
     .logo-wrap {
       display: flex;
@@ -76,10 +80,10 @@
       margin-bottom: 28px;
     }
     .logo-wrap img {
-      height: 36px;
+      height: 120px;
       background: #fff;
-      border-radius: 6px;
-      padding: 5px 14px;
+      border-radius: 10px;
+      padding: 10px 24px;
     }
 
     h1 {
@@ -210,9 +214,134 @@
     .icon-sun { display: none; }
     [data-theme="light"] .icon-sun  { display: block; }
     [data-theme="light"] .icon-moon { display: none; }
+
+    /* ── SPLASH ───────────────────────────────────────────────────────────── */
+    #splash {
+      position: fixed; inset: 0;
+      background: var(--fondo);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0;
+      transition: opacity .55s ease;
+    }
+    #splash::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%,  rgba(0,232,122,.09) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 60% at 80% 90%,  rgba(74,158,255,.07) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    #splash.out { opacity: 0; pointer-events: none; }
+
+    #splash-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      animation: splashRise .7s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @keyframes splashRise {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #splash-logo {
+      height: 100px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    [data-theme="light"] #splash-logo {
+      box-shadow: 0 8px 32px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+    }
+
+    #splash-tagline {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--t2);
+      opacity: 0;
+      animation: fadeUp .5s ease .55s forwards;
+    }
+
+    #splash-dots {
+      display: flex;
+      gap: 6px;
+      opacity: 0;
+      animation: fadeUp .4s ease .7s forwards;
+    }
+    .sdot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      animation: sdotPulse 1.4s ease infinite;
+    }
+    .sdot:nth-child(1) { background: var(--verde); animation-delay: 0s; }
+    .sdot:nth-child(2) { background: var(--azul);  animation-delay: .2s; }
+    .sdot:nth-child(3) { background: var(--verde); animation-delay: .4s; }
+    @keyframes sdotPulse {
+      0%,100% { opacity: .3; transform: scale(.8); }
+      50%     { opacity: 1;  transform: scale(1.3); }
+    }
+
+    #splash-bar-wrap {
+      width: 180px;
+      opacity: 0;
+      animation: fadeUp .4s ease .75s forwards;
+    }
+    #splash-bar {
+      width: 100%;
+      height: 2px;
+      background: var(--br2);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    #splash-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--verde), var(--azul));
+      border-radius: 1px;
+      animation: barFill 2s cubic-bezier(.4,0,.2,1) .8s forwards;
+    }
+    @keyframes barFill {
+      0%  { width: 0%; }
+      65% { width: 82%; }
+      100%{ width: 100%; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* La página del login empieza invisible y aparece tras el splash */
+    .page { opacity: 0; transition: opacity .45s ease; }
+    .page.visible { opacity: 1; }
   </style>
 </head>
 <body>
+
+<!-- ── SPLASH ─────────────────────────────────────────────────────────────── -->
+<div id="splash">
+  <div id="splash-inner">
+    <img id="splash-logo" src="/img/logo.png" alt="ABSTORAGES"/>
+    <div id="splash-tagline">AI · Logistics · Intelligence</div>
+    <div id="splash-dots">
+      <div class="sdot"></div>
+      <div class="sdot"></div>
+      <div class="sdot"></div>
+    </div>
+    <div id="splash-bar-wrap">
+      <div id="splash-bar"><div id="splash-fill"></div></div>
+    </div>
+  </div>
+</div>
+
 <div class="page">
   <button class="theme-btn" id="theme-btn">
     <span class="icon-moon">🌙</span>
@@ -273,10 +402,25 @@
 </div>
 
 <script>
-  // Theme
+  // Theme (se aplica antes del primer render)
   const html = document.documentElement;
   const saved = localStorage.getItem('abs-theme');
   if (saved) html.setAttribute('data-theme', saved);
+
+  // Splash → Login
+  window.addEventListener('DOMContentLoaded', () => {
+    const splash = document.getElementById('splash');
+    const page   = document.querySelector('.page');
+
+    // Esperar a que la barra termine (~2.8s desde inicio de página)
+    setTimeout(() => {
+      splash.classList.add('out');
+      setTimeout(() => {
+        splash.style.display = 'none';
+        page.classList.add('visible');
+      }, 560);
+    }, 2600);
+  });
   document.getElementById('theme-btn').addEventListener('click', () => {
     const t = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', t);

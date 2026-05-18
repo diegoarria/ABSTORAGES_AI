@@ -477,6 +477,94 @@
           </div>
         </div>
 
+        <!-- ─── CAMPAÑAS WHATSAPP (solo admin) ─────────────────────────────── -->
+        <div class="bc-section admin-only">
+          <div class="bc-header">
+            <div class="bc-title-row">
+              <span class="panel-title">Campañas WhatsApp Business</span>
+              <span class="bc-badge">● WA</span>
+            </div>
+            <div class="bc-header-actions">
+              <button class="btn-ghost btn-sm" id="bc-history-btn">📋 Historial</button>
+            </div>
+          </div>
+
+          <!-- Historial panel (oculto por defecto) -->
+          <div id="bc-history-panel" style="display:none;" class="bc-history-panel">
+            <div class="bc-history-scroll">
+              <table class="bc-history-table">
+                <thead><tr><th>ID</th><th>Plantilla</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
+                <tbody id="bc-history-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bc-body">
+
+            <!-- FORM AREA -->
+            <div id="bc-form-area">
+              <div class="bc-row">
+                <div class="bc-col">
+                  <label class="bc-label">Plantilla de mensaje</label>
+                  <select id="bc-template-select" class="bc-select"></select>
+                  <div class="bc-descripcion" id="bc-descripcion"></div>
+                </div>
+                <div class="bc-col bc-preview-col">
+                  <label class="bc-label">Preview</label>
+                  <div class="bc-preview-bubble" id="bc-preview-text"></div>
+                </div>
+              </div>
+
+              <div class="bc-recipients-wrap">
+                <div class="bc-label-row">
+                  <label class="bc-label">Destinatarios</label>
+                  <span class="bc-cols-hint" id="bc-cols-hint"></span>
+                </div>
+                <textarea id="bc-recipients-input" class="bc-textarea" rows="6"
+                  placeholder="telefono, nombre, var1, var2..."></textarea>
+                <div class="bc-count" id="bc-count"></div>
+              </div>
+
+              <div class="bc-actions">
+                <button class="bc-btn-start" id="bc-start-btn" disabled>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  Iniciar campaña
+                </button>
+              </div>
+            </div>
+
+            <!-- PROGRESS AREA (oculto hasta iniciar) -->
+            <div id="bc-progress-area" style="display:none;" class="bc-progress-area">
+              <div class="bc-status-row">
+                <span class="bc-status-text" id="bc-status-text">Iniciando...</span>
+                <span class="bc-err-count" id="bc-err-count" style="display:none;"></span>
+              </div>
+              <div class="bc-bar-track">
+                <div class="bc-bar-fill" id="bc-bar-fill" style="width:0%"></div>
+              </div>
+
+              <div class="bc-results-scroll">
+                <table class="bc-results-table">
+                  <thead><tr><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Hora</th></tr></thead>
+                  <tbody id="bc-results-body"></tbody>
+                </table>
+              </div>
+
+              <div class="bc-progress-actions">
+                <button class="bc-btn-cancel" id="bc-cancel-btn" style="display:none;">
+                  ✕ Cancelar envío
+                </button>
+                <button class="bc-btn-new" id="bc-new-btn" style="display:none;">
+                  + Nueva campaña
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -511,6 +599,7 @@
   <script src="js/sara.js"></script>
   <script src="js/sofia.js"></script>
   <script src="js/features.js"></script>
+  <script src="js/broadcast.js"></script>
 
   <script>
     // ── Roles & sesión ──────────────────────────────────────────────────────

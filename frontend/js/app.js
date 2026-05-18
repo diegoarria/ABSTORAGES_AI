@@ -188,11 +188,11 @@ const App = (() => {
       venta_mes       : 284500,
       meta_mes        : 400000,
       pipeline: [
-        { label: 'Nuevo contacto',    count: 12, color: '#7e8899' },
-        { label: 'Cotización enviada',count: 8,  color: '#4a9eff' },
-        { label: 'En negociación',    count: 5,  color: '#f5a623' },
-        { label: 'Cierre pendiente',  count: 3,  color: '#00e87a' },
-        { label: 'Cerrado / ganado',  count: 7,  color: '#00e87a' },
+        { label: 'Nuevo contacto',    count: 12, color: '#7e8899', lightColor: '#374151' },
+        { label: 'Cotización enviada',count: 8,  color: '#4a9eff', lightColor: '#1a6bbf' },
+        { label: 'En negociación',    count: 5,  color: '#f5a623', lightColor: '#b45309' },
+        { label: 'Cierre pendiente',  count: 3,  color: '#00e87a', lightColor: '#007a3d' },
+        { label: 'Cerrado / ganado',  count: 7,  color: '#00e87a', lightColor: '#007a3d' },
       ],
     },
     sofia: {
@@ -200,11 +200,11 @@ const App = (() => {
       servicios_dia    : 4,
       servicios_mes    : 61,
       pipeline: [
-        { label: 'Pendiente',    count: 2,  color: '#7e8899' },
-        { label: 'En búsqueda', count: 3,  color: '#f5a623' },
-        { label: 'Programado',  count: 5,  color: '#4a9eff' },
-        { label: 'En proceso',  count: 8,  color: '#00e87a' },
-        { label: 'Entregado',   count: 4,  color: '#4a9eff' },
+        { label: 'Pendiente',    count: 2,  color: '#7e8899', lightColor: '#374151' },
+        { label: 'En búsqueda', count: 3,  color: '#f5a623', lightColor: '#b45309' },
+        { label: 'Programado',  count: 5,  color: '#4a9eff', lightColor: '#1a6bbf' },
+        { label: 'En proceso',  count: 8,  color: '#00e87a', lightColor: '#007a3d' },
+        { label: 'Entregado',   count: 4,  color: '#4a9eff', lightColor: '#1a6bbf' },
       ],
     },
   };
@@ -244,16 +244,24 @@ const App = (() => {
     if (pipelineSofia) pipelineSofia.innerHTML = renderPipeline(o.pipeline);
   }
 
+  function isLightTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'light';
+  }
+
   function renderPipeline(stages) {
+    const light = isLightTheme();
     const max = Math.max(...stages.map(s => s.count), 1);
-    return stages.map(s => `
-      <div class="kpi-pipe-row">
-        <div class="kpi-pipe-label">${s.label}</div>
-        <div class="kpi-pipe-track">
-          <div class="kpi-pipe-fill" style="width:${Math.round((s.count / max) * 100)}%;background:${s.color}"></div>
-        </div>
-        <div class="kpi-pipe-count" style="color:${s.color}">${s.count}</div>
-      </div>`).join('');
+    return stages.map(s => {
+      const c = light ? (s.lightColor || s.color) : s.color;
+      return `
+        <div class="kpi-pipe-row">
+          <div class="kpi-pipe-label">${s.label}</div>
+          <div class="kpi-pipe-track">
+            <div class="kpi-pipe-fill" style="width:${Math.round((s.count / max) * 100)}%;background:${c}"></div>
+          </div>
+          <div class="kpi-pipe-count" style="color:${c}">${s.count}</div>
+        </div>`;
+    }).join('');
   }
 
   function set(id, val) {
@@ -306,6 +314,12 @@ const App = (() => {
     cargarLeads();
     renderKPIs();
     conectarActividadStream();
+
+    // Re-renderizar pipelines cuando cambie el tema
+    new MutationObserver(() => renderKPIs()).observe(
+      document.documentElement,
+      { attributes: true, attributeFilter: ['data-theme'] }
+    );
 
     // Refrescar métricas cada 30s
     setInterval(cargarMetricas, 30000);

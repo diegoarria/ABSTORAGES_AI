@@ -1,10 +1,12 @@
 require('dotenv').config();
 
 const BASE_URL = process.env.WHATSAPP_BASE_URL || 'https://waba.360dialog.io/v1';
-const API_KEY = process.env.WHATSAPP_API_KEY;
+const API_KEY  = process.env.WHATSAPP_API_KEY;
+const WABA_ID  = process.env.WHATSAPP_WABA_ID;
+const WA_LIVE  = !!(API_KEY && WABA_ID);
 
 async function enviarMensaje(telefono, texto) {
-  if (!API_KEY) {
+  if (!WA_LIVE) {
     console.log(`[WhatsApp STUB] → ${telefono}: ${texto}`);
     return { status: 'stub', to: telefono, message: texto };
   }
@@ -32,7 +34,7 @@ async function enviarMensaje(telefono, texto) {
 }
 
 async function enviarTemplate(telefono, templateName, componentes = []) {
-  if (!API_KEY) {
+  if (!WA_LIVE) {
     console.log(`[WhatsApp STUB] Template "${templateName}" → ${telefono}`);
     return { status: 'stub', to: telefono, template: templateName };
   }
