@@ -1313,6 +1313,11 @@ body {
   .agent-sidebar { display: none; }
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }
   .pipeline-stages { grid-template-columns: repeat(3, 1fr); }
+  .header-agents { display: none; }
+  .header-nav-links { gap: 6px; }
+  .btn-portal { padding: 5px 10px; font-size: 11px; }
+  .header-user-section { border: none; gap: 8px; }
+  .header-user-name { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1366,7 +1371,7 @@ body {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .theme-toggle {
   width: 34px; height: 34px;
@@ -1380,23 +1385,99 @@ body {
   flex-shrink: 0;
 }
 .theme-toggle:hover { background: var(--fondo4); color: var(--texto); }
-.btn-portal {
+
+/* Botones de portal */
+.header-nav-links {
   display: flex;
+  gap: 8px;
   align-items: center;
-  gap: 6px;
-  background: var(--verde-dim);
-  border: 1px solid rgba(0,232,122,0.3);
+}
+.btn-portal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid rgba(0,232,122,0.25);
   color: var(--verde);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  padding: 7px 16px;
+  padding: 6px 12px;
   border-radius: var(--radius);
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
+  text-decoration: none;
 }
-.btn-portal:hover { background: rgba(0,232,122,0.2); }
+.btn-portal:hover {
+  background: rgba(0,232,122,0.1);
+  border-color: rgba(0,232,122,0.4);
+}
+
+/* User menu compacto */
+.header-user-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border-left: 1px solid var(--borde);
+}
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--texto2);
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--texto3);
+  transition: background 0.3s;
+}
+.status-dot.online { background: var(--verde); box-shadow: 0 0 6px var(--verde-glow); }
+.status-dot.warning { background: var(--amber); }
+.status-dot.error { background: var(--rojo); }
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.header-user:hover { opacity: 0.8; }
+.header-user-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.header-user-dot.role-admin        { background: var(--verde); box-shadow: 0 0 5px rgba(0,232,122,.4); }
+.header-user-dot.role-cliente      { background: var(--azul);  box-shadow: 0 0 5px rgba(74,158,255,.4); }
+.header-user-dot.role-transportista{ background: #f5a623;      box-shadow: 0 0 5px rgba(245,166,35,.4); }
+.header-user-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--texto);
+  white-space: nowrap;
+}
+
+.btn-logout {
+  width: 28px; height: 28px;
+  border-radius: var(--radius);
+  background: transparent;
+  border: 1px solid var(--borde2);
+  color: var(--texto2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.btn-logout:hover {
+  background: var(--rojo-dim);
+  border-color: var(--rojo);
+  color: var(--rojo);
+}
 
 /* 3-column grid */
 .command-layout {

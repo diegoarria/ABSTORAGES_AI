@@ -42,21 +42,14 @@
 
     <!-- Right -->
     <div class="header-right">
-      <div class="header-status">
-        <div class="status-dot online" id="server-status" title="Servidor"></div>
-        <span class="status-label" id="status-text">Conectado</span>
+      <!-- Navigation links (Portal, Prospector, LUCA) -->
+      <div class="header-nav-links">
+        <a class="btn-portal" href="/e0-prospector.html" target="_blank" title="E0 Prospector">🔍 Prospector</a>
+        <a class="btn-portal" href="/carrier-chat.html" target="_blank" title="LUCA Transportistas">🚛 LUCA</a>
+        <button class="btn-portal" id="btn-open-portal" title="Ver portal completo">🏠 Portal</button>
       </div>
-      <div class="header-user" id="header-user">
-        <div class="header-user-dot" id="header-user-dot"></div>
-        <span class="header-user-name" id="header-user-name"></span>
-        <button class="btn-logout" id="btn-logout" title="Cerrar sesión">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-        </button>
-      </div>
+
+      <!-- Theme toggle -->
       <button class="theme-toggle" id="theme-toggle" title="Cambiar tema">
         <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5"/>
@@ -73,18 +66,28 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
       </button>
-      <a class="btn-portal admin-only" href="/e0-prospector.html" target="_blank" style="text-decoration:none;">
-        🔍 Prospector
-      </a>
-      <a class="btn-portal" href="/carrier-chat.html" target="_blank" style="text-decoration:none;">
-        🚛 LUCA
-      </a>
-      <button class="btn-portal" id="btn-open-portal">
-        Ver Portal
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </button>
+
+      <!-- User section -->
+      <div class="header-user-section">
+        <!-- Server status -->
+        <div class="header-status">
+          <div class="status-dot online" id="server-status" title="Servidor"></div>
+          <span id="status-text">En línea</span>
+        </div>
+
+        <!-- User info & logout -->
+        <div class="header-user" id="header-user" title="Información del usuario">
+          <div class="header-user-dot" id="header-user-dot"></div>
+          <span class="header-user-name" id="header-user-name"></span>
+          <button class="btn-logout" id="btn-logout" title="Cerrar sesión">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
