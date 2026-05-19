@@ -6,6 +6,7 @@ const path = require('path');
 const basicAuth = require('./middleware/auth');
 const saraRoutes = require('./routes/sara');
 const sofiaRoutes = require('./routes/sofia');
+const prospectorRoutes = require('./routes/prospector');
 const { suscribirNuevaOrden, suscribirActividad, publicarActividad } = require('./services/redis');
 const { registrarActividad, obtenerActividadReciente, obtenerMetricas } = require('./db/db');
 
@@ -61,6 +62,7 @@ function broadcastActividad(evento) {
 // ─── RUTAS API ────────────────────────────────────────────────────────────────
 app.use('/api/sara', saraRoutes);
 app.use('/api/sofia', sofiaRoutes);
+app.use('/api/prospector', prospectorRoutes);
 
 // GET /api/health
 app.get('/api/health', (req, res) => {

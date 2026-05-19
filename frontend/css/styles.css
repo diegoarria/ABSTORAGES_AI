@@ -11,6 +11,17 @@
   --texto3: #6b7280;   /* más oscuro que #9ca3af — pasa contraste WCAG AA */
   --shadow:    0 2px 8px rgba(0,0,0,0.08);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+
+  /* Accent colors: versiones oscuras para legibilidad WCAG sobre fondos claros */
+  --verde:     #007a3d;
+  --verde-dim: rgba(0, 122, 61, 0.1);
+  --verde-glow:rgba(0, 122, 61, 0.2);
+  --azul:      #1a6bbf;
+  --azul-dim:  rgba(26, 107, 191, 0.1);
+  --amber:     #b45309;
+  --amber-dim: rgba(180, 83, 9, 0.1);
+  --rojo:      #b91c1c;
+  --rojo-dim:  rgba(185, 28, 28, 0.1);
 }
 
 /* Ambient gradient */
@@ -129,12 +140,36 @@ body::before {
 /* Header user chip */
 [data-theme="light"] .header-user { background: var(--fondo3); border-color: var(--borde2); }
 
+/* Hardcoded neon rgba values — no se actualizan con variables, requieren override explícito */
+[data-theme="light"] .agent-avatar.sara  { background: rgba(0,122,61,0.1);    color: #007a3d; border-color: rgba(0,122,61,0.25); }
+[data-theme="light"] .agent-avatar.sofia { background: rgba(26,107,191,0.1);  color: #1a6bbf; border-color: rgba(26,107,191,0.25); }
+[data-theme="light"] .badge.green        { border-color: rgba(0,122,61,0.2); }
+[data-theme="light"] .message.user .message-bubble { border-color: rgba(0,122,61,0.2); }
+[data-theme="light"] .btn-tts.active     { border-color: rgba(0,122,61,0.25); background: rgba(0,122,61,0.08); }
+[data-theme="light"] .btn-close-portal:hover { border-color: rgba(0,122,61,0.3); }
+[data-theme="light"] .bc-preview-bubble  { border-color: rgba(0,122,61,0.15); }
+[data-theme="light"] .header-user-dot.role-admin        { box-shadow: 0 0 5px rgba(0,122,61,.3); }
+[data-theme="light"] .header-user-dot.role-cliente      { box-shadow: 0 0 5px rgba(26,107,191,.3); }
+[data-theme="light"] .header-user-dot.role-transportista{ box-shadow: 0 0 5px rgba(180,83,9,.3); }
+[data-theme="light"] .ops-pill-ok   { background: rgba(0,122,61,0.1); color: #007a3d; }
+[data-theme="light"] .gps-stat.green { background: rgba(0,122,61,0.1); color: #007a3d; }
+
 /* Panels & sections */
 [data-theme="light"] .panel       { background: #ffffff; border-color: var(--borde2); }
 [data-theme="light"] .gps-section { background: #ffffff; border-color: var(--borde2); }
 [data-theme="light"] .leads-section { background: #ffffff; border-color: var(--borde2); }
 [data-theme="light"] .agent-summary-card { background: var(--fondo3); border-color: var(--borde); }
 [data-theme="light"] .capability-list li { background: var(--fondo3); }
+
+/* Nav activa y brand: evitar neón sobre fondo claro */
+[data-theme="light"] .nav-btn.active   { color: #006b30; background: rgba(0,122,61,0.1); }
+[data-theme="light"] .nav-btn:hover    { color: var(--texto); background: var(--fondo3); }
+[data-theme="light"] .agent-summary-card:hover { border-color: #007a3d; }
+[data-theme="light"] .agent-summary-card:hover .agent-cta { color: #007a3d; }
+[data-theme="light"] .btn-ghost:hover  { border-color: #007a3d; color: #007a3d; }
+[data-theme="light"] .btn-send         { background: #007a3d; color: #ffffff; }
+[data-theme="light"] .btn-send:hover   { background: #006b30; }
+[data-theme="light"] .btn-send:disabled { background: var(--fondo4); color: var(--texto3); }
 
 /* ─── Legibilidad de texto en portal completo ────────────────────────────── */
 /* Colores funcionales (verde/azul) sobre fondo claro necesitan variantes oscuras */
@@ -1477,13 +1512,21 @@ body {
   color: var(--rojo);
 }
 
+/* Contenedor de scroll para el control de mando */
+.cmd-scroll-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
 /* 3-column grid */
 .command-layout {
-  flex: 1;
-  min-height: 0;           /* permite que el grid sea más pequeño que su contenido */
   display: grid;
-  grid-template-columns: 28fr 44fr 28fr;
-  grid-template-rows: 1fr; /* la fila toma exactamente la altura disponible */
+  grid-template-columns: 37fr 26fr 37fr;
+  grid-template-rows: 1fr;
+  min-width: 900px;        /* activa scroll horizontal en pantallas angostas */
+  height: 100%;            /* llena el wrapper cuando el viewport es suficiente */
+  min-height: 520px;       /* activa scroll vertical en pantallas muy bajas */
   overflow: hidden;
   background: var(--borde);
   gap: 1px;
@@ -1541,8 +1584,9 @@ body {
 .cmd-center {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  min-height: 0;           /* grid item: permite shrink por debajo del contenido */
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
   max-height: 100%;
   background: var(--fondo2);
 }
@@ -1895,8 +1939,8 @@ body[data-role="transportista"] .admin-only { display: none !important; }
 .hidden-role { display: none !important; }
 
 /* Cuando solo hay una columna de chat + centro, expandir el chat */
-.layout-single-left  { grid-template-columns: 44fr 56fr !important; }
-.layout-single-right { grid-template-columns: 56fr 44fr !important; }
+.layout-single-left  { grid-template-columns: 48fr 52fr !important; }
+.layout-single-right { grid-template-columns: 52fr 48fr !important; }
 
 /* Header: usuario actual */
 .header-user {
