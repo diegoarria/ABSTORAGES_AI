@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>ABSTORAGES · Rastreo de Unidad</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --verde: #00e87a; --rojo: #ff4a4a; --azul: #4a9eff; --amber: #f5a623;
+      --fondo: #07090e; --s1: #0d1117; --s2: #111620; --br: rgba(255,255,255,.07);
+      --t1: #edf0f4; --t2: #7e8899; --sans: 'system-ui', sans-serif;
+    }
+    html, body { height: 100%; background: var(--fondo); color: var(--t1); font-family: var(--sans); }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 20px; }
+
+    .logo-bar {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; font-weight: 700; color: var(--verde);
+      letter-spacing: .05em;
+    }
+    .logo-bar img { height: 36px; background: #fff; border-radius: 6px; padding: 4px 10px; }
+
+    .card {
+      width: 100%; max-width: 360px;
+      background: var(--s1);
+      border: 1px solid var(--br);
+      border-radius: 16px;
+      padding: 24px 20px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .status-circle {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 3px solid var(--br);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      margin: 0 auto;
+      transition: border-color .4s, background .4s;
+    }
+    .status-circle.activo { border-color: var(--verde); background: rgba(0,232,122,.1); animation: pulseGreen 2s infinite; }
+    .status-circle.error  { border-color: var(--rojo);  background: rgba(255,74,74,.1); }
+    @keyframes pulseGreen {
+      0%,100% { box-shadow: 0 0 0 0 rgba(0,232,122,.4); }
+      50%      { box-shadow: 0 0 0 12px rgba(0,232,122,0); }
+    }
+
+    .status-label { text-align: center; font-size: 14px; font-weight: 600; color: var(--t2); }
+    .status-label.activo { color: var(--verde); }
+    .status-label.error  { color: var(--rojo); }
+
+    .folio-box {
+      background: var(--s2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+    .folio-num  { font-size: 18px; font-weight: 800; color: var(--t1); }
+    .folio-sub  { font-size: 11px; color: var(--t2); margin-top: 2px; }
+
+    .coords {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .coord-item {
+      background: var(--s2); border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .coord-label { font-size: 9px; color: var(--t2); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+    .coord-val   { font-size: 14px; font-weight: 700; font-family: monospace; }
+
+    .vel-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .vel-num  { font-size: 36px; font-weight: 800; color: var(--verde); }
+    .vel-unit { font-size: 13px; color: var(--t2); margin-top: 6px; }
+
+    .btn-toggle {
+      width: 100%; padding: 14px;
+      border: none; border-radius: 10px;
+      font-family: var(--sans); font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-toggle.iniciar  { background: var(--verde); color: #07090e; }
+    .btn-toggle.detener  { background: rgba(255,74,74,.15); border: 1px solid rgba(255,74,74,.3); color: var(--rojo); }
+    .btn-toggle:active { transform: scale(.97); }
+
+    .last-update { text-align: center; font-size: 11px; color: var(--t2); }
+
+    .warn {
+      background: rgba(245,166,35,.1);
+      border: 1px solid rgba(245,166,35,.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--amber);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="logo-bar">
+  <img src="/img/logo.png" alt="ABSTORAGES"/>
+</div>
+
+<div class="card">
+  <div class="status-circle" id="circle">📍</div>
+  <div class="status-label" id="status-label">Presiona Iniciar para transmitir</div>
+
+  <div class="folio-box">
+    <div class="folio-num" id="folio-display">—</div>
+    <div class="folio-sub" id="chofer-display">Cargando datos de viaje...</div>
+  </div>
+
+  <div class="coords">
+    <div class="coord-item">
+      <div class="coord-label">Latitud</div>
+      <div class="coord-val" id="lat-val">—</div>
+    </div>
+    <div class="coord-item">
+      <div class="coord-label">Longitud</div>
+      <div class="coord-val" id="lng-val">—</div>
+    </div>
+    <div class="coord-item" style="grid-column:1/-1;">
+      <div class="coord-label">Velocidad</div>
+      <div class="vel-row">
+        <div class="vel-num" id="vel-val">0</div>
+        <div class="vel-unit">km/h</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-toggle iniciar" id="btn-toggle" onclick="toggleTracking()">
+    📡 Iniciar rastreo
+  </button>
+
+  <div class="last-update" id="last-update"></div>
+
+  <div class="warn" id="warn-gps" style="display:none;">
+    ⚠️ Activa el GPS de tu celular y permite el acceso a ubicación cuando el browser te lo pida.
+  </div>
+</div>
+
+<script>
+  // ── Parámetros de la URL ──────────────────────────────────────────────────
+  const params  = new URLSearchParams(location.search);
+  const TOKEN   = params.get('token')  || '';
+  const FOLIO   = params.get('folio')  || 'SIN-FOLIO';
+  const CHOFER  = params.get('chofer') || 'Operador';
+  const API_URL = '/api/gps/update';
+  const INTERVALO = 5000; // enviar cada 5 segundos
+
+  document.getElementById('folio-display').textContent  = FOLIO;
+  document.getElementById('chofer-display').textContent = CHOFER;
+
+  let tracking   = false;
+  let watchId    = null;
+  let sendTimer  = null;
+  let lastPos    = null;
+  let lastSpeed  = 0;
+
+  function toggleTracking() {
+    tracking ? detener() : iniciar();
+  }
+
+  function iniciar() {
+    if (!navigator.geolocation) {
+      document.getElementById('warn-gps').style.display = 'block';
+      return;
+    }
+    tracking = true;
+    setUI('iniciando');
+
+    watchId = navigator.geolocation.watchPosition(
+      onPosition,
+      onError,
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    );
+
+    // Enviar cada INTERVALO ms aunque no haya movimiento
+    sendTimer = setInterval(() => { if (lastPos) enviar(lastPos); }, INTERVALO);
+  }
+
+  function detener() {
+    tracking = false;
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    if (sendTimer)        { clearInterval(sendTimer); sendTimer = null; }
+    lastPos = null;
+    setUI('detenido');
+  }
+
+  function onPosition(pos) {
+    const { latitude: lat, longitude: lng, speed, heading } = pos.coords;
+    const velocidad = speed != null ? Math.round(speed * 3.6) : lastSpeed; // m/s → km/h
+    lastSpeed = velocidad;
+    lastPos   = { lat, lng, velocidad, rumbo: heading || 0 };
+
+    document.getElementById('lat-val').textContent = lat.toFixed(6);
+    document.getElementById('lng-val').textContent = lng.toFixed(6);
+    document.getElementById('vel-val').textContent = velocidad;
+    setUI('activo');
+
+    // Primer envío inmediato
+    enviar(lastPos);
+  }
+
+  function onError(err) {
+    console.warn('[GPS]', err.message);
+    document.getElementById('warn-gps').style.display = 'block';
+    setUI('error');
+  }
+
+  async function enviar({ lat, lng, velocidad, rumbo }) {
+    try {
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-gps-token': TOKEN },
+        body: JSON.stringify({ folio: FOLIO, chofer: CHOFER, lat, lng, velocidad, rumbo, fuente: 'chofer-app' }),
+      });
+      const ahora = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('last-update').textContent = `Última actualización: ${ahora}`;
+    } catch (e) {
+      console.error('[GPS send]', e);
+    }
+  }
+
+  function setUI(estado) {
+    const circle = document.getElementById('circle');
+    const label  = document.getElementById('status-label');
+    const btn    = document.getElementById('btn-toggle');
+
+    const map = {
+      iniciando: { icon: '🔄', cls: '',       lbl: 'Obteniendo señal GPS...',    btnCls: 'detener', btnTxt: '■ Detener rastreo' },
+      activo:    { icon: '📡', cls: 'activo', lbl: 'Transmitiendo posición',     btnCls: 'detener', btnTxt: '■ Detener rastreo' },
+      detenido:  { icon: '📍', cls: '',       lbl: 'Rastreo detenido',           btnCls: 'iniciar', btnTxt: '📡 Iniciar rastreo' },
+      error:     { icon: '⚠️', cls: 'error',  lbl: 'Error de GPS — revisa permisos', btnCls: 'iniciar', btnTxt: '📡 Reintentar' },
+    };
+    const s = map[estado] || map.detenido;
+    circle.textContent = s.icon;
+    circle.className   = 'status-circle ' + s.cls;
+    label.textContent  = s.lbl;
+    label.className    = 'status-label ' + s.cls;
+    btn.textContent    = s.btnTxt;
+    btn.className      = 'btn-toggle ' + s.btnCls;
+  }
+
+  // Mantener pantalla encendida mientras transmite (Screen Wake Lock API)
+  let wakeLock = null;
+  document.getElementById('btn-toggle').addEventListener('click', async () => {
+    if (tracking && 'wakeLock' in navigator) {
+      try { wakeLock = await navigator.wakeLock.request('screen'); } catch (_) {}
+    } else if (wakeLock) {
+      wakeLock.release(); wakeLock = null;
+    }
+  });
+</script>
+</body>
+</html>

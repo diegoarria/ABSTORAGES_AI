@@ -15,6 +15,7 @@ const tariff      = require('./backend/services/tariff');
 const SARA_PROMPT = require('./backend/agents/sara-prompt');
 const SOFIA_PROMPT= require('./backend/agents/sofia-prompt');
 const broadcast   = require('./backend/services/broadcast');
+const gpsLive     = require('./backend/services/gps-live');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -117,6 +118,25 @@ app.get('/webhook/whatsapp', (req, res) => {
 // Recursos públicos (logo, CSS del login) accesibles sin sesión
 app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
 app.use('/css', express.static(path.join(__dirname, 'frontend', 'css')));
+
+// Página del chofer — URL pública autenticada con token GPS
+app.get('/tracker', (req, res) => {
+  if (req.query.token !== gpsLive.GPS_TOKEN)
+    return res.status(401).send('<h2 style="font-family:sans-serif;padding:40px">Enlace inválido. Solicita uno nuevo a ABSTORAGES.</h2>');
+  res.sendFile(path.join(__dirname, 'frontend', 'tracker.html'));
+});
+
+// GPS update — usa token propio, no sesión de usuario (trackers y página del chofer)
+app.post('/api/gps/update', (req, res) => {
+  const token = req.headers['x-gps-token'] || req.body.token;
+  if (token !== gpsLive.GPS_TOKEN)
+    return res.status(401).json({ error: 'Token inválido' });
+  const { folio, lat, lng, velocidad = 0, rumbo = 0, chofer = '', estatus = 'EN_PROCESO', fuente = 'device' } = req.body;
+  if (!folio || lat == null || lng == null)
+    return res.status(400).json({ error: 'folio, lat y lng son requeridos' });
+  const registro = gpsLive.actualizar(folio, { lat: +lat, lng: +lng, velocidad: +velocidad, rumbo: +rumbo, chofer, estatus, fuente });
+  res.json({ ok: true, ts: registro.ts });
+});
 
 app.use(auth);
 app.use(express.static(path.join(__dirname, 'frontend')));
@@ -346,6 +366,26 @@ async function handleChat(agente, req, res) {
 
 app.post('/api/sara/chat',  (req, res) => handleChat('sara',  req, res));
 app.post('/api/sofia/chat', (req, res) => handleChat('sofia', req, res));
+
+// ─── GPS EN TIEMPO REAL ───────────────────────────────────────────────────────
+
+// GET — lista todas las posiciones en vivo (para el mapa del portal)
+app.get('/api/gps/live', (req, res) => {
+  res.json(gpsLive.listar());
+});
+
+// SSE — stream de actualizaciones en tiempo real para el mapa
+app.get('/api/gps/stream', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+  res.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`);
+
+  gpsLive.agregarListener(res);
+  req.on('close', () => gpsLive.removerListener(res));
+});
+
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
 function splitForWhatsApp(text, maxLen = 1500) {

@@ -315,11 +315,75 @@ const GpsMap = (() => {
     m.marker.openPopup();
   }
 
-  // Init cuando el tab de dashboard esté visible
+  // ─── Unidades en vivo (GPS real) ───────────────────────────────────────
+  let sseGps = null;
+
+  function conectarGpsLive() {
+    if (sseGps) return;
+    sseGps = new EventSource('/api/gps/stream');
+
+    sseGps.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.type !== 'gps_update') return;
+        const u = msg.unidad;
+
+        if (markers[u.folio]) {
+          // Actualizar marcador existente
+          const m = markers[u.folio];
+          m.data = { ...m.data, ...u };
+          m.marker.setLatLng([u.lat, u.lng]);
+          m.marker.setPopupContent(buildPopup(m.data));
+          // Actualizar icono si cambió el estatus
+          const color = statusColor(u.estatus || 'EN_PROCESO');
+          m.marker.setIcon(buildIcon(color, u.estatus === 'ALERTA'));
+        } else {
+          // Nueva unidad en vivo — agregarla al mapa
+          const unidadLive = {
+            id:          u.folio,
+            folio:       u.folio,
+            chofer:      u.chofer || 'Operador',
+            tipo:        u.tipo   || 'Unidad',
+            ruta:        u.ruta   || '—',
+            estatus:     u.estatus || 'EN_PROCESO',
+            cliente:     u.cliente || '—',
+            lat:         u.lat,
+            lng:         u.lng,
+            velocidad:   u.velocidad || 0,
+            kmRestantes: u.kmRestantes || 0,
+            citaHora:    u.citaHora   || '—',
+            _live: true,
+          };
+          addMarker(unidadLive);
+        }
+        updateSidebar();
+        updateCounter();
+      } catch (_) {}
+    };
+
+    sseGps.onerror = () => {
+      sseGps.close(); sseGps = null;
+      setTimeout(conectarGpsLive, 5000); // reconectar en 5s
+    };
+  }
+
+  function buildIcon(color, isAlerta) {
+    return L.divIcon({
+      className: '',
+      html: `<div class="gps-marker ${isAlerta ? 'gps-alerta' : ''}" style="border-color:${color}">
+               <div class="gps-dot" style="background:${color}"></div>
+               ${isAlerta ? `<div class="gps-pulse" style="background:${color}"></div>` : ''}
+             </div>`,
+      iconSize: [20, 20], iconAnchor: [10, 10],
+    });
+  }
+
+  // ─── Init cuando el tab de dashboard esté visible ───────────────────────
   function tryInit() {
     if (document.getElementById('gps-map')) {
       init();
       updateSidebar();
+      conectarGpsLive();
     }
   }
 
