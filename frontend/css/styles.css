@@ -1334,12 +1334,10 @@ body {
   display: block;
 }
 .header-agents {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-left: 24px;
 }
 .pill-sep { color: var(--texto3); font-size: 16px; }
 .pill-label { font-size: 10px; color: var(--texto2); font-weight: 400; }
