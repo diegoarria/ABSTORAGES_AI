@@ -187,9 +187,8 @@ Para cada empresa devuelve un objeto con:
 - empresa: nombre realista y creíble
 - giro: descripción corta (máx 6 palabras)
 - ciudad: ciudad donde está ubicada la empresa
-- contacto: nombre completo y cargo del tomador de decisiones en logística (ej: "Ing. Carlos Ramírez · Director de Operaciones")
 - por_que: razón específica de necesidad de flete (1 oración)
-- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, dirigido al contacto por su nombre, menciona la empresa y ciudad, termina con pregunta de apertura
+- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, menciona la empresa por nombre y ciudad, termina con pregunta de apertura
 - fuente: "IA Generativa"
 Responde SOLO JSON válido, sin markdown. Formato: {"prospectos": [...]}`;
 
