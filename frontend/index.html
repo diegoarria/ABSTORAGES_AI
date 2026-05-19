@@ -73,6 +73,12 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
       </button>
+      <a class="btn-portal admin-only" href="/e0-prospector.html" target="_blank" style="text-decoration:none;">
+        🔍 Prospector
+      </a>
+      <a class="btn-portal" href="/carrier-chat.html" target="_blank" style="text-decoration:none;">
+        🚛 LUCA
+      </a>
       <button class="btn-portal" id="btn-open-portal">
         Ver Portal
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -477,6 +483,44 @@
           </div>
         </div>
 
+        <!-- ─── DASHBOARD OPERATIVO (solo admin) ───────────────────────────── -->
+        <div class="ops-section admin-only">
+          <div class="ops-header">
+            <span class="panel-title">Dashboard Operativo</span>
+            <span class="ops-refresh" id="ops-refresh-label"></span>
+          </div>
+
+          <!-- KPIs reales de SARA -->
+          <div class="ops-kpis" id="ops-kpis">
+            <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-hoy">—</div><div class="ops-kpi-label">Leads hoy</div><div class="ops-kpi-sub" id="ops-sesiones-hoy"></div></div>
+            <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-semana">—</div><div class="ops-kpi-label">Leads 7 días</div></div>
+            <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-total">—</div><div class="ops-kpi-label">Total leads</div><div class="ops-kpi-sub" id="ops-webhooks"></div></div>
+            <div class="ops-kpi"><div class="ops-kpi-val green" id="ops-carriers">—</div><div class="ops-kpi-label">Carriers activos</div></div>
+          </div>
+
+          <!-- Tabla últimos leads -->
+          <div class="ops-leads-wrap">
+            <div class="ops-sub-title">Últimos leads capturados por SARA</div>
+            <div class="ops-table-scroll">
+              <table class="ops-table">
+                <thead><tr><th>Hace</th><th>Nombre</th><th>Empresa</th><th>Ruta</th><th>Carga</th><th>Teléfono</th><th>Estado</th></tr></thead>
+                <tbody id="ops-leads-tbody"><tr><td colspan="7" class="ops-empty">Aún sin leads — SARA los captura automáticamente</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Pool de carriers -->
+          <div class="ops-carriers-wrap">
+            <div class="ops-sub-title">Pool de Carriers · LUCA</div>
+            <div class="ops-table-scroll">
+              <table class="ops-table">
+                <thead><tr><th>ID</th><th>Nombre</th><th>Unidad</th><th>Zona</th><th>Disponibilidad</th><th>Registrado</th></tr></thead>
+                <tbody id="ops-carriers-tbody"><tr><td colspan="6" class="ops-empty">Sin carriers registrados — comparte el link de LUCA</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- ─── CAMPAÑAS WHATSAPP (solo admin) ─────────────────────────────── -->
         <div class="bc-section admin-only">
           <div class="bc-header">
@@ -600,6 +644,82 @@
   <script src="js/sofia.js"></script>
   <script src="js/features.js"></script>
   <script src="js/broadcast.js"></script>
+  <script>
+  // ─── Dashboard Operativo — stats en tiempo real ───────────────────────────
+  const OpsDash = (() => {
+    function timeAgo(iso) {
+      const s = (Date.now() - new Date(iso).getTime()) / 1000;
+      if (s < 60)    return Math.floor(s) + 's';
+      if (s < 3600)  return Math.floor(s/60) + 'min';
+      if (s < 86400) return Math.floor(s/3600) + 'h';
+      return Math.floor(s/86400) + 'd';
+    }
+
+    async function refresh() {
+      try {
+        const [statsRes, leadsRes, carriersRes] = await Promise.all([
+          fetch('/api/leads/stats').then(r => r.json()),
+          fetch('/api/leads').then(r => r.json()),
+          fetch('/api/carriers').then(r => r.json()),
+        ]);
+
+        // KPIs
+        const l = statsRes.leads || {};
+        document.getElementById('ops-leads-hoy').textContent     = l.today     ?? '—';
+        document.getElementById('ops-leads-semana').textContent  = l.last_7_days ?? '—';
+        document.getElementById('ops-leads-total').textContent   = l.total     ?? '—';
+        document.getElementById('ops-webhooks').textContent      = l.webhook_sent ? l.webhook_sent + ' enviados a ops' : '';
+        document.getElementById('ops-carriers').textContent      = carriersRes.length ?? '—';
+        document.getElementById('ops-refresh-label').textContent = 'Act. ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
+
+        // Tabla leads
+        const tbody = document.getElementById('ops-leads-tbody');
+        if (!leadsRes.length) {
+          tbody.innerHTML = '<tr><td colspan="7" class="ops-empty">SARA capturará leads automáticamente en las conversaciones</td></tr>';
+        } else {
+          tbody.innerHTML = leadsRes.slice(0, 20).map(l => `
+            <tr>
+              <td>${timeAgo(l.created_at)}</td>
+              <td>${esc(l.nombre)}</td>
+              <td>${esc(l.empresa)}</td>
+              <td>${esc(l.origen)} → ${esc(l.destino)}</td>
+              <td>${esc(l.tipo_carga)}</td>
+              <td>${esc(l.telefono)}</td>
+              <td><span class="ops-pill ops-pill-ok">✓ Capturado</span></td>
+            </tr>`).join('');
+        }
+
+        // Tabla carriers
+        const ctbody = document.getElementById('ops-carriers-tbody');
+        if (!carriersRes.length) {
+          ctbody.innerHTML = '<tr><td colspan="6" class="ops-empty">Comparte /carrier-chat.html con tus transportistas para que se registren</td></tr>';
+        } else {
+          ctbody.innerHTML = carriersRes.map(c => `
+            <tr>
+              <td class="ops-mono">${esc(c.id)}</td>
+              <td>${esc(c.nombre)}</td>
+              <td>${esc((c.unidades||[]).join(', '))}</td>
+              <td>${esc(c.zona)}</td>
+              <td><span class="ops-pill ${c.disponibilidad === 'disponible' ? 'ops-pill-ok' : 'ops-pill-warn'}">${esc(c.disponibilidad||'—')}</span></td>
+              <td>${timeAgo(c.registered_at)}</td>
+            </tr>`).join('');
+        }
+      } catch(e) { console.error('[OpsDash]', e); }
+    }
+
+    function esc(s) { return (s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      refresh();
+      setInterval(refresh, 30000);
+      // Refrescar cuando se abre el portal overlay
+      document.getElementById('btn-open-portal')?.addEventListener('click', () => setTimeout(refresh, 200));
+      document.getElementById('btn-open-portal-2')?.addEventListener('click', () => setTimeout(refresh, 200));
+    });
+
+    return { refresh };
+  })();
+  </script>
 
   <script>
     // ── Roles & sesión ──────────────────────────────────────────────────────

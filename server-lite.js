@@ -16,6 +16,9 @@ const SARA_PROMPT = require('./backend/agents/sara-prompt');
 const SOFIA_PROMPT= require('./backend/agents/sofia-prompt');
 const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
+const leads       = require('./backend/services/leads');
+const carriers    = require('./backend/services/carriers');
+const LUCA_PROMPT = require('./backend/agents/luca-prompt');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -314,8 +317,8 @@ app.post('/api/sofia/reporte-entrega', async (req, res) => {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
 function buildPrompt(agente, contextBlock, tariffCtx) {
-  const base = agente === 'sara' ? SARA_PROMPT : SOFIA_PROMPT;
-  const tariffBlock = `\n\n## MERCADO ACTUAL (actualizado en tiempo real)\n${tariffCtx.prompt}`;
+  const base = agente === 'sara' ? SARA_PROMPT : agente === 'luca' ? LUCA_PROMPT : SOFIA_PROMPT;
+  const tariffBlock = agente === 'luca' ? '' : `\n\n## MERCADO ACTUAL (actualizado en tiempo real)\n${tariffCtx.prompt}`;
   return contextBlock
     ? `${base}${tariffBlock}\n\n${contextBlock}`
     : `${base}${tariffBlock}`;
@@ -352,9 +355,21 @@ async function handleChat(agente, req, res) {
     );
     memory.addMessage(sid, 'assistant', fullText);
 
-    // Detectar si SOFIA cerró un folio para loguear reporte
+    // Detectar lead capturado por SARA
+    if (agente === 'sara') {
+      const lead = leads.extractFromText(fullText, sid);
+      if (lead) res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
+    }
+
+    // Detectar si SOFIA cerró un folio
     if (agente === 'sofia' && /CONCLUIDO|entregado.*acuse|carga entregada/i.test(fullText)) {
       res.write(`data: ${JSON.stringify({ type: 'folio_update', estatus: 'ENTREGADO' })}\n\n`);
+    }
+
+    // Detectar carrier registrado por LUCA
+    if (agente === 'luca') {
+      const carrier = carriers.extractFromText(fullText);
+      if (carrier) res.write(`data: ${JSON.stringify({ type: 'carrier_registered', carrier })}\n\n`);
     }
   } catch (err) {
     res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
@@ -366,6 +381,52 @@ async function handleChat(agente, req, res) {
 
 app.post('/api/sara/chat',  (req, res) => handleChat('sara',  req, res));
 app.post('/api/sofia/chat', (req, res) => handleChat('sofia', req, res));
+app.post('/api/luca/chat',  (req, res) => handleChat('luca',  req, res));
+
+// ─── LEADS ────────────────────────────────────────────────────────────────────
+app.get('/api/leads',       (req, res) => res.json(leads.list()));
+app.get('/api/leads/stats', (req, res) => res.json(leads.stats()));
+app.post('/api/leads',      (req, res) => res.json(leads.add(req.body)));
+
+// ─── CARRIERS ─────────────────────────────────────────────────────────────────
+app.get('/api/carriers',  (req, res) => res.json(carriers.list()));
+app.post('/api/carriers', (req, res) => res.json(carriers.add(req.body)));
+
+// ─── E0 PROSPECTOR ────────────────────────────────────────────────────────────
+app.post('/api/prospector/generate', async (req, res) => {
+  const { sector, zona } = req.body;
+  if (!sector || !zona) return res.status(400).json({ error: 'sector y zona requeridos' });
+
+  const prompt = `Eres un experto en prospección comercial de logística en México.
+Genera una lista JSON de exactamente 8 empresas del sector "${sector}" en "${zona}" que probablemente necesiten servicios de flete.
+
+Para cada empresa devuelve un objeto con:
+- empresa: nombre realista y creíble de la empresa
+- giro: descripción corta del giro (máx 6 palabras)
+- por_que: razón específica por la que necesitaría flete (1 oración)
+- mensaje: mensaje de prospección personalizado para WhatsApp de ABSTORAGES, máximo 4 párrafos, tono profesional pero cercano, menciona la empresa por nombre, menciona la ruta o tipo de producto si aplica, y termina con una pregunta de apertura
+
+Responde SOLO con JSON válido, sin markdown, sin texto extra. Formato:
+{"prospectos": [...]}`;
+
+  try {
+    let json = '';
+    await chatStream(prompt, [{ role: 'user', content: 'Genera la lista.' }],
+      chunk => { json += chunk; }, () => {});
+
+    const clean = json.replace(/```json|```/g, '').trim();
+    const data  = JSON.parse(clean);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'Error generando prospectos: ' + e.message });
+  }
+});
+
+// Páginas LUCA y Prospector (accesibles sin sesión de portal para carriers externos)
+app.get('/carrier-chat.html', (req, res) =>
+  res.sendFile(path.join(__dirname, 'frontend', 'carrier-chat.html')));
+app.get('/e0-prospector.html', (req, res) =>
+  res.sendFile(path.join(__dirname, 'frontend', 'e0-prospector.html')));
 
 // ─── GPS EN TIEMPO REAL ───────────────────────────────────────────────────────
 
