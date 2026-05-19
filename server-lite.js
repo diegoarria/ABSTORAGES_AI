@@ -18,7 +18,8 @@ const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
 const leads       = require('./backend/services/leads');
 const carriers    = require('./backend/services/carriers');
-const LUCA_PROMPT = require('./backend/agents/luca-prompt');
+const LUCA_PROMPT      = require('./backend/agents/luca-prompt');
+const prospectorApis   = require('./backend/services/prospector-apis');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -140,6 +141,61 @@ app.post('/api/gps/update', (req, res) => {
   const registro = gpsLive.actualizar(folio, { lat: +lat, lng: +lng, velocidad: +velocidad, rumbo: +rumbo, chofer, estatus, fuente });
   res.json({ ok: true, ts: registro.ts });
 });
+
+// ─── E0 PROSPECTOR — rutas públicas (sin sesión, accesibles desde la página externa) ─
+app.get('/api/prospector/status', (req, res) => {
+  res.json(prospectorApis.apiStatus());
+});
+
+app.post('/api/prospector/generate', async (req, res) => {
+  const { sector, zona } = req.body;
+  if (!sector || !zona) return res.status(400).json({ error: 'sector y zona requeridos' });
+
+  try {
+    const { prospectos: realProspectos, sources } = await prospectorApis.searchAll(sector, zona, 8);
+
+    if (realProspectos.length > 0) {
+      const enriquecidos = await Promise.all(realProspectos.map(async p => {
+        if (p.mensaje) return p;
+        const msgPrompt = `Eres el equipo comercial de ABSTORAGES Logistics Solutions.
+Redacta UN SOLO mensaje de prospección de WhatsApp para la empresa "${p.empresa}" del sector "${p.giro || sector}" en "${p.ciudad || zona}".
+Máximo 4 párrafos. Tono profesional pero cercano. Menciona la empresa por nombre. Termina con una pregunta de apertura.
+Responde SOLO el texto del mensaje, sin comillas ni explicaciones.`;
+        let msg = '';
+        await chatStream(msgPrompt, [{ role: 'user', content: 'Redacta el mensaje.' }],
+          chunk => { msg += chunk; }, () => {});
+        return { ...p, mensaje: msg.trim() };
+      }));
+      return res.json({ prospectos: enriquecidos, fuentes: sources, modo: 'real' });
+    }
+
+    // Fallback: Claude genera empresas representativas
+    const prompt = `Eres un experto en prospección comercial de logística en México.
+Genera una lista JSON de exactamente 8 empresas del sector "${sector}" en "${zona}" que probablemente necesiten servicios de flete.
+Para cada empresa devuelve un objeto con:
+- empresa: nombre realista y creíble
+- giro: descripción corta (máx 6 palabras)
+- por_que: razón específica de necesidad de flete (1 oración)
+- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, menciona la empresa por nombre, termina con pregunta de apertura
+- fuente: "IA Generativa"
+Responde SOLO JSON válido, sin markdown. Formato: {"prospectos": [...]}`;
+
+    let json = '';
+    await chatStream(prompt, [{ role: 'user', content: 'Genera la lista.' }],
+      chunk => { json += chunk; }, () => {});
+    const clean = json.replace(/```json|```/g, '').trim();
+    const data  = JSON.parse(clean);
+    res.json({ ...data, fuentes: ['IA Generativa'], modo: 'ia' });
+  } catch (e) {
+    res.status(500).json({ error: 'Error generando prospectos: ' + e.message });
+  }
+});
+
+// Páginas públicas LUCA y Prospector
+app.get('/carrier-chat.html', (req, res) =>
+  res.sendFile(path.join(__dirname, 'frontend', 'carrier-chat.html')));
+app.get('/e0-prospector.html', (req, res) =>
+  res.sendFile(path.join(__dirname, 'frontend', 'e0-prospector.html')));
 
 app.use(auth);
 app.use(express.static(path.join(__dirname, 'frontend')));
@@ -391,42 +447,6 @@ app.post('/api/leads',      (req, res) => res.json(leads.add(req.body)));
 // ─── CARRIERS ─────────────────────────────────────────────────────────────────
 app.get('/api/carriers',  (req, res) => res.json(carriers.list()));
 app.post('/api/carriers', (req, res) => res.json(carriers.add(req.body)));
-
-// ─── E0 PROSPECTOR ────────────────────────────────────────────────────────────
-app.post('/api/prospector/generate', async (req, res) => {
-  const { sector, zona } = req.body;
-  if (!sector || !zona) return res.status(400).json({ error: 'sector y zona requeridos' });
-
-  const prompt = `Eres un experto en prospección comercial de logística en México.
-Genera una lista JSON de exactamente 8 empresas del sector "${sector}" en "${zona}" que probablemente necesiten servicios de flete.
-
-Para cada empresa devuelve un objeto con:
-- empresa: nombre realista y creíble de la empresa
-- giro: descripción corta del giro (máx 6 palabras)
-- por_que: razón específica por la que necesitaría flete (1 oración)
-- mensaje: mensaje de prospección personalizado para WhatsApp de ABSTORAGES, máximo 4 párrafos, tono profesional pero cercano, menciona la empresa por nombre, menciona la ruta o tipo de producto si aplica, y termina con una pregunta de apertura
-
-Responde SOLO con JSON válido, sin markdown, sin texto extra. Formato:
-{"prospectos": [...]}`;
-
-  try {
-    let json = '';
-    await chatStream(prompt, [{ role: 'user', content: 'Genera la lista.' }],
-      chunk => { json += chunk; }, () => {});
-
-    const clean = json.replace(/```json|```/g, '').trim();
-    const data  = JSON.parse(clean);
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: 'Error generando prospectos: ' + e.message });
-  }
-});
-
-// Páginas LUCA y Prospector (accesibles sin sesión de portal para carriers externos)
-app.get('/carrier-chat.html', (req, res) =>
-  res.sendFile(path.join(__dirname, 'frontend', 'carrier-chat.html')));
-app.get('/e0-prospector.html', (req, res) =>
-  res.sendFile(path.join(__dirname, 'frontend', 'e0-prospector.html')));
 
 // ─── GPS EN TIEMPO REAL ───────────────────────────────────────────────────────
 

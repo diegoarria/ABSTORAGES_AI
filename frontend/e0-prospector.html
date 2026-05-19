@@ -10,7 +10,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --verde: #00e87a; --verde-dim: rgba(0,232,122,.1); --azul: #4a9eff;
-      --amber: #f5a623; --rojo: #ff4a4a;
+      --amber: #f5a623; --rojo: #ff4a4a; --purple: #a78bfa;
       --fondo: #07090e; --s1: #0d1117; --s2: #111620; --s3: #161d2a;
       --br: rgba(255,255,255,.07); --br2: rgba(255,255,255,.12);
       --t1: #edf0f4; --t2: #7e8899; --t3: #4a5568;
@@ -29,12 +29,28 @@
     .title-block .sub  { font-size: 10px; color: var(--t2); }
     header img { height: 28px; background: #fff; border-radius: 6px; padding: 3px 8px; }
 
-    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 24px; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 28px 24px; }
+
+    /* API Status bar */
+    .api-status-bar {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 18px; padding: 10px 14px;
+      background: var(--s1); border: 1px solid var(--br); border-radius: var(--r);
+      font-size: 11px;
+    }
+    .api-status-label { color: var(--t2); font-weight: 600; margin-right: 4px; }
+    .api-badge {
+      padding: 3px 10px; border-radius: 100px; font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .api-badge.on  { background: rgba(0,232,122,.12); color: var(--verde); border: 1px solid rgba(0,232,122,.2); }
+    .api-badge.off { background: var(--s2); color: var(--t3); border: 1px solid var(--br); }
+    .api-badge .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
     /* Form */
     .form-card {
       background: var(--s1); border: 1px solid var(--br2);
-      border-radius: 14px; padding: 24px 28px; margin-bottom: 28px;
+      border-radius: 14px; padding: 24px 28px; margin-bottom: 18px;
     }
     .form-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--t1); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
@@ -54,9 +70,24 @@
     .btn-buscar:hover { opacity: .88; } .btn-buscar:disabled { opacity: .4; cursor: not-allowed; }
 
     /* Estado */
-    .status-bar { font-size: 12px; color: var(--t2); margin-bottom: 16px; min-height: 18px; }
+    .status-bar { font-size: 12px; color: var(--t2); margin-bottom: 16px; min-height: 18px; display: flex; align-items: center; gap: 8px; }
     .status-bar.searching { color: var(--amber); }
     .status-bar.done { color: var(--verde); }
+
+    /* Fuentes strip */
+    .fuentes-strip {
+      display: none; align-items: center; gap: 6px; flex-wrap: wrap;
+      margin-bottom: 16px; font-size: 11px; color: var(--t2);
+    }
+    .fuentes-strip.show { display: flex; }
+    .fuente-tag {
+      padding: 2px 9px; border-radius: 100px; font-size: 10px; font-weight: 700;
+    }
+    .fuente-apollo   { background: rgba(255,165,0,.1);  color: #f5a623; border: 1px solid rgba(245,166,35,.2); }
+    .fuente-lusha    { background: rgba(74,158,255,.1); color: var(--azul); border: 1px solid rgba(74,158,255,.2); }
+    .fuente-zoominfo { background: rgba(167,139,250,.1);color: var(--purple); border: 1px solid rgba(167,139,250,.2); }
+    .fuente-linkedin { background: rgba(0,119,181,.15); color: #0077b5; border: 1px solid rgba(0,119,181,.25); }
+    .fuente-ia       { background: rgba(0,232,122,.1);  color: var(--verde); border: 1px solid rgba(0,232,122,.15); }
 
     /* Resultados */
     .results { display: flex; flex-direction: column; gap: 14px; }
@@ -67,9 +98,25 @@
     }
     .prospect-card:hover { border-color: var(--br2); }
     .prospect-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-    .prospect-num { font-size: 10px; font-weight: 800; color: var(--t3); }
+    .prospect-num { font-size: 10px; font-weight: 800; color: var(--t3); margin-bottom: 3px; }
     .prospect-name { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
     .prospect-sector { font-size: 11px; color: var(--t2); }
+
+    /* Contact chips */
+    .contact-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 500;
+      background: var(--s2); border: 1px solid var(--br2); color: var(--t2);
+      text-decoration: none; transition: all .15s;
+    }
+    .chip:hover { border-color: var(--br2); color: var(--t1); }
+    .chip.email   { color: var(--amber); border-color: rgba(245,166,35,.2); background: rgba(245,166,35,.07); }
+    .chip.phone   { color: var(--verde); border-color: rgba(0,232,122,.2);  background: rgba(0,232,122,.07); }
+    .chip.linkedin{ color: #0077b5;       border-color: rgba(0,119,181,.25); background: rgba(0,119,181,.08); }
+    .chip.web     { color: var(--azul);   border-color: rgba(74,158,255,.2); background: rgba(74,158,255,.07); }
+    .chip.emp     { color: var(--t3); }
+
     .prospect-why {
       font-size: 12px; color: var(--t2); line-height: 1.55; margin-bottom: 14px;
       padding: 8px 12px; background: var(--s2); border-radius: 6px;
@@ -82,7 +129,7 @@
       border-radius: 8px; border-top-left-radius: 2px;
       padding: 12px 14px; white-space: pre-wrap;
     }
-    .prospect-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .prospect-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .btn-copy {
       padding: 6px 14px; background: var(--s2); border: 1px solid var(--br2);
       border-radius: 6px; color: var(--t2); font-family: var(--sans); font-size: 11px; font-weight: 600;
@@ -97,16 +144,27 @@
       transition: all .15s;
     }
     .btn-wa:hover { background: rgba(37,211,102,.18); }
+    .source-tag {
+      padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: 700;
+      background: var(--s2); border: 1px solid var(--br); color: var(--t3);
+      margin-left: auto;
+    }
 
     /* Empty */
     .empty { text-align: center; padding: 60px 24px; color: var(--t2); font-size: 13px; }
     .empty-icon { font-size: 40px; margin-bottom: 12px; }
 
     /* Loading dots */
-    .loading { display: flex; gap: 6px; align-items: center; padding: 40px; justify-content: center; }
+    .loading { display: flex; flex-direction: column; gap: 12px; align-items: center; padding: 40px; justify-content: center; }
+    .loading-text { font-size: 12px; color: var(--t2); }
+    .ldots { display: flex; gap: 6px; }
     .ldot { width: 8px; height: 8px; border-radius: 50%; background: var(--verde); animation: ldotPulse 1.2s ease infinite; }
     .ldot:nth-child(2) { animation-delay: .2s; } .ldot:nth-child(3) { animation-delay: .4s; }
     @keyframes ldotPulse { 0%,100%{ opacity:.3; transform:scale(.8); } 50%{ opacity:1; transform:scale(1.2); } }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -123,6 +181,17 @@
 </header>
 
 <div class="wrap">
+
+  <!-- API Status -->
+  <div class="api-status-bar" id="api-status-bar">
+    <span class="api-status-label">Fuentes:</span>
+    <span class="api-badge off" id="badge-apollo"><span class="dot"></span>Apollo.io</span>
+    <span class="api-badge off" id="badge-lusha"><span class="dot"></span>Lusha</span>
+    <span class="api-badge off" id="badge-zoominfo"><span class="dot"></span>ZoomInfo</span>
+    <span class="api-badge off" id="badge-linkedin"><span class="dot"></span>LinkedIn</span>
+    <span class="api-badge on"  id="badge-ia"><span class="dot"></span>IA Generativa</span>
+  </div>
+
   <div class="form-card">
     <div class="form-title">¿A quién quieres prospectar?</div>
     <div class="form-row">
@@ -154,6 +223,7 @@
     </div>
   </div>
 
+  <div class="fuentes-strip" id="fuentes-strip"></div>
   <div class="status-bar" id="status"></div>
   <div id="results">
     <div class="empty">
@@ -166,6 +236,20 @@
 <script>
   let searching = false;
 
+  // Cargar estado de APIs al inicio
+  fetch('/api/prospector/status').then(r => r.json()).then(s => {
+    if (s.apollo)    toggleBadge('apollo',    true);
+    if (s.lusha)     toggleBadge('lusha',     true);
+    if (s.zoominfo)  toggleBadge('zoominfo',  true);
+    if (s.linkedin)  toggleBadge('linkedin',  true);
+  }).catch(() => {});
+
+  function toggleBadge(name, active) {
+    const el = document.getElementById('badge-' + name);
+    if (!el) return;
+    el.className = 'api-badge ' + (active ? 'on' : 'off');
+  }
+
   async function buscar() {
     if (searching) return;
     const sector = document.getElementById('sector').value;
@@ -174,12 +258,21 @@
 
     searching = true;
     document.getElementById('btn-buscar').disabled = true;
-    document.getElementById('status').className = 'status-bar searching';
-    document.getElementById('status').textContent = `Buscando empresas de ${sector} en ${zona}...`;
-    document.getElementById('results').innerHTML = '<div class="loading"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>';
+    document.getElementById('fuentes-strip').className = 'fuentes-strip';
+    setStatus('searching', `Buscando empresas de ${sector} en ${zona}...`);
+    document.getElementById('results').innerHTML = `
+      <div class="loading">
+        <div class="ldots"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>
+        <div class="loading-text" id="load-txt">Consultando Apollo.io, Lusha, ZoomInfo, LinkedIn...</div>
+      </div>`;
+
+    setTimeout(() => {
+      const t = document.getElementById('load-txt');
+      if (t) t.textContent = 'Enriqueciendo resultados con IA...';
+    }, 3000);
 
     try {
-      const res = await fetch('/api/prospector/generate', {
+      const res  = await fetch('/api/prospector/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sector, zona }),
@@ -187,43 +280,83 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al generar prospectos');
 
-      renderResultados(data.prospectos, sector, zona);
-      document.getElementById('status').className = 'status-bar done';
-      document.getElementById('status').textContent = `${data.prospectos.length} prospectos encontrados en ${zona} · ${sector}`;
+      renderResultados(data.prospectos, sector, zona, data.fuentes || [], data.modo);
+      setStatus('done', `${data.prospectos.length} prospectos encontrados en ${zona} · ${sector}`);
+      renderFuentesStrip(data.fuentes || [], data.modo);
     } catch(e) {
       document.getElementById('results').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div>${e.message}</div></div>`;
-      document.getElementById('status').textContent = '';
+      setStatus('', '');
     }
 
     searching = false;
     document.getElementById('btn-buscar').disabled = false;
   }
 
-  function renderResultados(prospectos, sector, zona) {
+  function setStatus(cls, txt) {
+    const el = document.getElementById('status');
+    el.className = 'status-bar' + (cls ? ' ' + cls : '');
+    el.textContent = txt;
+  }
+
+  function renderFuentesStrip(fuentes, modo) {
+    const strip = document.getElementById('fuentes-strip');
+    if (!fuentes.length) { strip.className = 'fuentes-strip'; return; }
+    strip.innerHTML = '<span style="color:var(--t3);font-size:10px;font-weight:600">DATOS DE:</span> ' +
+      fuentes.map(f => `<span class="fuente-tag ${fuenteClass(f)}">${f}</span>`).join('');
+    if (modo === 'ia') strip.innerHTML += '<span style="color:var(--t3);font-size:10px;margin-left:4px">— Empresas representativas generadas por IA</span>';
+    strip.className = 'fuentes-strip show';
+  }
+
+  function fuenteClass(f) {
+    const lf = f.toLowerCase();
+    if (lf.includes('apollo'))   return 'fuente-apollo';
+    if (lf.includes('lusha'))    return 'fuente-lusha';
+    if (lf.includes('zoominfo')) return 'fuente-zoominfo';
+    if (lf.includes('linkedin')) return 'fuente-linkedin';
+    return 'fuente-ia';
+  }
+
+  function renderResultados(prospectos, sector, zona, fuentes, modo) {
     document.getElementById('results').innerHTML = `
       <div class="results">
         ${prospectos.map((p, i) => `
           <div class="prospect-card">
             <div class="prospect-head">
               <div>
-                <div class="prospect-num">#${i+1} · ${sector.toUpperCase()} · ${zona.toUpperCase()}</div>
+                <div class="prospect-num">#${i+1} · ${esc(sector.toUpperCase())} · ${esc(zona.toUpperCase())}</div>
                 <div class="prospect-name">${esc(p.empresa)}</div>
                 <div class="prospect-sector">${esc(p.giro || '')}</div>
               </div>
+              ${p.fuente ? `<span class="source-tag">${esc(p.fuente)}</span>` : ''}
             </div>
+            ${buildContactRow(p)}
             <div class="prospect-why">💡 ${esc(p.por_que || '')}</div>
             <div class="prospect-msg-label">Mensaje WhatsApp personalizado</div>
-            <div class="prospect-msg" id="msg-${i}">${esc(p.mensaje)}</div>
+            <div class="prospect-msg" id="msg-${i}">${esc(p.mensaje || '')}</div>
             <div class="prospect-actions">
               <button class="btn-copy" onclick="copiar(${i}, this)">📋 Copiar mensaje</button>
-              <a class="btn-wa" href="https://wa.me/?text=${encodeURIComponent(p.mensaje)}" target="_blank">
-                📱 Abrir en WhatsApp
-              </a>
+              ${p.mensaje ? `<a class="btn-wa" href="https://wa.me/?text=${encodeURIComponent(p.mensaje)}" target="_blank">📱 Abrir en WhatsApp</a>` : ''}
+              ${p.telefono ? `<a class="btn-wa" href="https://wa.me/${sanitizePhone(p.telefono)}?text=${encodeURIComponent(p.mensaje || '')}" target="_blank">📞 WA directo</a>` : ''}
             </div>
           </div>
         `).join('')}
       </div>
     `;
+  }
+
+  function buildContactRow(p) {
+    const chips = [];
+    if (p.email)    chips.push(`<a class="chip email"  href="mailto:${esc(p.email)}"  target="_blank">✉ ${esc(p.email)}</a>`);
+    if (p.telefono) chips.push(`<span class="chip phone">📞 ${esc(p.telefono)}</span>`);
+    if (p.linkedin) chips.push(`<a class="chip linkedin" href="${esc(p.linkedin)}" target="_blank">in LinkedIn</a>`);
+    if (p.website)  chips.push(`<a class="chip web"  href="${p.website.startsWith('http') ? '' : 'https://'}${esc(p.website)}" target="_blank">🌐 ${esc(p.website)}</a>`);
+    if (p.empleados)chips.push(`<span class="chip emp">👥 ${esc(String(p.empleados))} emp.</span>`);
+    if (!chips.length) return '';
+    return `<div class="contact-row">${chips.join('')}</div>`;
+  }
+
+  function sanitizePhone(phone) {
+    return (phone || '').replace(/\D/g, '');
   }
 
   function copiar(i, btn) {
@@ -235,7 +368,7 @@
   }
 
   function esc(str) {
-    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 </script>
 </body>
