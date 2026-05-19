@@ -163,8 +163,9 @@ app.post('/api/prospector/generate', async (req, res) => {
       const enriquecidos = await Promise.all(realProspectos.map(async p => {
         if (p.mensaje) return p;
         const lugar = p.ciudad || (nacional ? 'México' : zona);
+        const contactoCtx = p.contacto ? ` Dirígete a "${p.contacto}".` : '';
         const msgPrompt = `Eres el equipo comercial de ABSTORAGES Logistics Solutions.
-Redacta UN SOLO mensaje de prospección de WhatsApp para la empresa "${p.empresa}" del sector "${p.giro || sector}" ubicada en "${lugar}".
+Redacta UN SOLO mensaje de prospección de WhatsApp para la empresa "${p.empresa}" del sector "${p.giro || sector}" ubicada en "${lugar}".${contactoCtx}
 Máximo 4 párrafos. Tono profesional pero cercano. Menciona la empresa por nombre. Termina con una pregunta de apertura.
 Responde SOLO el texto del mensaje, sin comillas ni explicaciones.`;
         let msg = '';
@@ -186,8 +187,9 @@ Para cada empresa devuelve un objeto con:
 - empresa: nombre realista y creíble
 - giro: descripción corta (máx 6 palabras)
 - ciudad: ciudad donde está ubicada la empresa
+- contacto: nombre completo y cargo del tomador de decisiones en logística (ej: "Ing. Carlos Ramírez · Director de Operaciones")
 - por_que: razón específica de necesidad de flete (1 oración)
-- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, menciona la empresa por nombre y su ciudad, termina con pregunta de apertura
+- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, dirigido al contacto por su nombre, menciona la empresa y ciudad, termina con pregunta de apertura
 - fuente: "IA Generativa"
 Responde SOLO JSON válido, sin markdown. Formato: {"prospectos": [...]}`;
 

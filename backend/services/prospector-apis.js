@@ -33,6 +33,7 @@ function normalize(raw, source) {
     empleados: raw.employees || raw.num_employees   || raw.employee_count    || '',
     ciudad:    raw.ciudad    || raw.city            || raw.locality          || '',
     pais:      raw.pais      || raw.country         || 'México',
+    contacto:  raw.contacto  || raw.contact_name    || raw.owner_name        || '',
     por_que:   raw.por_que   || '',
     mensaje:   raw.mensaje   || '',
     fuente:    source,
@@ -67,17 +68,23 @@ async function searchApollo(sector, zona, limit = 8) {
       body
     );
     if (res.status !== 200 || !res.body?.organizations) return [];
-    return res.body.organizations.slice(0, limit).map(org =>
-      normalize({
+    return res.body.organizations.slice(0, limit).map(org => {
+      // Apollo devuelve key_people o contacts en algunos planes
+      const kp = (org.key_people || org.contacts || [])[0];
+      const contacto = kp
+        ? `${kp.first_name || ''} ${kp.last_name || ''}`.trim() + (kp.title ? ` · ${kp.title}` : '')
+        : '';
+      return normalize({
         empresa:   org.name,
         giro:      (org.keywords || []).slice(0, 3).join(', ') || org.industry,
         website:   org.website_url || org.primary_domain,
         empleados: org.estimated_num_employees,
         ciudad:    org.city || org.state,
         linkedin:  org.linkedin_url,
+        contacto,
         por_que:   `Empresa de ${org.industry || sector} con ${org.estimated_num_employees || '?'} empleados — alta probabilidad de necesitar logística y flete regular.`,
-      }, 'Apollo.io')
-    );
+      }, 'Apollo.io');
+    });
   } catch (_) { return []; }
 }
 
@@ -102,17 +109,21 @@ async function searchLusha(sector, zona, limit = 8) {
       }
     );
     if (res.status !== 200 || !res.body?.data) return [];
-    return res.body.data.slice(0, limit).map(c =>
-      normalize({
+    return res.body.data.slice(0, limit).map(c => {
+      const cp = (c.contacts || [])[0];
+      const contacto = cp ? `${cp.firstName || ''} ${cp.lastName || ''}`.trim() + (cp.title ? ` · ${cp.title}` : '') : '';
+      return normalize({
         empresa:  c.name,
         giro:     c.industry,
         website:  c.website,
         empleados:c.employees,
         ciudad:   c.city || zona,
         telefono: c.phone,
+        email:    cp?.email || '',
+        contacto,
         por_que:  `Empresa de ${c.industry || sector} en ${c.city || zona} con ${c.employees || '?'} empleados — candidata para servicios de flete.`,
-      }, 'Lusha')
-    );
+      }, 'Lusha');
+    });
   } catch (_) { return []; }
 }
 
@@ -166,8 +177,10 @@ async function searchZoomInfo(sector, zona, limit = 8) {
       body
     );
     if (res.status !== 200 || !res.body?.data?.result) return [];
-    return res.body.data.result.slice(0, limit).map(c =>
-      normalize({
+    return res.body.data.result.slice(0, limit).map(c => {
+      const cp = (c.contacts || [])[0];
+      const contacto = cp ? `${cp.firstName || ''} ${cp.lastName || ''}`.trim() + (cp.jobTitle ? ` · ${cp.jobTitle}` : '') : '';
+      return normalize({
         empresa:  c.name,
         giro:     c.industry,
         website:  c.website,
@@ -175,9 +188,11 @@ async function searchZoomInfo(sector, zona, limit = 8) {
         empleados:c.employeeCount,
         ciudad:   c.city || zona,
         linkedin: c.linkedInUrl,
+        email:    cp?.email || '',
+        contacto,
         por_que:  `${c.industry || sector} con ${c.employeeCount || '?'} empleados en ${c.city || zona} — perfil ideal para transporte de carga.`,
-      }, 'ZoomInfo')
-    );
+      }, 'ZoomInfo');
+    });
   } catch (_) { return []; }
 }
 
