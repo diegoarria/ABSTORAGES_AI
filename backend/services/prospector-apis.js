@@ -50,7 +50,8 @@ async function searchApollo(sector, zona, limit = 8) {
   const body = {
     api_key: APOLLO_KEY,
     q_organization_keyword_tags: [sector],
-    organization_locations: [zona],
+    // Omit location filter for national searches (zona === null)
+    ...(zona ? { organization_locations: [zona] } : { organization_locations: ['Mexico'] }),
     per_page: limit,
     page: 1,
   };
@@ -88,12 +89,8 @@ const LUSHA_KEY = process.env.LUSHA_API_KEY;
 async function searchLusha(sector, zona, limit = 8) {
   if (!LUSHA_KEY || LUSHA_KEY.startsWith('xxxx')) return [];
 
-  const params = new URLSearchParams({
-    company_industry: sector,
-    company_country: 'Mexico',
-    company_city: zona,
-    limit: String(limit),
-  });
+  const params = new URLSearchParams({ company_industry: sector, company_country: 'Mexico', limit: String(limit) });
+  if (zona) params.set('company_city', zona);
 
   try {
     const res = await httpsRequest(
@@ -145,10 +142,14 @@ async function searchZoomInfo(sector, zona, limit = 8) {
     const token = await getZoomInfoToken();
     if (!token) return [];
 
+    const locationFilter = zona
+      ? { locationSearchType: 'CITY', stateList: [zona] }
+      : { locationSearchType: 'COUNTRY', countryList: ['Mexico'] };
+
     const body = {
       matchCompanyInput: [
         { industryList: [{ value: sector, matchType: 'FUZZY' }] },
-        { locationSearchType: 'CITY', stateList: [zona] },
+        locationFilter,
       ],
       outputFields: ['id','name','website','phone','city','state','employeeCount','industry','linkedInUrl'],
       rpp: limit,

@@ -151,14 +151,20 @@ app.post('/api/prospector/generate', async (req, res) => {
   const { sector, zona } = req.body;
   if (!sector || !zona) return res.status(400).json({ error: 'sector y zona requeridos' });
 
+  const nacional  = zona === 'todo-mexico';
+  const zonaLabel = nacional ? 'México' : zona;
+  // Null zona for national searches so APIs omit city filter
+  const zonaApi   = nacional ? null : zona;
+
   try {
-    const { prospectos: realProspectos, sources } = await prospectorApis.searchAll(sector, zona, 8);
+    const { prospectos: realProspectos, sources } = await prospectorApis.searchAll(sector, zonaApi, 8);
 
     if (realProspectos.length > 0) {
       const enriquecidos = await Promise.all(realProspectos.map(async p => {
         if (p.mensaje) return p;
+        const lugar = p.ciudad || (nacional ? 'México' : zona);
         const msgPrompt = `Eres el equipo comercial de ABSTORAGES Logistics Solutions.
-Redacta UN SOLO mensaje de prospección de WhatsApp para la empresa "${p.empresa}" del sector "${p.giro || sector}" en "${p.ciudad || zona}".
+Redacta UN SOLO mensaje de prospección de WhatsApp para la empresa "${p.empresa}" del sector "${p.giro || sector}" ubicada en "${lugar}".
 Máximo 4 párrafos. Tono profesional pero cercano. Menciona la empresa por nombre. Termina con una pregunta de apertura.
 Responde SOLO el texto del mensaje, sin comillas ni explicaciones.`;
         let msg = '';
@@ -170,13 +176,18 @@ Responde SOLO el texto del mensaje, sin comillas ni explicaciones.`;
     }
 
     // Fallback: Claude genera empresas representativas
+    const alcance = nacional
+      ? 'distribuidas en distintos estados de la República Mexicana (incluye ciudades como CDMX, Monterrey, Guadalajara, Puebla, Querétaro, entre otras — varía la ciudad en cada empresa)'
+      : `en "${zonaLabel}"`;
+
     const prompt = `Eres un experto en prospección comercial de logística en México.
-Genera una lista JSON de exactamente 8 empresas del sector "${sector}" en "${zona}" que probablemente necesiten servicios de flete.
+Genera una lista JSON de exactamente 8 empresas del sector "${sector}" ${alcance} que probablemente necesiten servicios de flete.
 Para cada empresa devuelve un objeto con:
 - empresa: nombre realista y creíble
 - giro: descripción corta (máx 6 palabras)
+- ciudad: ciudad donde está ubicada la empresa
 - por_que: razón específica de necesidad de flete (1 oración)
-- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, menciona la empresa por nombre, termina con pregunta de apertura
+- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, menciona la empresa por nombre y su ciudad, termina con pregunta de apertura
 - fuente: "IA Generativa"
 Responde SOLO JSON válido, sin markdown. Formato: {"prospectos": [...]}`;
 

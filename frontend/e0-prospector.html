@@ -212,7 +212,33 @@
       </div>
       <div>
         <label>Ciudad / Zona</label>
-        <input type="text" id="zona" placeholder="Ej: Monterrey, CDMX, Guadalajara..." value="Monterrey"/>
+        <select id="zona" onchange="onZonaChange()">
+          <option value="todo-mexico">🇲🇽 Todo México</option>
+          <optgroup label="── Principales ciudades ──">
+            <option value="Monterrey">Monterrey</option>
+            <option value="CDMX">Ciudad de México (CDMX)</option>
+            <option value="Guadalajara">Guadalajara</option>
+            <option value="Puebla">Puebla</option>
+            <option value="Tijuana">Tijuana</option>
+            <option value="León">León</option>
+            <option value="Ciudad Juárez">Ciudad Juárez</option>
+            <option value="Querétaro">Querétaro</option>
+            <option value="San Luis Potosí">San Luis Potosí</option>
+            <option value="Mérida">Mérida</option>
+            <option value="Hermosillo">Hermosillo</option>
+            <option value="Saltillo">Saltillo</option>
+            <option value="Chihuahua">Chihuahua</option>
+            <option value="Veracruz">Veracruz</option>
+            <option value="Aguascalientes">Aguascalientes</option>
+            <option value="Torreón">Torreón</option>
+            <option value="Culiacán">Culiacán</option>
+            <option value="Mexicali">Mexicali</option>
+          </optgroup>
+          <optgroup label="── Otra ciudad ──">
+            <option value="__custom__">Escribir otra ciudad...</option>
+          </optgroup>
+        </select>
+        <input type="text" id="zona-custom" placeholder="Escribe la ciudad..." style="display:none;margin-top:6px"/>
       </div>
       <button class="btn-buscar" id="btn-buscar" onclick="buscar()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -250,16 +276,32 @@
     el.className = 'api-badge ' + (active ? 'on' : 'off');
   }
 
+  function onZonaChange() {
+    const sel = document.getElementById('zona').value;
+    const custom = document.getElementById('zona-custom');
+    custom.style.display = sel === '__custom__' ? 'block' : 'none';
+    if (sel !== '__custom__') custom.value = '';
+  }
+
+  function getZona() {
+    const sel = document.getElementById('zona').value;
+    if (sel === 'todo-mexico') return 'todo-mexico';
+    if (sel === '__custom__') return document.getElementById('zona-custom').value.trim();
+    return sel;
+  }
+
   async function buscar() {
     if (searching) return;
     const sector = document.getElementById('sector').value;
-    const zona   = document.getElementById('zona').value.trim();
+    const zona   = getZona();
     if (!zona) { alert('Escribe una ciudad o zona.'); return; }
+
+    const zonaLabel = zona === 'todo-mexico' ? 'Todo México' : zona;
 
     searching = true;
     document.getElementById('btn-buscar').disabled = true;
     document.getElementById('fuentes-strip').className = 'fuentes-strip';
-    setStatus('searching', `Buscando empresas de ${sector} en ${zona}...`);
+    setStatus('searching', `Buscando empresas de ${sector} en ${zonaLabel}...`);
     document.getElementById('results').innerHTML = `
       <div class="loading">
         <div class="ldots"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>
@@ -280,8 +322,8 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al generar prospectos');
 
-      renderResultados(data.prospectos, sector, zona, data.fuentes || [], data.modo);
-      setStatus('done', `${data.prospectos.length} prospectos encontrados en ${zona} · ${sector}`);
+      renderResultados(data.prospectos, sector, zonaLabel, data.fuentes || [], data.modo);
+      setStatus('done', `${data.prospectos.length} prospectos encontrados en ${zonaLabel} · ${sector}`);
       renderFuentesStrip(data.fuentes || [], data.modo);
     } catch(e) {
       document.getElementById('results').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div>${e.message}</div></div>`;
