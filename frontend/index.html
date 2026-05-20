@@ -91,7 +91,7 @@
     </div>
   </header>
 
-  <!-- ─── COMMAND LAYOUT ────────────────────────────────────────────────── -->
+  <!-- ─── 3-COLUMN LAYOUT ─────────────────────────────────────────────────── -->
   <div class="cmd-scroll-wrap">
   <main class="command-layout">
 
@@ -151,72 +151,29 @@
       </div>
     </div>
 
-    <!-- ── CONTROL DE MANDO ──────────────────────────────────────────────── -->
-    <div class="cmd-center">
+    <!-- ── CENTRO DE MANDO ───────────────────────────────────────────────── -->
+    <div class="cmd-center cmd-center-scroll">
 
       <div class="cmd-center-head">
-        <div class="cmd-center-title">Control de Mando</div>
+        <div class="cmd-center-title">Centro de Mando</div>
         <div class="live-indicator">
           <span class="live-dot"></span>
           <span>LIVE</span>
         </div>
       </div>
 
-      <!-- Mini metrics -->
-      <div class="cmd-metrics">
-        <div class="cmd-metric green">
-          <div class="cmd-metric-val" id="metric-folios-activos">—</div>
-          <div class="cmd-metric-label">Folios Activos</div>
-        </div>
-        <div class="cmd-metric amber">
-          <div class="cmd-metric-val" id="metric-folios-hoy">—</div>
-          <div class="cmd-metric-label">Folios Hoy</div>
-        </div>
-        <div class="cmd-metric blue">
-          <div class="cmd-metric-val" id="metric-proveedores">—</div>
-          <div class="cmd-metric-label">Proveedores</div>
-        </div>
-        <div class="cmd-metric red">
-          <div class="cmd-metric-val" id="metric-alertas">—</div>
-          <div class="cmd-metric-label">Alertas</div>
-        </div>
-      </div>
-
-      <!-- Pipeline -->
-      <div class="cmd-pipeline-wrap">
+      <!-- Conversaciones activas -->
+      <div class="cmd-conv-section">
         <div class="cmd-section-label">
-          Pipeline de Servicios
-          <button class="btn-ghost btn-sm" id="btn-refresh-folios" style="padding:2px 8px;font-size:10px;">↺</button>
+          Conversaciones activas
+          <span class="cmd-conv-badge" id="cmd-conv-count">0</span>
         </div>
-        <div class="cmd-pipeline-stages">
-          <div class="cmd-pipe-stage">
-            <div class="cmd-pipe-count" id="stage-pendiente">0</div>
-            <div class="cmd-pipe-label">Pendiente</div>
-          </div>
-          <div class="cmd-pipe-stage">
-            <div class="cmd-pipe-count" id="stage-busqueda">0</div>
-            <div class="cmd-pipe-label">Búsqueda</div>
-          </div>
-          <div class="cmd-pipe-stage">
-            <div class="cmd-pipe-count" id="stage-programado">0</div>
-            <div class="cmd-pipe-label">Programado</div>
-          </div>
-          <div class="cmd-pipe-stage amber">
-            <div class="cmd-pipe-count" id="stage-proceso">0</div>
-            <div class="cmd-pipe-label">En Proceso</div>
-          </div>
-          <div class="cmd-pipe-stage blue">
-            <div class="cmd-pipe-count" id="stage-entregado">0</div>
-            <div class="cmd-pipe-label">Entregado</div>
-          </div>
-          <div class="cmd-pipe-stage green">
-            <div class="cmd-pipe-count" id="stage-concluido">0</div>
-            <div class="cmd-pipe-label">Concluido</div>
-          </div>
+        <div class="cmd-sessions" id="cmd-sessions">
+          <div class="cmd-sessions-empty">Sin conversaciones aún...</div>
         </div>
       </div>
 
-      <!-- Alertas Predictivas (solo admin) -->
+      <!-- Alertas (solo admin) -->
       <div class="cmd-alerts admin-only">
         <div class="cmd-section-label">
           Alertas Predictivas
@@ -320,7 +277,7 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
-          Volver al Control de Mando
+          Volver al Centro de Mando
         </button>
         <div class="portal-overlay-title">Portal ABSTORAGES</div>
         <div class="header-status" style="margin-left:auto;">
@@ -615,6 +572,7 @@
         </div>
 
       </div>
+
     </div>
   </div>
 
@@ -719,7 +677,6 @@
       setInterval(refresh, 30000);
       // Refrescar cuando se abre el portal overlay
       document.getElementById('btn-open-portal')?.addEventListener('click', () => setTimeout(refresh, 200));
-      document.getElementById('btn-open-portal-2')?.addEventListener('click', () => setTimeout(refresh, 200));
     });
 
     return { refresh };
@@ -761,7 +718,6 @@
             const hasContent = portalBody.querySelectorAll(':not(.admin-only)').length > 2;
             if (!hasContent) {
               document.getElementById('btn-open-portal')?.classList.add('hidden-role');
-              document.getElementById('btn-open-portal-2')?.classList.add('hidden-role');
             }
           }
         }
@@ -798,13 +754,58 @@
     }
 
     document.getElementById('btn-open-portal').addEventListener('click', openPortal);
-    document.getElementById('btn-open-portal-2').addEventListener('click', openPortal);
+    document.getElementById('btn-open-portal-2')?.addEventListener('click', openPortal);
     document.getElementById('btn-close-portal').addEventListener('click', closePortal);
 
-    // Close on ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closePortal();
     });
+
+    // ── Centro de Mando — círculos de sesión ────────────────────────────────
+    window.CentroMando = (() => {
+      const sessions = {};
+      let count = 0;
+
+      function activate(sessionId, agente) {
+        if (!sessionId) return;
+        const container = document.getElementById('cmd-sessions');
+        if (!container) return;
+
+        if (!sessions[sessionId]) {
+          count++;
+          sessions[sessionId] = { num: count, timer: null };
+          const empty = container.querySelector('.cmd-sessions-empty');
+          if (empty) empty.remove();
+
+          const dot = document.createElement('div');
+          dot.className = `cmd-session-dot ${agente.toLowerCase()}-dot`;
+          dot.id = `cmd-dot-${sessionId.replace(/[^a-z0-9]/gi, '')}`;
+          dot.textContent = count;
+          dot.title = `Sesión ${count} · ${agente}`;
+          container.appendChild(dot);
+
+          const badge = document.getElementById('cmd-conv-count');
+          if (badge) badge.textContent = count;
+        }
+
+        const safeId = `cmd-dot-${sessionId.replace(/[^a-z0-9]/gi, '')}`;
+        const dot = document.getElementById(safeId);
+        if (!dot) return;
+
+        dot.classList.add('active', 'pulse');
+        setTimeout(() => dot.classList.remove('pulse'), 600);
+
+        const s = sessions[sessionId];
+        if (s.timer) clearTimeout(s.timer);
+        s.timer = setTimeout(() => dot.classList.remove('active'), 10000);
+      }
+
+      return {
+        addItem(agente, tipo, mensaje, sessionId) {
+          activate(sessionId, agente);
+        }
+      };
+    })();
   </script>
 </body>
 </html>

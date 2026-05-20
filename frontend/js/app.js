@@ -83,6 +83,17 @@ const App = (() => {
         } else if (data.type === 'actividad') {
           agregarActividad(data, true);
           cargarMetricas();
+          // Centro de Mando feed
+          const cmTipos = ['MENSAJE_USUARIO','MENSAJE_SARA','MENSAJE_SOFIA','CIERRE_VENTA','NUEVA_ORDEN','FOLIO_ACTUALIZADO'];
+          if (cmTipos.includes(data.tipo)) {
+            window.CentroMando?.addItem(
+              data.agente,
+              data.tipo,
+              data.mensaje || '',
+              data.metadata?.sessionId || data.sessionId,
+              data.timestamp
+            );
+          }
         }
       } catch (err) {
         console.error('[SSE] Error parseando evento:', err);

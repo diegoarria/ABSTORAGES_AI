@@ -19,10 +19,12 @@ router.post('/chat', async (req, res) => {
   res.flushHeaders();
 
   try {
-    const historial = await obtenerHistorialConversacion('SARA', sessionId);
+    let historial = [];
+    try { historial = await obtenerHistorialConversacion('SARA', sessionId); } catch (_) {}
     historial.push({ role: 'user', content: message });
 
-    await guardarMensaje('SARA', sessionId, 'user', message);
+    try { await guardarMensaje('SARA', sessionId, 'user', message); } catch (_) {}
+    publicarActividad('SARA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
     let respuestaCompleta = '';
 
@@ -34,8 +36,9 @@ router.post('/chat', async (req, res) => {
       },
       async (fullText) => {
         respuestaCompleta = fullText;
-        await guardarMensaje('SARA', sessionId, 'assistant', fullText);
-        await registrarActividad('SARA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`);
+        try { await guardarMensaje('SARA', sessionId, 'assistant', fullText); } catch (_) {}
+        try { await registrarActividad('SARA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`); } catch (_) {}
+        publicarActividad('SARA', 'MENSAJE_SARA', fullText.substring(0, 160), { sessionId }).catch(() => {});
 
         // Detectar si SARA está cerrando una venta y publicar evento
         if (detectarCierreVenta(fullText, message)) {

@@ -456,7 +456,8 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al ingresar');
-      window.location.href = '/';
+      const next = new URLSearchParams(window.location.search).get('next');
+      window.location.href = next || '/';
     } catch (ex) {
       err.textContent = ex.message;
       err.classList.add('show');

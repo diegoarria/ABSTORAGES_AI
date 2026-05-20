@@ -17,7 +17,7 @@ function auth(req, res, next) {
   if (!user) {
     const wantsHtml = req.headers.accept?.includes('text/html') && req.method === 'GET';
     return wantsHtml
-      ? res.redirect('/login')
+      ? res.redirect('/login?next=' + encodeURIComponent(req.originalUrl))
       : res.status(401).json({ error: 'No autenticado' });
   }
 

@@ -4,11 +4,15 @@ const cors = require('cors');
 const path = require('path');
 
 const basicAuth = require('./middleware/auth');
+const sessions = require('./services/sessions');
 const saraRoutes = require('./routes/sara');
 const sofiaRoutes = require('./routes/sofia');
 const prospectorRoutes = require('./routes/prospector');
+const lucaRoutes = require('./routes/luca');
 const { suscribirNuevaOrden, suscribirActividad, publicarActividad } = require('./services/redis');
 const { registrarActividad, obtenerActividadReciente, obtenerMetricas } = require('./db/db');
+
+const USERS = require('./data/users.json');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +21,28 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ─── AUTH ROUTES (public — before basicAuth) ──────────────────────────────────
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/login.html'));
+});
+
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+  const user = USERS.find(u => u.email === email && u.password === password);
+  if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
+
+  const sessionId = sessions.create({ id: user.id, nombre: user.nombre, email: user.email, role: user.role });
+  res.cookie('abs_session', sessionId, { httpOnly: true, sameSite: 'lax', maxAge: 86400000 });
+  res.json({ ok: true, nombre: user.nombre, role: user.role });
+});
+
+app.post('/api/logout', (req, res) => {
+  const match = req.headers.cookie?.match(/abs_session=([^;]+)/);
+  if (match) sessions.destroy(match[1]);
+  res.clearCookie('abs_session');
+  res.json({ ok: true });
+});
 
 // ─── FRONTEND ─────────────────────────────────────────────────────────────────
 app.use(basicAuth);
@@ -63,6 +89,12 @@ function broadcastActividad(evento) {
 app.use('/api/sara', saraRoutes);
 app.use('/api/sofia', sofiaRoutes);
 app.use('/api/prospector', prospectorRoutes);
+app.use('/api/luca', lucaRoutes);
+
+// GET /api/me — usuario autenticado actual
+app.get('/api/me', (req, res) => {
+  res.json(req.user);
+});
 
 // GET /api/health
 app.get('/api/health', (req, res) => {

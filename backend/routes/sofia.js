@@ -19,10 +19,12 @@ router.post('/chat', async (req, res) => {
   res.flushHeaders();
 
   try {
-    const historial = await obtenerHistorialConversacion('SOFIA', sessionId);
+    let historial = [];
+    try { historial = await obtenerHistorialConversacion('SOFIA', sessionId); } catch (_) {}
     historial.push({ role: 'user', content: message });
 
-    await guardarMensaje('SOFIA', sessionId, 'user', message);
+    try { await guardarMensaje('SOFIA', sessionId, 'user', message); } catch (_) {}
+    publicarActividad('SOFIA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
     await chatStream(
       SOFIA_SYSTEM_PROMPT,
@@ -31,8 +33,9 @@ router.post('/chat', async (req, res) => {
         res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
       },
       async (fullText) => {
-        await guardarMensaje('SOFIA', sessionId, 'assistant', fullText);
-        await registrarActividad('SOFIA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`);
+        try { await guardarMensaje('SOFIA', sessionId, 'assistant', fullText); } catch (_) {}
+        try { await registrarActividad('SOFIA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`); } catch (_) {}
+        publicarActividad('SOFIA', 'MENSAJE_SOFIA', fullText.substring(0, 160), { sessionId }).catch(() => {});
 
         // Detectar actualización de estatus de folio
         const actualizacion = detectarActualizacionFolio(fullText);
