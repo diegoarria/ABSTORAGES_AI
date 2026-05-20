@@ -72,7 +72,7 @@ app.get('/api/actividad/stream', (req, res) => {
   // Enviar actividad reciente al conectar
   obtenerActividadReciente(20).then((actividades) => {
     sendEvent({ type: 'historial', actividades });
-  });
+  }).catch(() => {});
 });
 
 function broadcastActividad(evento) {

@@ -6,7 +6,7 @@
   <title>ABSTORAGES — Acceso</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -22,7 +22,8 @@
       --t1: #edf0f4;
       --t2: #7e8899;
       --t3: #4a5568;
-      --sans: 'Poppins', sans-serif;
+      --sans: 'Inter', 'Poppins', sans-serif;
+      --display: 'Poppins', sans-serif;
     }
     [data-theme="light"] {
       --fondo: #f0f4f8;
@@ -40,13 +41,15 @@
       background: var(--fondo);
       font-family: var(--sans);
       color: var(--t1);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     body::before {
       content: '';
       position: fixed; inset: 0;
       background:
-        radial-gradient(ellipse 70% 60% at 20% 0%,  rgba(0,232,122,.06) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 60% at 80% 100%, rgba(74,158,255,.05) 0%, transparent 60%);
+        radial-gradient(ellipse 70% 60% at 10% 0%,  rgba(0,232,122,.07) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 60% at 90% 100%, rgba(74,158,255,.05) 0%, transparent 55%);
       pointer-events: none;
     }
 
@@ -65,80 +68,94 @@
       max-width: 400px;
       background: var(--s1);
       border: 1px solid var(--br);
-      border-radius: 16px;
-      padding: 36px 32px;
-      box-shadow: 0 24px 64px rgba(0,0,0,.5);
+      border-radius: 20px;
+      padding: 40px 36px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
     }
     [data-theme="light"] .card {
-      box-shadow: 0 8px 40px rgba(0,0,0,.1);
+      box-shadow: 0 8px 40px rgba(0,0,0,.10);
       border-color: var(--br2);
     }
 
     .logo-wrap {
       display: flex;
       justify-content: center;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
     }
     .logo-wrap img {
-      height: 120px;
+      height: 110px;
       background: #fff;
-      border-radius: 10px;
-      padding: 10px 24px;
+      border-radius: 12px;
+      padding: 10px 26px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
     }
 
     h1 {
+      font-family: var(--display);
       font-size: 22px;
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
     }
     .sub {
       font-size: 13px;
       color: var(--t2);
       text-align: center;
       margin-bottom: 28px;
+      line-height: 1.5;
     }
 
-    .field { margin-bottom: 16px; }
+    .field { margin-bottom: 18px; }
     label {
       display: block;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--t2);
       text-transform: uppercase;
-      margin-bottom: 6px;
+      letter-spacing: 0.07em;
+      margin-bottom: 7px;
     }
     input {
       width: 100%;
       background: var(--s2);
       border: 1px solid var(--br2);
-      border-radius: 8px;
+      border-radius: 10px;
       color: var(--t1);
       font-family: var(--sans);
       font-size: 14px;
-      padding: 11px 14px;
+      padding: 12px 16px;
       outline: none;
-      transition: border-color .15s;
+      transition: border-color .2s, box-shadow .2s;
     }
-    input:focus { border-color: var(--verde); }
+    input:focus {
+      border-color: var(--verde);
+      box-shadow: 0 0 0 3px rgba(0,232,122,.08);
+    }
     input::placeholder { color: var(--t3); }
 
     .btn-login {
       width: 100%;
       margin-top: 8px;
-      padding: 12px;
+      padding: 13px;
       background: var(--verde);
       border: none;
-      border-radius: 8px;
-      color: #07090e;
+      border-radius: 10px;
+      color: #06080c;
       font-family: var(--sans);
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: opacity .15s;
+      transition: all .2s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 2px 10px rgba(0,232,122,.2);
+      letter-spacing: 0.01em;
     }
-    .btn-login:hover { opacity: .88; }
-    .btn-login:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-login:hover {
+      opacity: .9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,232,122,.3);
+    }
+    .btn-login:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .error-msg {
       display: none;
@@ -146,17 +163,18 @@
       color: var(--rojo);
       text-align: center;
       margin-top: 12px;
-      padding: 8px 12px;
-      background: rgba(255,74,74,.08);
-      border: 1px solid rgba(255,74,74,.2);
-      border-radius: 6px;
+      padding: 9px 14px;
+      background: rgba(255,74,74,.07);
+      border: 1px solid rgba(255,74,74,.18);
+      border-radius: 8px;
+      line-height: 1.5;
     }
     .error-msg.show { display: block; }
 
     .divider {
       border: none;
       border-top: 1px solid var(--br);
-      margin: 24px 0 20px;
+      margin: 26px 0 22px;
     }
 
     .demo-title {
@@ -164,46 +182,53 @@
       font-weight: 700;
       color: var(--t3);
       text-transform: uppercase;
+      letter-spacing: 0.08em;
       text-align: center;
       margin-bottom: 12px;
     }
     .demo-users {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 7px;
     }
     .demo-btn {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 9px 12px;
+      padding: 10px 14px;
       background: var(--s2);
       border: 1px solid var(--br);
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all .15s;
+      transition: all .18s cubic-bezier(0.4,0,0.2,1);
       text-align: left;
       width: 100%;
     }
-    .demo-btn:hover { border-color: var(--br2); background: var(--s3); }
+    .demo-btn:hover {
+      border-color: var(--br2);
+      background: var(--s3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
     .demo-dot {
-      width: 8px; height: 8px;
+      width: 9px; height: 9px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .demo-dot.admin { background: var(--verde); }
-    .demo-dot.cliente { background: var(--azul); }
-    .demo-dot.transportista { background: #f5a623; }
+    .demo-dot.admin { background: var(--verde); box-shadow: 0 0 6px rgba(0,232,122,.5); }
+    .demo-dot.cliente { background: var(--azul); box-shadow: 0 0 6px rgba(74,158,255,.5); }
+    .demo-dot.transportista { background: #f5a623; box-shadow: 0 0 6px rgba(245,166,35,.5); }
     .demo-info { flex: 1; }
-    .demo-name { font-size: 12px; font-weight: 600; color: var(--t1); }
-    .demo-role { font-size: 10px; color: var(--t2); margin-top: 1px; }
-    .demo-arrow { font-size: 12px; color: var(--t3); }
+    .demo-name { font-size: 12.5px; font-weight: 700; color: var(--t1); }
+    .demo-role { font-size: 10.5px; color: var(--t2); margin-top: 2px; }
+    .demo-arrow { font-size: 13px; color: var(--t3); transition: transform .15s, color .15s; }
+    .demo-btn:hover .demo-arrow { transform: translateX(3px); color: var(--t2); }
 
     .theme-btn {
       position: absolute;
       top: 20px; right: 20px;
-      width: 36px; height: 36px;
-      border-radius: 8px;
+      width: 38px; height: 38px;
+      border-radius: 10px;
       background: var(--s1);
       border: 1px solid var(--br2);
       color: var(--t2);
