@@ -11,6 +11,7 @@ const prospectorRoutes = require('./routes/prospector');
 const lucaRoutes = require('./routes/luca');
 const { suscribirNuevaOrden, suscribirActividad, publicarActividad } = require('./services/redis');
 const { registrarActividad, obtenerActividadReciente, obtenerMetricas } = require('./db/db');
+const tariff = require('./services/tariff');
 
 const USERS = require('./data/users.json');
 
@@ -94,6 +95,12 @@ app.use('/api/luca', lucaRoutes);
 // GET /api/me — usuario autenticado actual
 app.get('/api/me', (req, res) => {
   res.json(req.user);
+});
+
+// GET /api/tarifa/contexto — tarifario dinámico en tiempo real
+app.get('/api/tarifa/contexto', (req, res) => {
+  const tipoUnidad = req.query.unidad || 'caja seca 53';
+  res.json(tariff.getContext(tipoUnidad));
 });
 
 // GET /api/health

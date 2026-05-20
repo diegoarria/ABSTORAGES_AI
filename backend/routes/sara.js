@@ -4,6 +4,7 @@ const { chatStream } = require('../services/claude');
 const { publicarNuevaOrden, publicarActividad } = require('../services/redis');
 const { guardarMensaje, obtenerHistorialConversacion, registrarActividad } = require('../db/db');
 const mem = require('../services/sessionMemory');
+const tariff = require('../services/tariff');
 const SARA_SYSTEM_PROMPT = require('../agents/sara-prompt');
 
 // POST /api/sara/chat — streaming SSE
@@ -30,8 +31,10 @@ router.post('/chat', async (req, res) => {
 
     let respuestaCompleta = '';
 
+    const systemPrompt = SARA_SYSTEM_PROMPT + tariff.getContext().prompt;
+
     await chatStream(
-      SARA_SYSTEM_PROMPT,
+      systemPrompt,
       historial,
       (chunk) => {
         res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);

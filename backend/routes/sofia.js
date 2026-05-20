@@ -4,6 +4,7 @@ const { chatStream } = require('../services/claude');
 const { publicarActividad, suscribirNuevaOrden } = require('../services/redis');
 const { guardarMensaje, obtenerHistorialConversacion, registrarActividad, actualizarEstatusFolio, obtenerFolioActivo, obtenerMetricas } = require('../db/db');
 const mem = require('../services/sessionMemory');
+const tariff = require('../services/tariff');
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 
 // POST /api/sofia/chat — streaming SSE
@@ -28,8 +29,10 @@ router.post('/chat', async (req, res) => {
     guardarMensaje('SOFIA', sessionId, 'user', message).catch(() => {});
     publicarActividad('SOFIA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
+    const systemPrompt = SOFIA_SYSTEM_PROMPT + tariff.getContext().prompt;
+
     await chatStream(
-      SOFIA_SYSTEM_PROMPT,
+      systemPrompt,
       historial,
       (chunk) => {
         res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
