@@ -78,8 +78,7 @@ const App = (() => {
         const data = JSON.parse(e.data);
         if (data.type === 'historial') {
           const log = document.getElementById('activity-log');
-          log.innerHTML = '';
-          data.actividades?.forEach((a) => agregarActividad(a, false));
+          if (log) { log.innerHTML = ''; data.actividades?.forEach((a) => agregarActividad(a, false)); }
         } else if (data.type === 'actividad') {
           agregarActividad(data, true);
           cargarMetricas();
@@ -109,6 +108,7 @@ const App = (() => {
 
   function agregarActividad(evento, prepend = true) {
     const log = document.getElementById('activity-log');
+    if (!log) return;
     const empty = log.querySelector('.activity-empty');
     if (empty) empty.remove();
 

@@ -37,6 +37,7 @@ const Sara = (() => {
 
     agregarMensajeUsuario(mensaje);
     mostrarTyping();
+    window.CentroMando?.onUserMessage(mensaje);
 
     const btnSend = document.getElementById('sara-send');
     btnSend.disabled = true;
@@ -83,6 +84,7 @@ const Sara = (() => {
 
             if (data.type === 'nueva_orden') {
               App.toast(`Nueva orden publicada a SOFIA: ${data.datos?.folio || ''}`, 'verde');
+              window.CentroMando?.onLeadComplete(data.datos);
             }
 
             if (data.type === 'error') {
@@ -93,6 +95,7 @@ const Sara = (() => {
           } catch (e) { /* ignorar líneas malformadas */ }
         }
       }
+      window.CentroMando?.onSaraResponse(textoAcumulado);
     } catch (err) {
       quitarTyping();
       agregarMensajeError('sara', 'No se pudo conectar con SARA. ¿El servidor está corriendo?');
@@ -183,8 +186,8 @@ const Sara = (() => {
       <div class="message assistant">
         <div class="message-avatar sara">S</div>
         <div class="message-bubble">
-          <p>¡Hola! Soy <strong>SARA</strong>, la AI Vendedora de ABSTORAGES Logistics Solutions.</p>
-          <p>Estoy lista para prospectar clientes, generar cotizaciones, negociar contratos y cerrar ventas. ¿En qué te puedo ayudar?</p>
+          <p>Hola, soy <strong>SARA</strong> asistente digital de ABSTORAGES.</p>
+          <p>¿Cómo puedo ayudarte?</p>
         </div>
       </div>
     `;

@@ -3,6 +3,7 @@ const router = express.Router();
 const { chatStream } = require('../services/claude');
 const { publicarNuevaOrden, publicarActividad } = require('../services/redis');
 const { guardarMensaje, obtenerHistorialConversacion, registrarActividad } = require('../db/db');
+const mem = require('../services/sessionMemory');
 const SARA_SYSTEM_PROMPT = require('../agents/sara-prompt');
 
 // POST /api/sara/chat — streaming SSE
@@ -19,11 +20,12 @@ router.post('/chat', async (req, res) => {
   res.flushHeaders();
 
   try {
-    let historial = [];
-    try { historial = await obtenerHistorialConversacion('SARA', sessionId); } catch (_) {}
-    historial.push({ role: 'user', content: message });
+    // Memoria en tiempo real (funciona sin PostgreSQL)
+    mem.addMessage('SARA', sessionId, 'user', message);
+    const historial = mem.getHistory('SARA', sessionId);
 
-    try { await guardarMensaje('SARA', sessionId, 'user', message); } catch (_) {}
+    // Sync con DB en background (sin bloquear)
+    guardarMensaje('SARA', sessionId, 'user', message).catch(() => {});
     publicarActividad('SARA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
     let respuestaCompleta = '';
@@ -36,8 +38,10 @@ router.post('/chat', async (req, res) => {
       },
       async (fullText) => {
         respuestaCompleta = fullText;
-        try { await guardarMensaje('SARA', sessionId, 'assistant', fullText); } catch (_) {}
-        try { await registrarActividad('SARA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`); } catch (_) {}
+        // Guardar respuesta en memoria inmediatamente
+        mem.addMessage('SARA', sessionId, 'assistant', fullText);
+        guardarMensaje('SARA', sessionId, 'assistant', fullText).catch(() => {});
+        registrarActividad('SARA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`).catch(() => {});
         publicarActividad('SARA', 'MENSAJE_SARA', fullText.substring(0, 160), { sessionId }).catch(() => {});
 
         // Detectar si SARA está cerrando una venta y publicar evento

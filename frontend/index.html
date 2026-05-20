@@ -108,7 +108,7 @@
         <div class="message assistant">
           <div class="message-avatar sara">S</div>
           <div class="message-bubble">
-            <p>¡Hola! Soy <strong>SARA</strong> de ABSTORAGES.</p>
+            <p>Hola, soy <strong>SARA</strong> asistente digital de ABSTORAGES.</p>
             <p>¿Cómo puedo ayudarte?</p>
           </div>
         </div>
@@ -138,56 +138,93 @@
 
       <div class="cmd-center-head">
         <div class="cmd-center-title">Centro de Mando</div>
-        <div class="live-indicator">
-          <span class="live-dot"></span>
-          <span>LIVE</span>
-        </div>
-      </div>
-
-      <!-- Conversaciones activas -->
-      <div class="cmd-conv-section">
-        <div class="cmd-section-label">
-          Conversaciones activas
-          <span class="cmd-conv-badge" id="cmd-conv-count">0</span>
-        </div>
-        <div class="cmd-sessions" id="cmd-sessions">
-          <div class="cmd-sessions-empty">Sin conversaciones aún...</div>
-        </div>
-      </div>
-
-      <!-- Alertas (solo admin) -->
-      <div class="cmd-alerts admin-only">
-        <div class="cmd-section-label">
-          Alertas Predictivas
-          <span class="cmd-alert-badge" id="cmd-alert-count">0</span>
-          <span style="margin-left:auto;font-size:9px;color:var(--texto3);">IA · Tiempo real</span>
-        </div>
-        <div class="cmd-alert-list" id="cmd-alert-list">
-          <div class="cmd-alert-empty">Analizando patrones...</div>
-        </div>
-      </div>
-
-      <!-- Activity log (solo admin) -->
-      <div class="cmd-activity admin-only">
-        <div class="cmd-section-label">
-          Actividad en Tiempo Real
-          <div class="live-indicator" style="margin-left:auto;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="live-indicator">
             <span class="live-dot"></span>
+            <span>LIVE</span>
           </div>
-        </div>
-        <div class="activity-log" id="activity-log">
-          <div class="activity-empty">
-            <span class="mono text-2">Conectando al stream...</span>
-          </div>
+          <button class="mando-gear" id="gear-btn" title="Configuración">⚙</button>
         </div>
       </div>
 
-      <button class="cmd-portal-btn" id="btn-open-portal-2">
-        Ver Portal Completo
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </button>
+      <!-- Stage dots — 13 campos del lead -->
+      <div class="cmd-stage-dots" id="stage-dots"></div>
+
+      <!-- Event feed -->
+      <div class="cmd-event-feed" id="event-feed">
+        <div class="cmd-event-empty" id="event-empty">Esperando actividad...</div>
+      </div>
+
+      <!-- Setup panel -->
+      <div class="cmd-setup-panel" id="setup-panel">
+        <div class="cmd-setup-section">
+          <div class="cmd-setup-label">Carga restringida</div>
+          <div class="cmd-setup-tags" id="setup-tags">
+            <input type="text" class="cmd-setup-tag-input" id="setup-tag-input" placeholder="Agregar tipo...">
+          </div>
+        </div>
+        <div class="cmd-setup-section">
+          <div class="cmd-setup-field">
+            <label>Peso máximo (ton)</label>
+            <input type="number" class="cmd-setup-input" id="s-max-weight" min="0" max="100" value="0">
+          </div>
+        </div>
+        <div class="cmd-setup-section">
+          <div class="cmd-setup-toggle-row">
+            <span class="cmd-setup-toggle-label">Pedir email</span>
+            <label class="cmd-setup-toggle"><input type="checkbox" id="s-require-email"><span class="sl"></span></label>
+          </div>
+          <div class="cmd-setup-toggle-row">
+            <span class="cmd-setup-toggle-label">Descripción de carga</span>
+            <label class="cmd-setup-toggle"><input type="checkbox" id="s-ask-desc"><span class="sl"></span></label>
+          </div>
+        </div>
+        <div class="cmd-setup-section">
+          <div class="cmd-setup-field">
+            <label>Margen de ganancia</label>
+            <div class="cmd-setup-range-row">
+              <input type="range" id="s-margin" min="5" max="50" value="22">
+              <span class="cmd-setup-range-val" id="s-margin-val">22%</span>
+            </div>
+          </div>
+        </div>
+        <div class="cmd-setup-section">
+          <div class="cmd-setup-label">Negociación carrier</div>
+          <div class="cmd-setup-field">
+            <label>Rondas</label>
+            <input type="number" class="cmd-setup-input" id="s-carrier-rounds" min="0" max="10" value="2">
+          </div>
+          <div class="cmd-setup-field">
+            <label>Rango %</label>
+            <div class="cmd-setup-range-row">
+              <input type="range" id="s-carrier-pct" min="0" max="30" value="10">
+              <span class="cmd-setup-range-val" id="s-carrier-pct-val">10%</span>
+            </div>
+          </div>
+        </div>
+        <div class="cmd-setup-section">
+          <div class="cmd-setup-label">Negociación cliente</div>
+          <div class="cmd-setup-field">
+            <label>Rondas</label>
+            <input type="number" class="cmd-setup-input" id="s-client-rounds" min="0" max="10" value="2">
+          </div>
+          <div class="cmd-setup-field">
+            <label>Descuento máx %</label>
+            <div class="cmd-setup-range-row">
+              <input type="range" id="s-client-pct" min="0" max="20" value="5">
+              <span class="cmd-setup-range-val" id="s-client-pct-val">5%</span>
+            </div>
+          </div>
+        </div>
+        <button class="cmd-setup-save" id="setup-save-btn">Guardar</button>
+      </div>
+
+      <!-- Match panel -->
+      <div class="cmd-match-panel" id="match-panel"></div>
+
+      <div class="cmd-mando-footer">
+        <button class="cmd-reset-btn" id="reset-btn">↺ Reiniciar</button>
+      </div>
 
     </div>
 
@@ -743,49 +780,422 @@
       if (e.key === 'Escape') closePortal();
     });
 
-    // ── Centro de Mando — círculos de sesión ────────────────────────────────
+    // ── Centro de Mando — Stage Dots + Event Feed + Auto-Match ─────────────
     window.CentroMando = (() => {
-      const sessions = {};
-      let count = 0;
 
-      function activate(sessionId, agente) {
-        if (!sessionId) return;
-        const container = document.getElementById('cmd-sessions');
+      // ── EventBus ──────────────────────────────────────────────────────────
+      const EB = { _l: {}, on(e,fn){ (this._l[e]||=[]).push(fn); }, emit(e,d){ (this._l[e]||[]).forEach(fn=>fn(d)); } };
+
+      // ── State ──────────────────────────────────────────────────────────────
+      const STATE = {
+        fieldsCollected: {},
+        leadComplete: false,
+        leadData: null,
+        quote: null,
+        pendingField: null,
+        matchTriggered: false,
+      };
+
+      // ── Field definitions ─────────────────────────────────────────────────
+      const FIELDS = [
+        'origen','destino','tipo_carga','descripcion_carga','peso_toneladas',
+        'tipo_unidad','fecha_carga','requisitos','nombre','empresa','telefono','rfc','email'
+      ];
+      const FIELD_LABELS = {
+        origen:'Origen', destino:'Destino', tipo_carga:'Tipo carga',
+        descripcion_carga:'Desc. carga', peso_toneladas:'Peso',
+        tipo_unidad:'Tipo unidad', fecha_carga:'Fecha', requisitos:'Requisitos',
+        nombre:'Nombre', empresa:'Empresa', telefono:'Teléfono', rfc:'RFC', email:'Email'
+      };
+      const FIELD_TRIGGERS = {
+        origen: /origen|de d[oó]nde|desde d[oó]nde|de qu[eé] ciudad/i,
+        destino: /destino|a d[oó]nde|hacia|a qu[eé] ciudad/i,
+        tipo_carga: /tipo.*(carga|mercanc|producto)|qu[eé].*transportar/i,
+        descripcion_carga: /cargar exactamente|qu[eé] vas a cargar|descripci[oó]n/i,
+        peso_toneladas: /ton|peso|kilogramo/i,
+        tipo_unidad: /tipo.*(unidad|transporte|trailer|cami[oó]n)/i,
+        fecha_carga: /cu[aá]ndo|fecha|para cu[aá]ndo/i,
+        requisitos: /requisito|especial|condici[oó]n/i,
+        nombre: /tu nombre|c[oó]mo te llamas|nombre completo/i,
+        empresa: /empresa|compa[ñn][ií]a|negocio/i,
+        telefono: /tel[eé]fono|n[uú]mero|celular|whatsapp/i,
+        rfc: /rfc/i,
+        email: /correo|email|e-mail/i,
+      };
+
+      // ── Stage dots ────────────────────────────────────────────────────────
+      function renderDots() {
+        const container = document.getElementById('stage-dots');
         if (!container) return;
-
-        if (!sessions[sessionId]) {
-          count++;
-          sessions[sessionId] = { num: count, timer: null };
-          const empty = container.querySelector('.cmd-sessions-empty');
-          if (empty) empty.remove();
-
+        container.innerHTML = '';
+        FIELDS.forEach((f, i) => {
           const dot = document.createElement('div');
-          dot.className = `cmd-session-dot ${agente.toLowerCase()}-dot`;
-          dot.id = `cmd-dot-${sessionId.replace(/[^a-z0-9]/gi, '')}`;
-          dot.textContent = count;
-          dot.title = `Sesión ${count} · ${agente}`;
+          const captured = STATE.fieldsCollected[f];
+          dot.className = 'cmd-stage-dot' + (captured ? ' captured' : '');
+          dot.id = 'sdot-' + f;
+          dot.textContent = i + 1;
+          const tip = document.createElement('span');
+          tip.className = 'dot-tip';
+          tip.textContent = FIELD_LABELS[f] + (captured ? ': ' + captured : '');
+          dot.appendChild(tip);
           container.appendChild(dot);
-
-          const badge = document.getElementById('cmd-conv-count');
-          if (badge) badge.textContent = count;
-        }
-
-        const safeId = `cmd-dot-${sessionId.replace(/[^a-z0-9]/gi, '')}`;
-        const dot = document.getElementById(safeId);
-        if (!dot) return;
-
-        dot.classList.add('active', 'pulse');
-        setTimeout(() => dot.classList.remove('pulse'), 600);
-
-        const s = sessions[sessionId];
-        if (s.timer) clearTimeout(s.timer);
-        s.timer = setTimeout(() => dot.classList.remove('active'), 10000);
+        });
       }
 
-      return {
-        addItem(agente, tipo, mensaje, sessionId) {
-          activate(sessionId, agente);
+      function lightDot(field, value) {
+        STATE.fieldsCollected[field] = value;
+        const dot = document.getElementById('sdot-' + field);
+        if (dot) {
+          dot.classList.add('captured');
+          dot.querySelector('.dot-tip').textContent = FIELD_LABELS[field] + ': ' + value;
         }
+      }
+
+      // ── Event feed ────────────────────────────────────────────────────────
+      function tsNow() {
+        return new Date().toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      }
+
+      function addEvent(icon, iconClass, title, detail) {
+        const feed = document.getElementById('event-feed');
+        if (!feed) return;
+        const empty = document.getElementById('event-empty');
+        if (empty) empty.remove();
+        const item = document.createElement('div');
+        item.className = 'cmd-event-item';
+        item.innerHTML =
+          '<div class="cmd-event-icon ' + iconClass + '">' + icon + '</div>' +
+          '<div class="cmd-event-body">' +
+            '<div class="cmd-event-title">' + title + '</div>' +
+            (detail ? '<div class="cmd-event-detail">' + detail + '</div>' : '') +
+            '<div class="cmd-event-time">' + tsNow() + '</div>' +
+          '</div>';
+        feed.insertBefore(item, feed.firstChild);
+      }
+
+      // ── Field detection (from user messages) ──────────────────────────────
+      function scanUserMessage(text) {
+        const destMatch = text.match(/(?:flete|enviar|mandar|llevar|viaje|carga)\s.*?(?:a\s+(?:la\s+)?|hacia\s+|para\s+)([A-Za-záéíóúñÁÉÍÓÚÑ\s.]{2,25})/i);
+        if (destMatch && !STATE.fieldsCollected.destino) {
+          const dest = destMatch[1].trim().replace(/\s+$/, '');
+          if (dest.length >= 2) { lightDot('destino', dest); EB.emit('field', { field: 'destino', value: dest }); }
+        }
+        const origMatch = text.match(/(?:desde|de|sale\s+de|origen)\s+(?:la\s+)?([A-Za-záéíóúñÁÉÍÓÚÑ\s.]{2,25})(?:\s*[,.]|\s+(?:a\s|hacia|para)\b|$)/i);
+        if (origMatch && !STATE.fieldsCollected.origen) {
+          const orig = origMatch[1].trim().replace(/\s+$/, '');
+          if (orig.length >= 2) { lightDot('origen', orig); EB.emit('field', { field: 'origen', value: orig }); }
+        }
+        // If we had a pending field (SARA asked and user just replied)
+        if (STATE.pendingField && text.trim().length > 0) {
+          lightDot(STATE.pendingField, text.trim().substring(0, 60));
+          EB.emit('field', { field: STATE.pendingField, value: text.trim().substring(0, 60) });
+          STATE.pendingField = null;
+        }
+      }
+
+      function inferField(botText) {
+        for (let i = 0; i < FIELDS.length; i++) {
+          const f = FIELDS[i];
+          if (!STATE.fieldsCollected[f] && FIELD_TRIGGERS[f] && FIELD_TRIGGERS[f].test(botText)) {
+            STATE.pendingField = f;
+            return;
+          }
+        }
+        STATE.pendingField = null;
+      }
+
+      // ── Lead complete ─────────────────────────────────────────────────────
+      function markLeadComplete(leadData, quote) {
+        if (STATE.leadComplete) return;
+        STATE.leadComplete = true;
+        STATE.leadData = leadData || Object.assign({}, STATE.fieldsCollected);
+        STATE.quote = quote || null;
+        if (STATE.leadData) {
+          Object.entries(STATE.leadData).forEach(([k, v]) => {
+            if (FIELDS.includes(k) && v && !STATE.fieldsCollected[k]) lightDot(k, String(v));
+          });
+        }
+        EB.emit('lead_complete', STATE);
+        if (STATE.quote) EB.emit('quote', STATE.quote);
+        // Auto-trigger match after short delay (no LUCA on this page)
+        setTimeout(triggerAutoMatch, 1200);
+      }
+
+      // ── S7 Auto-Match pipeline ────────────────────────────────────────────
+      function fmtNum(n) { return Number(n).toLocaleString('es-MX'); }
+      function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+      async function triggerAutoMatch() {
+        if (STATE.matchTriggered) return;
+        STATE.matchTriggered = true;
+
+        const lead = STATE.leadData || {};
+        const quote = STATE.quote || {};
+        const origen = lead.origen || '?';
+        const destino = lead.destino || '?';
+        const peso = lead.peso_toneladas || '?';
+        const marginPct = parseInt(document.getElementById('s-margin')?.value) || 22;
+
+        let clientPrice = quote.client_price || quote.precio_cliente || 0;
+        let carrierCost = quote.carrier_cost || 0;
+        if (!carrierCost && clientPrice) carrierCost = Math.round(clientPrice / (1 + marginPct / 100));
+        if (!clientPrice && carrierCost) clientPrice = Math.round(carrierCost * (1 + marginPct / 100));
+        if (!clientPrice) { carrierCost = 18500; clientPrice = 22570; }
+        const profit = clientPrice - carrierCost;
+
+        // Simulated carrier (LUCA is on a different page)
+        const carrierName = 'Transportes Rápidos SA';
+        const carrierUnit = lead.tipo_unidad || 'Torton';
+        const carrierLoc = origen;
+
+        addEvent('🔍', 'amber', 'S7 Auto-Match iniciado', 'Lead: ' + origen + ' → ' + destino + ' (' + peso + ' ton)');
+        await delay(1200);
+        addEvent('📊', 'amber', 'Consultando pool de disponibilidad', 'Filtro: origen=' + origen + ', unidad compatible');
+        await delay(1500);
+        addEvent('🎯', 'amber', 'E6 Buscador: carrier encontrado', carrierName + ' (' + carrierUnit + ') en ' + carrierLoc + '\nScore: 72.5 — Tier: OBSERVACIÓN');
+        await delay(1200);
+        const semaforo = marginPct >= 15 ? 'VERDE' : marginPct >= 10 ? 'AMARILLO' : 'NARANJA';
+        const sIcon = semaforo === 'VERDE' ? '🟢' : semaforo === 'AMARILLO' ? '🟡' : '🟠';
+        addEvent(sIcon, 'amber', 'E4 Comisionista: semáforo ' + semaforo,
+          'Costo carrier: $' + fmtNum(carrierCost) + '\nPrecio cliente: $' + fmtNum(clientPrice) + '\nUtilidad bruta: $' + fmtNum(profit) + ' (' + marginPct + '%)');
+        await delay(1800);
+        const ofertaInicial = Math.round(carrierCost * 0.85);
+        addEvent('📱', 'blue', 'WhatsApp enviado a ' + carrierName,
+          'Hola, tenemos un flete:\n' + origen + ' → ' + destino + ', ' + peso + ' ton, ' + carrierUnit + '\nOferta: $' + fmtNum(ofertaInicial) + ' MXN');
+        await delay(2500);
+        const contraoferta = Math.round(carrierCost * 1.05);
+        addEvent('💬', 'blue', carrierName + ' responde',
+          '"Gracias. Por esa ruta mi tarifa es $' + fmtNum(contraoferta) + '"');
+        await delay(1500);
+        addEvent('🧠', 'amber', 'E4 evalúa contraoferta',
+          'Oferta: $' + fmtNum(ofertaInicial) + ' vs Contra: $' + fmtNum(contraoferta) + '\nTecho: $' + fmtNum(carrierCost) + '\n' +
+          (contraoferta <= carrierCost ? 'Dentro del rango — ACEPTAR' : 'Fuera de rango — contraoferta ronda 2'));
+
+        let precioFinal;
+        if (contraoferta <= carrierCost) {
+          precioFinal = contraoferta;
+        } else {
+          await delay(2000);
+          const oferta2 = Math.round((carrierCost + contraoferta) / 2);
+          addEvent('📱', 'blue', 'WhatsApp: contraoferta ronda 2', '"Podemos ofrecerte $' + fmtNum(oferta2) + '. Es lo mejor para esta ruta."');
+          await delay(2200);
+          precioFinal = oferta2;
+          addEvent('💬', 'blue', carrierName + ' acepta', '"Sale, va por $' + fmtNum(precioFinal) + '. Confirma datos."');
+        }
+
+        await delay(1200);
+        addEvent('⭐', 'amber', 'E7 Evaluador: rating actualizado', carrierName + ': aceptacion_tarifa +10\nScore: 72.5 → 75.0');
+        await delay(800);
+        const profitFinal = clientPrice - precioFinal;
+        const marginFinal = ((profitFinal / clientPrice) * 100).toFixed(1);
+        addEvent('💰', 'green', 'P&L del viaje',
+          'Precio cliente: $' + fmtNum(clientPrice) + '\nCosto carrier:  $' + fmtNum(precioFinal) + '\nUtilidad neta:  $' + fmtNum(profitFinal) + ' (' + marginFinal + '%)');
+        await delay(1500);
+        const folio = 'ABS-' + Math.random().toString(36).slice(2,6).toUpperCase();
+        addEvent('📄', 'amber', 'Carta instrucción generada',
+          'Folio: ' + folio + '\nOrigen: ' + origen + ' → Destino: ' + destino + '\nCarrier: ' + carrierName + ' | ' + carrierUnit);
+        await delay(1200);
+        addEvent('📱', 'blue', 'WhatsApp: carta instrucción enviada', 'Instrucciones de carga, contacto del cliente y datos de facturación enviados a ' + carrierName);
+        await delay(1000);
+        addEvent('📱', 'green', 'WhatsApp: confirmación al cliente',
+          'Hola ' + (lead.nombre || 'cliente') + ', tu flete ' + origen + ' → ' + destino + ' fue asignado.\nCarrier: ' + carrierName + '\nPrecio: $' + fmtNum(clientPrice) + ' MXN');
+        await delay(1000);
+        addEvent('✅', 'green', 'FLETE ASIGNADO',
+          carrierName + ' — $' + fmtNum(clientPrice) + ' MXN\n' + origen + ' → ' + destino + ' | ' + carrierUnit + ' | ' + peso + ' ton');
+
+        showMatchPanel(carrierName, precioFinal, profitFinal, marginFinal, lead, clientPrice);
+      }
+
+      function showMatchPanel(carrier, costoCarrier, profit, margin, lead, clientPrice) {
+        const panel = document.getElementById('match-panel');
+        if (!panel) return;
+        panel.innerHTML =
+          '<div class="cmd-match-title">Flete Asignado</div>' +
+          '<div class="cmd-match-card">' +
+            '<div class="mc-label">Ruta</div>' +
+            '<div class="mc-value">' + (lead.origen||'?') + ' → ' + (lead.destino||'?') + '</div>' +
+            '<div class="mc-detail">' + (lead.tipo_carga||'') + ' · ' + (lead.peso_toneladas||'?') + ' ton · ' + (lead.tipo_unidad||'') + '</div>' +
+          '</div>' +
+          '<div class="cmd-match-card">' +
+            '<div class="mc-label">Carrier</div>' +
+            '<div class="mc-value">' + carrier + '</div>' +
+            '<div class="mc-detail">Costo negociado: $' + fmtNum(costoCarrier||0) + '</div>' +
+          '</div>' +
+          '<div class="cmd-match-card">' +
+            '<div class="mc-label">Resultado</div>' +
+            '<div class="mc-value">$' + fmtNum(clientPrice||0) + ' MXN al cliente</div>' +
+            '<div class="mc-detail">Utilidad: $' + fmtNum(profit||0) + ' (' + (margin||'?') + '%)</div>' +
+          '</div>';
+        panel.classList.add('open');
+      }
+
+      // ── EventBus listeners ────────────────────────────────────────────────
+      EB.on('field', d => {
+        const n = Object.keys(STATE.fieldsCollected).length;
+        addEvent('📋', 'green', 'Campo ' + n + '/13: ' + FIELD_LABELS[d.field], '"' + d.value + '"');
+      });
+      EB.on('lead_complete', d => {
+        const ld = d.leadData || {};
+        addEvent('✅', 'green', 'Lead Completo — ' + Object.keys(STATE.fieldsCollected).length + '/13 campos',
+          (ld.nombre||'') + ' | ' + (ld.empresa||'') + '\n' + (ld.origen||'') + ' → ' + (ld.destino||'') + '\n' +
+          (ld.tipo_carga||'') + ' · ' + (ld.peso_toneladas||'?') + ' ton');
+      });
+      EB.on('quote', q => {
+        const clientP = q.client_price || q.precio_cliente || 0;
+        const carrierC = q.carrier_cost || 0;
+        const margin = q.margin_pct || q.margin || 0;
+        const profit = clientP - carrierC;
+        addEvent('💰', 'green', 'Cotización generada',
+          'Precio cliente: $' + fmtNum(clientP) + ' MXN\nCosto carrier:  $' + fmtNum(carrierC) + '\nMargen: ' + margin + '% ($' + fmtNum(profit) + ')');
+      });
+
+      // ── Setup panel — localStorage ────────────────────────────────────────
+      let restrictedCargo = [];
+
+      function renderSetupTags() {
+        const container = document.getElementById('setup-tags');
+        const input = document.getElementById('setup-tag-input');
+        if (!container || !input) return;
+        container.querySelectorAll('.cmd-setup-tag').forEach(t => t.remove());
+        restrictedCargo.forEach((tag, i) => {
+          const el = document.createElement('div');
+          el.className = 'cmd-setup-tag';
+          el.innerHTML = tag + '<span class="rm" data-i="' + i + '">&times;</span>';
+          container.insertBefore(el, input);
+        });
+      }
+
+      function loadSetup() {
+        try {
+          const saved = JSON.parse(localStorage.getItem('abs_cmd_setup') || '{}');
+          restrictedCargo = saved.restricted_cargo || [];
+          renderSetupTags();
+          if (document.getElementById('s-max-weight')) document.getElementById('s-max-weight').value = saved.max_weight_tons || 0;
+          if (document.getElementById('s-require-email')) document.getElementById('s-require-email').checked = !!saved.require_email;
+          if (document.getElementById('s-ask-desc')) document.getElementById('s-ask-desc').checked = !!saved.ask_cargo_description;
+          const margin = saved.profit_margin_pct || 22;
+          if (document.getElementById('s-margin')) { document.getElementById('s-margin').value = margin; document.getElementById('s-margin-val').textContent = margin + '%'; }
+          if (document.getElementById('s-carrier-rounds')) document.getElementById('s-carrier-rounds').value = saved.carrier_negotiation_rounds || 2;
+          const cPct = saved.carrier_negotiation_pct || 10;
+          if (document.getElementById('s-carrier-pct')) { document.getElementById('s-carrier-pct').value = cPct; document.getElementById('s-carrier-pct-val').textContent = cPct + '%'; }
+          if (document.getElementById('s-client-rounds')) document.getElementById('s-client-rounds').value = saved.client_negotiation_rounds || 2;
+          const clPct = saved.client_discount_pct || 5;
+          if (document.getElementById('s-client-pct')) { document.getElementById('s-client-pct').value = clPct; document.getElementById('s-client-pct-val').textContent = clPct + '%'; }
+        } catch(e) {}
+      }
+
+      function saveSetup() {
+        const btn = document.getElementById('setup-save-btn');
+        const payload = {
+          restricted_cargo: restrictedCargo,
+          max_weight_tons: parseInt(document.getElementById('s-max-weight')?.value) || 0,
+          require_email: document.getElementById('s-require-email')?.checked || false,
+          ask_cargo_description: document.getElementById('s-ask-desc')?.checked || false,
+          profit_margin_pct: parseInt(document.getElementById('s-margin')?.value) || 22,
+          carrier_negotiation_rounds: parseInt(document.getElementById('s-carrier-rounds')?.value) || 2,
+          carrier_negotiation_pct: parseInt(document.getElementById('s-carrier-pct')?.value) || 10,
+          client_negotiation_rounds: parseInt(document.getElementById('s-client-rounds')?.value) || 2,
+          client_discount_pct: parseInt(document.getElementById('s-client-pct')?.value) || 5,
+        };
+        localStorage.setItem('abs_cmd_setup', JSON.stringify(payload));
+        addEvent('⚙', 'amber', 'Configuración guardada', 'Margen: ' + payload.profit_margin_pct + '% · Restricciones: ' + restrictedCargo.length);
+        if (btn) { btn.textContent = '✓ Guardado'; setTimeout(() => { btn.textContent = 'Guardar'; }, 1500); }
+      }
+
+      // ── Reset ─────────────────────────────────────────────────────────────
+      function resetAll() {
+        Object.keys(STATE).forEach(k => {
+          if (k === 'fieldsCollected') STATE[k] = {};
+          else STATE[k] = false;
+        });
+        STATE.leadData = null; STATE.quote = null; STATE.pendingField = null;
+        const feed = document.getElementById('event-feed');
+        if (feed) feed.innerHTML = '<div class="cmd-event-empty" id="event-empty">Esperando actividad...</div>';
+        const mp = document.getElementById('match-panel');
+        if (mp) { mp.classList.remove('open'); mp.innerHTML = ''; }
+        renderDots();
+      }
+
+      // ── Wire up UI ────────────────────────────────────────────────────────
+      document.addEventListener('DOMContentLoaded', () => {
+        renderDots();
+
+        const gearBtn = document.getElementById('gear-btn');
+        const setupPanel = document.getElementById('setup-panel');
+        if (gearBtn && setupPanel) {
+          gearBtn.addEventListener('click', () => {
+            const isOpen = setupPanel.classList.contains('open');
+            setupPanel.classList.toggle('open');
+            gearBtn.classList.toggle('active');
+            if (!isOpen) loadSetup();
+          });
+        }
+
+        const saveBtn = document.getElementById('setup-save-btn');
+        if (saveBtn) saveBtn.addEventListener('click', saveSetup);
+
+        const resetBtn = document.getElementById('reset-btn');
+        if (resetBtn) resetBtn.addEventListener('click', resetAll);
+
+        const tagInput = document.getElementById('setup-tag-input');
+        if (tagInput) {
+          tagInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              const v = e.target.value.trim().toLowerCase();
+              if (v && !restrictedCargo.includes(v)) { restrictedCargo.push(v); renderSetupTags(); }
+              e.target.value = '';
+            }
+            if (e.key === 'Backspace' && e.target.value === '' && restrictedCargo.length) {
+              restrictedCargo.pop(); renderSetupTags();
+            }
+          });
+        }
+        const tagsContainer = document.getElementById('setup-tags');
+        if (tagsContainer) {
+          tagsContainer.addEventListener('click', e => {
+            if (e.target.classList.contains('rm')) {
+              restrictedCargo.splice(parseInt(e.target.dataset.i), 1);
+              renderSetupTags();
+            } else {
+              document.getElementById('setup-tag-input')?.focus();
+            }
+          });
+        }
+
+        // Sliders live update
+        ['s-margin','s-carrier-pct','s-client-pct'].forEach(id => {
+          const el = document.getElementById(id);
+          const val = document.getElementById(id + '-val');
+          if (el && val) el.addEventListener('input', () => { val.textContent = el.value + '%'; });
+        });
+      });
+
+      // ── Public API ────────────────────────────────────────────────────────
+      return {
+        // Called from sara.js before sending user message
+        onUserMessage(text) {
+          scanUserMessage(text);
+        },
+        // Called from sara.js after SARA response stream completes
+        onSaraResponse(text) {
+          inferField(text);
+          // Frontend fallback: if enough fields + closing signal → lead complete
+          if (!STATE.leadComplete) {
+            const closingSignals = /resumen|registrad|listo|hemos registrado|tengo todo|cotizaci[oó]n|contactar|pronto/i;
+            if (closingSignals.test(text) && Object.keys(STATE.fieldsCollected).length >= 7) {
+              markLeadComplete(Object.assign({}, STATE.fieldsCollected), null);
+            }
+          }
+        },
+        // Called from sara.js when nueva_orden event fires
+        onLeadComplete(datos) {
+          markLeadComplete(datos || Object.assign({}, STATE.fieldsCollected), datos?.quote || null);
+        },
+        // Legacy compat for app.js SSE activity
+        addItem(agente, tipo, mensaje, sessionId) {
+          // no-op: replaced by field-based event feed
+        },
       };
     })();
   </script>

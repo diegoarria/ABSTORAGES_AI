@@ -3,6 +3,7 @@ const router = express.Router();
 const { chatStream } = require('../services/claude');
 const { publicarActividad, suscribirNuevaOrden } = require('../services/redis');
 const { guardarMensaje, obtenerHistorialConversacion, registrarActividad, actualizarEstatusFolio, obtenerFolioActivo, obtenerMetricas } = require('../db/db');
+const mem = require('../services/sessionMemory');
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 
 // POST /api/sofia/chat — streaming SSE
@@ -19,11 +20,12 @@ router.post('/chat', async (req, res) => {
   res.flushHeaders();
 
   try {
-    let historial = [];
-    try { historial = await obtenerHistorialConversacion('SOFIA', sessionId); } catch (_) {}
-    historial.push({ role: 'user', content: message });
+    // Memoria en tiempo real (funciona sin PostgreSQL)
+    mem.addMessage('SOFIA', sessionId, 'user', message);
+    const historial = mem.getHistory('SOFIA', sessionId);
 
-    try { await guardarMensaje('SOFIA', sessionId, 'user', message); } catch (_) {}
+    // Sync con DB en background (sin bloquear)
+    guardarMensaje('SOFIA', sessionId, 'user', message).catch(() => {});
     publicarActividad('SOFIA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
     await chatStream(
@@ -33,8 +35,10 @@ router.post('/chat', async (req, res) => {
         res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
       },
       async (fullText) => {
-        try { await guardarMensaje('SOFIA', sessionId, 'assistant', fullText); } catch (_) {}
-        try { await registrarActividad('SOFIA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`); } catch (_) {}
+        // Guardar respuesta en memoria inmediatamente
+        mem.addMessage('SOFIA', sessionId, 'assistant', fullText);
+        guardarMensaje('SOFIA', sessionId, 'assistant', fullText).catch(() => {});
+        registrarActividad('SOFIA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`).catch(() => {});
         publicarActividad('SOFIA', 'MENSAJE_SOFIA', fullText.substring(0, 160), { sessionId }).catch(() => {});
 
         // Detectar actualización de estatus de folio
