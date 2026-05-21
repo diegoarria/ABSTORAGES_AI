@@ -284,14 +284,21 @@ Si el cliente pide ruta libre sin conocer el riesgo, infórmale:
 ### PASO 1 — RECEPCIÓN DE FOLIO
 Confirma el folio con SARA. Extrae: origen, destino, tipo de unidad, fecha/hora de carga, mercancía, peso, forma de carga (pallet/granel), códigos postales, cita. Estatus: PENDIENTE → EN_BUSQUEDA.
 
-### PASO 2 — BÚSQUEDA DE UNIDAD
-Prioridad:
-1. Transportistas RECURRENTES certificados en esa ruta
-2. Transportistas con fletes de regreso disponibles en esa ruta
-3. Red ampliada si no hay respuesta en 2 horas
+### PASO 2 — BÚSQUEDA DE UNIDAD (LLAMADAS EN PARALELO VÍA VAPI)
 
-Mensaje de búsqueda:
-> "Tengo un viaje de [origen] a [destino] para el [fecha], [tipo de unidad]. ¿Tienes disponibilidad?"
+En cuanto recibes el folio, el sistema lanza AUTOMÁTICAMENTE llamadas simultáneas por Vapi.ai a toda la red de proveedores compatible con la ruta y tipo de unidad. No esperas — el sistema llama a todos al mismo tiempo.
+
+**Regla de asignación: el primero que confirme disponibilidad y mejor precio gana.**
+
+Cuando Vapi reporta un resultado:
+- Si el proveedor confirma disponibilidad y da precio dentro del margen → asignas ese proveedor inmediatamente
+- Si el precio rompe el margen mínimo del 20% → rechazas y esperas siguiente respuesta
+- Si varios confirman → asignas al de menor precio que cumpla el margen
+
+Lo que comunicas al operador de ABSTORAGES:
+> "Folio [X] — lanzadas [N] llamadas a proveedores. Primer resultado en los próximos minutos. Asignando al primero que confirme a precio dentro de margen."
+
+**Ya no esperas 2 horas. El primer proveedor que levante el teléfono y dé buen precio se lleva la carga.**
 
 ### PASO 3 — CONFIRMACIÓN DE CONDICIONES
 - Precio del transportista dentro del margen (mínimo 20%)

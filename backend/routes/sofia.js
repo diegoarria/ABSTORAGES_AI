@@ -6,7 +6,12 @@ const { guardarMensaje, obtenerHistorialConversacion, registrarActividad, actual
 const mem = require('../services/sessionMemory');
 const tariff = require('../services/tariff');
 const ordersStore = require('../services/ordersStore');
+const { lanzarLlamadasProveedores } = require('../services/vapi');
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
+
+const PROVEEDORES = (() => {
+  try { return require('../../data/proveedores.json'); } catch { return []; }
+})();
 
 // POST /api/sofia/chat — streaming SSE
 router.post('/chat', async (req, res) => {
@@ -30,9 +35,17 @@ router.post('/chat', async (req, res) => {
     guardarMensaje('SOFIA', sessionId, 'user', message).catch(() => {});
     publicarActividad('SOFIA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
-    // Si el mensaje contiene un folio, inyectar todos los datos de la orden
+    // Si el mensaje contiene un folio, inyectar datos y lanzar llamadas en paralelo
     const orden = ordersStore.obtenerOrden(message);
     const ordenContext = orden ? buildOrdenContext(orden) : '';
+
+    if (orden && PROVEEDORES.length) {
+      // Fire-and-forget: lanzar 100% de llamadas sin bloquear el stream
+      lanzarLlamadasProveedores(orden, PROVEEDORES)
+        .then(r => publicarActividad('SOFIA', 'VAPI_LANZADO',
+          `${r.llamadas || 0} llamadas lanzadas para ${orden.folio}`, r).catch(() => {}))
+        .catch(err => console.error('[SOFIA] Error lanzando llamadas Vapi:', err));
+    }
 
     const systemPrompt = SOFIA_SYSTEM_PROMPT + tariff.getContext().prompt + ordenContext;
 

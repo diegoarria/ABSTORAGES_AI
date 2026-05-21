@@ -1,0 +1,29 @@
+[
+  {
+    "id": "PROV-001",
+    "nombre": "Transportes García",
+    "telefono": "+528112345678",
+    "tipos_unidad": ["caja seca 53", "caja seca 48"],
+    "rutas": ["MTY", "CDMX", "GDL", "QRO", "SLP"],
+    "clasificacion": "RECURRENTE",
+    "activo": true
+  },
+  {
+    "id": "PROV-002",
+    "nombre": "Fletes Rodríguez",
+    "telefono": "+528198765432",
+    "tipos_unidad": ["torton", "rabon"],
+    "rutas": ["MTY", "TMP", "TOR", "SLP"],
+    "clasificacion": "INTERMITENTE",
+    "activo": true
+  },
+  {
+    "id": "PROV-003",
+    "nombre": "Logística Norteña SA",
+    "telefono": "+528133334444",
+    "tipos_unidad": ["caja seca 53", "full", "plataforma"],
+    "rutas": ["MTY", "CDMX", "GDL", "NLD", "JRZ"],
+    "clasificacion": "RECURRENTE",
+    "activo": true
+  }
+]

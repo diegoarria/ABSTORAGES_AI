@@ -9,6 +9,7 @@ const saraRoutes = require('./routes/sara');
 const sofiaRoutes = require('./routes/sofia');
 const prospectorRoutes = require('./routes/prospector');
 const lucaRoutes = require('./routes/luca');
+const vapiWebhookRoutes = require('./routes/vapi-webhook');
 const { suscribirNuevaOrden, suscribirActividad, publicarActividad } = require('./services/redis');
 const { registrarActividad, obtenerActividadReciente, obtenerMetricas } = require('./db/db');
 const tariff = require('./services/tariff');
@@ -91,6 +92,7 @@ app.use('/api/sara', saraRoutes);
 app.use('/api/sofia', sofiaRoutes);
 app.use('/api/prospector', prospectorRoutes);
 app.use('/api/luca', lucaRoutes);
+app.use('/api/vapi', vapiWebhookRoutes);
 
 // GET /api/me — usuario autenticado actual
 app.get('/api/me', (req, res) => {
