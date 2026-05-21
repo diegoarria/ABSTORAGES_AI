@@ -5,6 +5,7 @@ const { publicarNuevaOrden, publicarActividad } = require('../services/redis');
 const { guardarMensaje, obtenerHistorialConversacion, registrarActividad } = require('../db/db');
 const mem = require('../services/sessionMemory');
 const tariff = require('../services/tariff');
+const ordersStore = require('../services/ordersStore');
 const SARA_SYSTEM_PROMPT = require('../agents/sara-prompt');
 
 // POST /api/sara/chat — streaming SSE
@@ -51,6 +52,8 @@ router.post('/chat', async (req, res) => {
         if (detectarCierreVenta(fullText, message)) {
           const datosServicio = extraerDatosServicio(message, fullText);
           if (datosServicio) {
+            // Guardar en store para que SOFIA acceda con solo el folio
+            ordersStore.guardarOrden(datosServicio);
             await publicarNuevaOrden(datosServicio);
             await publicarActividad('SARA', 'CIERRE_VENTA', `Nueva orden publicada: ${datosServicio.folio || 'pendiente'}`, datosServicio);
             res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: datosServicio })}\n\n`);

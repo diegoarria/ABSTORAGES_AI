@@ -5,6 +5,7 @@ const { publicarActividad, suscribirNuevaOrden } = require('../services/redis');
 const { guardarMensaje, obtenerHistorialConversacion, registrarActividad, actualizarEstatusFolio, obtenerFolioActivo, obtenerMetricas } = require('../db/db');
 const mem = require('../services/sessionMemory');
 const tariff = require('../services/tariff');
+const ordersStore = require('../services/ordersStore');
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 
 // POST /api/sofia/chat — streaming SSE
@@ -29,7 +30,11 @@ router.post('/chat', async (req, res) => {
     guardarMensaje('SOFIA', sessionId, 'user', message).catch(() => {});
     publicarActividad('SOFIA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
-    const systemPrompt = SOFIA_SYSTEM_PROMPT + tariff.getContext().prompt;
+    // Si el mensaje contiene un folio, inyectar todos los datos de la orden
+    const orden = ordersStore.obtenerOrden(message);
+    const ordenContext = orden ? buildOrdenContext(orden) : '';
+
+    const systemPrompt = SOFIA_SYSTEM_PROMPT + tariff.getContext().prompt + ordenContext;
 
     await chatStream(
       systemPrompt,
@@ -103,6 +108,13 @@ router.get('/historial/:sessionId', async (req, res) => {
   }
 });
 
+// GET /api/sofia/orden/:folio — consultar datos de una orden por folio
+router.get('/orden/:folio', (req, res) => {
+  const orden = ordersStore.obtenerOrden(req.params.folio);
+  if (!orden) return res.status(404).json({ error: 'Folio no encontrado' });
+  res.json(orden);
+});
+
 // GET /api/sofia/metricas
 router.get('/metricas', async (req, res) => {
   try {
@@ -113,6 +125,21 @@ router.get('/metricas', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener métricas' });
   }
 });
+
+function buildOrdenContext(o) {
+  return `\n\n---\nFOLIO ${o.folio} — DATOS COMPLETOS DE SARA (NO PREGUNTES NADA DE ESTO AL CLIENTE):\n` +
+    `Ruta: ${o.ruta || ''}\n` +
+    `Tipo de unidad: ${o.tipo_unidad || ''}\n` +
+    `Tipo de carga: ${o.tipo_carga || ''} — ${o.descripcion_carga || ''}\n` +
+    `Peso: ${o.peso_toneladas || ''} toneladas\n` +
+    `Fecha de carga: ${o.fecha_carga || ''}\n` +
+    `Requisitos especiales: ${o.requisitos || 'ninguno'}\n` +
+    `Cliente: ${o.cliente || ''} | Empresa: ${o.empresa || ''}\n` +
+    `RFC: ${o.rfc || ''} | Teléfono: ${o.telefono || ''} | Email: ${o.email || ''}\n\n` +
+    `INSTRUCCIÓN: Tienes TODOS los datos. Confirma el folio, repite el resumen de la orden ` +
+    `y arranca INMEDIATAMENTE a buscar transportista disponible para esta ruta y unidad. ` +
+    `No hagas ninguna pregunta sobre datos del cliente — ya los tienes todos.\n---\n`;
+}
 
 function detectarActualizacionFolio(respuesta) {
   const folioMatch = respuesta.match(/ABST-\d{6}/i);
