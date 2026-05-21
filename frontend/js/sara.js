@@ -100,6 +100,7 @@ const Sara = (() => {
         }
       }
       window.CentroMando?.onSaraResponse(textoAcumulado);
+      window.Features?.speakResponse(textoAcumulado, 'sara');
     } catch (err) {
       quitarTyping();
       agregarMensajeError('sara', 'No se pudo conectar con SARA. ¿El servidor está corriendo?');

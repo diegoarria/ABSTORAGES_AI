@@ -93,6 +93,7 @@ const Sofia = (() => {
           } catch (e) { /* ignorar */ }
         }
       }
+      window.Features?.speakResponse(textoAcumulado, 'sofia');
     } catch (err) {
       quitarTyping();
       agregarMensajeError('No se pudo conectar con SOFIA. ¿El servidor está corriendo?');

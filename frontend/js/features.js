@@ -105,13 +105,19 @@ const Features = (() => {
     ro.observe(bubble);
   }
 
-  // ── MICROPHONE STT (Web Speech API) ──────────────────────────────────────
+  // ── MICROPHONE STT + VOICE CALL MODE ─────────────────────────────────────
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  // Qué agente habló por voz en el último mensaje (para auto-leer respuesta)
+  const _voicePending = {};
 
   function initMic(inputId, btnId) {
     const btn = document.getElementById(btnId);
     const input = document.getElementById(inputId);
     if (!btn || !input) return;
+
+    const agente = btnId.replace('-mic', ''); // 'sara' | 'sofia'
+    const sendBtn = document.getElementById(btnId.replace('-mic', '-send'));
 
     if (!SpeechRecognition) {
       btn.disabled = true;
@@ -126,12 +132,13 @@ const Features = (() => {
     recognition.interimResults = true;
 
     let recording = false;
+    let hasTranscript = false;
 
     btn.addEventListener('click', () => {
-      if (recording) {
-        recognition.stop();
-        return;
-      }
+      if (recording) { recognition.stop(); return; }
+      hasTranscript = false;
+      // Detener TTS si estaba hablando
+      window.speechSynthesis?.cancel();
       recognition.start();
     });
 
@@ -146,12 +153,19 @@ const Features = (() => {
       input.value = transcript;
       input.style.height = 'auto';
       input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+      hasTranscript = transcript.trim().length > 0;
     };
 
     recognition.onend = () => {
       recording = false;
       btn.classList.remove('recording');
-      btn.title = 'Hablar';
+      btn.title = 'Hablar con ' + agente.toUpperCase();
+      // Auto-enviar si hubo transcripción
+      if (hasTranscript && sendBtn && !sendBtn.disabled) {
+        _voicePending[agente] = true;
+        // Pequeño delay para que el navegador termine de escribir el resultado final
+        setTimeout(() => sendBtn.click(), 80);
+      }
     };
 
     recognition.onerror = (e) => {
@@ -161,6 +175,35 @@ const Features = (() => {
         App.toast('Error de micrófono: ' + e.error, 'amber', 3000);
       }
     };
+  }
+
+  // ── TTS AUTOMÁTICO (browser speechSynthesis, sin API key) ─────────────────
+  function speakResponse(text, agente) {
+    if (!window.speechSynthesis) return;
+    // Solo si el último mensaje de este agente fue por voz
+    if (!_voicePending[agente]) return;
+    _voicePending[agente] = false;
+
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/<[^>]+>/g, '').replace(/[*_`#>]/g, '').slice(0, 3000);
+    const utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = 'es-MX';
+    utt.rate = 1.05;
+    utt.pitch = agente === 'sara' ? 1.1 : 0.95;
+
+    const loadVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang === 'es-MX' || v.lang === 'es-US' || v.lang.startsWith('es'));
+      if (preferred) utt.voice = preferred;
+      window.speechSynthesis.speak(utt);
+    };
+
+    // getVoices() puede estar vacío en primer uso — esperar el evento
+    if (window.speechSynthesis.getVoices().length > 0) {
+      loadVoice();
+    } else {
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoice, { once: true });
+    }
   }
 
   // ── PREDICTIVE ALERTS WIDGET ──────────────────────────────────────────────
@@ -254,5 +297,5 @@ const Features = (() => {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { playTTS, loadPredictiveAlerts, loadTariff };
+  return { playTTS, speakResponse, loadPredictiveAlerts, loadTariff };
 })();
