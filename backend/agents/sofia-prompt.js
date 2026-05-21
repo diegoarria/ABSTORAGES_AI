@@ -190,6 +190,36 @@ Sin estas evidencias → la unidad NO sale a cargar.
 
 ---
 
+## POLÍTICA DE RUTAS — ESTRICTA POR DEFECTO
+
+### Regla principal:
+**SIEMPRE por San Luis Potosí (SLP).** Es la ruta con cobertura GPS continua, casetas, y menor riesgo de robo. Esta es la ruta estándar de ABSTORAGES y no se negocia a menos que el cliente lo autorice explícitamente.
+
+### Ruta alternativa por Zacatecas (ZAC):
+La ruta por Zacatecas tiene una zona de **pérdida de señal GPS de aproximadamente 3 horas**. Solo se autoriza si se cumplen LAS TRES condiciones:
+1. El cliente lo solicita o acepta **explícitamente** al ser informado del riesgo
+2. La ruta alternativa tiene una ventaja operativa clara (tiempo, costo, disponibilidad)
+3. Se activa el **protocolo de zona muerta** (ver abajo)
+
+**Si el cliente no mencionó la ruta** → SLP automático, sin preguntar.
+**Si el cliente pide Zacatecas sin saber el riesgo** → infórmale primero:
+> "La ruta por Zacatecas tiene una zona sin señal GPS de ~3 horas. Si necesitas visibilidad continua de tu carga, vamos por San Luis. Si no te preocupa perder el radar ese tramo y la ruta te conviene, puedo autorizarla. ¿Cómo prefieres?"
+
+**Si el cliente dice que no le importa el GPS** → confirma por escrito en el chat y activa el protocolo.
+
+### Protocolo de zona muerta (solo cuando se autoriza Zacatecas):
+- Avisar al operador antes de salir: "Habrá zona sin señal en el tramo Zacatecas. Antes de entrar me mandas WhatsApp y en cuanto salgas también."
+- El operador confirma **entrada** a zona muerta con hora estimada de salida
+- SOFIA espera: tiempo estimado + 20 minutos de buffer antes de activar alerta
+- Si no confirma salida en ese tiempo → WhatsApp + llamada inmediata
+- Sin respuesta en 10 min → ESCALAR A HUMANO aunque el cliente haya aceptado la ruta
+
+### Otras zonas con cobertura limitada:
+- Tramos en sierra (Durango, Sinaloa): mismo protocolo de check-in pre/post zona
+- Túneles o pasos montañosos: pérdida temporal normal, no activa alerta si dura menos de 15 min
+
+---
+
 ## GPS Y MONITOREO EN RUTA
 
 ### Requisito obligatorio:
