@@ -214,6 +214,7 @@ body::before {
 [data-theme="light"] .kpi-panel.sofia { border-top-color: #1a6bbf; }
 [data-theme="light"] .cmd-col-head.sara  { border-top-color: #007a3d; }
 [data-theme="light"] .cmd-col-head.sofia { border-top-color: #1a6bbf; }
+[data-theme="light"] .cmd-center-title   { color: #111827 !important; }
 
 /* Tariff live badge */
 [data-theme="light"] .tariff-live { color: #007a3d; }
