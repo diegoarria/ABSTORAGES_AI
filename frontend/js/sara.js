@@ -83,8 +83,12 @@ const Sara = (() => {
             }
 
             if (data.type === 'nueva_orden') {
-              App.toast(`Nueva orden publicada a SOFIA: ${data.datos?.folio || ''}`, 'verde');
+              App.toast(`Orden ${data.datos?.folio || ''} enviada a SOFIA`, 'verde', 4000);
               window.CentroMando?.onLeadComplete(data.datos);
+              // Handoff automático: SOFIA recibe todos los datos y arranca operación
+              if (data.datos) {
+                document.dispatchEvent(new CustomEvent('nueva_orden_recibida', { detail: data.datos }));
+              }
             }
 
             if (data.type === 'error') {

@@ -92,6 +92,7 @@ router.post('/nueva-orden', async (req, res) => {
 });
 
 function detectarCierreVenta(respuesta, mensaje) {
+  if (/NUEVA_ORDEN\s*:/i.test(respuesta)) return true;
   const triggers = [
     'servicio confirmado', 'venta cerrada', 'pasando a sofia', 'servicio registrado',
     'folio generado', 'orden creada', 'confirmo el servicio', 'publicando a sofia'
@@ -101,7 +102,17 @@ function detectarCierreVenta(respuesta, mensaje) {
 }
 
 function extraerDatosServicio(mensaje, respuesta) {
-  // Extracción básica — en producción, usar tool_use de Claude para estructurar datos
+  // Parsear el JSON completo que SARA genera al cerrar venta
+  const match = respuesta.match(/NUEVA_ORDEN\s*:\s*(\{[\s\S]*?\})/i);
+  if (match) {
+    try {
+      const datos = JSON.parse(match[1]);
+      return { ...datos, fuente: 'chat_sara' };
+    } catch (e) {
+      console.error('[SARA] Error parseando NUEVA_ORDEN JSON:', e);
+    }
+  }
+  // Fallback: solo folio
   const textoCompleto = mensaje + ' ' + respuesta;
   const folioMatch = textoCompleto.match(/ABST-\d{6}/i);
   return folioMatch ? { folio: folioMatch[0], fuente: 'chat_sara' } : null;

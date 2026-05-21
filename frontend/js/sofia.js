@@ -105,26 +105,102 @@ const Sofia = (() => {
   }
 
   function escucharNuevaOrden() {
-    // El servidor ya re-broadcast los eventos Redis via SSE en /api/actividad/stream
-    // Sofia recibe notificación visual cuando SARA publica nueva_orden
     document.addEventListener('nueva_orden_recibida', (e) => {
-      const orden = e.detail;
-      App.toast(`SOFIA recibió nueva orden: ${orden.folio}`, 'azul');
-      // Inyectar mensaje automático en chat de Sofia
-      const messages = document.getElementById('sofia-messages');
-      const div = document.createElement('div');
-      div.className = 'message assistant';
-      div.innerHTML = `
-        <div class="message-avatar sofia">S</div>
-        <div class="message-bubble" style="border-color: rgba(74,158,255,0.3)">
-          <p><strong>Nueva orden recibida de SARA</strong></p>
-          <p>Folio: <code>${App.escapeHtml(orden.folio || '')}</code></p>
-          <p>Iniciando flujo de colocación de servicio automáticamente.</p>
-        </div>
-      `;
-      messages.appendChild(div);
-      scrollToBottom('sofia-messages');
+      recibirOrden(e.detail);
     });
+  }
+
+  async function recibirOrden(orden) {
+    if (!orden?.folio) return;
+    App.toast(`SOFIA recibió orden ${orden.folio} — iniciando colocación`, 'azul', 4000);
+
+    // Mostrar tarjeta de handoff en el chat de SOFIA
+    const messages = document.getElementById('sofia-messages');
+    const tarjeta = document.createElement('div');
+    tarjeta.className = 'message assistant';
+    tarjeta.innerHTML = `
+      <div class="message-avatar sofia">S</div>
+      <div class="message-bubble" style="border-color: rgba(74,158,255,0.35); background: rgba(74,158,255,0.06)">
+        <p><strong>Handoff de SARA recibido</strong></p>
+        <p>Folio <code>${App.escapeHtml(orden.folio)}</code> · ${App.escapeHtml(orden.ruta || '')} · ${App.escapeHtml(orden.tipo_unidad || '')}</p>
+        <p style="opacity:.7; font-size:.85em">Cliente: ${App.escapeHtml(orden.cliente || orden.empresa || '—')} · Fecha: ${App.escapeHtml(orden.fecha_carga || '—')}</p>
+      </div>
+    `;
+    messages.appendChild(tarjeta);
+    scrollToBottom('sofia-messages');
+
+    // Construir mensaje de briefing completo para SOFIA
+    const briefing = formatearHandoff(orden);
+
+    // Enviar al API de SOFIA para que procese y responda operacionalmente
+    mostrarTyping();
+    isStreaming = true;
+    document.getElementById('sofia-send').disabled = true;
+
+    try {
+      const res = await fetch('/api/sofia/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: briefing, sessionId }),
+      });
+
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+      quitarTyping();
+      const streamDiv = iniciarBurbujaSofia();
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lineas = buffer.split('\n\n');
+        buffer = lineas.pop();
+        for (const linea of lineas) {
+          if (!linea.startsWith('data: ')) continue;
+          try {
+            const data = JSON.parse(linea.slice(6));
+            if (data.type === 'chunk') {
+              streamDiv.innerHTML = (streamDiv.innerHTML || '') + data.text;
+              streamDiv.innerHTML = renderMarkdown(streamDiv.textContent || '');
+              scrollToBottom('sofia-messages');
+            }
+            if (data.type === 'folio_update') App.toast(`Folio ${data.folio} → ${data.estatus}`, 'azul', 3000);
+            if (data.type === 'done') break;
+          } catch (e) { /* ignorar */ }
+        }
+      }
+    } catch (err) {
+      quitarTyping();
+      agregarMensajeError('Error al recibir handoff de SARA.');
+      console.error('[SOFIA] Error en handoff:', err);
+    } finally {
+      isStreaming = false;
+      document.getElementById('sofia-send').disabled = false;
+    }
+  }
+
+  function formatearHandoff(o) {
+    return `HANDOFF_SARA→SOFIA — Venta cerrada. Tienes TODOS los datos. No preguntes nada que ya esté aquí.
+
+Folio: ${o.folio || ''}
+Ruta: ${o.ruta || ''}
+Tipo de unidad: ${o.tipo_unidad || ''}
+Tipo de carga: ${o.tipo_carga || ''}
+Descripción de carga: ${o.descripcion_carga || ''}
+Peso: ${o.peso_toneladas || ''} toneladas
+Fecha de carga: ${o.fecha_carga || ''}
+Requisitos especiales: ${o.requisitos || 'ninguno'}
+
+Cliente: ${o.cliente || ''}
+Empresa / Razón social: ${o.empresa || ''}
+RFC: ${o.rfc || ''}
+Teléfono: ${o.telefono || ''}
+Email: ${o.email || ''}
+
+Inicia el flujo de colocación de servicio (Paso 1). Confirma los datos y dime qué transportista estás buscando.`;
   }
 
   function agregarMensajeUsuario(texto) {
@@ -236,5 +312,5 @@ const Sofia = (() => {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return {};
+  return { recibirOrden };
 })();
