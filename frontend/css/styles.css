@@ -212,8 +212,8 @@ body::before {
 /* KPI panel headers */
 [data-theme="light"] .kpi-panel.sara  { border-top-color: #007a3d; }
 [data-theme="light"] .kpi-panel.sofia { border-top-color: #1a6bbf; }
-[data-theme="light"] .cmd-col-head.sara  { border-top-color: #007a3d; }
-[data-theme="light"] .cmd-col-head.sofia { border-top-color: #1a6bbf; }
+[data-theme="light"] .cmd-col-head.sara  { border-top-color: #00e87a; background: linear-gradient(135deg, #1a2f52 0%, #162844 100%) !important; }
+[data-theme="light"] .cmd-col-head.sofia { border-top-color: #4a9eff; background: linear-gradient(135deg, #1a2f52 0%, #162844 100%) !important; }
 [data-theme="light"] .cmd-center-title   { color: #111827 !important; }
 
 /* Tariff live badge */
@@ -1608,11 +1608,28 @@ body {
 }
 .cmd-col-head.sara  {
   border-top: 2px solid var(--verde);
-  background: linear-gradient(180deg, rgba(0,232,122,0.04) 0%, var(--fondo2) 100%);
+  background: linear-gradient(135deg, #1a2f52 0%, #162844 100%);
 }
 .cmd-col-head.sofia {
-  border-top: 2px solid var(--azul);
-  background: linear-gradient(180deg, rgba(74,158,255,0.04) 0%, var(--fondo2) 100%);
+  border-top: 2px solid #4a9eff;
+  background: linear-gradient(135deg, #1a2f52 0%, #162844 100%);
+}
+.cmd-col-head.sara .cmd-name,
+.cmd-col-head.sara .cmd-sub,
+.cmd-col-head.sofia .cmd-name,
+.cmd-col-head.sofia .cmd-sub  { color: #ffffff !important; }
+.cmd-col-head.sara .cmd-sub,
+.cmd-col-head.sofia .cmd-sub  { opacity: 0.65; }
+.cmd-col-head.sara .cmd-action-btn,
+.cmd-col-head.sofia .cmd-action-btn {
+  border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
+}
+.cmd-col-head.sara .cmd-action-btn:hover,
+.cmd-col-head.sofia .cmd-action-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.3);
 }
 
 .cmd-avatar {
