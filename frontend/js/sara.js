@@ -78,13 +78,20 @@ const Sara = (() => {
 
             if (data.type === 'chunk') {
               textoAcumulado += data.text;
-              streamDiv.innerHTML = renderMarkdown(textoAcumulado);
+              // Strip raw NUEVA_ORDEN JSON while streaming (show clean text)
+              const cleanText = textoAcumulado.replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '').trim();
+              streamDiv.innerHTML = renderMarkdown(cleanText);
               scrollToBottom('sara-messages');
             }
 
             if (data.type === 'nueva_orden') {
-              App.toast(`Orden ${data.datos?.folio || ''} enviada a SOFIA`, 'verde', 4000);
-              window.CentroMando?.onLeadComplete(data.datos);
+              const d = data.datos || {};
+              App.toast(`Orden ${d.folio || ''} enviada a SOFIA`, 'verde', 4000);
+              window.CentroMando?.onLeadComplete(d);
+              // Replace streaming bubble with professional order card
+              const cleanMsg = textoAcumulado.replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '').trim();
+              streamDiv.innerHTML = renderMarkdown(cleanMsg) + renderOrdenCard(d);
+              scrollToBottom('sara-messages');
               // Handoff automático: SOFIA recibe todos los datos y arranca operación
               if (data.datos) {
                 document.dispatchEvent(new CustomEvent('nueva_orden_recibida', { detail: data.datos }));
@@ -191,8 +198,8 @@ const Sara = (() => {
       <div class="message assistant">
         <div class="message-avatar sara">S</div>
         <div class="message-bubble">
-          <p>Hola, soy <strong>SARA</strong> asistente digital de ABSTORAGES.</p>
-          <p>¿Cómo puedo ayudarte?</p>
+          <p>¡Hola! Soy <strong>SARA</strong>, ejecutiva comercial de <strong>ABSTORAGES Logistics Solutions</strong>.</p>
+          <p>¿Con quién tengo el gusto y de qué empresa me contactas?</p>
         </div>
       </div>
     `;
@@ -205,6 +212,108 @@ const Sara = (() => {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       el.scrollTop = el.scrollHeight;
     }));
+  }
+
+  // ── Orden confirmada — tarjeta profesional ────────────────────────────────
+  function renderOrdenCard(d) {
+    const fmt = (v) => v || '—';
+    const folio = fmt(d.folio);
+    const now = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
+
+    return `
+<div class="orden-card">
+  <div class="orden-card-header">
+    <div class="orden-card-badge">
+      <span class="orden-check">✓</span>
+      <span>ORDEN CONFIRMADA</span>
+    </div>
+    <div class="orden-folio">${App.escapeHtml(folio)}</div>
+  </div>
+
+  <div class="orden-section">
+    <div class="orden-row-2">
+      <div class="orden-field">
+        <div class="orden-label">👤 Cliente</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.cliente))}</div>
+      </div>
+      <div class="orden-field">
+        <div class="orden-label">🏢 Empresa</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.empresa))}</div>
+      </div>
+    </div>
+    <div class="orden-row-2">
+      <div class="orden-field">
+        <div class="orden-label">📞 Teléfono</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.telefono))}</div>
+      </div>
+      <div class="orden-field">
+        <div class="orden-label">✉️ Email</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.email))}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="orden-divider"></div>
+
+  <div class="orden-section">
+    <div class="orden-field full">
+      <div class="orden-label">📍 Ruta</div>
+      <div class="orden-value ruta">${App.escapeHtml(fmt(d.ruta || (d.origen && d.destino ? d.origen + ' → ' + d.destino : null)))}</div>
+    </div>
+    <div class="orden-row-3">
+      <div class="orden-field">
+        <div class="orden-label">🚚 Unidad</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.tipo_unidad))}</div>
+      </div>
+      <div class="orden-field">
+        <div class="orden-label">📅 Fecha</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.fecha_carga))}</div>
+      </div>
+      <div class="orden-field">
+        <div class="orden-label">⚖️ Peso</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.peso_toneladas))} ton</div>
+      </div>
+    </div>
+    <div class="orden-row-2">
+      <div class="orden-field">
+        <div class="orden-label">📦 Tipo de carga</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.tipo_carga))}</div>
+      </div>
+      <div class="orden-field">
+        <div class="orden-label">🏷️ Mercancía</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.descripcion_carga))}</div>
+      </div>
+    </div>
+    ${d.requisitos ? `
+    <div class="orden-field full">
+      <div class="orden-label">⚠️ Requisitos especiales</div>
+      <div class="orden-value">${App.escapeHtml(d.requisitos)}</div>
+    </div>` : ''}
+  </div>
+
+  <div class="orden-divider"></div>
+
+  <div class="orden-section">
+    <div class="orden-row-2">
+      <div class="orden-field">
+        <div class="orden-label">🧾 RFC</div>
+        <div class="orden-value">${App.escapeHtml(fmt(d.rfc))}</div>
+      </div>
+      <div class="orden-field">
+        <div class="orden-label">📆 Registrada</div>
+        <div class="orden-value">${now}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="orden-footer">
+    <div class="orden-footer-brand">ABSTORAGES Logistics Solutions</div>
+    <div class="orden-footer-status">
+      <span class="orden-status-dot"></span>
+      Enviada a operaciones · SOFIA en proceso
+    </div>
+  </div>
+</div>`;
   }
 
   // Markdown mínimo: negrita, cursiva, código, listas

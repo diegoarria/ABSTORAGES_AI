@@ -6,7 +6,12 @@ const { guardarMensaje, obtenerHistorialConversacion, registrarActividad } = req
 const mem = require('../services/sessionMemory');
 const tariff = require('../services/tariff');
 const ordersStore = require('../services/ordersStore');
+const { lanzarNegociacion } = require('../services/negociacion-wa');
 const SARA_SYSTEM_PROMPT = require('../agents/sara-prompt');
+
+const PROVEEDORES = (() => {
+  try { return require('../../data/proveedores.json'); } catch { return []; }
+})();
 
 // POST /api/sara/chat — streaming SSE
 router.post('/chat', async (req, res) => {
@@ -57,6 +62,16 @@ router.post('/chat', async (req, res) => {
             await publicarNuevaOrden(datosServicio);
             await publicarActividad('SARA', 'CIERRE_VENTA', `Nueva orden publicada: ${datosServicio.folio || 'pendiente'}`, datosServicio);
             res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: datosServicio })}\n\n`);
+
+            // SOFIA lanza negociación WhatsApp con todos los carriers en paralelo
+            if (PROVEEDORES.length) {
+              lanzarNegociacion(datosServicio, PROVEEDORES)
+                .then(r => publicarActividad('SOFIA', 'WA_NEGOCIACION_INICIADA',
+                  `${r?.enviados || 0}/${r?.carriers || 0} carriers contactados — ${datosServicio.folio}`, r).catch(() => {}))
+                .catch(err => console.error('[SARA→NegWA] Error iniciando negociación:', err.message));
+            } else {
+              console.warn('[SARA→NegWA] Sin proveedores en data/proveedores.json — negociación WA omitida');
+            }
           }
         }
       }

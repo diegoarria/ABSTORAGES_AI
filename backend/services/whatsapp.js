@@ -2,8 +2,7 @@ require('dotenv').config();
 
 const BASE_URL = process.env.WHATSAPP_BASE_URL || 'https://waba.360dialog.io/v1';
 const API_KEY  = process.env.WHATSAPP_API_KEY;
-const WABA_ID  = process.env.WHATSAPP_WABA_ID;
-const WA_LIVE  = !!(API_KEY && WABA_ID);
+const WA_LIVE  = !!(API_KEY && API_KEY !== 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
 
 async function enviarMensaje(telefono, texto) {
   if (!WA_LIVE) {

@@ -7,6 +7,7 @@ const mem = require('../services/sessionMemory');
 const tariff = require('../services/tariff');
 const ordersStore = require('../services/ordersStore');
 const { lanzarLlamadasProveedores } = require('../services/vapi');
+const { lanzarNegociacion } = require('../services/negociacion-wa');
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 
 const PROVEEDORES = (() => {
@@ -35,18 +36,39 @@ router.post('/chat', async (req, res) => {
     guardarMensaje('SOFIA', sessionId, 'user', message).catch(() => {});
     publicarActividad('SOFIA', 'MENSAJE_USUARIO', message.substring(0, 160), { sessionId }).catch(() => {});
 
-    // Si el mensaje contiene un folio, inyectar datos y lanzar llamadas en paralelo
-    const orden = ordersStore.obtenerOrden(message);
-    const ordenContext = orden ? buildOrdenContext(orden) : '';
+    // ── Resolución de folio activo ────────────────────────────────────────────
+    // 1. ¿El mensaje actual trae un folio?
+    let orden = ordersStore.obtenerOrden(message);
 
-    if (orden && PROVEEDORES.length) {
-      // Fire-and-forget: lanzar 100% de llamadas sin bloquear el stream
-      lanzarLlamadasProveedores(orden, PROVEEDORES)
-        .then(r => publicarActividad('SOFIA', 'VAPI_LANZADO',
-          `${r.llamadas || 0} llamadas lanzadas para ${orden.folio}`, r).catch(() => {}))
-        .catch(err => console.error('[SOFIA] Error lanzando llamadas Vapi:', err));
+    // 2. Si no, ¿esta sesión ya tiene un folio activo de un mensaje anterior?
+    if (!orden) {
+      const folioSesion = mem.getActiveFolio('SOFIA', sessionId);
+      if (folioSesion) orden = ordersStore.obtenerOrdenPorFolio(folioSesion);
     }
 
+    // 3. Si encontramos folio nuevo, persistirlo para el resto de la sesión
+    if (orden?.folio) {
+      const folioAnterior = mem.getActiveFolio('SOFIA', sessionId);
+      if (folioAnterior !== orden.folio) {
+        mem.setActiveFolio('SOFIA', sessionId, orden.folio);
+        console.log(`[SOFIA] Folio activo para sesión ${sessionId}: ${orden.folio}`);
+
+        // Primera vez que se detecta este folio en esta sesión → lanzar operaciones
+        if (PROVEEDORES.length) {
+          lanzarLlamadasProveedores(orden, PROVEEDORES)
+            .then(r => publicarActividad('SOFIA', 'VAPI_LANZADO',
+              `${r.llamadas || 0} llamadas Vapi para ${orden.folio}`, r).catch(() => {}))
+            .catch(err => console.error('[SOFIA] Error Vapi:', err));
+
+          lanzarNegociacion(orden, PROVEEDORES)
+            .then(r => publicarActividad('SOFIA', 'WA_NEGOCIACION_INICIADA',
+              `${r?.enviados || 0} carriers contactados vía WA — ${orden.folio}`, r).catch(() => {}))
+            .catch(err => console.error('[SOFIA] Error NegWA:', err));
+        }
+      }
+    }
+
+    const ordenContext = orden ? buildOrdenContext(orden) : '';
     const systemPrompt = SOFIA_SYSTEM_PROMPT + tariff.getContext().prompt + ordenContext;
 
     await chatStream(
@@ -140,18 +162,54 @@ router.get('/metricas', async (req, res) => {
 });
 
 function buildOrdenContext(o) {
-  return `\n\n---\nFOLIO ${o.folio} — DATOS COMPLETOS DE SARA (NO PREGUNTES NADA DE ESTO AL CLIENTE):\n` +
-    `Ruta: ${o.ruta || ''}\n` +
-    `Tipo de unidad: ${o.tipo_unidad || ''}\n` +
-    `Tipo de carga: ${o.tipo_carga || ''} — ${o.descripcion_carga || ''}\n` +
-    `Peso: ${o.peso_toneladas || ''} toneladas\n` +
-    `Fecha de carga: ${o.fecha_carga || ''}\n` +
-    `Requisitos especiales: ${o.requisitos || 'ninguno'}\n` +
-    `Cliente: ${o.cliente || ''} | Empresa: ${o.empresa || ''}\n` +
-    `RFC: ${o.rfc || ''} | Teléfono: ${o.telefono || ''} | Email: ${o.email || ''}\n\n` +
-    `INSTRUCCIÓN: Tienes TODOS los datos. Confirma el folio, repite el resumen de la orden ` +
-    `y arranca INMEDIATAMENTE a buscar transportista disponible para esta ruta y unidad. ` +
-    `No hagas ninguna pregunta sobre datos del cliente — ya los tienes todos.\n---\n`;
+  const v  = (val) => val || '—';
+  const ts = o.guardado ? new Date(o.guardado).toLocaleString('es-MX') : '—';
+
+  return `
+
+════════════════════════════════════════════════════════════════════════
+ORDEN ACTIVA — ${o.folio}
+Registrada por SARA el ${ts}
+════════════════════════════════════════════════════════════════════════
+
+⚠️  REGLA ABSOLUTA: TIENES TODOS LOS DATOS DEL CLIENTE Y DEL SERVICIO.
+    ESTÁ PROHIBIDO preguntar al cliente cualquier cosa que esté en este bloque.
+    Si el cliente pregunta algo que ya está aquí, respóndelo directamente.
+    No pidas confirmación de datos que ya tienes.
+
+── DATOS DEL CLIENTE ───────────────────────────────────────────────────
+  Nombre completo : ${v(o.cliente)}
+  Empresa         : ${v(o.empresa)}
+  RFC             : ${v(o.rfc)}
+  Teléfono        : ${v(o.telefono)}
+  Email           : ${v(o.email)}
+
+── DETALLES DEL SERVICIO ───────────────────────────────────────────────
+  Ruta            : ${v(o.ruta || (o.origen && o.destino ? `${o.origen} → ${o.destino}` : null))}
+  Origen          : ${v(o.origen)}
+  Destino         : ${v(o.destino)}
+  Tipo de unidad  : ${v(o.tipo_unidad)}
+  Tipo de carga   : ${v(o.tipo_carga)}
+  Mercancía       : ${v(o.descripcion_carga)}
+  Peso            : ${v(o.peso_toneladas)} toneladas
+  Fecha de carga  : ${v(o.fecha_carga)}
+  Hora de cita    : ${v(o.hora_cita)}
+  Requisitos esp. : ${v(o.requisitos)}
+
+── DATOS COMERCIALES ───────────────────────────────────────────────────
+  Precio cliente  : ${o.precio_cliente ? `$${Number(o.precio_cliente).toLocaleString('es-MX')} MXN` : '—'}
+  Folio SARA      : ${v(o.folio)}
+  Fuente          : ${v(o.fuente)}
+
+── INSTRUCCIÓN OPERATIVA INMEDIATA ─────────────────────────────────────
+  1. Saluda al cliente por su nombre (${v(o.cliente)}) — ya lo conoces.
+  2. Confirma el folio ${o.folio} con un resumen compacto de la orden.
+  3. Informa que el sistema YA está buscando transportista en paralelo.
+  4. Avanza al Paso 3 — verificación de condiciones del carrier ganador.
+  5. NO preguntes nada de lo que ya está arriba. CERO preguntas redundantes.
+
+════════════════════════════════════════════════════════════════════════
+`;
 }
 
 function detectarActualizacionFolio(respuesta) {

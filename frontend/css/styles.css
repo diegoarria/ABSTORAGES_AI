@@ -2922,3 +2922,166 @@ body[data-role="transportista"] .cmd-center-head::after {
 [data-theme="light"] .cmd-setup-tags  { background: #f0f4f8; border-color: #c8d0dc; }
 [data-theme="light"] .cmd-match-card  { background: rgba(0,180,100,.06); }
 [data-theme="light"] .cmd-setup-toggle .sl { background: #e2e8f0; }
+
+/* ── ORDEN CONFIRMADA CARD ───────────────────────────────────────────────────── */
+.orden-card {
+  margin-top: 14px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 232, 122, .2);
+  background: linear-gradient(160deg, rgba(0,232,122,.04) 0%, rgba(0,232,122,.01) 100%);
+  box-shadow: 0 4px 24px rgba(0,0,0,.25), 0 0 0 1px rgba(0,232,122,.08);
+  font-size: 13px;
+}
+
+.orden-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(0,232,122,.14) 0%, rgba(0,200,100,.08) 100%);
+  border-bottom: 1px solid rgba(0,232,122,.15);
+}
+
+.orden-card-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #00e87a;
+}
+
+.orden-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #00e87a;
+  color: #030f07;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.orden-folio {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #00e87a;
+  background: rgba(0,232,122,.1);
+  border: 1px solid rgba(0,232,122,.2);
+  border-radius: 8px;
+  padding: 4px 12px;
+  letter-spacing: .08em;
+}
+
+.orden-section { padding: 14px 18px; }
+
+.orden-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.orden-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.orden-field { }
+.orden-field.full { margin-bottom: 10px; }
+
+.orden-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--texto-dim, #6b7a96);
+  margin-bottom: 4px;
+}
+
+.orden-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto, #edf0f4);
+  word-break: break-word;
+}
+
+.orden-value.ruta {
+  font-size: 14px;
+  font-weight: 700;
+  color: #00e87a;
+}
+
+.orden-divider {
+  height: 1px;
+  background: rgba(255,255,255,.06);
+  margin: 0 18px;
+}
+
+.orden-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: rgba(0,0,0,.15);
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+
+.orden-footer-brand {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--texto-dim, #6b7a96);
+}
+
+.orden-footer-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #00e87a;
+  font-weight: 600;
+}
+
+.orden-status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #00e87a;
+  animation: ordenDotPulse 1.8s ease infinite;
+}
+
+@keyframes ordenDotPulse {
+  0%,100% { opacity: .4; transform: scale(.8); }
+  50%      { opacity: 1;  transform: scale(1.3); box-shadow: 0 0 6px rgba(0,232,122,.6); }
+}
+
+/* Light mode overrides */
+[data-theme="light"] .orden-card {
+  background: linear-gradient(160deg, rgba(0,180,100,.06) 0%, #ffffff 100%);
+  border-color: rgba(0,180,100,.25);
+  box-shadow: 0 4px 20px rgba(0,0,0,.1), 0 0 0 1px rgba(0,180,100,.12);
+}
+[data-theme="light"] .orden-card-header {
+  background: linear-gradient(135deg, rgba(0,180,100,.12) 0%, rgba(0,180,100,.04) 100%);
+  border-color: rgba(0,180,100,.2);
+}
+[data-theme="light"] .orden-card-badge { color: #00a855; }
+[data-theme="light"] .orden-check     { background: #00a855; color: #fff; }
+[data-theme="light"] .orden-folio     { color: #00a855; background: rgba(0,168,85,.1); border-color: rgba(0,168,85,.25); }
+[data-theme="light"] .orden-value     { color: #111827; }
+[data-theme="light"] .orden-value.ruta{ color: #00a855; }
+[data-theme="light"] .orden-label     { color: #6b7280; }
+[data-theme="light"] .orden-divider   { background: rgba(0,0,0,.08); }
+[data-theme="light"] .orden-footer    { background: rgba(0,0,0,.03); border-color: rgba(0,0,0,.07); }
+[data-theme="light"] .orden-footer-brand  { color: #9ca3af; }
+[data-theme="light"] .orden-footer-status { color: #00a855; }
+[data-theme="light"] .orden-status-dot    { background: #00a855; }
