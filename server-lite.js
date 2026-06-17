@@ -31,22 +31,27 @@ const EL_VOICE_SOFIA = process.env.ELEVENLABS_VOICE_SOFIA || 'EXAVITQu4vr4xnSDxM
 const EL_LIVE = EL_KEY && !EL_KEY.startsWith('xxxx');
 
 // ─── WHATSAPP ──────────────────────────────────────────────────────────────
-const WA_KEY  = process.env.WHATSAPP_API_KEY;
-const WA_URL  = process.env.WHATSAPP_BASE_URL || 'https://waba.360dialog.io/v1';
-const WA_LIVE = WA_KEY && !WA_KEY.startsWith('xxxx');
+const WA_KEY      = process.env.WHATSAPP_API_KEY;
+const WA_PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID; // 360dialog Cloud API
+const WA_LIVE     = WA_KEY && !WA_KEY.startsWith('xxxx');
 
 async function sendWhatsApp(to, text) {
   if (!WA_LIVE) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
   }
-  const sendUrl = `${WA_URL}/messages`;
+  // 360dialog Cloud API — requiere WHATSAPP_PHONE_NUMBER_ID
+  const phoneId = WA_PHONE_ID || '1160752237115563';
+  const sendUrl = `https://waba-v2.360dialog.io/v1/messages`;
   const payload = JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } });
-  console.log(`[WA] Enviando a ${to} via ${sendUrl}`);
+  console.log(`[WA] Enviando a ${to}`);
   try {
     const r = await fetch(sendUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
+      headers: {
+        'Content-Type': 'application/json',
+        'D360-API-KEY': WA_KEY,
+      },
       body: payload,
     });
     const resp = await r.text();
