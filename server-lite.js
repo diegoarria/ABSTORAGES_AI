@@ -43,7 +43,13 @@ async function sendWhatsApp(to, text) {
   // 360dialog Cloud API — requiere WHATSAPP_PHONE_NUMBER_ID
   const phoneId = WA_PHONE_ID || '1160752237115563';
   const sendUrl = `https://waba-v2.360dialog.io/v1/messages`;
-  const payload = JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } });
+  const payload = JSON.stringify({
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to,
+    type: 'text',
+    text: { preview_url: false, body: text },
+  });
   console.log(`[WA] Enviando a ${to}`);
   try {
     const r = await fetch(sendUrl, {
