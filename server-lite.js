@@ -87,12 +87,13 @@ app.post('/api/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-// WhatsApp webhook — sin auth (viene de 360dialog)
+// WhatsApp webhook — sin auth (viene de 360dialog / Meta Cloud API)
 app.post('/webhook/whatsapp', async (req, res) => {
-  console.log('[WA webhook] recibido:', JSON.stringify(req.body).slice(0, 300));
   res.sendStatus(200);
   try {
-    const msgs = req.body?.messages;
+    // Formato Meta Cloud API (nuevo 360dialog)
+    const value = req.body?.entry?.[0]?.changes?.[0]?.value;
+    const msgs  = value?.messages;
     if (!msgs?.length) return;
     const msg = msgs[0];
     if (msg.type !== 'text') return;
