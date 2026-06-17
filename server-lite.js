@@ -40,9 +40,8 @@ async function sendWhatsApp(to, text) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
   }
-  // 360dialog Cloud API (D-Hub)
-  const WABA_ID  = process.env.WHATSAPP_WABA_ID || '1468318567796355';
-  const sendUrl  = `https://waba-v2.360dialog.io/whatsapp/app/${WABA_ID}/v1/messages`;
+  // 360dialog Cloud API — channel key
+  const sendUrl  = `https://waba-v2.360dialog.io/v1/messages`;
   const payload  = JSON.stringify({
     messaging_product: 'whatsapp',
     recipient_type: 'individual',
