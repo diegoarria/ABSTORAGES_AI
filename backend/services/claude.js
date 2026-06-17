@@ -6,17 +6,16 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const MODEL = 'claude-haiku-4-5-20251001';
 const MAX_TOKENS = 4096;
 
-async function chatStream(systemPrompt, messages, onChunk, onDone) {
-  const stream = await client.messages.stream({
-    model: MODEL,
-    max_tokens: MAX_TOKENS,
-    system: systemPrompt,
-    messages,
-  });
+async function chatStream(systemPrompt, messages, onChunk, onDone, signal) {
+  const stream = await client.messages.stream(
+    { model: MODEL, max_tokens: MAX_TOKENS, system: systemPrompt, messages },
+    signal ? { signal } : {}
+  );
 
   let fullText = '';
 
   for await (const chunk of stream) {
+    if (signal?.aborted) break;
     if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
       const text = chunk.delta.text;
       fullText += text;
@@ -24,8 +23,10 @@ async function chatStream(systemPrompt, messages, onChunk, onDone) {
     }
   }
 
-  const finalMessage = await stream.finalMessage();
-  if (onDone) onDone(fullText, finalMessage);
+  if (!signal?.aborted) {
+    const finalMessage = await stream.finalMessage();
+    if (onDone) onDone(fullText, finalMessage);
+  }
 
   return fullText;
 }

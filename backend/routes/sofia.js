@@ -27,6 +27,14 @@ router.post('/chat', async (req, res) => {
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
 
+  const controller = new AbortController();
+  res.on('close', () => controller.abort());
+
+  const safeWrite = (payload) => {
+    if (controller.signal.aborted || res.writableEnded) return;
+    try { res.write(payload); } catch (_) { controller.abort(); }
+  };
+
   try {
     // Memoria en tiempo real (funciona sin PostgreSQL)
     mem.addMessage('SOFIA', sessionId, 'user', message);
@@ -75,7 +83,7 @@ router.post('/chat', async (req, res) => {
       systemPrompt,
       historial,
       (chunk) => {
-        res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
+        safeWrite(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
       },
       async (fullText) => {
         // Guardar respuesta en memoria inmediatamente
@@ -87,17 +95,20 @@ router.post('/chat', async (req, res) => {
         // Detectar actualización de estatus de folio
         const actualizacion = detectarActualizacionFolio(fullText);
         if (actualizacion) {
-          res.write(`data: ${JSON.stringify({ type: 'folio_update', ...actualizacion })}\n\n`);
+          safeWrite(`data: ${JSON.stringify({ type: 'folio_update', ...actualizacion })}\n\n`);
         }
-      }
+      },
+      controller.signal
     );
 
-    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
-    res.end();
+    safeWrite(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    if (!res.writableEnded) res.end();
   } catch (err) {
-    console.error('[SOFIA] Error en chat:', err);
-    res.write(`data: ${JSON.stringify({ type: 'error', message: 'Error al procesar tu mensaje' })}\n\n`);
-    res.end();
+    if (!controller.signal.aborted) {
+      console.error('[SOFIA] Error en chat:', err);
+      safeWrite(`data: ${JSON.stringify({ type: 'error', message: 'Error al procesar tu mensaje' })}\n\n`);
+    }
+    if (!res.writableEnded) res.end();
   }
 });
 

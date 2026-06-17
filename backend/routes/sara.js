@@ -26,6 +26,14 @@ router.post('/chat', async (req, res) => {
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
 
+  const controller = new AbortController();
+  res.on('close', () => controller.abort());
+
+  const safeWrite = (payload) => {
+    if (controller.signal.aborted || res.writableEnded) return;
+    try { res.write(payload); } catch (_) { controller.abort(); }
+  };
+
   try {
     // Memoria en tiempo real (funciona sin PostgreSQL)
     mem.addMessage('SARA', sessionId, 'user', message);
@@ -43,7 +51,7 @@ router.post('/chat', async (req, res) => {
       systemPrompt,
       historial,
       (chunk) => {
-        res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
+        safeWrite(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
       },
       async (fullText) => {
         respuestaCompleta = fullText;
@@ -53,6 +61,14 @@ router.post('/chat', async (req, res) => {
         registrarActividad('SARA', 'INFO', null, `Respuesta generada para sesión ${sessionId}`).catch(() => {});
         publicarActividad('SARA', 'MENSAJE_SARA', fullText.substring(0, 160), { sessionId }).catch(() => {});
 
+        // Detectar cierre de chat o escalación
+        if (/CERRAR_CHAT/i.test(fullText)) {
+          safeWrite(`data: ${JSON.stringify({ type: 'cerrar_chat' })}\n\n`);
+        }
+        if (/ESCALAR_HUMANO/i.test(fullText)) {
+          safeWrite(`data: ${JSON.stringify({ type: 'escalar_humano' })}\n\n`);
+        }
+
         // Detectar si SARA está cerrando una venta y publicar evento
         if (detectarCierreVenta(fullText, message)) {
           const datosServicio = extraerDatosServicio(message, fullText);
@@ -61,7 +77,7 @@ router.post('/chat', async (req, res) => {
             ordersStore.guardarOrden(datosServicio);
             await publicarNuevaOrden(datosServicio);
             await publicarActividad('SARA', 'CIERRE_VENTA', `Nueva orden publicada: ${datosServicio.folio || 'pendiente'}`, datosServicio);
-            res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: datosServicio })}\n\n`);
+            safeWrite(`data: ${JSON.stringify({ type: 'nueva_orden', datos: datosServicio })}\n\n`);
 
             // SOFIA lanza negociación WhatsApp con todos los carriers en paralelo
             if (PROVEEDORES.length) {
@@ -74,15 +90,18 @@ router.post('/chat', async (req, res) => {
             }
           }
         }
-      }
+      },
+      controller.signal
     );
 
-    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
-    res.end();
+    safeWrite(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    if (!res.writableEnded) res.end();
   } catch (err) {
-    console.error('[SARA] Error en chat:', err);
-    res.write(`data: ${JSON.stringify({ type: 'error', message: 'Error al procesar tu mensaje' })}\n\n`);
-    res.end();
+    if (!controller.signal.aborted) {
+      console.error('[SARA] Error en chat:', err);
+      safeWrite(`data: ${JSON.stringify({ type: 'error', message: 'Error al procesar tu mensaje' })}\n\n`);
+    }
+    if (!res.writableEnded) res.end();
   }
 });
 

@@ -7,8 +7,6 @@ const basicAuth = require('./middleware/auth');
 const sessions = require('./services/sessions');
 const saraRoutes = require('./routes/sara');
 const sofiaRoutes = require('./routes/sofia');
-const prospectorRoutes = require('./routes/prospector');
-const lucaRoutes = require('./routes/luca');
 const vapiWebhookRoutes = require('./routes/vapi-webhook');
 const waWebhookRoutes  = require('./routes/whatsapp-webhook');
 const { suscribirNuevaOrden, suscribirActividad, publicarActividad } = require('./services/redis');
@@ -91,8 +89,6 @@ function broadcastActividad(evento) {
 // ─── RUTAS API ────────────────────────────────────────────────────────────────
 app.use('/api/sara', saraRoutes);
 app.use('/api/sofia', sofiaRoutes);
-app.use('/api/prospector', prospectorRoutes);
-app.use('/api/luca', lucaRoutes);
 app.use('/api/vapi', vapiWebhookRoutes);
 app.use('/api/whatsapp', waWebhookRoutes);
 

@@ -2709,6 +2709,21 @@ body[data-role="transportista"] .cmd-center-head::after {
 [data-theme="light"] .ops-kpi       { background: #ffffff; }
 [data-theme="light"] .ops-table th  { background: #f0f4f8; }
 
+.ops-table tbody tr:hover { background: var(--hover, rgba(255,255,255,.04)); }
+
+.btn-ver-chat {
+  padding: 3px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid var(--sara, #6c63ff);
+  background: transparent;
+  color: var(--sara, #6c63ff);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.btn-ver-chat:hover { background: var(--sara, #6c63ff); color: #fff; }
+
 /* ═══════════════════════════════════════════════════════════════════════════
    CENTRO DE MANDO — STAGE DOTS + EVENT FEED + SETUP PANEL + MATCH PANEL
    ═══════════════════════════════════════════════════════════════════════════ */

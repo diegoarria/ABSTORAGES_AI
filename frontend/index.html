@@ -431,66 +431,39 @@
           </div>
         </div>
 
-        <!-- Últimos leads capturados (solo admin) -->
-        <div class="leads-section admin-only">
-          <div class="leads-header">
-            <span class="panel-title">Últimos leads capturados</span>
-            <span class="leads-updated" id="leads-updated"></span>
-          </div>
-          <div class="leads-scroll-wrap">
-            <table class="leads-table">
-              <thead>
-                <tr>
-                  <th>HACE</th>
-                  <th>NOMBRE</th>
-                  <th>EMPRESA</th>
-                  <th>RUTA</th>
-                  <th>CARGA</th>
-                  <th>PESO</th>
-                  <th>TEL</th>
-                  <th>STATUS</th>
-                </tr>
-              </thead>
-              <tbody id="leads-tbody">
-                <tr><td colspan="8" class="leads-empty">Cargando leads...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ─── DASHBOARD OPERATIVO (solo admin) ───────────────────────────── -->
+        <!-- ─── LEADS SARA (solo admin) ──────────────────────────────────────── -->
         <div class="ops-section admin-only">
           <div class="ops-header">
-            <span class="panel-title">Dashboard Operativo</span>
+            <span class="panel-title">Leads SARA</span>
             <span class="ops-refresh" id="ops-refresh-label"></span>
           </div>
 
-          <!-- KPIs reales de SARA -->
+          <!-- KPIs -->
           <div class="ops-kpis" id="ops-kpis">
-            <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-hoy">—</div><div class="ops-kpi-label">Leads hoy</div><div class="ops-kpi-sub" id="ops-sesiones-hoy"></div></div>
+            <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-hoy">—</div><div class="ops-kpi-label">Leads hoy</div></div>
             <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-semana">—</div><div class="ops-kpi-label">Leads 7 días</div></div>
-            <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-total">—</div><div class="ops-kpi-label">Total leads</div><div class="ops-kpi-sub" id="ops-webhooks"></div></div>
-            <div class="ops-kpi"><div class="ops-kpi-val green" id="ops-carriers">—</div><div class="ops-kpi-label">Carriers activos</div></div>
+            <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-total">—</div><div class="ops-kpi-label">Total leads</div></div>
           </div>
 
-          <!-- Tabla últimos leads -->
+          <!-- Tabla de leads enriquecida -->
           <div class="ops-leads-wrap">
-            <div class="ops-sub-title">Últimos leads capturados por SARA</div>
             <div class="ops-table-scroll">
               <table class="ops-table">
-                <thead><tr><th>Hace</th><th>Nombre</th><th>Empresa</th><th>Ruta</th><th>Carga</th><th>Teléfono</th><th>Estado</th></tr></thead>
-                <tbody id="ops-leads-tbody"><tr><td colspan="7" class="ops-empty">Aún sin leads — SARA los captura automáticamente</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Pool de carriers -->
-          <div class="ops-carriers-wrap">
-            <div class="ops-sub-title">Pool de Carriers · LUCA</div>
-            <div class="ops-table-scroll">
-              <table class="ops-table">
-                <thead><tr><th>ID</th><th>Nombre</th><th>Unidad</th><th>Zona</th><th>Disponibilidad</th><th>Registrado</th></tr></thead>
-                <tbody id="ops-carriers-tbody"><tr><td colspan="6" class="ops-empty">Sin carriers registrados — comparte el link de LUCA</td></tr></tbody>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Nombre</th>
+                    <th>Empresa</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Servicio</th>
+                    <th>Resumen</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="ops-leads-tbody">
+                  <tr><td colspan="8" class="ops-empty">SARA capturará leads automáticamente</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -612,6 +585,21 @@
     </div>
   </div>
 
+  <!-- ─── MODAL CHAT LEAD ─────────────────────────────────────────────────── -->
+  <div id="lead-chat-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-panel,#1a1a2e);border:1px solid var(--borde,#2a2a4a);border-radius:12px;width:min(680px,95vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--borde,#2a2a4a);display:flex;align-items:center;gap:12px;">
+        <div id="lcm-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--sara,#6c63ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.85rem;">S</div>
+        <div style="flex:1;">
+          <div id="lcm-nombre" style="font-weight:600;font-size:.95rem;"></div>
+          <div id="lcm-meta" style="font-size:.75rem;color:var(--texto-dim,#888);margin-top:2px;"></div>
+        </div>
+        <button onclick="LeadChatModal.close()" style="background:none;border:none;cursor:pointer;color:var(--texto-dim,#888);font-size:1.2rem;line-height:1;">✕</button>
+      </div>
+      <div id="lcm-messages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/app.js"></script>
   <script src="js/gps-map.js"></script>
@@ -621,7 +609,7 @@
   <script src="js/features.js"></script>
   <script src="js/broadcast.js"></script>
   <script>
-  // ─── Dashboard Operativo — stats en tiempo real ───────────────────────────
+  // ─── Leads SARA — tabla enriquecida + modal de chat ──────────────────────
   const OpsDash = (() => {
     function timeAgo(iso) {
       const s = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -630,69 +618,122 @@
       if (s < 86400) return Math.floor(s/3600) + 'h';
       return Math.floor(s/86400) + 'd';
     }
+    function esc(s) {
+      return (s && s !== '—' ? String(s) : '—')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
 
     async function refresh() {
       try {
-        const [statsRes, leadsRes, carriersRes] = await Promise.all([
+        const [statsRes, leadsRes] = await Promise.all([
           fetch('/api/leads/stats').then(r => r.json()),
           fetch('/api/leads').then(r => r.json()),
-          fetch('/api/carriers').then(r => r.json()),
         ]);
 
-        // KPIs
         const l = statsRes.leads || {};
-        document.getElementById('ops-leads-hoy').textContent     = l.today     ?? '—';
-        document.getElementById('ops-leads-semana').textContent  = l.last_7_days ?? '—';
-        document.getElementById('ops-leads-total').textContent   = l.total     ?? '—';
-        document.getElementById('ops-webhooks').textContent      = l.webhook_sent ? l.webhook_sent + ' enviados a ops' : '';
-        document.getElementById('ops-carriers').textContent      = carriersRes.length ?? '—';
+        document.getElementById('ops-leads-hoy').textContent    = l.today       ?? '—';
+        document.getElementById('ops-leads-semana').textContent = l.last_7_days ?? '—';
+        document.getElementById('ops-leads-total').textContent  = l.total       ?? '—';
         document.getElementById('ops-refresh-label').textContent = 'Act. ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
 
-        // Tabla leads
         const tbody = document.getElementById('ops-leads-tbody');
         if (!leadsRes.length) {
-          tbody.innerHTML = '<tr><td colspan="7" class="ops-empty">SARA capturará leads automáticamente en las conversaciones</td></tr>';
-        } else {
-          tbody.innerHTML = leadsRes.slice(0, 20).map(l => `
-            <tr>
-              <td>${timeAgo(l.created_at)}</td>
-              <td>${esc(l.nombre)}</td>
-              <td>${esc(l.empresa)}</td>
-              <td>${esc(l.origen)} → ${esc(l.destino)}</td>
-              <td>${esc(l.tipo_carga)}</td>
-              <td>${esc(l.telefono)}</td>
-              <td><span class="ops-pill ops-pill-ok">✓ Capturado</span></td>
-            </tr>`).join('');
+          tbody.innerHTML = '<tr><td colspan="8" class="ops-empty">SARA capturará leads automáticamente en las conversaciones</td></tr>';
+          return;
         }
 
-        // Tabla carriers
-        const ctbody = document.getElementById('ops-carriers-tbody');
-        if (!carriersRes.length) {
-          ctbody.innerHTML = '<tr><td colspan="6" class="ops-empty">Comparte /carrier-chat.html con tus transportistas para que se registren</td></tr>';
-        } else {
-          ctbody.innerHTML = carriersRes.map(c => `
-            <tr>
-              <td class="ops-mono">${esc(c.id)}</td>
-              <td>${esc(c.nombre)}</td>
-              <td>${esc((c.unidades||[]).join(', '))}</td>
-              <td>${esc(c.zona)}</td>
-              <td><span class="ops-pill ${c.disponibilidad === 'disponible' ? 'ops-pill-ok' : 'ops-pill-warn'}">${esc(c.disponibilidad||'—')}</span></td>
-              <td>${timeAgo(c.registered_at)}</td>
-            </tr>`).join('');
-        }
+        tbody.innerHTML = leadsRes.slice(0, 50).map(lead => {
+          const servicio = (lead.origen !== '—' && lead.destino !== '—')
+            ? `${esc(lead.origen)} → ${esc(lead.destino)}${lead.tipo_unidad && lead.tipo_unidad !== '—' ? ' · ' + esc(lead.tipo_unidad) : ''}`
+            : (lead.tipo_unidad && lead.tipo_unidad !== '—' ? esc(lead.tipo_unidad) : '—');
+          return `
+            <tr style="cursor:pointer;" onclick="LeadChatModal.open('${esc(lead.id)}')">
+              <td style="white-space:nowrap;color:var(--texto-dim)">${timeAgo(lead.created_at)}</td>
+              <td><strong>${esc(lead.nombre)}</strong></td>
+              <td>${esc(lead.empresa)}</td>
+              <td>${esc(lead.telefono)}</td>
+              <td>${esc(lead.email)}</td>
+              <td style="white-space:nowrap;">${servicio}</td>
+              <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--texto-dim);font-size:.8rem;" title="${esc(lead.resumen)}">${esc(lead.resumen) !== '—' ? esc(lead.resumen) : ''}</td>
+              <td><button class="btn-ver-chat" onclick="event.stopPropagation();LeadChatModal.open('${esc(lead.id)}')">Ver chat</button></td>
+            </tr>`;
+        }).join('');
       } catch(e) { console.error('[OpsDash]', e); }
     }
-
-    function esc(s) { return (s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
     document.addEventListener('DOMContentLoaded', () => {
       refresh();
       setInterval(refresh, 30000);
-      // Refrescar cuando se abre el portal overlay
       document.getElementById('btn-open-portal')?.addEventListener('click', () => setTimeout(refresh, 200));
     });
 
     return { refresh };
+  })();
+
+  // ─── Modal de chat del lead ───────────────────────────────────────────────
+  const LeadChatModal = (() => {
+    const modal = () => document.getElementById('lead-chat-modal');
+
+    function renderMsg(m) {
+      const isUser = m.role === 'user';
+      const bg  = isUser ? 'var(--bg-user,#2a2a4a)' : 'var(--bg-panel,#111128)';
+      const align = isUser ? 'flex-end' : 'flex-start';
+      const clean = (m.content || '')
+        .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+        .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
+        .trim();
+      if (!clean) return '';
+      return `<div style="display:flex;justify-content:${align};">
+        <div style="max-width:78%;padding:10px 14px;border-radius:10px;background:${bg};font-size:.85rem;line-height:1.5;border:1px solid var(--borde,#2a2a4a);">
+          ${clean.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+        </div>
+      </div>`;
+    }
+
+    async function open(id) {
+      const m = modal();
+      m.style.display = 'flex';
+      document.getElementById('lcm-nombre').textContent = 'Cargando...';
+      document.getElementById('lcm-meta').textContent   = '';
+      document.getElementById('lcm-messages').innerHTML = '<div style="text-align:center;color:var(--texto-dim);padding:20px;">Cargando conversación...</div>';
+
+      try {
+        const data = await fetch(`/api/leads/${encodeURIComponent(id)}/chat`).then(r => r.json());
+        const lead = data.lead || {};
+        const hist = data.historial?.history || [];
+
+        document.getElementById('lcm-nombre').textContent =
+          [lead.nombre, lead.empresa].filter(v => v && v !== '—').join(' · ') || 'Lead sin nombre';
+
+        const metaParts = [];
+        if (lead.telefono && lead.telefono !== '—') metaParts.push('📱 ' + lead.telefono);
+        if (lead.email    && lead.email    !== '—') metaParts.push('✉ ' + lead.email);
+        if (lead.origen   && lead.destino  && lead.origen !== '—') metaParts.push(lead.origen + ' → ' + lead.destino);
+        if (lead.precio_cotizado && lead.precio_cotizado !== '—') metaParts.push(lead.precio_cotizado);
+        document.getElementById('lcm-meta').textContent = metaParts.join('  ·  ');
+
+        const msgs = document.getElementById('lcm-messages');
+        if (!hist.length) {
+          msgs.innerHTML = '<div style="text-align:center;color:var(--texto-dim);padding:20px;">Sin historial disponible</div>';
+        } else {
+          msgs.innerHTML = hist.map(renderMsg).filter(Boolean).join('');
+          msgs.scrollTop = msgs.scrollHeight;
+        }
+      } catch(e) {
+        document.getElementById('lcm-messages').innerHTML = '<div style="color:var(--rojo,#f55);padding:20px;">Error cargando el chat</div>';
+      }
+    }
+
+    function close() {
+      modal().style.display = 'none';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.getElementById('lead-chat-modal')?.addEventListener('click', e => {
+      if (e.target === document.getElementById('lead-chat-modal')) close();
+    });
+
+    return { open, close };
   })();
   </script>
 

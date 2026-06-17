@@ -4,6 +4,7 @@ const Sara = (() => {
   let sessionId = App.generateSessionId();
   let isStreaming = false;
   let currentStreamDiv = null;
+  let chatCerrado = false;
 
   function init() {
     document.getElementById('sara-session-id').textContent = sessionId;
@@ -30,7 +31,7 @@ const Sara = (() => {
   async function enviarMensaje() {
     const input = document.getElementById('sara-input');
     const mensaje = input.value.trim();
-    if (!mensaje || isStreaming) return;
+    if (!mensaje || isStreaming || chatCerrado) return;
 
     input.value = '';
     input.style.height = 'auto';
@@ -78,8 +79,11 @@ const Sara = (() => {
 
             if (data.type === 'chunk') {
               textoAcumulado += data.text;
-              // Strip raw NUEVA_ORDEN JSON while streaming (show clean text)
-              const cleanText = textoAcumulado.replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '').trim();
+              const cleanText = textoAcumulado
+                .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+                .replace(/CERRAR_CHAT/gi, '')
+                .replace(/ESCALAR_HUMANO/gi, '')
+                .trim();
               streamDiv.innerHTML = renderMarkdown(cleanText);
               scrollToBottom('sara-messages');
             }
@@ -97,6 +101,9 @@ const Sara = (() => {
                 document.dispatchEvent(new CustomEvent('nueva_orden_recibida', { detail: data.datos }));
               }
             }
+
+            if (data.type === 'cerrar_chat') cerrarChat(streamDiv, textoAcumulado);
+            if (data.type === 'escalar_humano') notificarEscalacion(streamDiv);
 
             if (data.type === 'error') {
               streamDiv.innerHTML = `<em style="color: var(--rojo)">Error: ${App.escapeHtml(data.message)}</em>`;
@@ -185,9 +192,43 @@ const Sara = (() => {
     scrollToBottom(`${agente}-messages`);
   }
 
+  function cerrarChat(streamDiv, textoAcumulado) {
+    // Limpiar señal técnica del texto visible
+    if (streamDiv) {
+      const cleanText = (textoAcumulado || '').replace(/CERRAR_CHAT/gi, '').trim();
+      streamDiv.innerHTML = renderMarkdown(cleanText);
+    }
+    chatCerrado = true;
+    const input = document.getElementById('sara-input');
+    const btnSend = document.getElementById('sara-send');
+    if (input) { input.disabled = true; input.placeholder = 'Chat cerrado'; }
+    if (btnSend) btnSend.disabled = true;
+
+    // Banner de cierre
+    const messages = document.getElementById('sara-messages');
+    const banner = document.createElement('div');
+    banner.style.cssText = 'text-align:center;padding:10px;color:var(--texto-dim);font-size:.8em;border-top:1px solid var(--borde);margin-top:8px;';
+    banner.textContent = '— Chat finalizado —';
+    messages.appendChild(banner);
+    scrollToBottom('sara-messages');
+  }
+
+  function notificarEscalacion(streamDiv) {
+    if (streamDiv) {
+      const cleanText = streamDiv.textContent.replace(/ESCALAR_HUMANO/gi, '').trim();
+      streamDiv.innerHTML = renderMarkdown(cleanText);
+    }
+    App.toast('Escalado a equipo humano — alguien te contactará pronto', 'azul', 5000);
+  }
+
   function nuevaSesion() {
     sessionId = App.generateSessionId();
+    chatCerrado = false;
     document.getElementById('sara-session-id').textContent = sessionId;
+    const input = document.getElementById('sara-input');
+    const btnSend = document.getElementById('sara-send');
+    if (input) { input.disabled = false; input.placeholder = ''; }
+    if (btnSend) btnSend.disabled = false;
     limpiarChat();
     App.toast('Nueva sesión SARA iniciada', 'verde', 2000);
   }

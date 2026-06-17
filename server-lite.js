@@ -17,9 +17,6 @@ const SOFIA_PROMPT= require('./backend/agents/sofia-prompt');
 const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
 const leads       = require('./backend/services/leads');
-const carriers    = require('./backend/services/carriers');
-const LUCA_PROMPT      = require('./backend/agents/luca-prompt');
-const prospectorApis   = require('./backend/services/prospector-apis');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -142,72 +139,6 @@ app.post('/api/gps/update', (req, res) => {
   res.json({ ok: true, ts: registro.ts });
 });
 
-// ─── E0 PROSPECTOR — rutas públicas (sin sesión, accesibles desde la página externa) ─
-app.get('/api/prospector/status', (req, res) => {
-  res.json(prospectorApis.apiStatus());
-});
-
-app.post('/api/prospector/generate', async (req, res) => {
-  const { sector, zona } = req.body;
-  if (!sector || !zona) return res.status(400).json({ error: 'sector y zona requeridos' });
-
-  const nacional  = zona === 'todo-mexico';
-  const zonaLabel = nacional ? 'México' : zona;
-  // Null zona for national searches so APIs omit city filter
-  const zonaApi   = nacional ? null : zona;
-
-  try {
-    const { prospectos: realProspectos, sources } = await prospectorApis.searchAll(sector, zonaApi, 8);
-
-    if (realProspectos.length > 0) {
-      const enriquecidos = await Promise.all(realProspectos.map(async p => {
-        if (p.mensaje) return p;
-        const lugar = p.ciudad || (nacional ? 'México' : zona);
-        const contactoCtx = p.contacto ? ` Dirígete a "${p.contacto}".` : '';
-        const msgPrompt = `Eres el equipo comercial de ABSTORAGES Logistics Solutions.
-Redacta UN SOLO mensaje de prospección de WhatsApp para la empresa "${p.empresa}" del sector "${p.giro || sector}" ubicada en "${lugar}".${contactoCtx}
-Máximo 4 párrafos. Tono profesional pero cercano. Menciona la empresa por nombre. Termina con una pregunta de apertura.
-Responde SOLO el texto del mensaje, sin comillas ni explicaciones.`;
-        let msg = '';
-        await chatStream(msgPrompt, [{ role: 'user', content: 'Redacta el mensaje.' }],
-          chunk => { msg += chunk; }, () => {});
-        return { ...p, mensaje: msg.trim() };
-      }));
-      return res.json({ prospectos: enriquecidos, fuentes: sources, modo: 'real' });
-    }
-
-    // Fallback: Claude genera empresas representativas
-    const alcance = nacional
-      ? 'distribuidas en distintos estados de la República Mexicana (incluye ciudades como CDMX, Monterrey, Guadalajara, Puebla, Querétaro, entre otras — varía la ciudad en cada empresa)'
-      : `en "${zonaLabel}"`;
-
-    const prompt = `Eres un experto en prospección comercial de logística en México.
-Genera una lista JSON de exactamente 8 empresas del sector "${sector}" ${alcance} que probablemente necesiten servicios de flete.
-Para cada empresa devuelve un objeto con:
-- empresa: nombre realista y creíble
-- giro: descripción corta (máx 6 palabras)
-- ciudad: ciudad donde está ubicada la empresa
-- por_que: razón específica de necesidad de flete (1 oración)
-- mensaje: mensaje WhatsApp de ABSTORAGES, máx 4 párrafos, tono profesional, menciona la empresa por nombre y ciudad, termina con pregunta de apertura
-- fuente: "IA Generativa"
-Responde SOLO JSON válido, sin markdown. Formato: {"prospectos": [...]}`;
-
-    let json = '';
-    await chatStream(prompt, [{ role: 'user', content: 'Genera la lista.' }],
-      chunk => { json += chunk; }, () => {});
-    const clean = json.replace(/```json|```/g, '').trim();
-    const data  = JSON.parse(clean);
-    res.json({ ...data, fuentes: ['IA Generativa'], modo: 'ia' });
-  } catch (e) {
-    res.status(500).json({ error: 'Error generando prospectos: ' + e.message });
-  }
-});
-
-// Páginas públicas LUCA y Prospector
-app.get('/carrier-chat.html', (req, res) =>
-  res.sendFile(path.join(__dirname, 'frontend', 'carrier-chat.html')));
-app.get('/e0-prospector.html', (req, res) =>
-  res.sendFile(path.join(__dirname, 'frontend', 'e0-prospector.html')));
 
 app.use(auth);
 app.use(express.static(path.join(__dirname, 'frontend')));
@@ -385,8 +316,8 @@ app.post('/api/sofia/reporte-entrega', async (req, res) => {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
 function buildPrompt(agente, contextBlock, tariffCtx) {
-  const base = agente === 'sara' ? SARA_PROMPT : agente === 'luca' ? LUCA_PROMPT : SOFIA_PROMPT;
-  const tariffBlock = agente === 'luca' ? '' : `\n\n## MERCADO ACTUAL (actualizado en tiempo real)\n${tariffCtx.prompt}`;
+  const base = agente === 'sara' ? SARA_PROMPT : SOFIA_PROMPT;
+  const tariffBlock = `\n\n## MERCADO ACTUAL (actualizado en tiempo real)\n${tariffCtx.prompt}`;
   return contextBlock
     ? `${base}${tariffBlock}\n\n${contextBlock}`
     : `${base}${tariffBlock}`;
@@ -440,11 +371,6 @@ async function handleChat(agente, req, res) {
       res.write(`data: ${JSON.stringify({ type: 'folio_update', estatus: 'ENTREGADO' })}\n\n`);
     }
 
-    // Detectar carrier registrado por LUCA
-    if (agente === 'luca') {
-      const carrier = carriers.extractFromText(fullText);
-      if (carrier) res.write(`data: ${JSON.stringify({ type: 'carrier_registered', carrier })}\n\n`);
-    }
   } catch (err) {
     res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
   }
@@ -455,16 +381,17 @@ async function handleChat(agente, req, res) {
 
 app.post('/api/sara/chat',  (req, res) => handleChat('sara',  req, res));
 app.post('/api/sofia/chat', (req, res) => handleChat('sofia', req, res));
-app.post('/api/luca/chat',  (req, res) => handleChat('luca',  req, res));
 
 // ─── LEADS ────────────────────────────────────────────────────────────────────
-app.get('/api/leads',       (req, res) => res.json(leads.list()));
-app.get('/api/leads/stats', (req, res) => res.json(leads.stats()));
-app.post('/api/leads',      (req, res) => res.json(leads.add(req.body)));
-
-// ─── CARRIERS ─────────────────────────────────────────────────────────────────
-app.get('/api/carriers',  (req, res) => res.json(carriers.list()));
-app.post('/api/carriers', (req, res) => res.json(carriers.add(req.body)));
+app.get('/api/leads',            (req, res) => res.json(leads.list()));
+app.get('/api/leads/stats',      (req, res) => res.json(leads.stats()));
+app.post('/api/leads',           (req, res) => res.json(leads.add(req.body)));
+app.get('/api/leads/:id/chat',   (req, res) => {
+  const lead = leads.getById(req.params.id);
+  if (!lead) return res.status(404).json({ error: 'Lead no encontrado' });
+  const historial = memory.getSession(lead.sessionId);
+  res.json({ lead, historial });
+});
 
 // ─── GPS EN TIEMPO REAL ───────────────────────────────────────────────────────
 
