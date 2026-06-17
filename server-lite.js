@@ -89,6 +89,7 @@ app.post('/api/logout', (req, res) => {
 
 // WhatsApp webhook — sin auth (viene de 360dialog)
 app.post('/webhook/whatsapp', async (req, res) => {
+  console.log('[WA webhook] recibido:', JSON.stringify(req.body).slice(0, 300));
   res.sendStatus(200);
   try {
     const msgs = req.body?.messages;
