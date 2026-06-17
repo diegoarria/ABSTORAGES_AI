@@ -14,9 +14,12 @@ const memory      = require('./backend/services/memory');
 const tariff      = require('./backend/services/tariff');
 const SARA_PROMPT = require('./backend/agents/sara-prompt');
 const SOFIA_PROMPT= require('./backend/agents/sofia-prompt');
+const cors        = require('cors');
 const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
 const leads       = require('./backend/services/leads');
+const notifier    = require('./backend/services/notifier');
+const vapi        = require('./backend/services/vapi');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -52,6 +55,10 @@ async function sendWhatsApp(to, text) {
 
 // ─── MIDDLEWARE ────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '2mb' }));
+
+// CORS abierto solo para el widget (rutas /api/widget/* y /widget)
+app.use('/api/widget', cors());
+app.use('/widget', cors());
 
 // ─── LOGIN / LOGOUT / ME (rutas públicas, antes del middleware de auth) ───────
 app.get('/login', (req, res) => {
@@ -119,6 +126,17 @@ app.get('/webhook/whatsapp', (req, res) => {
 // Recursos públicos (logo, CSS del login) accesibles sin sesión
 app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
 app.use('/css', express.static(path.join(__dirname, 'frontend', 'css')));
+
+// ─── WIDGET (público — sin auth, para embedding en landing pages) ───────────
+app.get('/widget', (req, res) =>
+  res.sendFile(path.join(__dirname, 'frontend', 'sara-widget.html')));
+app.get('/sara-widget.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.sendFile(path.join(__dirname, 'frontend', 'sara-widget.js'));
+});
+
+// Chat público del widget — misma lógica que /api/sara/chat pero sin auth
+app.post('/api/widget/chat', (req, res) => handleChat('sara', req, res));
 
 // Página del chofer — URL pública autenticada con token GPS
 app.get('/tracker', (req, res) => {
@@ -363,7 +381,14 @@ async function handleChat(agente, req, res) {
     // Detectar lead capturado por SARA
     if (agente === 'sara') {
       const lead = leads.extractFromText(fullText, sid);
-      if (lead) res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
+      if (lead) {
+        res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
+        // Notificar al equipo y lanzar llamada de seguimiento (no bloquea la respuesta)
+        notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
+        if (process.env.VAPI_FOLLOWUP === 'true') {
+          vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
+        }
+      }
     }
 
     // Detectar si SOFIA cerró un folio

@@ -1,6 +1,26 @@
-// ─── LEADS — Captura y estadísticas de leads de SARA ─────────────────────────
+// ─── LEADS — Captura, estadísticas y persistencia en disco ───────────────────
+const fs   = require('fs');
+const path = require('path');
 
-const leads = [];
+const LEADS_FILE = path.join(__dirname, '../../data/leads.json');
+
+function loadFromDisk() {
+  try {
+    if (fs.existsSync(LEADS_FILE)) return JSON.parse(fs.readFileSync(LEADS_FILE, 'utf8'));
+  } catch {}
+  return [];
+}
+
+const leads = loadFromDisk();
+
+let saveTimer = null;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2)); }
+    catch (e) { console.error('[leads] Error guardando en disco:', e.message); }
+  }, 1000);
+}
 
 function add(lead) {
   const entry = {
@@ -22,6 +42,7 @@ function add(lead) {
     ...lead,
   };
   leads.push(entry);
+  scheduleSave();
   return entry;
 }
 
@@ -29,7 +50,7 @@ function getById(id) {
   return leads.find(l => l.id === id) || null;
 }
 
-function list(limit = 50) {
+function list(limit = 100) {
   return leads.slice(-limit).reverse();
 }
 
@@ -37,19 +58,17 @@ function stats() {
   const now     = Date.now();
   const DAY_MS  = 86400000;
   const WEEK_MS = DAY_MS * 7;
-
-  const today = leads.filter(l => now - new Date(l.created_at).getTime() < DAY_MS).length;
-  const week  = leads.filter(l => now - new Date(l.created_at).getTime() < WEEK_MS).length;
-  const total = leads.length;
-  const sent  = leads.filter(l => l.webhook_status === 'sent').length;
-
   return {
-    leads: { today, last_7_days: week, total, webhook_sent: sent },
+    leads: {
+      today:        leads.filter(l => now - new Date(l.created_at).getTime() < DAY_MS).length,
+      last_7_days:  leads.filter(l => now - new Date(l.created_at).getTime() < WEEK_MS).length,
+      total:        leads.length,
+      webhook_sent: leads.filter(l => l.webhook_status === 'sent').length,
+    },
     generated_at: new Date().toISOString(),
   };
 }
 
-// Extrae lead del texto de SARA al cerrar una venta (NUEVA_ORDEN signal)
 function extractFromText(text, sessionId) {
   const nombre   = text.match(/(?:nombre|cliente)[:\s]+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)/i)?.[1];
   const telefono = text.match(/(?:\+?52\s*)?(\d{2,3}[\s\-]?\d{3,4}[\s\-]?\d{4})/)?.[1];
@@ -59,29 +78,21 @@ function extractFromText(text, sessionId) {
   const empresa  = text.match(/(?:empresa|compañía|negocio)[:\s]+([A-ZÁÉÍÓÚÑa-záéíóúñ ]+?)(?:\n|,|\.)/i)?.[1];
   const folio    = text.match(/ABST-\d+/)?.[0];
   const precio   = text.match(/\$\s*([\d,]+)/)?.[0];
-  const unidad   = text.match(/caja seca \d{2}|torton|rabon|plataforma|full/i)?.[0];
-  const resumen  = buildResumen({ nombre, empresa, origen, destino, unidad, precio, text });
+  const unidad   = text.match(/caja seca \d{2}|torton|rabe?on|plataforma|full/i)?.[0];
+
+  const partes = [];
+  if (empresa && empresa !== '—') partes.push(empresa);
+  else if (nombre) partes.push(nombre);
+  if (origen && destino) partes.push(`${origen} → ${destino}`);
+  if (unidad)  partes.push(unidad);
+  if (precio)  partes.push(precio);
+  const resumen = partes.join(' · ');
 
   if ((nombre || telefono) && (origen || destino || folio)) {
     return add({ nombre, telefono, email, origen, destino, empresa, folio,
                  tipo_unidad: unidad, precio_cotizado: precio, resumen, sessionId });
   }
   return null;
-}
-
-function buildResumen({ nombre, empresa, origen, destino, unidad, precio, text }) {
-  const partes = [];
-  if (empresa && empresa !== '—') partes.push(empresa);
-  else if (nombre && nombre !== '—') partes.push(nombre);
-  if (origen && destino) partes.push(`${origen} → ${destino}`);
-  if (unidad) partes.push(unidad);
-  if (precio) partes.push(precio);
-
-  if (partes.length > 0) return partes.join(' · ');
-
-  // Fallback: primera oración relevante del texto
-  const lineas = text.split('\n').map(l => l.trim()).filter(l => l.length > 20 && !l.startsWith('NUEVA_ORDEN'));
-  return lineas[0]?.slice(0, 120) || '';
 }
 
 module.exports = { add, getById, list, stats, extractFromText };

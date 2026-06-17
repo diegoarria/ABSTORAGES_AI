@@ -217,10 +217,62 @@ async function iniciarLlamadaSimple(telefono, contexto) {
   return res.json();
 }
 
+// ── Llamada de seguimiento al lead capturado por SARA ─────────────────────────
+async function llamarLead(lead) {
+  const raw = (lead.telefono || '').replace(/\D/g, '');
+  if (raw.length < 10) {
+    console.log(`[Vapi] Teléfono inválido para llamada de seguimiento: ${lead.telefono}`);
+    return;
+  }
+  const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
+
+  const primerMensaje =
+    `Hola ${lead.nombre || ''}, soy SARA de ABSTORAGES Logistics Solutions. ` +
+    `Estuve platicando contigo sobre tu solicitud de flete. ` +
+    `¿Tienes un momento para confirmar los detalles?`;
+
+  if (!API_KEY || !PHONE_NUMBER_ID) {
+    console.log(`[Vapi STUB] Llamada de seguimiento a ${lead.nombre} (${numero})`);
+    return { status: 'stub' };
+  }
+
+  const res = await fetch(`${BASE_URL}/call/phone`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: JSON.stringify({
+      phoneNumberId: PHONE_NUMBER_ID,
+      customer: { number: numero, name: lead.nombre || 'Cliente' },
+      assistantOverrides: {
+        firstMessage: primerMensaje,
+        model: {
+          provider: 'anthropic',
+          model: 'claude-haiku-4-5-20251001',
+          messages: [{
+            role: 'system',
+            content:
+              `Eres SARA, ejecutiva comercial de ABSTORAGES Logistics Solutions. ` +
+              `Llamas a ${lead.nombre} de ${lead.empresa} para confirmar su solicitud. ` +
+              `Ruta: ${lead.origen} → ${lead.destino}. Unidad: ${lead.tipo_unidad}. ` +
+              `Precio cotizado: ${lead.precio_cotizado}. ` +
+              `Confirma datos, resuelve dudas y cierra el acuerdo. Sé breve y profesional.`,
+          }],
+        },
+        ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
+      },
+    }),
+  });
+
+  if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  console.log(`[Vapi] Llamada a lead ${lead.id} iniciada — callId ${data.id}`);
+  return data;
+}
+
 module.exports = {
   lanzarLlamadasProveedores,
   procesarResultadoLlamada,
   obtenerEstadoLlamadas,
   llamarTransportistaSinRespuesta,
   llamarCheckDeRuta,
+  llamarLead,
 };
