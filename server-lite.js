@@ -37,20 +37,23 @@ const WA_LIVE = WA_KEY && !WA_KEY.startsWith('xxxx');
 
 async function sendWhatsApp(to, text) {
   if (!WA_LIVE) {
-    console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}...`);
+    console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
   }
-  const body = JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } });
-  return new Promise((resolve, reject) => {
-    const url = new URL(`${WA_URL}/messages`);
-    const req = https.request({
-      hostname: url.hostname, path: url.pathname, method: 'POST',
+  const sendUrl = `${WA_URL}/messages`;
+  const payload = JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } });
+  console.log(`[WA] Enviando a ${to} via ${sendUrl}`);
+  try {
+    const r = await fetch(sendUrl, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
-    }, res => { res.resume(); res.on('end', resolve); });
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
+      body: payload,
+    });
+    const resp = await r.text();
+    console.log(`[WA] Respuesta ${r.status}: ${resp.slice(0, 200)}`);
+  } catch (e) {
+    console.error('[WA] Error enviando:', e.message);
+  }
 }
 
 // ─── MIDDLEWARE ────────────────────────────────────────────────────────────
