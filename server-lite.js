@@ -40,28 +40,25 @@ async function sendWhatsApp(to, text) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
   }
-  // 360dialog Cloud API — requiere WHATSAPP_PHONE_NUMBER_ID
-  const phoneId = WA_PHONE_ID || '1160752237115563';
-  const sendUrl = `https://waba-v2.360dialog.io/v1/messages`;
-  const payload = JSON.stringify({
+  // 360dialog Cloud API (D-Hub)
+  const WABA_ID  = process.env.WHATSAPP_WABA_ID || '1468318567796355';
+  const sendUrl  = `https://waba-v2.360dialog.io/whatsapp/app/${WABA_ID}/v1/messages`;
+  const payload  = JSON.stringify({
     messaging_product: 'whatsapp',
     recipient_type: 'individual',
     to,
     type: 'text',
-    text: { preview_url: false, body: text },
+    text: { body: text },
   });
-  console.log(`[WA] Enviando a ${to}`);
+  console.log(`[WA] Enviando a ${to} → ${sendUrl}`);
   try {
     const r = await fetch(sendUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'D360-API-KEY': WA_KEY,
-      },
+      headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
       body: payload,
     });
     const resp = await r.text();
-    console.log(`[WA] Respuesta ${r.status}: ${resp.slice(0, 200)}`);
+    console.log(`[WA] Respuesta ${r.status}: ${resp.slice(0, 300)}`);
   } catch (e) {
     console.error('[WA] Error enviando:', e.message);
   }
