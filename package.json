@@ -4,8 +4,8 @@
   "description": "ABSTORAGES AI Portal — SARA (Sales AI) + SOFIA (Operations Planner AI)",
   "main": "backend/server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "start": "node server-lite.js",
+    "dev": "nodemon server-lite.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
