@@ -423,6 +423,12 @@ async function handleChat(agente, req, res) {
     );
     memory.addMessage(sid, 'assistant', fullText);
 
+    // Detectar señales de control
+    if (/CERRAR_CHAT/i.test(fullText))
+      res.write(`data: ${JSON.stringify({ type: 'cerrar_chat' })}\n\n`);
+    if (/ESCALAR_HUMANO/i.test(fullText))
+      res.write(`data: ${JSON.stringify({ type: 'escalar_humano' })}\n\n`);
+
     // Detectar lead capturado por SARA
     if (agente === 'sara') {
       const lead = leads.extractFromText(fullText, sid);
