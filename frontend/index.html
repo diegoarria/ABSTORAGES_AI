@@ -434,6 +434,23 @@
             <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-total">—</div><div class="ops-kpi-label">Total leads</div></div>
           </div>
 
+          <!-- Filtros de fecha -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;">
+            <button class="leads-filter-btn active" data-periodo="todo">Todo</button>
+            <button class="leads-filter-btn" data-periodo="hoy">Hoy</button>
+            <button class="leads-filter-btn" data-periodo="semana">Esta semana</button>
+            <button class="leads-filter-btn" data-periodo="mes">Este mes</button>
+            <button class="leads-filter-btn" data-periodo="año">Este año</button>
+            <span style="color:var(--texto-dim);font-size:.75rem;margin-left:4px;">o rango:</span>
+            <input type="date" id="leads-desde" style="font-size:.75rem;padding:4px 8px;border-radius:7px;border:1px solid var(--borde,#1e2340);background:var(--bg-panel,#111128);color:var(--texto,#eee);">
+            <input type="date" id="leads-hasta" style="font-size:.75rem;padding:4px 8px;border-radius:7px;border:1px solid var(--borde,#1e2340);background:var(--bg-panel,#111128);color:var(--texto,#eee);">
+            <button onclick="OpsDash.refresh()" style="font-size:.75rem;padding:4px 10px;border-radius:7px;background:var(--verde,#00e87a);color:#000;border:none;cursor:pointer;font-weight:700;">Buscar</button>
+          </div>
+          <style>
+            .leads-filter-btn{font-size:.75rem;padding:4px 12px;border-radius:20px;border:1px solid var(--borde,#1e2340);background:transparent;color:var(--texto-dim,#8090aa);cursor:pointer;transition:all .15s;}
+            .leads-filter-btn.active,.leads-filter-btn:hover{background:rgba(0,232,122,.12);color:#00e87a;border-color:rgba(0,232,122,.3);}
+          </style>
+
           <!-- Tarjetas de leads estilo Cliengo -->
           <div id="leads-cards-list" style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
             <div style="text-align:center;color:var(--texto-dim);padding:32px;font-size:.85rem;">
@@ -594,11 +611,29 @@
         .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
+    function getPeriodoParams() {
+      const periodo = document.querySelector('.leads-filter-btn.active')?.dataset.periodo || 'todo';
+      const now = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      if (periodo === 'hoy')   return `desde=${ymd(now)}T00:00:00&hasta=${ymd(now)}T23:59:59`;
+      if (periodo === 'semana'){ const d=new Date(now); d.setDate(now.getDate()-now.getDay()); return `desde=${ymd(d)}T00:00:00`; }
+      if (periodo === 'mes')   return `desde=${now.getFullYear()}-${pad(now.getMonth()+1)}-01T00:00:00`;
+      if (periodo === 'año')   return `desde=${now.getFullYear()}-01-01T00:00:00`;
+      const desde = document.getElementById('leads-desde')?.value;
+      const hasta = document.getElementById('leads-hasta')?.value;
+      const p = [];
+      if (desde) p.push(`desde=${desde}T00:00:00`);
+      if (hasta) p.push(`hasta=${hasta}T23:59:59`);
+      return p.join('&');
+    }
+
     async function refresh() {
       try {
+        const params = getPeriodoParams();
         const [statsRes, leadsRes] = await Promise.all([
           fetch('/api/leads/stats').then(r => r.json()),
-          fetch('/api/leads').then(r => r.json()),
+          fetch(`/api/leads${params ? '?'+params : ''}`).then(r => r.json()),
         ]);
 
         const l = statsRes.leads || {};
@@ -673,6 +708,18 @@
       refresh();
       setInterval(refresh, 30000);
       document.getElementById('btn-open-portal')?.addEventListener('click', () => setTimeout(refresh, 200));
+      document.addEventListener('click', e => {
+        const btn = e.target.closest('.leads-filter-btn');
+        if (!btn) return;
+        document.querySelectorAll('.leads-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // limpiar fechas manuales si se elige periodo predefinido
+        if (btn.dataset.periodo !== 'todo') {
+          document.getElementById('leads-desde').value = '';
+          document.getElementById('leads-hasta').value = '';
+        }
+        refresh();
+      });
     });
 
     return { refresh };

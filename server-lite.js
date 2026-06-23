@@ -429,7 +429,7 @@ app.post('/api/sara/chat',  (req, res) => handleChat('sara',  req, res));
 app.post('/api/sofia/chat', (req, res) => handleChat('sofia', req, res));
 
 // ─── LEADS ────────────────────────────────────────────────────────────────────
-app.get('/api/leads',            async (req, res) => res.json(await leads.list()));
+app.get('/api/leads',            async (req, res) => res.json(await leads.list({ desde: req.query.desde, hasta: req.query.hasta })));
 app.get('/api/leads/stats',      async (req, res) => res.json(await leads.stats()));
 app.post('/api/leads',           (req, res) => res.json(leads.add(req.body)));
 app.get('/api/leads/export.csv', async (req, res) => {

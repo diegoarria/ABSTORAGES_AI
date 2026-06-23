@@ -102,16 +102,24 @@ async function getById(id) {
   return cache.find(l => l.id === id) || null;
 }
 
-async function list(limit = 100) {
+async function list({ limit = 500, desde = null, hasta = null } = {}) {
   if (pool) {
     try {
+      const conds = [], vals = [];
+      if (desde) { conds.push(`created_at >= $${vals.length+1}`); vals.push(desde); }
+      if (hasta) { conds.push(`created_at <= $${vals.length+1}`); vals.push(hasta); }
+      const where = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
+      vals.push(limit);
       const { rows } = await pool.query(
-        'SELECT * FROM leads ORDER BY created_at DESC LIMIT $1', [limit]
+        `SELECT * FROM leads ${where} ORDER BY created_at DESC LIMIT $${vals.length}`, vals
       );
       return rows;
     } catch (e) { console.error('[leads] list DB error:', e.message); }
   }
-  return cache.slice(-limit).reverse();
+  let rows = [...cache].reverse();
+  if (desde) rows = rows.filter(l => new Date(l.created_at) >= new Date(desde));
+  if (hasta) rows = rows.filter(l => new Date(l.created_at) <= new Date(hasta));
+  return rows.slice(0, limit);
 }
 
 async function stats() {
