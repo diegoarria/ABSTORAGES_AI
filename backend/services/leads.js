@@ -29,6 +29,7 @@ function add(lead) {
     webhook_status:  'sent',
     nombre:          lead.nombre          || '—',
     empresa:         lead.empresa         || '—',
+    rfc:             lead.rfc             || '—',
     telefono:        lead.telefono        || '—',
     email:           lead.email           || '—',
     origen:          lead.origen          || '—',
@@ -69,7 +70,14 @@ function stats() {
   };
 }
 
-function extractFromText(text, sessionId) {
+function detectIntent(text) {
+  if (/\b(trabajo|empleo|vacante|chofer|conductor|operador|plaza)\b/i.test(text)) return 'trabajo';
+  if (/\b(mudanza|muebles|mudarse|casa|departamento)\b/i.test(text))              return 'mudanzas';
+  if (/\b(flete|carga|transporte|ruta|cotiz|envío|traslado|camión|unidad)\b/i.test(text)) return 'fletes_nacionales';
+  return 'otro';
+}
+
+function extractFromText(text, sessionId, extras = {}) {
   const nombre   = text.match(/(?:nombre|cliente)[:\s]+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)/i)?.[1];
   const telefono = text.match(/(?:\+?52\s*)?(\d{2,3}[\s\-]?\d{3,4}[\s\-]?\d{4})/)?.[1];
   const email    = text.match(/[\w.+-]+@[\w-]+\.[\w.]+/)?.[0];
@@ -79,6 +87,10 @@ function extractFromText(text, sessionId) {
   const folio    = text.match(/ABST-\d+/)?.[0];
   const precio   = text.match(/\$\s*([\d,]+)/)?.[0];
   const unidad   = text.match(/caja seca \d{2}|torton|rabe?on|plataforma|full/i)?.[0];
+  const rfc      = text.match(/\b([A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3})\b/i)?.[1]?.toUpperCase();
+  const tipo_carga = text.match(/(?:tipo de carga|carga)[:\s]+([^\n,.]+)/i)?.[1]?.trim();
+  const peso_toneladas = text.match(/(\d+(?:\.\d+)?)\s*(?:ton(?:eladas?)?|t\b)/i)?.[1];
+  const intent = detectIntent(text);
 
   const partes = [];
   if (empresa && empresa !== '—') partes.push(empresa);
@@ -89,8 +101,9 @@ function extractFromText(text, sessionId) {
   const resumen = partes.join(' · ');
 
   if ((nombre || telefono) && (origen || destino || folio)) {
-    return add({ nombre, telefono, email, origen, destino, empresa, folio,
-                 tipo_unidad: unidad, precio_cotizado: precio, resumen, sessionId });
+    return add({ nombre, telefono, email, origen, destino, empresa, rfc, folio,
+                 tipo_carga, tipo_unidad: unidad, peso_toneladas, intent,
+                 precio_cotizado: precio, resumen, sessionId, ...extras });
   }
   return null;
 }

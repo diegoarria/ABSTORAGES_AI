@@ -40,16 +40,14 @@ async function sendWhatsApp(to, text) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
   }
-  // 360dialog Cloud API — channel key
-  const sendUrl  = `https://waba-v2.360dialog.io/v1/messages`;
-  const payload  = JSON.stringify({
+  const sendUrl = `https://waba-v2.360dialog.io/v1/messages`;
+  const payload = JSON.stringify({
     messaging_product: 'whatsapp',
-    recipient_type: 'individual',
     to,
     type: 'text',
     text: { body: text },
   });
-  console.log(`[WA] Enviando a ${to} → ${sendUrl}`);
+  console.log(`[WA] Enviando a ${to}`);
   try {
     const r = await fetch(sendUrl, {
       method: 'POST',
@@ -57,7 +55,7 @@ async function sendWhatsApp(to, text) {
       body: payload,
     });
     const resp = await r.text();
-    console.log(`[WA] Respuesta ${r.status}: ${resp.slice(0, 300)}`);
+    console.log(`[WA] Status ${r.status}: ${resp.slice(0, 500)}`);
   } catch (e) {
     console.error('[WA] Error enviando:', e.message);
   }
@@ -100,13 +98,15 @@ app.post('/api/logout', (req, res) => {
 // WhatsApp webhook — sin auth (viene de 360dialog / Meta Cloud API)
 app.post('/webhook/whatsapp', async (req, res) => {
   res.sendStatus(200);
+  console.log('[WA-IN] body:', JSON.stringify(req.body).slice(0, 600));
   try {
-    // Formato Meta Cloud API (nuevo 360dialog)
+    // Formato Meta Cloud API (360dialog DCHUB)
     const value = req.body?.entry?.[0]?.changes?.[0]?.value;
-    const msgs  = value?.messages;
-    if (!msgs?.length) return;
+    // Formato legacy 360dialog (fallback)
+    const msgs = value?.messages ?? req.body?.messages;
+    if (!msgs?.length) { console.log('[WA-IN] sin mensajes, ignorando'); return; }
     const msg = msgs[0];
-    if (msg.type !== 'text') return;
+    if (msg.type !== 'text') { console.log('[WA-IN] tipo no texto:', msg.type); return; }
     const phone   = msg.from;
     const texto   = msg.text.body.trim();
     const session = `wa_${phone}`;
@@ -392,7 +392,16 @@ async function handleChat(agente, req, res) {
 
     // Detectar lead capturado por SARA
     if (agente === 'sara') {
-      const lead = leads.extractFromText(fullText, sid);
+      const hasCierre   = /NUEVA_ORDEN/i.test(fullText);
+      const hasEscalar  = /ESCALAR_HUMANO/i.test(fullText);
+      const hasCerrar   = /CERRAR_CHAT/i.test(fullText);
+      const sara_nota   = hasCierre  ? 'cierre_de_venta'
+                        : hasEscalar ? 'escalado_a_operaciones'
+                        : hasCerrar  ? 'chat_cerrado'
+                        : req.body?.message ? 'cotizacion_en_proceso' : null;
+      const primer_mensaje = (memory.buildContext(sid).history || [])
+        .find(m => m.role === 'user')?.content?.slice(0, 160) || null;
+      const lead = leads.extractFromText(fullText, sid, { sara_nota, primer_mensaje });
       if (lead) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
         // Notificar al equipo y lanzar llamada de seguimiento (no bloquea la respuesta)

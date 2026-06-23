@@ -3,48 +3,59 @@
 require('dotenv').config();
 
 const RESEND_KEY   = process.env.RESEND_API_KEY;
-const TEAM_EMAIL   = process.env.NOTIF_EMAIL;
-const FROM_EMAIL   = process.env.NOTIF_FROM_EMAIL || 'SARA <sara@abstorages.mx>';
+const TEAM_EMAIL   = (process.env.NOTIF_EMAIL || '').split(',').map(e => e.trim()).filter(Boolean);
+const FROM_EMAIL   = process.env.NOTIF_FROM_EMAIL || 'SARA <onboarding@resend.dev>';
 const TEAM_WA      = process.env.NOTIF_WA_NUMBER;    // ej: 528181234567
 const WEBHOOK_URL  = process.env.LEAD_WEBHOOK_URL;   // n8n / Zapier / HubSpot
 
 const WA_KEY  = process.env.WHATSAPP_API_KEY;
-const WA_URL  = process.env.WHATSAPP_BASE_URL || 'https://waba.360dialog.io/v1';
+const WA_BASE = (process.env.WHATSAPP_BASE_URL || 'https://waba-v2.360dialog.io').replace(/\/+$/, '');
+const WA_URL  = WA_BASE.endsWith('/v1') ? WA_BASE : `${WA_BASE}/v1`;
 const WA_LIVE = WA_KEY && !WA_KEY.startsWith('xxxx');
 
 // ── Email via Resend ───────────────────────────────────────────────────────────
 async function sendEmail(lead) {
-  if (!RESEND_KEY || RESEND_KEY.startsWith('re_xxxx') || !TEAM_EMAIL) {
+  if (!RESEND_KEY || RESEND_KEY.startsWith('re_xxxx') || !TEAM_EMAIL.length) {
     console.log(`[Email STUB] Nuevo lead: ${lead.nombre} — ${lead.empresa}`);
     return;
   }
 
   const row = (label, val) =>
-    val && val !== '—'
-      ? `<tr><td style="padding:4px 12px 4px 0;color:#666;font-size:13px;">${label}</td><td style="padding:4px 0;font-size:13px;">${val}</td></tr>`
+    val && val !== '—' && val !== ''
+      ? `<tr><td style="padding:6px 16px 6px 0;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;">${label}</td><td style="padding:6px 0;font-size:13px;font-weight:500;color:#111;">${val}</td></tr>`
       : '';
 
+  const ruta = (lead.origen && lead.origen !== '—' && lead.destino && lead.destino !== '—')
+    ? `${lead.origen} → ${lead.destino}` : null;
+
+  const fecha = new Date(lead.created_at || Date.now()).toLocaleString('es-MX', {
+    dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey'
+  });
+
   const html = `
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:520px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
-      <div style="background:#0f1d4a;padding:20px 24px;display:flex;align-items:center;gap:12px;">
-        <div style="background:#1d4ed8;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:15px;">S</div>
-        <div>
-          <div style="color:#fff;font-weight:600;font-size:15px;">SARA · ABSTORAGES</div>
-          <div style="color:#93c5fd;font-size:12px;">Nuevo lead capturado</div>
-        </div>
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:540px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+      <div style="background:#0f1d4a;padding:20px 24px;">
+        <div style="color:#fff;font-weight:700;font-size:16px;">SARA · ABSTORAGES</div>
+        <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Nuevo lead capturado</div>
       </div>
       <div style="padding:24px;">
         <table style="width:100%;border-collapse:collapse;">
-          ${row('Nombre',         lead.nombre)}
-          ${row('Empresa',        lead.empresa)}
-          ${row('Teléfono',       lead.telefono)}
-          ${row('Email',          lead.email)}
-          ${row('Ruta',           lead.origen !== '—' && lead.destino !== '—' ? `${lead.origen} → ${lead.destino}` : null)}
-          ${row('Unidad',         lead.tipo_unidad)}
-          ${row('Precio cotizado',lead.precio_cotizado)}
-          ${row('Resumen',        lead.resumen)}
+          ${row('Folio sistema', lead.id)}
+          ${row('Folio ABST',   lead.folio)}
+          ${row('Nombre',       lead.nombre)}
+          ${row('Empresa',      lead.empresa)}
+          ${row('RFC',          lead.rfc)}
+          ${row('Teléfono',     lead.telefono)}
+          ${row('Email',        lead.email)}
+          ${row('Ruta',         ruta)}
+          ${row('Tipo de carga',lead.tipo_carga)}
+          ${row('Unidad',       lead.tipo_unidad)}
+          ${row('Peso (ton)',    lead.peso_toneladas)}
+          ${row('Precio cotizado', lead.precio_cotizado ? `<span style="color:#16a34a;font-size:15px;">${lead.precio_cotizado}</span>` : null)}
+          ${row('Fecha',        fecha)}
+          ${row('Sesión',       lead.sessionId)}
         </table>
-        <div style="margin-top:20px;font-size:11px;color:#aaa;">Capturado el ${new Date().toLocaleString('es-MX')} · ID ${lead.id}</div>
+        ${lead.resumen ? `<div style="margin-top:16px;padding:12px 16px;background:#f9fafb;border-radius:8px;font-size:12px;color:#6b7280;">${lead.resumen}</div>` : ''}
       </div>
     </div>`;
 
@@ -53,9 +64,10 @@ async function sendEmail(lead) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_KEY}` },
       body: JSON.stringify({ from: FROM_EMAIL, to: TEAM_EMAIL, subject: `Lead SARA: ${lead.nombre} — ${lead.empresa}`, html }),
+      // TEAM_EMAIL es array — Resend lo acepta directamente
     });
     if (!r.ok) console.error('[Email] Resend error:', await r.text());
-    else console.log(`[Email] Enviado a ${TEAM_EMAIL} — lead ${lead.id}`);
+    else console.log(`[Email] Enviado a ${TEAM_EMAIL.join(', ')} — lead ${lead.id}`);
   } catch (e) {
     console.error('[Email] Error:', e.message);
   }

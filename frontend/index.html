@@ -427,26 +427,10 @@
             <div class="ops-kpi"><div class="ops-kpi-val" id="ops-leads-total">—</div><div class="ops-kpi-label">Total leads</div></div>
           </div>
 
-          <!-- Tabla de leads enriquecida -->
-          <div class="ops-leads-wrap">
-            <div class="ops-table-scroll">
-              <table class="ops-table">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Nombre</th>
-                    <th>Empresa</th>
-                    <th>Teléfono</th>
-                    <th>Email</th>
-                    <th>Servicio</th>
-                    <th>Resumen</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="ops-leads-tbody">
-                  <tr><td colspan="8" class="ops-empty">SARA capturará leads automáticamente</td></tr>
-                </tbody>
-              </table>
+          <!-- Tarjetas de leads estilo Cliengo -->
+          <div id="leads-cards-list" style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+            <div style="text-align:center;color:var(--texto-dim);padding:32px;font-size:.85rem;">
+              SARA capturará leads automáticamente en las conversaciones
             </div>
           </div>
         </div>
@@ -616,27 +600,64 @@
         document.getElementById('ops-leads-total').textContent  = l.total       ?? '—';
         document.getElementById('ops-refresh-label').textContent = 'Act. ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
 
-        const tbody = document.getElementById('ops-leads-tbody');
+        const container = document.getElementById('leads-cards-list');
         if (!leadsRes.length) {
-          tbody.innerHTML = '<tr><td colspan="8" class="ops-empty">SARA capturará leads automáticamente en las conversaciones</td></tr>';
+          container.innerHTML = '<div style="text-align:center;color:var(--texto-dim);padding:32px;font-size:.85rem;">SARA capturará leads automáticamente en las conversaciones</div>';
           return;
         }
 
-        tbody.innerHTML = leadsRes.slice(0, 50).map(lead => {
-          const servicio = (lead.origen !== '—' && lead.destino !== '—')
-            ? `${esc(lead.origen)} → ${esc(lead.destino)}${lead.tipo_unidad && lead.tipo_unidad !== '—' ? ' · ' + esc(lead.tipo_unidad) : ''}`
-            : (lead.tipo_unidad && lead.tipo_unidad !== '—' ? esc(lead.tipo_unidad) : '—');
+        const INTENT_LABEL = {
+          fletes_nacionales: { label: 'Fletes nacionales', color: '#3b82f6' },
+          trabajo:           { label: 'Trabajo',           color: '#f59e0b' },
+          mudanzas:          { label: 'Mudanzas',          color: '#8b5cf6' },
+          otro:              { label: 'Otro',              color: '#6b7280' },
+        };
+        const NOTA_LABEL = {
+          cierre_de_venta:         { label: '✅ Cierre de venta',          color: '#16a34a' },
+          escalado_a_operaciones:  { label: '📡 Escalado a operaciones',   color: '#2563eb' },
+          chat_cerrado:            { label: '🔒 Chat cerrado',             color: '#6b7280' },
+          cotizacion_en_proceso:   { label: '💬 Cotización en proceso',    color: '#d97706' },
+          buscaba_trabajo:         { label: '👷 Buscaba trabajo',          color: '#7c3aed' },
+        };
+
+        container.innerHTML = leadsRes.slice(0, 50).map(lead => {
+          const intent = INTENT_LABEL[lead.intent] || INTENT_LABEL.otro;
+          const nota   = lead.sara_nota ? (NOTA_LABEL[lead.sara_nota] || { label: lead.sara_nota, color: '#6b7280' }) : null;
+          const nombre = (lead.nombre && lead.nombre !== '—') ? esc(lead.nombre) : '(Sin nombre)';
+          const empresa = (lead.empresa && lead.empresa !== '—') ? ` · ${esc(lead.empresa)}` : '';
+          const tel    = (lead.telefono && lead.telefono !== '—') ? `<span style="color:var(--texto-dim);font-size:.78rem;">📱 ${esc(lead.telefono)}</span>` : '';
+          const email  = (lead.email && lead.email !== '—') ? `<span style="color:var(--texto-dim);font-size:.78rem;">✉️ ${esc(lead.email)}</span>` : '';
+          const precio = (lead.precio_cotizado && lead.precio_cotizado !== '—') ? `<span style="color:#16a34a;font-weight:700;font-size:.85rem;">${esc(lead.precio_cotizado)}</span>` : '';
+          const msg    = lead.primer_mensaje ? `<div style="margin-top:8px;font-size:.82rem;color:var(--texto-dim);font-style:italic;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">"${esc(lead.primer_mensaje)}"</div>` : '';
+
           return `
-            <tr style="cursor:pointer;" onclick="LeadChatModal.open('${esc(lead.id)}')">
-              <td style="white-space:nowrap;color:var(--texto-dim)">${timeAgo(lead.created_at)}</td>
-              <td><strong>${esc(lead.nombre)}</strong></td>
-              <td>${esc(lead.empresa)}</td>
-              <td>${esc(lead.telefono)}</td>
-              <td>${esc(lead.email)}</td>
-              <td style="white-space:nowrap;">${servicio}</td>
-              <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--texto-dim);font-size:.8rem;" title="${esc(lead.resumen)}">${esc(lead.resumen) !== '—' ? esc(lead.resumen) : ''}</td>
-              <td><button class="btn-ver-chat" onclick="event.stopPropagation();LeadChatModal.open('${esc(lead.id)}')">Ver chat</button></td>
-            </tr>`;
+            <div onclick="LeadChatModal.open('${esc(lead.id)}')" style="
+              background:var(--bg-panel,#111128);
+              border:1px solid var(--borde,#1e2340);
+              border-radius:12px;
+              padding:14px 18px;
+              cursor:pointer;
+              transition:border-color .15s;
+            " onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='var(--borde,#1e2340)'">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:0;">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                    <span style="font-weight:700;font-size:.95rem;">${nombre}</span>
+                    <span style="font-size:.78rem;color:var(--texto-dim);">${empresa}</span>
+                    ${precio}
+                  </div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+                    ${tel} ${email}
+                  </div>
+                  ${msg}
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+                  <span style="font-size:.72rem;color:var(--texto-dim);white-space:nowrap;">${timeAgo(lead.created_at)}</span>
+                  <span style="font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px;background:${intent.color}22;color:${intent.color};white-space:nowrap;">${intent.label}</span>
+                  ${nota ? `<span style="font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px;background:${nota.color}22;color:${nota.color};white-space:nowrap;">${nota.label}</span>` : ''}
+                </div>
+              </div>
+            </div>`;
         }).join('');
       } catch(e) { console.error('[OpsDash]', e); }
     }
