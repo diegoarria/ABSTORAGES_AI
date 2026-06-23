@@ -212,12 +212,19 @@ app.post('/api/broadcast/cancel/:id', (req, res) => {
 // ─── RUTAS ESTÁTICAS ──────────────────────────────────────────────────────
 app.get('/simulator', (req, res) => res.sendFile(path.join(__dirname, 'frontend', 'simulator.html')));
 
-app.get('/api/health', (req, res) => res.json({
-  ok: true, mode: 'lite',
-  whatsapp: WA_LIVE ? 'live' : 'stub',
-  tts: EL_LIVE ? 'live' : 'stub',
-  timestamp: new Date().toISOString(),
-}));
+app.get('/api/health', async (req, res) => {
+  const { pool } = require('./backend/services/db');
+  let db = 'no conectada';
+  if (pool) {
+    try { await pool.query('SELECT 1'); db = 'conectada'; }
+    catch (e) { db = 'error: ' + e.message; }
+  }
+  res.json({ ok: true, mode: 'lite', db,
+    whatsapp: WA_LIVE ? 'live' : 'stub',
+    tts: EL_LIVE ? 'live' : 'stub',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.get('/api/metricas', (req, res) => {
   res.json({ folios_activos: 0, folios_hoy: 0, proveedores_activos: 0, alertas_activas: 0 });
