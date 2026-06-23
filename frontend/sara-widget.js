@@ -18,10 +18,11 @@
   if (window.__saraWidget) return;
   window.__saraWidget = true;
 
-  const s      = document.currentScript || document.querySelector('script[src*="sara-widget"]');
-  const BASE   = s ? new URL(s.src).origin : '';
-  const COLOR  = s?.dataset.color || '#1a3a8f';
-  const LABEL  = s?.dataset.label || 'Cotiza aquí';
+  const s         = document.currentScript || document.querySelector('script[src*="sara-widget"]');
+  const BASE      = s ? new URL(s.src).origin : '';
+  const COLOR     = s?.dataset.color    || '#1a3a8f';
+  const LABEL     = s?.dataset.label    || 'Cotiza aquí';
+  const AUTOOPEN  = s?.dataset.autoopen === 'true';
 
   // ── Estilos ──────────────────────────────────────────────────────────────────
   const style = document.createElement('style');
@@ -93,4 +94,13 @@
 
   document.body.appendChild(wrap);
   document.body.appendChild(btn);
+
+  if (AUTOOPEN) {
+    setTimeout(() => {
+      open = true;
+      wrap.style.display = 'block';
+      requestAnimationFrame(() => wrap.classList.add('open'));
+      btn.innerHTML = `${ICON_X} Cerrar`;
+    }, 800);
+  }
 })();
