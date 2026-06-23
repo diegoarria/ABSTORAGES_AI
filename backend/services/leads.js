@@ -34,7 +34,22 @@ async function saveToDb(entry) {
         precio_cotizado, folio, intent, sara_nota, primer_mensaje,
         resumen, session_id, webhook_status
       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
-      ON CONFLICT (id) DO NOTHING
+      ON CONFLICT (session_id) DO UPDATE SET
+        nombre          = COALESCE(NULLIF(EXCLUDED.nombre,'—'),          leads.nombre),
+        empresa         = COALESCE(NULLIF(EXCLUDED.empresa,'—'),         leads.empresa),
+        rfc             = COALESCE(NULLIF(EXCLUDED.rfc,'—'),             leads.rfc),
+        telefono        = COALESCE(NULLIF(EXCLUDED.telefono,'—'),        leads.telefono),
+        email           = COALESCE(NULLIF(EXCLUDED.email,'—'),           leads.email),
+        origen          = COALESCE(NULLIF(EXCLUDED.origen,'—'),          leads.origen),
+        destino         = COALESCE(NULLIF(EXCLUDED.destino,'—'),         leads.destino),
+        tipo_carga      = COALESCE(NULLIF(EXCLUDED.tipo_carga,'—'),      leads.tipo_carga),
+        tipo_unidad     = COALESCE(NULLIF(EXCLUDED.tipo_unidad,'—'),     leads.tipo_unidad),
+        peso_toneladas  = COALESCE(NULLIF(EXCLUDED.peso_toneladas,'—'),  leads.peso_toneladas),
+        precio_cotizado = COALESCE(NULLIF(EXCLUDED.precio_cotizado,'—'), leads.precio_cotizado),
+        folio           = COALESCE(NULLIF(EXCLUDED.folio,'—'),           leads.folio),
+        intent          = COALESCE(EXCLUDED.intent,                      leads.intent),
+        sara_nota       = COALESCE(EXCLUDED.sara_nota,                   leads.sara_nota),
+        resumen         = COALESCE(NULLIF(EXCLUDED.resumen,''),          leads.resumen)
     `, [
       entry.id, entry.created_at,
       entry.nombre, entry.empresa, entry.rfc, entry.telefono, entry.email,
@@ -166,7 +181,8 @@ function extractFromText(text, sessionId, extras = {}) {
   if (precio)  partes.push(precio);
   const resumen = partes.join(' · ');
 
-  if ((nombre || telefono) && (origen || destino || folio)) {
+  // Registrar toda conversación — aunque sea solo el primer mensaje
+  if (extras.primer_mensaje || nombre || telefono || email) {
     return add({ nombre, telefono, email, origen, destino, empresa, rfc, folio,
                  tipo_carga, tipo_unidad: unidad, peso_toneladas, intent,
                  precio_cotizado: precio, resumen, sessionId, ...extras });

@@ -29,11 +29,15 @@ if (process.env.DATABASE_URL) {
       sara_nota       TEXT,
       primer_mensaje  TEXT,
       resumen         TEXT,
-      session_id      TEXT,
+      session_id      TEXT UNIQUE,
       webhook_status  TEXT DEFAULT 'sent'
     )
-  `).then(() => console.log('[DB] Tabla leads lista'))
-    .catch(e => console.error('[DB] Error creando tabla:', e.message));
+  `).then(() => pool.query(`
+    CREATE INDEX IF NOT EXISTS leads_session_idx ON leads(session_id);
+    CREATE INDEX IF NOT EXISTS leads_created_idx ON leads(created_at DESC);
+  `))
+   .then(() => console.log('[DB] Tabla leads lista'))
+   .catch(e => console.error('[DB] Error creando tabla:', e.message));
 }
 
 module.exports = { pool };

@@ -400,12 +400,11 @@ async function handleChat(agente, req, res) {
                         : hasEscalar ? 'escalado_a_operaciones'
                         : hasCerrar  ? 'chat_cerrado'
                         : req.body?.message ? 'cotizacion_en_proceso' : null;
-      const primer_mensaje = (memory.buildContext(sid).history || [])
-        .find(m => m.role === 'user')?.content?.slice(0, 160) || null;
+      const historial = memory.buildContext(sid).history || [];
+      const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 160) || req.body?.message?.slice(0, 160) || '(sin mensaje)';
       const lead = leads.extractFromText(fullText, sid, { sara_nota, primer_mensaje });
       if (lead) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
-        // Notificar al equipo y lanzar llamada de seguimiento (no bloquea la respuesta)
         notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
         if (process.env.VAPI_FOLLOWUP === 'true') {
           vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
