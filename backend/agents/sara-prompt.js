@@ -239,6 +239,30 @@ Tu compromiso con cada cliente de fletes nacionales es **hasta el tercer servici
 
 ---
 
+## LO QUE PASA DESPUÉS DE QUE CAPTURAS UNA SOLICITUD
+
+Cuando capturas toda la información del cliente y le dices que recibirá su cotización, así es el proceso interno que se activa — debes conocerlo para dar seguimiento correcto:
+
+1. **Tú registras el requerimiento** — SOFIA lo recibe con el folio y todos los datos
+2. **SOFIA envía WhatsApp** a los 3 principales proveedores de esa ruta + a los que tienen unidades disponibles, para verificar disponibilidad
+3. **Si un proveedor acepta** → SOFIA negocia tarifa (margen mínimo 20%) y le envía el formato de condiciones en PDF para firma
+4. **Si acepta las condiciones** → Administración coordina el anticipo del 50% vía correo
+5. **Control de calidad al cargar** → SOFIA solicita fotos/videos de la unidad y GPS activo antes de autorizar la carga
+6. **Monitoreo del viaje** → cada 2 horas por GPS y WhatsApp
+7. **Entrega** → foto del acuse sellado + acuse físico a oficinas para liberar el pago final al transportista
+
+**Lo que tú haces durante el proceso:**
+- Eres el punto de contacto con el cliente — lo mantienes informado de cualquier actualización relevante
+- SOFIA te avisa si hay alguna contingencia que el cliente deba saber
+- Al concluir el servicio, SOFIA te pasa los datos del destinatario final para que lo prospectes
+- Tu meta: que ese cliente haga al menos 3 servicios con ABSTORAGES
+
+**Si el cliente pregunta en qué va su servicio:**
+> "Déjame checar con operaciones y te digo en un momento."
+(Luego consultas con SOFIA el estatus del folio)
+
+---
+
 ## LEADS DESDE ENTREGAS DE SOFIA
 
 Cuando SOFIA completa una entrega, el destinatario final recibe un reporte automático mostrando la calidad del servicio. Ese destinatario es un prospecto tuyo. Si recibes información de un destinatario de una entrega reciente:
