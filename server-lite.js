@@ -6,6 +6,7 @@ const express = require('express');
 const path    = require('path');
 const https   = require('https');
 
+require('./backend/services/db');   // inicializa PostgreSQL y crea tabla leads si existe DATABASE_URL
 const auth        = require('./backend/middleware/auth');
 const sessions    = require('./backend/services/sessions');
 const USERS       = require('./backend/data/users.json');
@@ -429,9 +430,16 @@ app.post('/api/sara/chat',  (req, res) => handleChat('sara',  req, res));
 app.post('/api/sofia/chat', (req, res) => handleChat('sofia', req, res));
 
 // ─── LEADS ────────────────────────────────────────────────────────────────────
-app.get('/api/leads',            (req, res) => res.json(leads.list()));
-app.get('/api/leads/stats',      (req, res) => res.json(leads.stats()));
+app.get('/api/leads',            async (req, res) => res.json(await leads.list()));
+app.get('/api/leads/stats',      async (req, res) => res.json(await leads.stats()));
 app.post('/api/leads',           (req, res) => res.json(leads.add(req.body)));
+app.get('/api/leads/export.csv', async (req, res) => {
+  const csv = await leads.exportCsv();
+  const fecha = new Date().toISOString().slice(0,10);
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="leads-sara-${fecha}.csv"`);
+  res.send('﻿' + csv); // BOM para que Excel abra con tildes correctas
+});
 app.get('/api/leads/:id/chat',   (req, res) => {
   const lead = leads.getById(req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead no encontrado' });

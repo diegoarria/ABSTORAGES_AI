@@ -1,6 +1,7 @@
-// ─── LEADS — Captura, estadísticas y persistencia en disco ───────────────────
+// ─── LEADS — Captura, estadísticas y persistencia (PostgreSQL + disco) ────────
 const fs   = require('fs');
 const path = require('path');
+const { pool } = require('./db');
 
 const LEADS_FILE = path.join(__dirname, '../../data/leads.json');
 
@@ -11,15 +12,39 @@ function loadFromDisk() {
   return [];
 }
 
-const leads = loadFromDisk();
+// Cache en memoria (siempre activo, sirve de fallback y acelera lecturas)
+const cache = loadFromDisk();
 
 let saveTimer = null;
 function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2)); }
+    try { fs.writeFileSync(LEADS_FILE, JSON.stringify(cache, null, 2)); }
     catch (e) { console.error('[leads] Error guardando en disco:', e.message); }
   }, 1000);
+}
+
+async function saveToDb(entry) {
+  if (!pool) return;
+  try {
+    await pool.query(`
+      INSERT INTO leads (
+        id, created_at, nombre, empresa, rfc, telefono, email,
+        origen, destino, tipo_carga, tipo_unidad, peso_toneladas,
+        precio_cotizado, folio, intent, sara_nota, primer_mensaje,
+        resumen, session_id, webhook_status
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
+      ON CONFLICT (id) DO NOTHING
+    `, [
+      entry.id, entry.created_at,
+      entry.nombre, entry.empresa, entry.rfc, entry.telefono, entry.email,
+      entry.origen, entry.destino, entry.tipo_carga, entry.tipo_unidad, entry.peso_toneladas,
+      entry.precio_cotizado, entry.folio, entry.intent, entry.sara_nota, entry.primer_mensaje,
+      entry.resumen, entry.sessionId, entry.webhook_status,
+    ]);
+  } catch (e) {
+    console.error('[leads] Error guardando en DB:', e.message);
+  }
 }
 
 function add(lead) {
@@ -38,36 +63,77 @@ function add(lead) {
     tipo_unidad:     lead.tipo_unidad     || '—',
     peso_toneladas:  lead.peso_toneladas  || '—',
     precio_cotizado: lead.precio_cotizado || '—',
+    folio:           lead.folio           || '—',
+    intent:          lead.intent          || 'otro',
+    sara_nota:       lead.sara_nota       || null,
+    primer_mensaje:  lead.primer_mensaje  || null,
     resumen:         lead.resumen         || '',
     sessionId:       lead.sessionId       || '',
     ...lead,
   };
-  leads.push(entry);
+  cache.push(entry);
   scheduleSave();
+  saveToDb(entry);
   return entry;
 }
 
-function getById(id) {
-  return leads.find(l => l.id === id) || null;
+async function getById(id) {
+  if (pool) {
+    try {
+      const { rows } = await pool.query('SELECT * FROM leads WHERE id = $1', [id]);
+      if (rows[0]) return rows[0];
+    } catch (e) { console.error('[leads] getById DB error:', e.message); }
+  }
+  return cache.find(l => l.id === id) || null;
 }
 
-function list(limit = 100) {
-  return leads.slice(-limit).reverse();
+async function list(limit = 100) {
+  if (pool) {
+    try {
+      const { rows } = await pool.query(
+        'SELECT * FROM leads ORDER BY created_at DESC LIMIT $1', [limit]
+      );
+      return rows;
+    } catch (e) { console.error('[leads] list DB error:', e.message); }
+  }
+  return cache.slice(-limit).reverse();
 }
 
-function stats() {
-  const now     = Date.now();
-  const DAY_MS  = 86400000;
-  const WEEK_MS = DAY_MS * 7;
+async function stats() {
+  if (pool) {
+    try {
+      const { rows } = await pool.query(`
+        SELECT
+          COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '1 day')  AS today,
+          COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '7 days') AS last_7_days,
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE webhook_status = 'sent')                AS webhook_sent
+        FROM leads
+      `);
+      return { leads: rows[0], generated_at: new Date().toISOString() };
+    } catch (e) { console.error('[leads] stats DB error:', e.message); }
+  }
+  const now = Date.now(), DAY = 86400000;
   return {
     leads: {
-      today:        leads.filter(l => now - new Date(l.created_at).getTime() < DAY_MS).length,
-      last_7_days:  leads.filter(l => now - new Date(l.created_at).getTime() < WEEK_MS).length,
-      total:        leads.length,
-      webhook_sent: leads.filter(l => l.webhook_status === 'sent').length,
+      today:        cache.filter(l => now - new Date(l.created_at).getTime() < DAY).length,
+      last_7_days:  cache.filter(l => now - new Date(l.created_at).getTime() < DAY * 7).length,
+      total:        cache.length,
+      webhook_sent: cache.filter(l => l.webhook_status === 'sent').length,
     },
     generated_at: new Date().toISOString(),
   };
+}
+
+async function exportCsv() {
+  const rows = await list(10000);
+  const cols = ['id','created_at','nombre','empresa','rfc','telefono','email',
+                 'origen','destino','tipo_carga','tipo_unidad','peso_toneladas',
+                 'precio_cotizado','folio','intent','sara_nota','primer_mensaje','resumen'];
+  const escape = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const header = cols.join(',');
+  const body   = rows.map(r => cols.map(c => escape(r[c] ?? r[c.replace('_','Id')] ?? '')).join(',')).join('\n');
+  return `${header}\n${body}`;
 }
 
 function detectIntent(text) {
@@ -88,7 +154,7 @@ function extractFromText(text, sessionId, extras = {}) {
   const precio   = text.match(/\$\s*([\d,]+)/)?.[0];
   const unidad   = text.match(/caja seca \d{2}|torton|rabe?on|plataforma|full/i)?.[0];
   const rfc      = text.match(/\b([A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3})\b/i)?.[1]?.toUpperCase();
-  const tipo_carga = text.match(/(?:tipo de carga|carga)[:\s]+([^\n,.]+)/i)?.[1]?.trim();
+  const tipo_carga     = text.match(/(?:tipo de carga|carga)[:\s]+([^\n,.]+)/i)?.[1]?.trim();
   const peso_toneladas = text.match(/(\d+(?:\.\d+)?)\s*(?:ton(?:eladas?)?|t\b)/i)?.[1];
   const intent = detectIntent(text);
 
@@ -108,4 +174,4 @@ function extractFromText(text, sessionId, extras = {}) {
   return null;
 }
 
-module.exports = { add, getById, list, stats, extractFromText };
+module.exports = { add, getById, list, stats, exportCsv, extractFromText };
