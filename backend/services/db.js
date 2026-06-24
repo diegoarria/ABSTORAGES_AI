@@ -36,8 +36,43 @@ if (process.env.DATABASE_URL) {
     CREATE INDEX IF NOT EXISTS leads_session_idx ON leads(session_id);
     CREATE INDEX IF NOT EXISTS leads_created_idx ON leads(created_at DESC);
   `))
-   .then(() => console.log('[DB] Tabla leads lista'))
+   .then(() => pool.query(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id         SERIAL PRIMARY KEY,
+      session_id TEXT        NOT NULL,
+      agente     TEXT        NOT NULL DEFAULT 'sara',
+      role       TEXT        NOT NULL,
+      content    TEXT        NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `))
+   .then(() => pool.query(`
+    CREATE INDEX IF NOT EXISTS messages_session_idx ON messages(session_id, created_at);
+  `))
+   .then(() => console.log('[DB] Tablas leads + messages listas'))
    .catch(e => console.error('[DB] Error creando tabla:', e.message));
 }
 
-module.exports = { pool };
+async function saveMessage(session_id, agente, role, content) {
+  if (!pool) return;
+  pool.query(
+    'INSERT INTO messages (session_id, agente, role, content) VALUES ($1,$2,$3,$4)',
+    [session_id, agente, role, content]
+  ).catch(e => console.error('[DB] saveMessage error:', e.message));
+}
+
+async function getMessages(session_id) {
+  if (!pool || !session_id) return [];
+  try {
+    const { rows } = await pool.query(
+      'SELECT role, content, created_at FROM messages WHERE session_id = $1 ORDER BY created_at ASC',
+      [session_id]
+    );
+    return rows;
+  } catch(e) {
+    console.error('[DB] getMessages error:', e.message);
+    return [];
+  }
+}
+
+module.exports = { pool, saveMessage, getMessages };

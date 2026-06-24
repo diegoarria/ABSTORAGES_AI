@@ -115,9 +115,11 @@ app.post('/webhook/whatsapp', async (req, res) => {
     const tariffCtx = tariff.getContext();
     const systemPrompt = buildPrompt('sara', contextBlock, tariffCtx);
     memory.addMessage(session, 'user', texto);
+    saveMessage(session, 'sara', 'user', texto);
     let respuesta = '';
     await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
     memory.addMessage(session, 'assistant', respuesta);
+    saveMessage(session, 'sara', 'assistant', respuesta);
     const bloques = splitForWhatsApp(respuesta);
     for (const bloque of bloques) await sendWhatsApp(phone, bloque);
     const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
@@ -213,7 +215,7 @@ app.post('/api/broadcast/cancel/:id', (req, res) => {
 app.get('/simulator', (req, res) => res.sendFile(path.join(__dirname, 'frontend', 'simulator.html')));
 
 app.get('/api/health', async (req, res) => {
-  const { pool } = require('./backend/services/db');
+  const { pool, saveMessage, getMessages } = require('./backend/services/db');
   let db = 'no conectada';
   if (pool) {
     try { await pool.query('SELECT 1'); db = 'conectada'; }
@@ -373,6 +375,7 @@ async function handleChat(agente, req, res) {
   const messages = [...history, { role: 'user', content: message }];
 
   memory.addMessage(sid, 'user', message);
+  saveMessage(sid, agente, 'user', message);
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -391,6 +394,7 @@ async function handleChat(agente, req, res) {
       () => {},
     );
     memory.addMessage(sid, 'assistant', fullText);
+    saveMessage(sid, agente, 'assistant', fullText);
 
     // Detectar señales de control
     if (/CERRAR_CHAT/i.test(fullText))
@@ -450,7 +454,11 @@ app.get('/api/leads/:id/chat',   async (req, res) => {
   const lead = await leads.getById(req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead no encontrado' });
   const sid = lead.session_id || lead.sessionId || '';
-  const historial = memory.getSession(sid);
+  // Intentar DB primero; fallback a memoria en-proceso
+  const dbMsgs = await getMessages(sid);
+  const historial = dbMsgs.length
+    ? { history: dbMsgs.map(r => ({ role: r.role, content: r.content })) }
+    : memory.getSession(sid);
   res.json({ lead, historial });
 });
 
