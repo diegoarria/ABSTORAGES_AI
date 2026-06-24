@@ -446,10 +446,11 @@ app.get('/api/leads/export.csv', async (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="leads-sara-${fecha}.csv"`);
   res.send('﻿' + csv); // BOM para que Excel abra con tildes correctas
 });
-app.get('/api/leads/:id/chat',   (req, res) => {
-  const lead = leads.getById(req.params.id);
+app.get('/api/leads/:id/chat',   async (req, res) => {
+  const lead = await leads.getById(req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead no encontrado' });
-  const historial = memory.getSession(lead.sessionId);
+  const sid = lead.session_id || lead.sessionId || '';
+  const historial = memory.getSession(sid);
   res.json({ lead, historial });
 });
 
