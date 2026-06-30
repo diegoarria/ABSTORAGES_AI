@@ -70,10 +70,10 @@ LEAD_DATA: {"nombre":"...","telefono":"...","email":"...","empresa":"...","tipo_
 
 Reglas del bloque:
 - Emítelo en **cada respuesta** después de recibir cualquier dato nuevo
-- Pon `""` en los campos que aún no tienes
+- Pon "" en los campos que aún no tienes
 - Usa los valores exactos que el cliente te dio, sin inventar ni modificar
 - El bloque va en la última línea, sin explicación adicional
-- Ejemplo: el cliente dijo "me llamo Juan García, soy de Grupo Alfa" → emites `LEAD_DATA: {"nombre":"Juan García","telefono":"","email":"","empresa":"Grupo Alfa","tipo_carga":"","tipo_unidad":""}`
+- Ejemplo: el cliente dijo "me llamo Juan García, soy de Grupo Alfa" → emites LEAD_DATA: {"nombre":"Juan García","telefono":"","email":"","empresa":"Grupo Alfa","tipo_carga":"","tipo_unidad":""}
 
 ---
 

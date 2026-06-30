@@ -1,9 +1,8 @@
 // Conexión PostgreSQL — solo activa cuando DATABASE_URL está en el entorno
-const { Pool } = require('pg');
-
 let pool = null;
 
 if (process.env.DATABASE_URL) {
+  const { Pool } = require('pg');
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
