@@ -6,7 +6,7 @@ const express = require('express');
 const path    = require('path');
 const https   = require('https');
 
-require('./backend/services/db');   // inicializa PostgreSQL y crea tabla leads si existe DATABASE_URL
+const { saveMessage, getMessages } = require('./backend/services/db');
 const auth        = require('./backend/middleware/auth');
 const sessions    = require('./backend/services/sessions');
 const USERS       = require('./backend/data/users.json');
