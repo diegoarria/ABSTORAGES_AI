@@ -92,9 +92,8 @@ const Sara = (() => {
               const d = data.datos || {};
               App.toast(`Orden ${d.folio || ''} enviada a SOFIA`, 'verde', 4000);
               window.CentroMando?.onLeadComplete(d);
-              // Replace streaming bubble with professional order card
               const cleanMsg = textoAcumulado.replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '').trim();
-              streamDiv.innerHTML = renderMarkdown(cleanMsg) + renderOrdenCard(d);
+              streamDiv.innerHTML = renderMarkdown(cleanMsg);
               scrollToBottom('sara-messages');
               // Handoff automático: SOFIA recibe todos los datos y arranca operación
               if (data.datos) {

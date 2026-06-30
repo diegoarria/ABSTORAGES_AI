@@ -32,30 +32,38 @@ async function sendEmail(lead) {
     dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey'
   });
 
+  const primerMsj = lead.primer_mensaje || lead.resumen || '';
+
   const html = `
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:540px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
       <div style="background:#0f1d4a;padding:20px 24px;">
         <div style="color:#fff;font-weight:700;font-size:16px;">SARA · ABSTORAGES</div>
-        <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Nuevo lead capturado</div>
+        <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Nuevo lead capturado · ${fecha}</div>
       </div>
-      <div style="padding:24px;">
+
+      ${primerMsj ? `
+      <div style="padding:16px 24px 0;">
+        <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;">Lo que dijo el cliente</div>
+        <div style="background:#f0f9ff;border-left:3px solid #0ea5e9;padding:12px 16px;border-radius:6px;font-size:14px;color:#0c4a6e;line-height:1.6;font-style:italic;">"${primerMsj}"</div>
+      </div>` : ''}
+
+      <div style="padding:20px 24px;">
+        <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px;">Datos capturados</div>
         <table style="width:100%;border-collapse:collapse;">
-          ${row('Folio sistema', lead.id)}
-          ${row('Folio ABST',   lead.folio)}
-          ${row('Nombre',       lead.nombre)}
-          ${row('Empresa',      lead.empresa)}
-          ${row('RFC',          lead.rfc)}
-          ${row('Teléfono',     lead.telefono)}
-          ${row('Email',        lead.email)}
-          ${row('Ruta',         ruta)}
-          ${row('Tipo de carga',lead.tipo_carga)}
-          ${row('Unidad',       lead.tipo_unidad)}
-          ${row('Peso (ton)',    lead.peso_toneladas)}
-          ${row('Precio cotizado', lead.precio_cotizado ? `<span style="color:#16a34a;font-size:15px;">${lead.precio_cotizado}</span>` : null)}
-          ${row('Fecha',        fecha)}
-          ${row('Sesión',       lead.sessionId)}
+          ${row('Nombre',          lead.nombre)}
+          ${row('Empresa',         lead.empresa)}
+          ${row('Teléfono',        lead.telefono)}
+          ${row('Email',           lead.email)}
+          ${row('RFC',             lead.rfc)}
+          ${row('Ruta',            ruta)}
+          ${row('Tipo de carga',   lead.tipo_carga)}
+          ${row('Unidad',          lead.tipo_unidad)}
+          ${row('Peso (ton)',       lead.peso_toneladas)}
+          ${row('Precio cotizado', lead.precio_cotizado ? `<span style="color:#16a34a;font-weight:700;">${lead.precio_cotizado}</span>` : null)}
+          ${row('Folio ABST',      lead.folio)}
+          ${row('Folio sistema',   lead.id)}
+          ${row('Sesión',          lead.sessionId)}
         </table>
-        ${lead.resumen ? `<div style="margin-top:16px;padding:12px 16px;background:#f9fafb;border-radius:8px;font-size:12px;color:#6b7280;">${lead.resumen}</div>` : ''}
       </div>
     </div>`;
 
@@ -63,7 +71,7 @@ async function sendEmail(lead) {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_KEY}` },
-      body: JSON.stringify({ from: FROM_EMAIL, to: TEAM_EMAIL, subject: `Lead SARA: ${lead.nombre} — ${lead.empresa}`, html }),
+      body: JSON.stringify({ from: FROM_EMAIL, to: TEAM_EMAIL, subject: `Lead SARA: ${[lead.nombre, lead.empresa, ruta].filter(v => v && v !== '—').join(' · ') || lead.id}`, html }),
       // TEAM_EMAIL es array — Resend lo acepta directamente
     });
     if (!r.ok) console.error('[Email] Resend error:', await r.text());

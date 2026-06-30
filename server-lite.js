@@ -41,22 +41,29 @@ async function sendWhatsApp(to, text) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
   }
-  const sendUrl = `https://waba-v2.360dialog.io/v1/messages`;
-  const payload = JSON.stringify({
-    messaging_product: 'whatsapp',
-    to,
-    type: 'text',
-    text: { body: text },
-  });
-  console.log(`[WA] Enviando a ${to}`);
+  // 360dialog WABA v2 — formato sin messaging_product
+  const payload = JSON.stringify({ to, type: 'text', text: { body: text } });
+  console.log(`[WA] Enviando a ${to}: ${text.slice(0, 60)}...`);
   try {
-    const r = await fetch(sendUrl, {
+    const r = await fetch('https://waba-v2.360dialog.io/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
       body: payload,
     });
     const resp = await r.text();
-    console.log(`[WA] Status ${r.status}: ${resp.slice(0, 500)}`);
+    if (!r.ok) {
+      console.error(`[WA] Error ${r.status}: ${resp}`);
+      // Fallback: intentar con messaging_product (Cloud API format)
+      const r2 = await fetch('https://waba-v2.360dialog.io/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
+        body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } }),
+      });
+      const resp2 = await r2.text();
+      console.log(`[WA] Fallback status ${r2.status}: ${resp2.slice(0, 300)}`);
+    } else {
+      console.log(`[WA] OK → ${to}: ${resp.slice(0, 100)}`);
+    }
   } catch (e) {
     console.error('[WA] Error enviando:', e.message);
   }
@@ -377,6 +384,13 @@ async function handleChat(agente, req, res) {
   memory.addMessage(sid, 'user', message);
   saveMessage(sid, agente, 'user', message);
 
+  // Garantizar que toda conversación con SARA quede registrada desde el primer mensaje
+  if (agente === 'sara') {
+    const historial = memory.buildContext(sid).history || [];
+    const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 160) || message.slice(0, 160);
+    leads.extractFromText(message, sid, { sara_nota: 'cotizacion_en_proceso', primer_mensaje });
+  }
+
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -412,13 +426,32 @@ async function handleChat(agente, req, res) {
                         : hasCerrar  ? 'chat_cerrado'
                         : req.body?.message ? 'cotizacion_en_proceso' : null;
       const historial = memory.buildContext(sid).history || [];
-      const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 160) || req.body?.message?.slice(0, 160) || '(sin mensaje)';
-      const lead = leads.extractFromText(fullText, sid, { sara_nota, primer_mensaje });
+      // Extraer SOLO de los mensajes del usuario — no de la respuesta de SARA
+      const userMessages = historial.filter(m => m.role === 'user').map(m => m.content).join('\n');
+      const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 300) || message.slice(0, 300);
+      const lead = leads.extractFromText(userMessages, sid, { sara_nota, primer_mensaje });
       if (lead) {
-        res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
-        notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
-        if (process.env.VAPI_FOLLOWUP === 'true') {
-          vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
+        if (hasCierre) {
+          res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
+        }
+
+        // Solo notificar cuando el lead tenga los campos mínimos obligatorios
+        const filled = f => f && f !== '—' && f !== '' && f !== null;
+        const leadCompleto = filled(lead.nombre)
+          && filled(lead.email)
+          && filled(lead.telefono)
+          && filled(lead.empresa)
+          && filled(lead.tipo_carga)
+          && filled(lead.tipo_unidad)
+          && filled(lead.rfc);
+
+        if (leadCompleto || hasCierre) {
+          notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
+          if (process.env.VAPI_FOLLOWUP === 'true') {
+            vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
+          }
+        } else {
+          console.log(`[lead] ${sid} — guardado sin notificar (faltan campos)`);
         }
       }
     }

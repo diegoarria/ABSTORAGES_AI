@@ -63,6 +63,34 @@ async function saveToDb(entry) {
 }
 
 function add(lead) {
+  const sid = lead.sessionId || '';
+  const existing = sid ? cache.find(l => l.sessionId === sid) : null;
+
+  if (existing) {
+    // Upsert en memoria: actualizar solo campos que mejoran lo que ya hay
+    const merge = (oldVal, newVal) =>
+      (newVal && newVal !== '—' && newVal !== null && newVal !== undefined) ? newVal : oldVal;
+    existing.nombre          = merge(existing.nombre,          lead.nombre);
+    existing.empresa         = merge(existing.empresa,         lead.empresa);
+    existing.rfc             = merge(existing.rfc,             lead.rfc);
+    existing.telefono        = merge(existing.telefono,        lead.telefono);
+    existing.email           = merge(existing.email,           lead.email);
+    existing.origen          = merge(existing.origen,          lead.origen);
+    existing.destino         = merge(existing.destino,         lead.destino);
+    existing.tipo_carga      = merge(existing.tipo_carga,      lead.tipo_carga);
+    existing.tipo_unidad     = merge(existing.tipo_unidad,     lead.tipo_unidad);
+    existing.peso_toneladas  = merge(existing.peso_toneladas,  lead.peso_toneladas);
+    existing.precio_cotizado = merge(existing.precio_cotizado, lead.precio_cotizado);
+    existing.folio           = merge(existing.folio,           lead.folio);
+    if (lead.intent && lead.intent !== 'otro') existing.intent = lead.intent;
+    if (lead.sara_nota)     existing.sara_nota    = lead.sara_nota;
+    if (lead.primer_mensaje) existing.primer_mensaje = lead.primer_mensaje;
+    if (lead.resumen)       existing.resumen      = lead.resumen;
+    scheduleSave();
+    saveToDb(existing);
+    return existing;
+  }
+
   const entry = {
     id:              `LEAD-${Date.now().toString(36).toUpperCase()}`,
     created_at:      new Date().toISOString(),
@@ -83,7 +111,7 @@ function add(lead) {
     sara_nota:       lead.sara_nota       || null,
     primer_mensaje:  lead.primer_mensaje  || null,
     resumen:         lead.resumen         || '',
-    sessionId:       lead.sessionId       || '',
+    sessionId:       sid,
     ...lead,
   };
   cache.push(entry);
@@ -167,35 +195,63 @@ function detectIntent(text) {
 }
 
 function extractFromText(text, sessionId, extras = {}) {
-  const nombre   = text.match(/(?:nombre|cliente)[:\s]+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)/i)?.[1];
+  // Nombre — "me llamo X", "soy X", "mi nombre es X", "nombre: X"
+  const nombre =
+    text.match(/(?:me llamo|mi nombre es|nombre[:\s]+)\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)/i)?.[1] ||
+    text.match(/^soy\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?: [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)/im)?.[1];
+
+  // Teléfono — 10 dígitos con o sin prefijo 52
   const telefono = text.match(/(?:\+?52\s*)?(\d{2,3}[\s\-]?\d{3,4}[\s\-]?\d{4})/)?.[1];
-  const email    = text.match(/[\w.+-]+@[\w-]+\.[\w.]+/)?.[0];
-  const origen   = text.match(/(?:origen|de)[:\s]+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)/i)?.[1];
-  const destino  = text.match(/(?:destino|hacia|a)[:\s]+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)/i)?.[1];
-  const empresa  = text.match(/(?:empresa|compañía|negocio)[:\s]+([A-ZÁÉÍÓÚÑa-záéíóúñ ]+?)(?:\n|,|\.)/i)?.[1];
-  const folio    = text.match(/ABST-\d+/)?.[0];
-  const precio   = text.match(/\$\s*([\d,]+)/)?.[0];
-  const unidad   = text.match(/caja seca \d{2}|torton|rabe?on|plataforma|full/i)?.[0];
-  const rfc      = text.match(/\b([A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3})\b/i)?.[1]?.toUpperCase();
-  const tipo_carga     = text.match(/(?:tipo de carga|carga)[:\s]+([^\n,.]+)/i)?.[1]?.trim();
-  const peso_toneladas = text.match(/(\d+(?:\.\d+)?)\s*(?:ton(?:eladas?)?|t\b)/i)?.[1];
+
+  // Email
+  const email = text.match(/[\w.+-]+@[\w-]+\.[\w.]+/)?.[0];
+
+  // Empresa — "empresa X", "trabajo en X", "mi empresa es X"
+  const empresa =
+    text.match(/(?:empresa[:\s]+|mi empresa(?:\s+es)?\s+|trabajo (?:en|para)\s+)([^\n,.(]{2,50})/i)?.[1]?.trim();
+
+  // RFC
+  const rfc = text.match(/\b([A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3})\b/i)?.[1]?.toUpperCase();
+
+  // Folio ABST
+  const folio = text.match(/ABST-\d+/)?.[0];
+
+  // Precio — "$15,000", "15000 pesos"
+  const precio = text.match(/\$\s*([\d,]+)/)?.[0];
+
+  // Tipo unidad
+  const unidad = text.match(/caja\s+(?:seca\s+)?(?:de\s+)?\d{2}(?:\s+pies)?|caja\s+(?:seca|refrigerada)|torton|rabe?on|plataforma|full\b/i)?.[0];
+
+  // Peso
+  const peso_toneladas = text.match(/(\d+(?:\.\d+)?)\s*(?:ton(?:eladas?)?)\b/i)?.[1];
+
+  // Ruta — "de MTY a GDL", "Monterrey a Guadalajara", "MTY → GDL"
+  const rutaMatch =
+    text.match(/(?:de|desde)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ]{3,}(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)?)\s+(?:a|hacia)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ]{3,}(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+)?)/i) ||
+    text.match(/([A-ZÁÉÍÓÚÑa-záéíóúñ]{3,})\s*(?:→|->)\s*([A-ZÁÉÍÓÚÑa-záéíóúñ]{3,})/i);
+  const origen  = rutaMatch?.[1]?.trim() || null;
+  const destino = rutaMatch?.[2]?.trim() || null;
+
+  // Tipo de carga — "carga de X", "llevo X", "transportar X", "son X botellas/cajas/etc."
+  const tipo_carga =
+    text.match(/(?:carga\s+de|llevo|transportar|mercancía[:\s]+|producto[:\s]+)\s*([^\n,.(\d]{3,50})/i)?.[1]?.trim() ||
+    text.match(/(?:son|es)\s+([a-záéíóúñA-ZÁÉÍÓÚÑ][^\n,.(]{3,40})/i)?.[1]?.trim();
+
   const intent = detectIntent(text);
 
   const partes = [];
   if (empresa && empresa !== '—') partes.push(empresa);
   else if (nombre) partes.push(nombre);
   if (origen && destino) partes.push(`${origen} → ${destino}`);
+  if (tipo_carga) partes.push(tipo_carga);
   if (unidad)  partes.push(unidad);
   if (precio)  partes.push(precio);
   const resumen = partes.join(' · ');
 
-  // Registrar toda conversación — aunque sea solo el primer mensaje
-  if (extras.primer_mensaje || nombre || telefono || email) {
-    return add({ nombre, telefono, email, origen, destino, empresa, rfc, folio,
-                 tipo_carga, tipo_unidad: unidad, peso_toneladas, intent,
-                 precio_cotizado: precio, resumen, sessionId, ...extras });
-  }
-  return null;
+  // SIEMPRE guardar — toda conversación con SARA se registra sin excepción
+  return add({ nombre, telefono, email, origen, destino, empresa, rfc, folio,
+               tipo_carga, tipo_unidad: unidad, peso_toneladas, intent,
+               precio_cotizado: precio, resumen, sessionId, ...extras });
 }
 
 module.exports = { add, getById, list, stats, exportCsv, extractFromText };
