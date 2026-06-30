@@ -81,6 +81,7 @@ const Sara = (() => {
               textoAcumulado += data.text;
               const cleanText = textoAcumulado
                 .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+                .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
                 .replace(/CERRAR_CHAT/gi, '')
                 .replace(/ESCALAR_HUMANO/gi, '')
                 .trim();

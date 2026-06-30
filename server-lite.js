@@ -418,40 +418,49 @@ async function handleChat(agente, req, res) {
 
     // Detectar lead capturado por SARA
     if (agente === 'sara') {
-      const hasCierre   = /NUEVA_ORDEN/i.test(fullText);
-      const hasEscalar  = /ESCALAR_HUMANO/i.test(fullText);
-      const hasCerrar   = /CERRAR_CHAT/i.test(fullText);
-      const sara_nota   = hasCierre  ? 'cierre_de_venta'
-                        : hasEscalar ? 'escalado_a_operaciones'
-                        : hasCerrar  ? 'chat_cerrado'
-                        : req.body?.message ? 'cotizacion_en_proceso' : null;
+      const hasCierre  = /NUEVA_ORDEN/i.test(fullText);
+      const hasEscalar = /ESCALAR_HUMANO/i.test(fullText);
+      const hasCerrar  = /CERRAR_CHAT/i.test(fullText);
+      const sara_nota  = hasCierre  ? 'cierre_de_venta'
+                       : hasEscalar ? 'escalado_a_operaciones'
+                       : hasCerrar  ? 'chat_cerrado'
+                       : 'cotizacion_en_proceso';
+
       const historial = memory.buildContext(sid).history || [];
-      // Extraer SOLO de los mensajes del usuario — no de la respuesta de SARA
-      const userMessages = historial.filter(m => m.role === 'user').map(m => m.content).join('\n');
       const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 300) || message.slice(0, 300);
-      const lead = leads.extractFromText(userMessages, sid, { sara_nota, primer_mensaje });
-      if (lead) {
-        if (hasCierre) {
-          res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
-        }
 
-        // Solo notificar cuando el lead tenga los campos mínimos obligatorios
-        const filled = f => f && f !== '—' && f !== '' && f !== null;
-        const leadCompleto = filled(lead.nombre)
-          && filled(lead.email)
-          && filled(lead.telefono)
-          && filled(lead.empresa)
-          && filled(lead.tipo_carga)
-          && filled(lead.tipo_unidad);
+      // Parsear token LEAD_DATA emitido por SARA con datos confirmados
+      const leadDataMatch = fullText.match(/LEAD_DATA:\s*(\{[^\n]+\})/);
+      let datosSara = {};
+      if (leadDataMatch) {
+        try { datosSara = JSON.parse(leadDataMatch[1]); } catch {}
+      }
 
-        if (leadCompleto || hasCierre) {
-          notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
-          if (process.env.VAPI_FOLLOWUP === 'true') {
-            vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
-          }
-        } else {
-          console.log(`[lead] ${sid} — guardado sin notificar (faltan campos)`);
+      // Upsert del lead con datos de SARA (más confiables que regex sobre texto libre)
+      const filled = f => f && f !== '—' && f !== '' && f !== null;
+      const lead = leads.add({ ...datosSara, sara_nota, primer_mensaje, sessionId: sid });
+
+      if (hasCierre) {
+        res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
+      }
+
+      // Notificar solo cuando SARA haya confirmado los 6 campos obligatorios
+      const leadCompleto = filled(lead.nombre)
+        && filled(lead.email)
+        && filled(lead.telefono)
+        && filled(lead.empresa)
+        && filled(lead.tipo_carga)
+        && filled(lead.tipo_unidad);
+
+      if (leadCompleto || hasCierre) {
+        notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
+        if (process.env.VAPI_FOLLOWUP === 'true') {
+          vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
         }
+      } else {
+        const faltantes = ['nombre','email','telefono','empresa','tipo_carga','tipo_unidad']
+          .filter(k => !filled(lead[k])).join(', ');
+        console.log(`[lead] ${sid} — sin notificar, faltan: ${faltantes}`);
       }
     }
 
