@@ -442,8 +442,7 @@ async function handleChat(agente, req, res) {
           && filled(lead.telefono)
           && filled(lead.empresa)
           && filled(lead.tipo_carga)
-          && filled(lead.tipo_unidad)
-          && filled(lead.rfc);
+          && filled(lead.tipo_unidad);
 
         if (leadCompleto || hasCierre) {
           notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
