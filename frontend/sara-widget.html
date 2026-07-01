@@ -18,9 +18,9 @@
     }
     .avatar {
       width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, #1a3a8f, #2563eb);
+      background: #1a3a8f url('/img/sara-avatar.png') center/cover no-repeat;
       display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: .85rem; color: #fff; flex-shrink: 0;
+      font-weight: 700; font-size: .85rem; color: transparent; flex-shrink: 0;
     }
     .header-info .name  { font-weight: 600; font-size: .88rem; }
     .header-info .status { font-size: .7rem; color: #5cdb95; margin-top: 1px; }
@@ -89,7 +89,7 @@
   <div class="header">
     <div class="avatar">S</div>
     <div class="header-info">
-      <div class="name">SARA · ABSTORAGES</div>
+      <div class="name">SARA Garza · ABSTORAGES</div>
       <div class="status">● En línea</div>
     </div>
   </div>
@@ -173,6 +173,7 @@
                 saraText += evt.text;
                 const clean = saraText
                   .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+                  .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
                   .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '').trim();
                 if (!saraDiv) saraDiv = addBubble('sara', toHtml(clean));
                 else saraDiv.querySelector('.bubble').innerHTML = toHtml(clean);
@@ -195,7 +196,7 @@
     inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) send(); });
 
     // Saludo inicial
-    addBubble('sara', '¡Hola! Soy SARA, ejecutiva comercial de <b>ABSTORAGES</b>.<br>¿En qué puedo ayudarte hoy?');
+    addBubble('sara', '¡Hola! Soy <b>SARA Garza</b>, ejecutiva comercial de <b>ABSTORAGES Logistics Solutions</b>.<br>¿Con quién tengo el gusto y de qué empresa me contactas?');
   </script>
 </body>
 </html>
