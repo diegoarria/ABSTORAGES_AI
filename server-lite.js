@@ -372,13 +372,14 @@ function buildPrompt(agente, contextBlock, tariffCtx) {
 
 // ─── CHAT (SSE streaming con memoria + tarifa dinámica) ───────────────────
 async function handleChat(agente, req, res) {
-  const { message, sessionId } = req.body;
+  const { message, sessionId, callMode } = req.body;
   if (!message) return res.status(400).json({ error: 'message requerido' });
 
   const sid = sessionId || `web_${agente}_${Date.now()}`;
   const { contextBlock, history } = memory.buildContext(sid);
   const tariffCtx = tariff.getContext();
-  const systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
+  let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
+  if (callMode) systemPrompt += '\n\n🎙️ MODO LLAMADA DE VOZ: El cliente está en una llamada. Responde en máximo 2 oraciones cortas y directas. Sin listas, sin markdown, sin asteriscos. Habla natural como en una conversación telefónica.';
   const messages = [...history, { role: 'user', content: message }];
 
   memory.addMessage(sid, 'user', message);

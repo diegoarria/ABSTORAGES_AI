@@ -225,9 +225,11 @@ const Features = (() => {
     endBtn.addEventListener('click', closeCall);
     micBtn.addEventListener('click', () => {
       if (callRecog) {
+        // Segunda pulsación: parar y enviar lo grabado
         callAutoListen = false;
         callRecog.stop();
       } else {
+        // Primera pulsación: empezar a escuchar
         callAutoListen = false;
         callListen();
       }
@@ -278,20 +280,27 @@ const Features = (() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const rec = new SR();
     rec.lang = 'es-MX';
-    rec.continuous = false;
+    rec.continuous = true;      // no cortar en silencios breves
     rec.interimResults = true;
     callRecog = rec;
 
     const micBtn = document.getElementById('call-mic-btn');
     if (micBtn) micBtn.classList.add('listening');
-    setCallStatus('Escuchando...', 'listening');
+    setCallStatus('Escuchando... (toca mic para enviar)', 'listening');
     const tx = document.getElementById('call-transcript');
     if (tx) tx.textContent = '';
 
     let userText = '';
 
     rec.onresult = e => {
-      userText = Array.from(e.results).map(r => r[0].transcript).join('');
+      // Acumular solo resultados finales + el interim más reciente
+      let final = '';
+      let interim = '';
+      for (const r of e.results) {
+        if (r.isFinal) final += r[0].transcript + ' ';
+        else interim = r[0].transcript;
+      }
+      userText = (final + interim).trim();
       if (tx) tx.textContent = userText;
     };
 
@@ -300,7 +309,7 @@ const Features = (() => {
       if (micBtn) micBtn.classList.remove('listening');
       if (!callActive) return;
       if (!userText.trim()) {
-        setCallStatus('No te escuché. Toca el micrófono para hablar.', 'idle');
+        setCallStatus('Toca el micrófono para hablar.', 'idle');
         if (tx) tx.textContent = '';
         return;
       }
@@ -329,7 +338,7 @@ const Features = (() => {
       const res = await fetch('/api/sara/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, sessionId }),
+        body: JSON.stringify({ message: text, sessionId, callMode: true }),
       });
       const reader  = res.body.getReader();
       const decoder = new TextDecoder();
