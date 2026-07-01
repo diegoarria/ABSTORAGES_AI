@@ -206,6 +206,187 @@ const Features = (() => {
     }
   }
 
+  // ── CALL MODE ────────────────────────────────────────────────────────────
+  let callActive    = false;
+  let callSeconds   = 0;
+  let callTimer     = null;
+  let callRecog     = null;
+  let callAudio     = null;
+  let callAutoListen = false;
+
+  function initCallMode() {
+    const overlay  = document.getElementById('call-overlay');
+    const micBtn   = document.getElementById('call-mic-btn');
+    const endBtn   = document.getElementById('call-end-btn');
+    const phoneBtn = document.getElementById('sara-mic');
+    if (!overlay || !micBtn || !endBtn || !phoneBtn) return;
+
+    phoneBtn.addEventListener('click', openCall);
+    endBtn.addEventListener('click', closeCall);
+    micBtn.addEventListener('click', () => {
+      if (callRecog) {
+        callAutoListen = false;
+        callRecog.stop();
+      } else {
+        callAutoListen = false;
+        callListen();
+      }
+    });
+  }
+
+  function openCall() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      App.toast('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.', 'amber', 5000);
+      return;
+    }
+    callActive   = true;
+    callSeconds  = 0;
+    const overlay = document.getElementById('call-overlay');
+    overlay.style.display = 'flex';
+    overlay.dataset.state  = 'idle';
+    setCallStatus('Iniciando llamada...', 'idle');
+    callTimer = setInterval(() => {
+      callSeconds++;
+      const m = String(Math.floor(callSeconds / 60)).padStart(1,'0');
+      const s = String(callSeconds % 60).padStart(2,'0');
+      const el = document.getElementById('call-timer');
+      if (el) el.textContent = `${m}:${s}`;
+    }, 1000);
+    callAutoListen = true;
+    setTimeout(callListen, 800);
+  }
+
+  function closeCall() {
+    callActive     = false;
+    callAutoListen = false;
+    clearInterval(callTimer);
+    if (callRecog)  { callRecog.stop(); callRecog = null; }
+    if (callAudio)  { callAudio.pause(); callAudio = null; }
+    const overlay = document.getElementById('call-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
+  function setCallStatus(text, state) {
+    const overlay = document.getElementById('call-overlay');
+    const status  = document.getElementById('call-status');
+    if (overlay) overlay.dataset.state = state;
+    if (status)  status.textContent = text;
+  }
+
+  function callListen() {
+    if (!callActive) return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SR();
+    rec.lang = 'es-MX';
+    rec.continuous = false;
+    rec.interimResults = true;
+    callRecog = rec;
+
+    const micBtn = document.getElementById('call-mic-btn');
+    if (micBtn) micBtn.classList.add('listening');
+    setCallStatus('Escuchando...', 'listening');
+    const tx = document.getElementById('call-transcript');
+    if (tx) tx.textContent = '';
+
+    let userText = '';
+
+    rec.onresult = e => {
+      userText = Array.from(e.results).map(r => r[0].transcript).join('');
+      if (tx) tx.textContent = userText;
+    };
+
+    rec.onend = async () => {
+      callRecog = null;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (!callActive) return;
+      if (!userText.trim()) {
+        setCallStatus('No te escuché. Toca el micrófono para hablar.', 'idle');
+        if (tx) tx.textContent = '';
+        return;
+      }
+      if (tx) tx.textContent = '';
+      setCallStatus('SARA está pensando...', 'thinking');
+      await callSendToSARA(userText);
+    };
+
+    rec.onerror = e => {
+      callRecog = null;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (e.error !== 'no-speech' && e.error !== 'aborted') {
+        setCallStatus('Error de micrófono: ' + e.error, 'idle');
+      } else {
+        setCallStatus('Toca el micrófono para hablar.', 'idle');
+      }
+    };
+
+    rec.start();
+  }
+
+  async function callSendToSARA(text) {
+    const sessionId = document.getElementById('sara-session-id')?.textContent || 'call-' + Date.now();
+    let fullText = '';
+    try {
+      const res = await fetch('/api/sara/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, sessionId }),
+      });
+      const reader  = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n\n'); buf = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const evt = JSON.parse(line.slice(6));
+            if (evt.type === 'chunk') fullText += evt.text;
+            if (evt.type === 'cerrar_chat') { closeCall(); return; }
+          } catch {}
+        }
+      }
+    } catch {
+      setCallStatus('Error de conexión.', 'idle');
+      return;
+    }
+
+    const clean = fullText
+      .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+      .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
+      .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
+      .replace(/[*_`#>]/g, '')
+      .trim();
+
+    if (!clean || !callActive) return;
+    setCallStatus('SARA está respondiendo...', 'speaking');
+    await callPlayTTS(clean);
+    if (!callActive) return;
+    setCallStatus('Toca el micrófono para hablar.', 'idle');
+    if (callAutoListen) setTimeout(callListen, 600);
+  }
+
+  function callPlayTTS(text) {
+    return new Promise(resolve => {
+      fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.slice(0, 2500), agente: 'sara' }),
+      }).then(r => r.ok ? r.blob() : null)
+        .then(blob => {
+          if (!blob) { resolve(); return; }
+          const url  = URL.createObjectURL(blob);
+          callAudio  = new Audio(url);
+          callAudio.play();
+          callAudio.onended = () => { URL.revokeObjectURL(url); callAudio = null; resolve(); };
+          callAudio.onerror = () => { callAudio = null; resolve(); };
+        })
+        .catch(resolve);
+    });
+  }
+
   // ── PREDICTIVE ALERTS WIDGET ──────────────────────────────────────────────
   function loadPredictiveAlerts() {
     fetch('/api/alertas/predictivas')
@@ -277,8 +458,8 @@ const Features = (() => {
   // ── INIT ──────────────────────────────────────────────────────────────────
   function init() {
     watchBubbles();
-    initMic('sara-input', 'sara-mic');
     initMic('sofia-input', 'sofia-mic');
+    initCallMode(); // sara-mic maneja call mode, no STT directo
     loadPredictiveAlerts();
     loadTariff();
 
@@ -297,5 +478,5 @@ const Features = (() => {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { playTTS, speakResponse, loadPredictiveAlerts, loadTariff };
+  return { playTTS, speakResponse, loadPredictiveAlerts, loadTariff, openCall, closeCall };
 })();
