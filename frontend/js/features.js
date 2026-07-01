@@ -374,17 +374,35 @@ const Features = (() => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.slice(0, 2500), agente: 'sara' }),
-      }).then(r => r.ok ? r.blob() : null)
+      }).then(r => r.ok ? r.blob() : Promise.reject('elevenlabs_error'))
         .then(blob => {
-          if (!blob) { resolve(); return; }
-          const url  = URL.createObjectURL(blob);
-          callAudio  = new Audio(url);
+          const url = URL.createObjectURL(blob);
+          callAudio = new Audio(url);
           callAudio.play();
           callAudio.onended = () => { URL.revokeObjectURL(url); callAudio = null; resolve(); };
-          callAudio.onerror = () => { callAudio = null; resolve(); };
+          callAudio.onerror = () => { callAudio = null; callBrowserTTS(text, resolve); };
         })
-        .catch(resolve);
+        .catch(() => callBrowserTTS(text, resolve));
     });
+  }
+
+  function callBrowserTTS(text, resolve) {
+    if (!window.speechSynthesis) { resolve(); return; }
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text.slice(0, 3000));
+    utt.lang  = 'es-MX';
+    utt.rate  = 1.05;
+    utt.pitch = 1.1;
+    const loadAndSpeak = () => {
+      const voices   = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang === 'es-MX' || v.lang === 'es-US' || v.lang.startsWith('es'));
+      if (preferred) utt.voice = preferred;
+      utt.onend   = resolve;
+      utt.onerror = resolve;
+      window.speechSynthesis.speak(utt);
+    };
+    if (window.speechSynthesis.getVoices().length > 0) loadAndSpeak();
+    else window.speechSynthesis.addEventListener('voiceschanged', loadAndSpeak, { once: true });
   }
 
   // ── PREDICTIVE ALERTS WIDGET ──────────────────────────────────────────────
