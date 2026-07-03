@@ -1646,8 +1646,8 @@ body {
   box-shadow: 0 0 14px rgba(0,232,122,0.10);
 }
 .cmd-avatar.sofia {
-  background: rgba(74,158,255,0.12);
-  color: var(--azul);
+  background: rgba(74,158,255,0.12) url('/img/sofia-avatar.png') center/cover no-repeat;
+  color: transparent;
   border: 1px solid rgba(74,158,255,0.28);
   box-shadow: 0 0 14px rgba(74,158,255,0.10);
 }
