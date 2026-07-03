@@ -65,7 +65,7 @@ body::before {
 [data-theme="light"] .message-bubble pre    { background: #e8eef6 !important; border-color: rgba(0,0,0,0.1) !important; color: #111827 !important; }
 
 [data-theme="light"] .message-avatar.sara  { background: rgba(0,122,61,0.1) url('/img/sara-avatar.png') center/cover no-repeat !important; color: transparent !important; border-color: rgba(0,122,61,0.22) !important; }
-[data-theme="light"] .message-avatar.sofia { background: rgba(26,107,191,0.1) !important; color: #1a6bbf !important; border-color: rgba(26,107,191,0.22) !important; }
+[data-theme="light"] .message-avatar.sofia { background: rgba(26,107,191,0.1) url('/img/sofia-avatar.png') center/cover no-repeat !important; color: transparent !important; border-color: rgba(26,107,191,0.22) !important; }
 [data-theme="light"] .message-avatar.user  { background: #e8eef6 !important; color: #374151 !important; border-color: rgba(0,0,0,0.12) !important; }
 
 /* Inputs */
@@ -204,9 +204,9 @@ body::before {
 
 /* Avatares de chat en columnas */
 [data-theme="light"] .cmd-avatar.sara  { background: rgba(0,160,70,0.12) url('/img/sara-avatar.png') center/cover no-repeat; color: transparent; }
-[data-theme="light"] .cmd-avatar.sofia { background: rgba(26,107,191,0.12); color: #1a6bbf; }
+[data-theme="light"] .cmd-avatar.sofia { background: rgba(26,107,191,0.12) url('/img/sofia-avatar.png') center/cover no-repeat; color: transparent; }
 [data-theme="light"] .message-avatar.sara  { background: rgba(0,160,70,0.12) url('/img/sara-avatar.png') center/cover no-repeat; color: transparent; }
-[data-theme="light"] .message-avatar.sofia { background: rgba(26,107,191,0.12); color: #1a6bbf; }
+[data-theme="light"] .message-avatar.sofia { background: rgba(26,107,191,0.12) url('/img/sofia-avatar.png') center/cover no-repeat; color: transparent; }
 [data-theme="light"] .message-avatar.user  { background: var(--fondo4); color: var(--texto2); }
 
 /* KPI panel headers */
@@ -735,7 +735,7 @@ body {
   flex-shrink: 0;
 }
 .message-avatar.sara  { background: rgba(0,232,122,0.12) url('/img/sara-avatar.png') center/cover no-repeat; color: transparent; border: 1px solid rgba(0,232,122,0.22); }
-.message-avatar.sofia { background: rgba(74,158,255,0.12); color: var(--azul); border: 1px solid rgba(74,158,255,0.22); }
+.message-avatar.sofia { background: rgba(74,158,255,0.12) url('/img/sofia-avatar.png') center/cover no-repeat; color: transparent; border: 1px solid rgba(74,158,255,0.22); }
 .message-avatar.user  { background: rgba(255,255,255,0.05); color: var(--texto3); border: 1px solid var(--borde2); font-size: 10px; }
 
 .message-bubble {

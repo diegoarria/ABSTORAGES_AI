@@ -120,7 +120,7 @@ const Sofia = (() => {
     const tarjeta = document.createElement('div');
     tarjeta.className = 'message assistant';
     tarjeta.innerHTML = `
-      <div class="message-avatar sofia">S</div>
+      <div class="message-avatar sofia"></div>
       <div class="message-bubble" style="border-color: rgba(74,158,255,0.35); background: rgba(74,158,255,0.06)">
         <p><strong>Handoff de SARA recibido</strong></p>
         <p>Folio <code>${App.escapeHtml(orden.folio)}</code> · ${App.escapeHtml(orden.ruta || '')} · ${App.escapeHtml(orden.tipo_unidad || '')}</p>
@@ -222,7 +222,7 @@ Inicia el flujo de colocación de servicio (Paso 1). Confirma los datos y dime q
     div.className = 'message assistant';
     div.id = 'sofia-typing';
     div.innerHTML = `
-      <div class="message-avatar sofia">S</div>
+      <div class="message-avatar sofia"></div>
       <div class="message-bubble">
         <div class="typing-indicator">
           <div class="typing-dot"></div>
@@ -247,7 +247,6 @@ Inicia el flujo de colocación de servicio (Paso 1). Confirma los datos y dime q
     bubble.className = 'message-bubble';
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar sofia';
-    avatar.textContent = 'S';
     div.appendChild(avatar);
     div.appendChild(bubble);
     messages.appendChild(div);
@@ -260,7 +259,7 @@ Inicia el flujo de colocación de servicio (Paso 1). Confirma los datos y dime q
     const div = document.createElement('div');
     div.className = 'message assistant';
     div.innerHTML = `
-      <div class="message-avatar sofia">S</div>
+      <div class="message-avatar sofia"></div>
       <div class="message-bubble" style="border-color: var(--rojo-dim)">
         <em style="color: var(--rojo)">${App.escapeHtml(texto)}</em>
       </div>
@@ -280,9 +279,9 @@ Inicia el flujo de colocación de servicio (Paso 1). Confirma los datos y dime q
     const messages = document.getElementById('sofia-messages');
     messages.innerHTML = `
       <div class="message assistant">
-        <div class="message-avatar sofia">S</div>
+        <div class="message-avatar sofia"></div>
         <div class="message-bubble">
-          <p>Hola, soy <strong>SOFIA</strong>, la AI Planner de ABSTORAGES Logistics Solutions.</p>
+          <p>Hola, soy <strong>SOFIA Novak</strong>, la AI Planner de ABSTORAGES Logistics Solutions.</p>
           <p>Gestiono la operación completa: busco transportistas, monitoreo viajes por GPS, coordino documentación ABCONTROL y manejo los folios de servicio. ¿Qué necesitas?</p>
         </div>
       </div>

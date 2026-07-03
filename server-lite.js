@@ -449,23 +449,18 @@ async function handleChat(agente, req, res) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
       }
 
-      // Notificar solo cuando SARA haya confirmado los 6 campos obligatorios
-      const leadCompleto = filled(lead.nombre)
-        && filled(lead.email)
-        && filled(lead.telefono)
-        && filled(lead.empresa)
-        && filled(lead.tipo_carga)
-        && filled(lead.tipo_unidad);
-
-      if (leadCompleto || hasCierre) {
-        notifier.notificarLead(lead).catch(e => console.error('[notifier]', e.message));
-        if (process.env.VAPI_FOLLOWUP === 'true') {
+      // Enviar resumen por email solo cuando la conversación termina con una señal
+      if (hasCierre || hasEscalar || hasCerrar) {
+        const histMsg = memory.buildContext(sid).history || [];
+        notifier.notificarResumen(lead, sara_nota, histMsg)
+          .catch(e => console.error('[notifier]', e.message));
+        if (process.env.VAPI_FOLLOWUP === 'true' && hasCierre) {
           vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
         }
       } else {
         const faltantes = ['nombre','email','telefono','empresa','tipo_carga','tipo_unidad']
           .filter(k => !filled(lead[k])).join(', ');
-        console.log(`[lead] ${sid} — sin notificar, faltan: ${faltantes}`);
+        console.log(`[lead] ${sid} — en proceso, faltan: ${faltantes}`);
       }
     }
 
