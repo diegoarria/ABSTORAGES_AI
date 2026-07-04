@@ -16,6 +16,7 @@ const tariff      = require('./backend/services/tariff');
 const SARA_PROMPT   = require('./backend/agents/sara-prompt');
 const SOFIA_PROMPT  = require('./backend/agents/sofia-prompt');
 const HECTOR_PROMPT = require('./backend/agents/hector-prompt');
+const NOA_PROMPT    = require('./backend/agents/noa-prompt');
 const cors        = require('cors');
 const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
@@ -364,9 +365,10 @@ app.post('/api/sofia/reporte-entrega', async (req, res) => {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
 function buildPrompt(agente, contextBlock, tariffCtx) {
-  const base = agente === 'sara' ? SARA_PROMPT
-             : agente === 'sofia' ? SOFIA_PROMPT
-             : HECTOR_PROMPT;
+  const base = agente === 'sara'   ? SARA_PROMPT
+             : agente === 'sofia'  ? SOFIA_PROMPT
+             : agente === 'hector' ? HECTOR_PROMPT
+             : NOA_PROMPT;
   // Tarifas solo para SOFIA — SARA y HÉCTOR no reciben precios
   const tariffBlock = agente === 'sofia'
     ? `\n\n## MERCADO ACTUAL (actualizado en tiempo real)\n${tariffCtx.prompt}`
@@ -479,6 +481,14 @@ async function handleChat(agente, req, res) {
       } catch {}
     }
 
+    // NOA — señal de alerta crítica
+    if (agente === 'noa' && /ALERTA_CRITICA/i.test(fullText)) {
+      try {
+        const m = fullText.match(/ALERTA_CRITICA:\s*(\{[^\n]+\})/);
+        if (m) res.write(`data: ${JSON.stringify({ type: 'alerta_critica', datos: JSON.parse(m[1]) })}\n\n`);
+      } catch {}
+    }
+
   } catch (err) {
     res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
   }
@@ -490,6 +500,7 @@ async function handleChat(agente, req, res) {
 app.post('/api/sara/chat',   (req, res) => handleChat('sara',   req, res));
 app.post('/api/sofia/chat', (req, res) => handleChat('sofia',  req, res));
 app.post('/api/hector/chat',(req, res) => handleChat('hector', req, res));
+app.post('/api/noa/chat',   (req, res) => handleChat('noa',    req, res));
 
 // ─── CUENTAS POR COBRAR ────────────────────────────────────────────────────────
 // Producción: conectar a ERP / AppSheets GET /api/cxc

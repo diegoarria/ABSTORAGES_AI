@@ -229,6 +229,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .hec-ai-bar .mta{flex:1;min-height:34px;resize:none;font-size:11.5px}
 .hec-ai-bar .btn{flex-shrink:0;align-self:flex-end}
 
+/* ── NOA AI bar ── */
+.noa-ai-foot{flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1);padding:10px 14px}
+.noa-ai-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);margin-bottom:6px}
+.noa-stream{background:var(--s3);border:1px solid var(--cr-b);border-radius:7px;padding:10px 13px;font-size:11px;line-height:1.65;color:var(--t2);max-height:110px;overflow-y:auto;white-space:pre-wrap;font-family:var(--sans);display:none}
+.noa-stream.visible{display:block}
+.noa-stream.streaming::after{content:'▋';animation:blink .8s step-end infinite;color:var(--crit)}
+.noa-input-row{display:flex;gap:6px;margin-top:6px;align-items:flex-start}
+.noa-input-row .mta{flex:1;min-height:32px;resize:none;font-size:11.5px;border-color:var(--cr-b)}
+.noa-input-row .mta:focus{border-color:rgba(255,58,58,.45)}
+.noa-input-row .btn-r{flex-shrink:0;align-self:flex-end}
+
 /* ── TOAST ── */
 @keyframes tup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--s4);border:1px solid var(--b3);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:600;color:var(--t1);z-index:9999;animation:tup .2s ease;box-shadow:0 12px 40px rgba(0,0,0,.5);white-space:nowrap;pointer-events:none}
@@ -291,6 +302,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
     </div>
 
     <div class="pbody"><div id="noa-out"></div></div>
+
+    <div class="noa-ai-foot">
+      <div class="noa-ai-lbl">N · NOA — Consulta AI</div>
+      <div class="noa-stream" id="noa-stream"></div>
+      <div class="noa-input-row">
+        <textarea class="mta" id="noa-ai-input" rows="1" placeholder="Pregunta a NOA sobre un folio, protocolo o zona de riesgo…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendNoaMsg();}"></textarea>
+        <button class="btn btn-r btn-sm" id="noa-send-btn" onclick="sendNoaMsg()">→</button>
+      </div>
+    </div>
   </section>
 
   <!-- ══ HÉCTOR ══ -->
@@ -395,6 +415,7 @@ var folios=FOLIOS.map(function(f){return Object.assign({},f,{esc:f.esc.map(funct
 var cuentas=CUENTAS.map(function(c){return Object.assign({},c,{fols:c.fols.slice()});});
 var sF='dias',sD='desc',gCl=null,tick=0;
 var hecSid='hec_'+Date.now(),hecStreaming=false;
+var noaSid='noa_'+Date.now(),noaStreaming=false;
 
 // ── NOA RENDER ────────────────────────────────────────
 function renderNOA(){
@@ -710,6 +731,59 @@ function sendHecMsg(){
   stream.textContent+='\n\n— '+msg+'\n\n';
   inp.value='';
   streamHector(msg);
+}
+
+// ── NOA AI ───────────────────────────────────────────
+function streamNoa(msg){
+  if(noaStreaming) return;
+  noaStreaming=true;
+  document.getElementById('noa-send-btn').disabled=true;
+  var stream=document.getElementById('noa-stream');
+  stream.classList.add('visible','streaming');
+
+  fetch('/api/noa/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:msg,sessionId:noaSid})
+  }).then(function(r){
+    if(!r.ok||!r.body) throw new Error('HTTP '+r.status);
+    var reader=r.body.getReader(),decoder=new TextDecoder(),buf='',acc='';
+    function pump(){
+      reader.read().then(function(chunk){
+        if(chunk.done){doneNoa();return;}
+        buf+=decoder.decode(chunk.value,{stream:true});
+        var lines=buf.split('\n\n');buf=lines.pop();
+        lines.forEach(function(l){
+          if(!l.startsWith('data: ')) return;
+          try{
+            var d=JSON.parse(l.slice(6));
+            if(d.type==='chunk'){acc+=d.text;stream.textContent=acc;stream.scrollTop=stream.scrollHeight;}
+            if(d.type==='done'){doneNoa();}
+            if(d.type==='alerta_critica'){toast('⚠ ALERTA CRÍTICA — '+d.datos.folio+': '+d.datos.motivo,'#FF3A3A');}
+          }catch(e){}
+        });
+        pump();
+      }).catch(function(){doneNoa();});
+    }
+    function doneNoa(){stream.classList.remove('streaming');noaStreaming=false;document.getElementById('noa-send-btn').disabled=false;}
+    pump();
+  }).catch(function(err){
+    stream.classList.remove('streaming');
+    stream.textContent='Error al conectar con NOA. Verifica que el servidor esté corriendo.';
+    noaStreaming=false;
+    document.getElementById('noa-send-btn').disabled=false;
+  });
+}
+
+function sendNoaMsg(){
+  var inp=document.getElementById('noa-ai-input');
+  var msg=inp.value.trim();
+  if(!msg||noaStreaming) return;
+  var stream=document.getElementById('noa-stream');
+  stream.classList.add('visible');
+  stream.textContent+='\n\n— '+msg+'\n\n';
+  inp.value='';
+  streamNoa(msg);
 }
 
 // ── FETCH CXC ─────────────────────────────────────────
