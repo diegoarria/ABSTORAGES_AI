@@ -222,6 +222,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .mta{width:100%;background:var(--s3);border:1px solid var(--b3);border-radius:6px;padding:10px;color:var(--t1);font-size:12px;font-family:inherit;resize:vertical;min-height:70px;outline:none;transition:border-color .12s}
 .mta:focus{border-color:var(--grn-b)}
 
+/* ── HÉCTOR AI en modal ── */
+.hec-stream{background:var(--s3);border:1px solid var(--grn-b);border-radius:7px;padding:13px;font-size:11.5px;line-height:1.75;color:var(--t2);min-height:54px;white-space:pre-wrap;font-family:var(--sans);position:relative}
+.hec-stream.streaming::after{content:'▋';animation:blink .8s step-end infinite;color:var(--grn)}
+.hec-ai-bar{display:flex;gap:6px;margin-top:7px;align-items:flex-start}
+.hec-ai-bar .mta{flex:1;min-height:34px;resize:none;font-size:11.5px}
+.hec-ai-bar .btn{flex-shrink:0;align-self:flex-end}
+
 /* ── TOAST ── */
 @keyframes tup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--s4);border:1px solid var(--b3);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:600;color:var(--t1);z-index:9999;animation:tup .2s ease;box-shadow:0 12px 40px rgba(0,0,0,.5);white-space:nowrap;pointer-events:none}
@@ -332,6 +339,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
   <div class="modal">
     <div class="mtitle">Gestión de Cobranza <button class="mx" onclick="closeGestion()">✕</button></div>
     <div id="gestion-body"></div>
+    <div class="msec" id="hec-ai-sec" style="display:none">
+      <div class="mlbl" style="color:var(--grn)">H · HÉCTOR — Análisis AI</div>
+      <div class="hec-stream" id="hec-stream"></div>
+      <div class="hec-ai-bar">
+        <textarea class="mta" id="hec-ai-input" rows="1" placeholder="Pregunta a HÉCTOR…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHecMsg();}"></textarea>
+        <button class="btn btn-sm btn-g" id="hec-send-btn" onclick="sendHecMsg()">→</button>
+      </div>
+    </div>
     <div class="mfoot">
       <button class="btn" onclick="closeGestion()">Cancelar</button>
       <button class="btn btn-g" onclick="confirmGestion()">✓ Registrar</button>
@@ -379,6 +394,7 @@ var SEM={
 var folios=FOLIOS.map(function(f){return Object.assign({},f,{esc:f.esc.map(function(e){return Object.assign({},e);})});});
 var cuentas=CUENTAS.map(function(c){return Object.assign({},c,{fols:c.fols.slice()});});
 var sF='dias',sD='desc',gCl=null,tick=0;
+var hecSid='hec_'+Date.now(),hecStreaming=false;
 
 // ── NOA RENDER ────────────────────────────────────────
 function renderNOA(){
@@ -592,17 +608,15 @@ function cycleSort(){
 function openP(cl,tipo){
   var c=cuentas.find(function(x){return x.cl===cl;});
   if(!c) return;
-  var txt=tipo==='cortesia'
-    ?'Buenos días,\n\nLe escribimos de ABSTORAGES Logistics Solutions para recordarle cordialmente la(s) factura(s) '+c.fols.join(', ')+' con saldo de '+mxn(c.monto)+'.\n\nSi ya realizó el pago, ignore este mensaje.\n\nAtentamente,\nAdministración · ABSTORAGES Logistics Solutions\nTel: (81) 8888-0000'
-    :'Estimados '+c.cl+',\n\nABSTORAGES Logistics Solutions les informa que existe una cuenta vencida de '+mxn(c.monto)+' — servicios '+c.fols.join(', ')+' — con '+c.dias+' días de atraso.\n\nSolicitamos regularizar en 5 días hábiles.\n\nAtentamente,\nAdministración Financiera · ABSTORAGES Logistics Solutions\n\n// Conectar: WhatsApp Business API (360dialog) POST /api/wa/send';
   gCl=cl;
   document.getElementById('gestion-body').innerHTML=
     '<div class="msec"><div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:3px">'+c.cl+'</div>'+
-    '<div style="font-size:11px;color:var(--t3)">'+c.fols.join(', ')+' · '+mxn(c.monto)+' · '+c.dias+' días</div></div>'+
-    '<div class="msec"><div class="mlbl">Plantilla HÉCTOR — '+(tipo==='cortesia'?'Cortesía':'Formal')+'</div>'+
-    '<div class="tpl">'+txt+'</div>'+
-    '<div style="margin-top:8px;font-size:10px;color:var(--t3)">Envío: <span style="color:#25D366;font-weight:700">WhatsApp</span> · <span style="color:#60a5fa;font-weight:700">Correo</span></div></div>';
+    '<div style="font-size:11px;color:var(--t3)">'+c.fols.join(', ')+' · '+mxn(c.monto)+' · '+c.dias+' días · '+SEM[c.sem].lbl+'</div></div>';
+  showHecAI();
   document.getElementById('m-gestion').classList.add('open');
+  var briefing='Genera la plantilla de comunicación de tipo "'+(tipo==='cortesia'?'cortesía':'formal')+'" para esta cuenta.\n'+
+    'Cliente: '+c.cl+'\nFacturas: '+c.fols.join(', ')+'\nMonto: $'+c.monto.toLocaleString('es-MX')+'\nDías vencido: '+c.dias+'\nNivel semáforo: '+SEM[c.sem].lbl+'\nResponsable: '+c.resp;
+  streamHector(briefing);
 }
 
 function openG(cl){
@@ -621,10 +635,90 @@ function openG(cl){
       '<label class="rrow"><input type="radio" name="gt" value="acuerdo"> Acuerdo de pago</label>'+
     '</div></div>'+
     '<div class="msec"><div class="mlbl">Notas</div><textarea class="mta" id="gnotas" placeholder="Describe el resultado…"></textarea></div>';
+  showHecAI();
   document.getElementById('m-gestion').classList.add('open');
+  var briefing='Necesito consejo de cobranza para esta cuenta:\n'+
+    'Cliente: '+c.cl+'\nFacturas: '+c.fols.join(', ')+'\nMonto: $'+c.monto.toLocaleString('es-MX')+'\nDías vencido: '+c.dias+'\nSemáforo: '+SEM[c.sem].lbl+'\nÚltima gestión: '+c.ult+' ('+c.fecha+')\nResponsable: '+c.resp+'\n¿Qué acción recomiendas?';
+  streamHector(briefing);
 }
 
-function closeGestion(){document.getElementById('m-gestion').classList.remove('open');gCl=null;}
+function closeGestion(){
+  document.getElementById('m-gestion').classList.remove('open');
+  document.getElementById('hec-ai-sec').style.display='none';
+  document.getElementById('hec-stream').textContent='';
+  document.getElementById('hec-stream').className='hec-stream';
+  document.getElementById('hec-ai-input').value='';
+  gCl=null;
+}
+
+// ── HÉCTOR AI ─────────────────────────────────────────
+function showHecAI(){
+  var sec=document.getElementById('hec-ai-sec');
+  var stream=document.getElementById('hec-stream');
+  sec.style.display='block';
+  stream.className='hec-stream streaming';
+  stream.textContent='';
+  document.getElementById('hec-ai-input').value='';
+}
+
+function streamHector(msg){
+  if(hecStreaming) return;
+  hecStreaming=true;
+  document.getElementById('hec-send-btn').disabled=true;
+  var stream=document.getElementById('hec-stream');
+  stream.className='hec-stream streaming';
+
+  fetch('/api/hector/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:msg,sessionId:hecSid})
+  }).then(function(r){
+    if(!r.ok||!r.body) throw new Error('HTTP '+r.status);
+    var reader=r.body.getReader(),decoder=new TextDecoder(),buf='',acc='';
+    function pump(){
+      reader.read().then(function(chunk){
+        if(chunk.done){done();return;}
+        buf+=decoder.decode(chunk.value,{stream:true});
+        var lines=buf.split('\n\n');buf=lines.pop();
+        lines.forEach(function(l){
+          if(!l.startsWith('data: ')) return;
+          try{
+            var d=JSON.parse(l.slice(6));
+            if(d.type==='chunk'){acc+=d.text;stream.textContent=acc;}
+            if(d.type==='done'){done();}
+            if(d.type==='plantilla_lista'){toast('Plantilla lista — '+d.datos.tipo,'#00B451');}
+          }catch(e){}
+        });
+        pump();
+      }).catch(function(){done();});
+    }
+    function done(){stream.className='hec-stream';hecStreaming=false;document.getElementById('hec-send-btn').disabled=false;}
+    pump();
+  }).catch(function(err){
+    stream.className='hec-stream';
+    stream.textContent='Error al conectar con HÉCTOR. Verifica que el servidor esté corriendo.';
+    hecStreaming=false;
+    document.getElementById('hec-send-btn').disabled=false;
+  });
+}
+
+function sendHecMsg(){
+  var inp=document.getElementById('hec-ai-input');
+  var msg=inp.value.trim();
+  if(!msg||hecStreaming) return;
+  var stream=document.getElementById('hec-stream');
+  stream.textContent+='\n\n— '+msg+'\n\n';
+  inp.value='';
+  streamHector(msg);
+}
+
+// ── FETCH CXC ─────────────────────────────────────────
+function fetchCuentas(){
+  fetch('/api/cuentas-cobrar').then(function(r){return r.json();}).then(function(data){
+    cuentas=data.map(function(c){return Object.assign({},c,{fols:c.fols.slice()});});
+    renderHEC();
+  }).catch(function(){/* usa mock ya cargado */});
+}
 function confirmGestion(){
   if(gCl){
     var c=cuentas.find(function(x){return x.cl===gCl;});
@@ -673,6 +767,7 @@ document.addEventListener('DOMContentLoaded',function(){
   setInterval(simTick,5000);
   renderNOA();
   renderHEC();
+  fetchCuentas();
   ['m-turno','m-gestion'].forEach(function(id){
     document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
   });

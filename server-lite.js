@@ -13,8 +13,9 @@ const USERS       = require('./backend/data/users.json');
 const { chatStream } = require('./backend/services/claude');
 const memory      = require('./backend/services/memory');
 const tariff      = require('./backend/services/tariff');
-const SARA_PROMPT = require('./backend/agents/sara-prompt');
-const SOFIA_PROMPT= require('./backend/agents/sofia-prompt');
+const SARA_PROMPT   = require('./backend/agents/sara-prompt');
+const SOFIA_PROMPT  = require('./backend/agents/sofia-prompt');
+const HECTOR_PROMPT = require('./backend/agents/hector-prompt');
 const cors        = require('cors');
 const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
@@ -363,9 +364,10 @@ app.post('/api/sofia/reporte-entrega', async (req, res) => {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
 function buildPrompt(agente, contextBlock, tariffCtx) {
-  const base = agente === 'sara' ? SARA_PROMPT : SOFIA_PROMPT;
-  // Tarifas solo para SOFIA — SARA no recibe precios para no poder cotizar
-  // bajo ningún canal (chat, llamada, mensaje)
+  const base = agente === 'sara' ? SARA_PROMPT
+             : agente === 'sofia' ? SOFIA_PROMPT
+             : HECTOR_PROMPT;
+  // Tarifas solo para SOFIA — SARA y HÉCTOR no reciben precios
   const tariffBlock = agente === 'sofia'
     ? `\n\n## MERCADO ACTUAL (actualizado en tiempo real)\n${tariffCtx.prompt}`
     : '';
@@ -469,6 +471,14 @@ async function handleChat(agente, req, res) {
       res.write(`data: ${JSON.stringify({ type: 'folio_update', estatus: 'ENTREGADO' })}\n\n`);
     }
 
+    // HÉCTOR — señal de plantilla generada
+    if (agente === 'hector' && /PLANTILLA_LISTA/i.test(fullText)) {
+      try {
+        const m = fullText.match(/PLANTILLA_LISTA:\s*(\{[^\n]+\})/);
+        if (m) res.write(`data: ${JSON.stringify({ type: 'plantilla_lista', datos: JSON.parse(m[1]) })}\n\n`);
+      } catch {}
+    }
+
   } catch (err) {
     res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
   }
@@ -477,8 +487,25 @@ async function handleChat(agente, req, res) {
   res.end();
 }
 
-app.post('/api/sara/chat',  (req, res) => handleChat('sara',  req, res));
-app.post('/api/sofia/chat', (req, res) => handleChat('sofia', req, res));
+app.post('/api/sara/chat',   (req, res) => handleChat('sara',   req, res));
+app.post('/api/sofia/chat', (req, res) => handleChat('sofia',  req, res));
+app.post('/api/hector/chat',(req, res) => handleChat('hector', req, res));
+
+// ─── CUENTAS POR COBRAR ────────────────────────────────────────────────────────
+// Producción: conectar a ERP / AppSheets GET /api/cxc
+app.get('/api/cuentas-cobrar', (req, res) => {
+  res.json([
+    { cl:'Liverpool S.A.B. de C.V.',   fols:['AB-2024-045','AB-2024-046'], monto:125000, dias:65, sem:'ne', ult:'Llamada sin respuesta',       fecha:'2024-01-08', resp:'Despacho Legal' },
+    { cl:'Grupo Herdez SA',            fols:['AB-2024-058'],               monto:87500,  dias:38, sem:'ro', ult:'Visita pendiente — Dirección', fecha:'2024-01-12', resp:'Dirección' },
+    { cl:'Soriana Operadora',          fols:['AB-2024-061','AB-2024-062'], monto:63000,  dias:22, sem:'na', ult:'Mensaje formal enviado',       fecha:'2024-01-14', resp:'Comercial' },
+    { cl:'Walmart de México',          fols:['AB-2024-071'],               monto:44800,  dias:18, sem:'na', ult:'Correo de recordatorio',       fecha:'2024-01-15', resp:'Comercial' },
+    { cl:'Cemex México SA',            fols:['AB-2024-075'],               monto:38200,  dias:12, sem:'am', ult:'Mensaje cortesía enviado',     fecha:'2024-01-16', resp:'Administración' },
+    { cl:'Alpura SA de CV',            fols:['AB-2024-079'],               monto:29750,  dias:8,  sem:'am', ult:'Mensaje cortesía enviado',     fecha:'2024-01-17', resp:'Administración' },
+    { cl:'Bimbo SA de CV',             fols:['AB-2024-082'],               monto:56000,  dias:3,  sem:'vd', ult:'Pago parcial recibido',        fecha:'2024-01-18', resp:'Administración' },
+    { cl:'FEMSA Comercio',             fols:['AB-2024-085'],               monto:72400,  dias:0,  sem:'vd', ult:'Al corriente',                 fecha:'2024-01-19', resp:'Administración' },
+    { cl:'HEB México SA',              fols:['AB-2024-086'],               monto:19800,  dias:1,  sem:'vd', ult:'Factura enviada',              fecha:'2024-01-19', resp:'Administración' },
+  ]);
+});
 
 // ─── LEADS ────────────────────────────────────────────────────────────────────
 app.get('/api/leads',            async (req, res) => res.json(await leads.list({ desde: req.query.desde, hasta: req.query.hasta })));
