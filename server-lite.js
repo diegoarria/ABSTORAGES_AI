@@ -121,6 +121,7 @@ app.post('/webhook/whatsapp', async (req, res) => {
     const texto   = msg.text.body.trim();
     const session = `wa_${phone}`;
     const { contextBlock, history } = memory.buildContext(session);
+    const esPrimerMensaje = history.length === 0; // capturado antes de agregar el mensaje actual
     const tariffCtx = tariff.getContext();
     const systemPrompt = buildPrompt('sara', contextBlock, tariffCtx);
     memory.addMessage(session, 'user', texto);
@@ -133,6 +134,23 @@ app.post('/webhook/whatsapp', async (req, res) => {
     for (const bloque of bloques) await sendWhatsApp(phone, bloque);
     const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
     if (metaMatch) memory.updateMeta(session, { empresa: metaMatch[1].trim() });
+
+    // Notificar al equipo: primer contacto vía WhatsApp + señales de cierre
+    const leadDataWA = respuesta.match(/LEAD_DATA:\s*(\{[^\n]+\})/);
+    let datosWA = {};
+    try { if (leadDataWA) datosWA = JSON.parse(leadDataWA[1]); } catch {}
+    const waHasCierre  = /NUEVA_ORDEN/i.test(respuesta);
+    const waHasEscalar = /ESCALAR_HUMANO/i.test(respuesta);
+    const waHasCerrar  = /CERRAR_CHAT/i.test(respuesta);
+    const waNota = waHasCierre ? 'cierre_de_venta' : waHasEscalar ? 'escalado_a_operaciones' : waHasCerrar ? 'chat_cerrado' : 'cotizacion_en_proceso';
+    const leadWA = leads.add({ ...datosWA, sara_nota: waNota, primer_mensaje: texto.slice(0, 300), sessionId: session, canal: 'whatsapp' });
+    if (esPrimerMensaje) {
+      notifier.notificarLead(leadWA).catch(e => console.error('[notifier WA primer-contacto]', e.message));
+    }
+    if (waHasCierre || waHasEscalar || waHasCerrar) {
+      const histWA = memory.buildContext(session).history || [];
+      notifier.notificarResumen(leadWA, waNota, histWA).catch(e => console.error('[notifier WA resumen]', e.message));
+    }
   } catch (err) {
     console.error('[WhatsApp webhook error]', err.message);
   }
@@ -453,7 +471,15 @@ async function handleChat(agente, req, res) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
       }
 
-      // Enviar resumen por email solo cuando la conversación termina con una señal
+      // Primer contacto: email inmediato al primer mensaje de la sesión.
+      // history.length === 0 porque se captura ANTES de agregar el mensaje actual,
+      // así que 0 = primera vez que esta persona escribe en esta sesión.
+      if (history.length === 0) {
+        notifier.notificarLead(lead)
+          .catch(e => console.error('[notifier primer-contacto]', e.message));
+      }
+
+      // Email de resumen al cierre de conversación (adicional al de primer contacto)
       if (hasCierre || hasEscalar || hasCerrar) {
         const histMsg = memory.buildContext(sid).history || [];
         notifier.notificarResumen(lead, sara_nota, histMsg)
