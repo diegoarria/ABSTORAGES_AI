@@ -218,8 +218,8 @@ const Features = (() => {
   const CALL_IDENTITIES = {
     sara:  { name: 'SARA Garza',   sub: 'Ejecutiva Comercial · ABSTORAGES',        pitch: 1.1,  photo: '/img/sara-avatar.png'  },
     sofia: { name: 'SOFIA Novak',  sub: 'Coordinadora de Operaciones · ABSTORAGES', pitch: 0.95, photo: '/img/sofia-avatar.png' },
-    noa:   { name: 'NOA',          sub: 'AI Monitoreo de Servicios · ABSTORAGES',   pitch: 1.0,  photo: '/img/sara-avatar.png'  },
-    hector:{ name: 'HÉCTOR',       sub: 'AI Administración y Cobranza · ABSTORAGES',pitch: 0.9,  photo: '/img/sara-avatar.png'  },
+    noa:   { name: 'NOA',          sub: 'AI Monitoreo de Servicios · ABSTORAGES',   pitch: 1.0,  photo: '/img/noa-avatar.png'    },
+    hector:{ name: 'HÉCTOR',       sub: 'AI Administración y Cobranza · ABSTORAGES',pitch: 0.9,  photo: '/img/hector-avatar.png' },
   };
 
   function initCallMode() {
