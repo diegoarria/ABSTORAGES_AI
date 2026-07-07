@@ -63,8 +63,7 @@
 
     .input-row {
       padding: 10px 12px; background: #0f0f1a;
-      border-top: 1px solid #2a2a4a;
-      display: flex; gap: 8px; flex-shrink: 0;
+      border-top: 1px solid #2a2a4a; display: flex; gap: 8px; flex-shrink: 0;
     }
     .input-row input {
       flex: 1; background: #1a1a3a; border: 1px solid #2a2a4a;
@@ -98,12 +97,11 @@
       width: 90px; height: 90px; border-radius: 50%;
       background: #1a3a8f url('/img/sara-avatar.png') center/cover no-repeat;
       margin-bottom: 14px; flex-shrink: 0;
-      transition: box-shadow .3s;
     }
-    .call-photo.talking  { animation: ring-g 1.3s ease-out infinite; }
-    .call-photo.listening{ animation: ring-b 1.1s ease-in-out infinite alternate; }
+    .call-photo.talking   { animation: ring-g 1.3s ease-out infinite; }
+    .call-photo.listening { animation: ring-b 1s ease-in-out infinite alternate; }
     @keyframes ring-g { 0%{box-shadow:0 0 0 0 rgba(0,180,81,.65)} 70%{box-shadow:0 0 0 22px rgba(0,180,81,0)} 100%{box-shadow:0 0 0 0 rgba(0,180,81,0)} }
-    @keyframes ring-b { from{box-shadow:0 0 0 0 rgba(37,99,235,.5)} to{box-shadow:0 0 0 14px rgba(37,99,235,0)} }
+    @keyframes ring-b { from{box-shadow:0 0 0 0 rgba(37,99,235,.5)} to{box-shadow:0 0 0 16px rgba(37,99,235,0)} }
 
     .call-name { font-size: 1.05rem; font-weight: 700; color: #e8e8f0; margin-bottom: 2px; }
     .call-sub  { font-size: .7rem; color: #7ab0e8; margin-bottom: 14px; }
@@ -112,9 +110,18 @@
       min-height: 36px; margin-bottom: 8px; padding: 0 16px; line-height: 1.5;
     }
 
+    /* Audio level bar */
+    .level-bar-wrap {
+      width: 120px; height: 4px; background: #1a2a4a; border-radius: 2px;
+      margin-bottom: 18px; overflow: hidden; opacity: 0; transition: opacity .3s;
+    }
+    .level-bar-wrap.visible { opacity: 1; }
+    #level-bar { height: 100%; width: 0%; background: #2563eb; border-radius: 2px; transition: width .08s; }
+
+    /* SARA talking bars */
     .sound-bars {
       display: flex; gap: 3px; align-items: flex-end; height: 22px;
-      margin-bottom: 16px; opacity: 0; transition: opacity .2s;
+      margin-bottom: 18px; opacity: 0; transition: opacity .2s;
     }
     .sound-bars.on { opacity: 1; }
     .bar { width: 4px; background: #00B451; border-radius: 2px; animation: bbar .6s ease-in-out infinite alternate; }
@@ -125,31 +132,14 @@
     .bar:nth-child(5){animation-delay:.15s;animation-duration:.5s}
     @keyframes bbar { from{height:4px} to{height:18px} }
 
-    /* ── Mobile: tap-to-speak button ── */
-    #btn-speak {
-      display: none;
-      width: 72px; height: 72px; border-radius: 50%;
-      background: #00B451; border: none; cursor: pointer; color: #fff;
-      align-items: center; justify-content: center;
-      margin-bottom: 16px;
-      transition: background .15s, transform .1s;
-      box-shadow: 0 4px 20px rgba(0,180,81,.4);
-      -webkit-tap-highlight-color: transparent;
-    }
-    #btn-speak.visible { display: flex; }
-    #btn-speak.listening { background: #2563eb; box-shadow: 0 4px 20px rgba(37,99,235,.5); animation: ring-b 1s ease-in-out infinite alternate; }
-    #btn-speak:active { transform: scale(.93); }
-
     .call-controls { display: flex; gap: 28px; align-items: center; }
     .btn-hangup {
       width: 54px; height: 54px; border-radius: 50%;
       background: #dc2626; border: none; cursor: pointer; color: #fff;
       display: flex; align-items: center; justify-content: center;
-      transition: background .15s, transform .15s;
-      -webkit-tap-highlight-color: transparent;
+      transition: background .15s; -webkit-tap-highlight-color: transparent;
     }
-    .btn-hangup:hover { background: #b91c1c; }
-    .btn-hangup:active { transform: scale(.93); }
+    .btn-hangup:active { background: #b91c1c; transform: scale(.93); }
   </style>
 </head>
 <body>
@@ -159,7 +149,7 @@
       <div class="name">SARA Garza · ABSTORAGES</div>
       <div class="status">● En línea</div>
     </div>
-    <button class="btn-call" id="open-call" title="Llamar" aria-label="Llamar a SARA">
+    <button class="btn-call" id="open-call" aria-label="Llamar a SARA">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.86 12 19.79 19.79 0 0 1 1.78 3.38 2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
       </svg>
@@ -175,17 +165,7 @@
       <div class="bar"></div><div class="bar"></div><div class="bar"></div>
       <div class="bar"></div><div class="bar"></div>
     </div>
-
-    <!-- Mobile tap-to-speak button -->
-    <button id="btn-speak" aria-label="Hablar">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-        <line x1="12" y1="19" x2="12" y2="23"/>
-        <line x1="8" y1="23" x2="16" y2="23"/>
-      </svg>
-    </button>
-
+    <div class="level-bar-wrap" id="level-wrap"><div id="level-bar"></div></div>
     <div class="call-controls">
       <button class="btn-hangup" id="btn-hangup" aria-label="Colgar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -213,12 +193,7 @@
     const msgsEl  = document.getElementById('msgs');
     const inp     = document.getElementById('inp');
     const btn     = document.getElementById('btn');
-    let closed    = false;
-
-    // Is mobile? (touch device)
-    const isMobile = navigator.maxTouchPoints > 0;
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const hasVoice = !!SR;
+    let closed = false;
 
     // ── Chat ─────────────────────────────────────────────────────────────────
     function addBubble(role, html) {
@@ -251,23 +226,15 @@
               .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi,'')
               .replace(/<[^>]+>/g,'').trim();
     }
-
-    // Strip markdown and special chars before sending to ElevenLabs TTS
     function cleanForTTS(t) {
       return t
-        .replace(/\*\*(.*?)\*\*/g, '$1')   // **bold** → bold
-        .replace(/\*(.*?)\*/g, '$1')        // *italic* → italic
-        .replace(/#{1,6}\s*/g, '')          // # headers
-        .replace(/^\s*[-•*]\s+/gm, '')      // bullet points
-        .replace(/^\s*\d+\.\s+/gm, '')      // numbered lists
-        .replace(/`[^`]*`/g, '')            // `code`
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // [link](url) → link
+        .replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1')
+        .replace(/#{1,6}\s*/g,'').replace(/^\s*[-•*]\s+/gm,'')
+        .replace(/^\s*\d+\.\s+/gm,'').replace(/`[^`]*`/g,'')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g,'$1')
         .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-        .replace(/[^\S\n]+/g, ' ')          // collapse spaces
-        .replace(/\n{2,}/g, '. ')           // double newlines → pause
-        .replace(/\n/g, ' ')                // single newlines → space
-        .replace(/\.{2,}/g, '.')            // multiple dots → one
-        .trim();
+        .replace(/[^\S\n]+/g,' ').replace(/\n{2,}/g,'. ').replace(/\n/g,' ')
+        .replace(/\.{2,}/g,'.').trim();
     }
 
     async function sendMessage(text) {
@@ -318,58 +285,70 @@
     inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) send(); });
     addBubble('sara', '¡Hola! Soy <b>SARA Garza</b>, ejecutiva comercial de <b>ABSTORAGES Logistics Solutions</b>.<br>¿Con quién tengo el gusto y de qué empresa me contactas?');
 
-    // ── Call ─────────────────────────────────────────────────────────────────
+    // ── Call — VAD + MediaRecorder + ElevenLabs STT ───────────────────────────
+    //
+    // Flujo completamente manos libres en todos los dispositivos:
+    // 1. getUserMedia() una sola vez al tocar el botón de llamada
+    // 2. AudioContext + AnalyserNode miden el nivel de audio 60fps
+    // 3. Cuando el usuario habla (nivel > umbral) → MediaRecorder graba
+    // 4. Cuando el usuario se calla (silencio > 900ms) → envía audio a /api/widget/stt
+    // 5. ElevenLabs Scribe transcribe → SARA responde → TTS → vuelve a escuchar
+    // 6. Si el usuario habla mientras SARA habla → barge-in (corta el audio)
+
     const overlay    = document.getElementById('call-overlay');
     const callPhoto  = document.getElementById('call-photo');
     const callStatus = document.getElementById('call-status');
     const soundBars  = document.getElementById('sound-bars');
-    const btnSpeak   = document.getElementById('btn-speak');
+    const levelWrap  = document.getElementById('level-wrap');
+    const levelBar   = document.getElementById('level-bar');
     const btnHangup  = document.getElementById('btn-hangup');
     const openCallBtn= document.getElementById('open-call');
 
-    let inCall = false, callState = 'idle';
-    let activeRec = null, activeNode = null;
-    let audioCtx = null;
+    // State
+    let inCall       = false;
+    let callState    = 'idle';   // idle | listening | recording | processing | speaking
+    let micStream    = null;
+    let audioCtx     = null;
+    let analyser     = null;
+    let mediaRec     = null;
+    let audioChunks  = [];
+    let activeNode   = null;     // Web Audio source currently playing
+    let vadActive    = false;
+    let silenceTimer = null;
+    let vadRafId     = null;
 
-    // Unlock Web Audio once via user gesture — then audio plays freely on mobile
-    function unlockAudio() {
-      if (audioCtx) return;
-      try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const buf = audioCtx.createBuffer(1, 1, 22050);
-        const src = audioCtx.createBufferSource();
-        src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
-      } catch {}
-    }
+    // VAD config
+    const SPEAK_THRESHOLD = 0.018;  // RMS amplitude to consider "speaking"
+    const SILENCE_MS      = 900;    // ms of quiet before sending clip
+    const MIN_BYTES       = 2000;   // ignore clips too short (noise)
 
     function setStatus(txt, color) {
       callStatus.textContent = txt;
       callStatus.style.color = color || '#5cdb95';
     }
-    function setSpeakingUI(on) {
+    function setSpeaking(on) {
       callPhoto.classList.toggle('talking', on);
       callPhoto.classList.toggle('listening', false);
       soundBars.classList.toggle('on', on);
-      if (isMobile) btnSpeak.classList.remove('listening');
+      levelWrap.classList.toggle('visible', false);
     }
-    function setListeningUI(on) {
+    function setListening(on) {
       callPhoto.classList.toggle('listening', on);
       callPhoto.classList.toggle('talking', false);
       soundBars.classList.toggle('on', false);
+      levelWrap.classList.toggle('visible', on);
     }
 
-    function stopAudio() {
+    // Stop TTS immediately (barge-in)
+    function stopTTS() {
       if (activeNode) { try { activeNode.stop(); } catch {} activeNode = null; }
-      setSpeakingUI(false);
-    }
-    function stopRec() {
-      if (activeRec) { activeRec._stopped = true; try { activeRec.abort(); } catch {} activeRec = null; }
-      setListeningUI(false);
+      setSpeaking(false);
     }
 
+    // Play TTS via Web Audio (works on mobile after audioCtx created in user gesture)
     async function playTTS(text) {
       if (!text || !inCall) return;
-      setSpeakingUI(true);
+      setSpeaking(true);
       setStatus('● SARA está hablando…');
       try {
         const res = await fetch(`${BASE}/api/widget/tts`, {
@@ -378,166 +357,166 @@
         });
         if (!res.ok) throw new Error('tts');
         const buf = await res.arrayBuffer();
-        if (audioCtx) {
-          if (audioCtx.state === 'suspended') await audioCtx.resume();
-          const decoded = await audioCtx.decodeAudioData(buf.slice(0));
-          activeNode = audioCtx.createBufferSource();
-          activeNode.buffer = decoded;
-          activeNode.connect(audioCtx.destination);
-          await new Promise(r => { activeNode.onended = r; activeNode.start(0); });
-          activeNode = null;
-        } else {
-          const url = URL.createObjectURL(new Blob([buf], { type:'audio/mpeg' }));
-          const a = new Audio(url);
-          await new Promise(r => { a.onended = r; a.onerror = r; a.play().catch(r); });
-          URL.revokeObjectURL(url);
-        }
+        if (!inCall) return;
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        const decoded = await audioCtx.decodeAudioData(buf);
+        if (!inCall) return;
+        activeNode = audioCtx.createBufferSource();
+        activeNode.buffer = decoded;
+        activeNode.connect(audioCtx.destination);
+        await new Promise(r => { activeNode.onended = r; activeNode.start(0); });
+        activeNode = null;
       } catch { activeNode = null; }
-      setSpeakingUI(false);
+      setSpeaking(false);
     }
 
-    async function processUserSpeech(text) {
-      if (!inCall || !text) return;
-      callState = 'processing';
-      setListeningUI(false);
-      setStatus('● Procesando…', '#7ab0e8');
-      if (isMobile) { btnSpeak.classList.remove('listening'); btnSpeak.disabled = true; }
+    // Send audio clip to ElevenLabs Scribe via backend
+    async function transcribeAndRespond(blob) {
+      if (!inCall || blob.size < MIN_BYTES) {
+        callState = 'listening';
+        setListening(true);
+        setStatus('● Escuchando…');
+        return;
+      }
 
-      const raw = await sendMessage(text);
-      if (!inCall) return;
-      if (raw) { callState = 'speaking'; await playTTS(cleanForTTS(cleanText(raw))); }
+      callState = 'processing';
+      setListening(false);
+      setStatus('● Procesando…', '#7ab0e8');
+
+      try {
+        const form = new FormData();
+        form.append('audio', blob, 'clip.webm');
+        const sttRes = await fetch(`${BASE}/api/widget/stt`, { method: 'POST', body: blob,
+          headers: { 'Content-Type': blob.type || 'audio/webm' } });
+        const { text } = await sttRes.json();
+
+        if (text && inCall) {
+          callState = 'speaking';
+          const raw = await sendMessage(text);
+          if (raw && inCall) await playTTS(cleanForTTS(cleanText(raw)));
+        }
+      } catch {}
 
       if (inCall) {
         callState = 'listening';
-        if (isMobile) {
-          // On mobile: show the tap-to-speak button again
-          btnSpeak.disabled = false;
-          btnSpeak.classList.remove('listening');
-          setStatus('Toca el micrófono para responder');
-          setListeningUI(false);
-        } else {
-          startContinuousListening();
-        }
+        setListening(true);
+        setStatus('● Escuchando…');
       }
     }
 
-    // Desktop: fully continuous, auto-restarts after each recognition
-    function startContinuousListening() {
-      if (!inCall || !hasVoice) return;
-      stopRec();
-      callState = 'listening';
-      setListeningUI(true);
-      setStatus('● Escuchando…');
+    // VAD loop — runs at ~60fps via requestAnimationFrame
+    function vadLoop() {
+      if (!inCall || !analyser) return;
 
-      const rec = new SR();
-      rec._stopped = false;
-      rec.lang = 'es-MX';
-      rec.continuous = false;
-      rec.interimResults = true;
-      activeRec = rec;
+      const data = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(data);
+      const rms = Math.sqrt(data.reduce((s, v) => s + v * v, 0) / data.length);
+      const pct = Math.min(100, (rms / SPEAK_THRESHOLD) * 50);
+      levelBar.style.width = pct + '%';
 
-      rec.onresult = (e) => {
-        const last = e.results[e.results.length - 1];
-        if (callState === 'speaking') { stopAudio(); callState = 'listening'; }
-        if (last.isFinal) {
-          const text = last[0].transcript.trim();
-          rec._stopped = true; activeRec = null;
-          if (text) processUserSpeech(text);
-        }
-      };
-      rec.onerror = () => {};
-      rec.onend = () => {
-        if (!rec._stopped && inCall && callState === 'listening') setTimeout(startContinuousListening, 100);
-      };
-      try { rec.start(); } catch {}
-    }
+      const isSpeaking = rms > SPEAK_THRESHOLD;
 
-    // Mobile: one tap → one recognition session → process → show button again
-    function startOneShotListening() {
-      if (!inCall || !hasVoice || callState === 'processing' || callState === 'speaking') return;
-      stopRec();
-      callState = 'listening';
-      setListeningUI(true);
-      btnSpeak.classList.add('listening');
-      setStatus('● Escuchando… habla ahora');
-
-      const rec = new SR();
-      rec._stopped = false;
-      rec.lang = 'es-MX';
-      rec.continuous = false;
-      rec.interimResults = false;
-      activeRec = rec;
-
-      rec.onresult = (e) => {
-        const text = e.results[0][0].transcript.trim();
-        rec._stopped = true; activeRec = null;
-        btnSpeak.classList.remove('listening');
-        setListeningUI(false);
-        if (text) processUserSpeech(text);
-      };
-      rec.onerror = () => {
-        rec._stopped = true; activeRec = null;
-        btnSpeak.classList.remove('listening');
-        btnSpeak.disabled = false;
-        callState = 'listening';
-        setStatus('No te escuché. Toca de nuevo para hablar', '#f59e0b');
-      };
-      rec.onend = () => {
-        if (!rec._stopped) {
-          // ended without result (silence)
-          btnSpeak.classList.remove('listening');
-          btnSpeak.disabled = false;
+      if (isSpeaking) {
+        // Barge-in: cut SARA mid-sentence
+        if (callState === 'speaking') {
+          stopTTS();
           callState = 'listening';
-          setStatus('Toca el micrófono para responder');
-          setListeningUI(false);
         }
-      };
-      try { rec.start(); } catch (err) {
-        btnSpeak.classList.remove('listening');
-        setStatus('No se pudo acceder al micrófono', '#f59e0b');
+
+        // Start recording if not already
+        if (callState === 'listening' && !vadActive) {
+          vadActive = true;
+          callState = 'recording';
+          setListening(false);
+          callPhoto.classList.add('listening');
+          setStatus('● Escuchando…');
+          audioChunks = [];
+          try {
+            mediaRec = new MediaRecorder(micStream);
+            mediaRec.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+            mediaRec.start();
+          } catch {}
+        }
+
+        // Reset silence timer on speech
+        if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+
+      } else if (vadActive && !silenceTimer) {
+        // User went quiet — start silence countdown
+        silenceTimer = setTimeout(() => {
+          silenceTimer = null;
+          vadActive = false;
+          if (mediaRec && mediaRec.state === 'recording') {
+            mediaRec.onstop = () => {
+              const blob = new Blob(audioChunks, { type: mediaRec.mimeType || 'audio/webm' });
+              audioChunks = [];
+              transcribeAndRespond(blob);
+            };
+            mediaRec.stop();
+          }
+        }, SILENCE_MS);
       }
+
+      vadRafId = requestAnimationFrame(vadLoop);
     }
 
     async function openCall() {
-      inCall = true; callState = 'speaking';
-      overlay.classList.add('active');
-      openCallBtn.style.display = 'none';
+      // audioCtx must be created HERE (synchronous user gesture context)
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Unlock with silent buffer
+        const buf = audioCtx.createBuffer(1, 1, 22050);
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
+      } catch {}
 
-      if (isMobile) {
-        btnSpeak.classList.add('visible');
-        btnSpeak.disabled = true; // disabled while SARA speaks
+      // Request mic permission
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      } catch {
+        setStatus('⚠ Permite el micrófono para usar la llamada', '#f59e0b');
+        return;
       }
 
+      // Connect mic to analyser (NOT to destination — no echo)
+      const micSource = audioCtx.createMediaStreamSource(micStream);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      micSource.connect(analyser);
+
+      inCall = true;
+      callState = 'speaking';
+      overlay.classList.add('active');
+      openCallBtn.style.display = 'none';
       setStatus('● En llamada');
-      await playTTS(cleanForTTS('¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?'));
 
-      if (!inCall) return;
-      callState = 'listening';
+      // SARA greeting
+      await playTTS('¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?');
 
-      if (isMobile) {
-        btnSpeak.disabled = false;
-        setStatus('Toca el micrófono para responder');
-      } else {
-        startContinuousListening();
+      if (inCall) {
+        callState = 'listening';
+        setListening(true);
+        setStatus('● Escuchando…');
+        vadRafId = requestAnimationFrame(vadLoop);
       }
     }
 
     function hangup() {
-      inCall = false; callState = 'idle';
-      stopAudio(); stopRec();
+      inCall = false; callState = 'idle'; vadActive = false;
+      if (vadRafId) { cancelAnimationFrame(vadRafId); vadRafId = null; }
+      if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+      stopTTS();
+      if (mediaRec && mediaRec.state === 'recording') { try { mediaRec.stop(); } catch {} }
+      if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
       overlay.classList.remove('active');
       openCallBtn.style.display = '';
-      btnSpeak.classList.remove('visible', 'listening');
       callPhoto.classList.remove('talking', 'listening');
       soundBars.classList.remove('on');
+      levelWrap.classList.remove('visible');
       setStatus('Conectando…');
     }
 
-    // Mobile speak button
-    btnSpeak.addEventListener('click', () => { startOneShotListening(); });
-
-    // Open call: unlock audio synchronously in the click handler
-    openCallBtn.addEventListener('click', () => { unlockAudio(); openCall(); });
+    openCallBtn.addEventListener('click', openCall); // audioCtx creation inside openCall
     btnHangup.addEventListener('click', hangup);
   </script>
 </body>

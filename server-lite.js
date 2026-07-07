@@ -228,6 +228,53 @@ app.post('/api/widget/tts', async (req, res) => {
   }
 });
 
+// STT público para el widget — ElevenLabs Scribe, sin auth
+app.post('/api/widget/stt', async (req, res) => {
+  if (!EL_LIVE) return res.json({ text: '' });
+
+  const chunks = [];
+  req.on('data', c => chunks.push(c));
+  req.on('end', async () => {
+    const audioBuf = Buffer.concat(chunks);
+    if (audioBuf.length < 1000) return res.json({ text: '' });
+
+    const contentType = req.headers['content-type'] || 'audio/webm';
+    const boundary = 'ELSTT' + Date.now();
+    const body = Buffer.concat([
+      Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="audio.webm"\r\nContent-Type: ${contentType}\r\n\r\n`),
+      audioBuf,
+      Buffer.from(`\r\n--${boundary}\r\nContent-Disposition: form-data; name="model_id"\r\n\r\nscribe_v1\r\n--${boundary}--\r\n`),
+    ]);
+
+    try {
+      const apiRes = await new Promise((resolve, reject) => {
+        const r = https.request({
+          hostname: 'api.elevenlabs.io',
+          path: '/v1/speech-to-text',
+          method: 'POST',
+          headers: {
+            'xi-api-key': EL_KEY,
+            'Content-Type': `multipart/form-data; boundary=${boundary}`,
+            'Content-Length': body.length,
+          },
+        }, resolve);
+        r.on('error', reject);
+        r.write(body);
+        r.end();
+      });
+
+      let raw = '';
+      apiRes.on('data', d => { raw += d; });
+      apiRes.on('end', () => {
+        try {
+          const parsed = JSON.parse(raw);
+          res.json({ text: parsed.text || '' });
+        } catch { res.json({ text: '' }); }
+      });
+    } catch { res.json({ text: '' }); }
+  });
+});
+
 // Página del chofer — URL pública autenticada con token GPS
 app.get('/tracker', (req, res) => {
   if (req.query.token !== gpsLive.GPS_TOKEN)
