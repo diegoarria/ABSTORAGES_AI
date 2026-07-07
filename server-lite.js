@@ -193,6 +193,41 @@ app.get('/sara-widget.js', (req, res) => {
 // Chat público del widget — misma lógica que /api/sara/chat pero sin auth
 app.post('/api/widget/chat', (req, res) => handleChat('sara', req, res));
 
+// TTS público para el widget — sin auth, solo voz de SARA
+app.post('/api/widget/tts', async (req, res) => {
+  const { text } = req.body;
+  if (!text) return res.status(400).json({ error: 'text requerido' });
+  if (!EL_LIVE) return res.status(503).json({ error: 'TTS no disponible' });
+
+  const body = JSON.stringify({
+    text: text.slice(0, 2500),
+    model_id: 'eleven_multilingual_v2',
+    voice_settings: { stability: 0.55, similarity_boost: 0.78, style: 0.3, use_speaker_boost: true },
+  });
+
+  try {
+    await new Promise((resolve, reject) => {
+      const r2 = https.request({
+        hostname: 'api.elevenlabs.io',
+        path: `/v1/text-to-speech/${EL_VOICE_SARA}/stream`,
+        method: 'POST',
+        headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
+      }, (apiRes) => {
+        if (apiRes.statusCode !== 200) {
+          let err = ''; apiRes.on('data', d => { err += d; });
+          apiRes.on('end', () => reject(new Error(`EL ${apiRes.statusCode}: ${err}`))); return;
+        }
+        res.setHeader('Content-Type', 'audio/mpeg');
+        res.setHeader('Cache-Control', 'no-store');
+        apiRes.pipe(res); apiRes.on('end', resolve);
+      });
+      r2.on('error', reject); r2.write(body); r2.end();
+    });
+  } catch (err) {
+    if (!res.headersSent) res.status(500).json({ error: err.message });
+  }
+});
+
 // Página del chofer — URL pública autenticada con token GPS
 app.get('/tracker', (req, res) => {
   if (req.query.token !== gpsLive.GPS_TOKEN)

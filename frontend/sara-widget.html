@@ -22,8 +22,16 @@
       display: flex; align-items: center; justify-content: center;
       font-weight: 700; font-size: .85rem; color: transparent; flex-shrink: 0;
     }
+    .header-info { flex: 1; }
     .header-info .name  { font-weight: 600; font-size: .88rem; }
     .header-info .status { font-size: .7rem; color: #5cdb95; margin-top: 1px; }
+    .btn-call {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #00B451; border: none; cursor: pointer; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background .15s, transform .15s;
+    }
+    .btn-call:hover { background: #009940; transform: scale(1.08); }
     .messages {
       flex: 1; overflow-y: auto; padding: 14px 14px 8px;
       display: flex; flex-direction: column; gap: 9px;
@@ -83,6 +91,51 @@
       text-align: center; font-size: .72rem; color: #6b7280;
       padding: 10px; border-top: 1px solid #2a2a4a; background: #0f0f1a;
     }
+
+    /* ── Call overlay ────────────────────────────────────────────────────── */
+    #call-overlay {
+      display: none; position: absolute; inset: 0; z-index: 100;
+      background: linear-gradient(160deg, #0a1628 0%, #0f2040 60%, #091520 100%);
+      flex-direction: column; align-items: center; justify-content: center; gap: 0;
+    }
+    #call-overlay.active { display: flex; }
+    .call-photo {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: #1a3a8f url('/img/sara-avatar.png') center/cover no-repeat;
+      margin-bottom: 18px;
+      box-shadow: 0 0 0 0 rgba(0,180,81,.5);
+      transition: box-shadow .3s;
+    }
+    .call-photo.talking {
+      animation: pulse-ring 1.2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(0,180,81,.55); }
+      70%  { box-shadow: 0 0 0 18px rgba(0,180,81,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,180,81,0); }
+    }
+    .call-name { font-size: 1.1rem; font-weight: 700; color: #e8e8f0; margin-bottom: 4px; }
+    .call-sub  { font-size: .72rem; color: #7ab0e8; margin-bottom: 28px; }
+    .call-status {
+      font-size: .78rem; color: #5cdb95; margin-bottom: 32px;
+      min-height: 18px; text-align: center; padding: 0 20px;
+    }
+    .call-controls { display: flex; gap: 24px; align-items: center; }
+    .btn-hangup {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #e53e3e; border: none; cursor: pointer; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, transform .15s;
+    }
+    .btn-hangup:hover { background: #c53030; transform: scale(1.08); }
+    .btn-mic-call {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: #1a3a6a; border: 2px solid #2a5abf; cursor: pointer; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-mic-call.listening { background: #00B451; border-color: #00B451; }
+    .call-hint { font-size: .68rem; color: #4a6a9a; margin-top: 24px; text-align: center; }
   </style>
 </head>
 <body>
@@ -92,6 +145,34 @@
       <div class="name">SARA Garza · ABSTORAGES</div>
       <div class="status">● En línea</div>
     </div>
+    <button class="btn-call" id="open-call" title="Llamar a SARA" aria-label="Iniciar llamada">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.86 12 19.79 19.79 0 0 1 1.78 3.38 2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Call overlay -->
+  <div id="call-overlay">
+    <div class="call-photo" id="call-photo"></div>
+    <div class="call-name">SARA Garza</div>
+    <div class="call-sub">Ejecutiva Comercial · ABSTORAGES</div>
+    <div class="call-status" id="call-status">● Conectando…</div>
+    <div class="call-controls">
+      <button class="btn-mic-call" id="btn-mic-call" title="Hablar" aria-label="Micrófono">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+      <button class="btn-hangup" id="btn-hangup" title="Colgar" aria-label="Colgar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.71 16.67C20.66 13.78 16.54 12 12 12 7.46 12 3.34 13.78.29 16.67c-.18.18-.29.43-.29.71 0 .28.11.53.29.71l2.48 2.48c.18.18.43.29.71.29.27 0 .52-.11.7-.28.79-.74 1.69-1.36 2.66-1.85.33-.16.56-.5.56-.9v-3.1c1.45-.47 2.98-.73 4.6-.73 1.62 0 3.15.26 4.6.72v3.1c0 .39.23.74.56.9.98.49 1.87 1.12 2.67 1.85.18.18.43.28.7.28.28 0 .53-.11.71-.29l2.48-2.48c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71z"/>
+        </svg>
+      </button>
+    </div>
+    <div class="call-hint">Presiona el micrófono y habla con SARA</div>
   </div>
 
   <div class="messages" id="msgs"></div>
@@ -108,12 +189,14 @@
   </div>
 
   <script>
-    const SESSION = 'widget_' + Math.random().toString(36).slice(2);
-    const msgsEl  = document.getElementById('msgs');
-    const inp     = document.getElementById('inp');
-    const btn     = document.getElementById('btn');
-    let closed = false;
+    const BASE     = window.location.origin;
+    const SESSION  = 'widget_' + Math.random().toString(36).slice(2);
+    const msgsEl   = document.getElementById('msgs');
+    const inp      = document.getElementById('inp');
+    const btn      = document.getElementById('btn');
+    let closed     = false;
 
+    // ── Chat functions ────────────────────────────────────────────────────────
     function addBubble(role, html) {
       const d = document.createElement('div');
       d.className = `msg ${role}`;
@@ -142,16 +225,15 @@
         '<div class="closed-bar">— Chat finalizado · Gracias por contactar ABSTORAGES —</div>';
     }
 
-    async function send() {
-      const text = inp.value.trim();
-      if (!text || closed) return;
-      inp.value = '';
+    async function sendMessage(text) {
+      if (!text || closed) return null;
       addBubble('user', toHtml(text));
       inp.disabled = true; btn.disabled = true;
       showTyping();
 
+      let saraText = '';
       try {
-        const res = await fetch('/api/widget/chat', {
+        const res = await fetch(`${BASE}/api/widget/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text, sessionId: SESSION }),
@@ -160,7 +242,7 @@
 
         const reader  = res.body.getReader();
         const decoder = new TextDecoder();
-        let saraDiv = null, saraText = '';
+        let saraDiv = null;
 
         while (true) {
           const { done, value } = await reader.read();
@@ -179,7 +261,7 @@
                 else saraDiv.querySelector('.bubble').innerHTML = toHtml(clean);
                 msgsEl.scrollTop = msgsEl.scrollHeight;
               } else if (evt.type === 'cerrar_chat') {
-                closeChat(); return;
+                closeChat(); return saraText;
               }
             } catch {}
           }
@@ -190,13 +272,145 @@
       }
 
       if (!closed) { inp.disabled = false; btn.disabled = false; inp.focus(); }
+      return saraText;
+    }
+
+    async function send() {
+      const text = inp.value.trim();
+      if (!text || closed) return;
+      inp.value = '';
+      await sendMessage(text);
     }
 
     btn.addEventListener('click', send);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) send(); });
 
-    // Saludo inicial
     addBubble('sara', '¡Hola! Soy <b>SARA Garza</b>, ejecutiva comercial de <b>ABSTORAGES Logistics Solutions</b>.<br>¿Con quién tengo el gusto y de qué empresa me contactas?');
+
+    // ── Call overlay ──────────────────────────────────────────────────────────
+    const overlay    = document.getElementById('call-overlay');
+    const callStatus = document.getElementById('call-status');
+    const callPhoto  = document.getElementById('call-photo');
+    const btnMic     = document.getElementById('btn-mic-call');
+    const btnHangup  = document.getElementById('btn-hangup');
+    const openCallBtn= document.getElementById('open-call');
+
+    let inCall      = false;
+    let recognition = null;
+    let isListening = false;
+    let isSpeaking  = false;
+    let currentAudio= null;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasSpeech = !!SpeechRecognition;
+
+    function setStatus(txt) { callStatus.textContent = txt; }
+
+    function openCall() {
+      inCall = true;
+      overlay.classList.add('active');
+      openCallBtn.style.display = 'none';
+      setStatus('● En llamada');
+      if (!hasSpeech) {
+        setStatus('⚠ Voz no disponible en este navegador — usa Chrome');
+      }
+    }
+
+    function hangup() {
+      inCall = false;
+      overlay.classList.remove('active');
+      openCallBtn.style.display = '';
+      if (recognition) { try { recognition.stop(); } catch {} recognition = null; }
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+      callPhoto.classList.remove('talking');
+      isListening = false; isSpeaking = false;
+      btnMic.classList.remove('listening');
+      setStatus('● Conectando…');
+    }
+
+    async function playTTS(text) {
+      if (!text) return;
+      isSpeaking = true;
+      callPhoto.classList.add('talking');
+      setStatus('● SARA está hablando…');
+      try {
+        const res = await fetch(`${BASE}/api/widget/tts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        if (!res.ok) throw new Error('TTS error');
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        currentAudio = new Audio(url);
+        await new Promise((resolve) => {
+          currentAudio.onended = resolve;
+          currentAudio.onerror = resolve;
+          currentAudio.play().catch(resolve);
+        });
+        URL.revokeObjectURL(url);
+        currentAudio = null;
+      } catch {
+        // silently fall back
+      }
+      isSpeaking = false;
+      callPhoto.classList.remove('talking');
+      if (inCall) setStatus('● En llamada — presiona el micrófono para hablar');
+    }
+
+    function startListening() {
+      if (!hasSpeech || isListening || isSpeaking) return;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'es-MX';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        isListening = true;
+        btnMic.classList.add('listening');
+        setStatus('● Escuchando… habla ahora');
+      };
+
+      recognition.onresult = async (e) => {
+        const text = e.results[0][0].transcript.trim();
+        isListening = false;
+        btnMic.classList.remove('listening');
+        if (!text || !inCall) return;
+        setStatus('● Procesando…');
+        const saraReply = await sendMessage(text);
+        if (saraReply && inCall) {
+          const clean = saraReply
+            .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+            .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
+            .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
+            .replace(/<[^>]+>/g, '').trim();
+          await playTTS(clean);
+        }
+      };
+
+      recognition.onerror = () => {
+        isListening = false;
+        btnMic.classList.remove('listening');
+        if (inCall) setStatus('● En llamada — presiona el micrófono para hablar');
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        btnMic.classList.remove('listening');
+      };
+
+      recognition.start();
+    }
+
+    openCallBtn.addEventListener('click', openCall);
+    btnHangup.addEventListener('click', hangup);
+    btnMic.addEventListener('click', () => {
+      if (isListening) {
+        recognition?.stop();
+      } else {
+        startListening();
+      }
+    });
   </script>
 </body>
 </html>
