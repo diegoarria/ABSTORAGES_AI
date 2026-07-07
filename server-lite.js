@@ -366,7 +366,7 @@ app.post('/api/tts', async (req, res) => {
     text: text.slice(0, 2500),
     model_id: 'eleven_multilingual_v2',
     voice_settings: agente === 'sofia'
-      ? { stability: 0.5, similarity_boost: 0.75, style: 0.0, use_speaker_boost: false }
+      ? { stability: 0.5, similarity_boost: 0.75, style: 0.0, use_speaker_boost: false, speed: 1.1 }
       : { stability: 0.72, similarity_boost: 0.80, style: 0.2, use_speaker_boost: true, speed: 1.05 },
   });
 
