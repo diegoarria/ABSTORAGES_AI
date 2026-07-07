@@ -76,6 +76,7 @@
   iframe.src   = `${BASE}/widget`;
   iframe.title = 'Chat SARA — ABSTORAGES Logistics';
   iframe.setAttribute('loading', 'lazy');
+  iframe.setAttribute('allow', 'microphone');
   wrap.appendChild(iframe);
 
   let open = false;
