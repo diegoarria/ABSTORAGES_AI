@@ -213,15 +213,24 @@ const Features = (() => {
   let callRecog     = null;
   let callAudio     = null;
   let callAutoListen = false;
+  let callAgente    = 'sara';
+
+  const CALL_IDENTITIES = {
+    sara:  { name: 'SARA Garza',   sub: 'Ejecutiva Comercial · ABSTORAGES',        pitch: 1.1,  photo: '/img/sara-avatar.png'  },
+    sofia: { name: 'SOFIA Novak',  sub: 'Coordinadora de Operaciones · ABSTORAGES', pitch: 0.95, photo: '/img/sofia-avatar.png' },
+    noa:   { name: 'NOA',          sub: 'AI Monitoreo de Servicios · ABSTORAGES',   pitch: 1.0,  photo: '/img/sara-avatar.png'  },
+    hector:{ name: 'HÉCTOR',       sub: 'AI Administración y Cobranza · ABSTORAGES',pitch: 0.9,  photo: '/img/sara-avatar.png'  },
+  };
 
   function initCallMode() {
     const overlay  = document.getElementById('call-overlay');
     const micBtn   = document.getElementById('call-mic-btn');
     const endBtn   = document.getElementById('call-end-btn');
-    const phoneBtn = document.getElementById('sara-mic');
-    if (!overlay || !micBtn || !endBtn || !phoneBtn) return;
+    if (!overlay || !micBtn || !endBtn) return;
 
-    phoneBtn.addEventListener('click', openCall);
+    ['sara', 'sofia', 'noa', 'hector'].forEach(ag => {
+      document.getElementById(`${ag}-mic`)?.addEventListener('click', () => openCall(ag));
+    });
     endBtn.addEventListener('click', closeCall);
     micBtn.addEventListener('click', () => {
       if (callRecog) {
@@ -236,16 +245,27 @@ const Features = (() => {
     });
   }
 
-  function openCall() {
+  function openCall(agente = 'sara') {
     if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
       App.toast('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.', 'amber', 5000);
       return;
     }
+    callAgente   = agente;
     callActive   = true;
     callSeconds  = 0;
     const overlay = document.getElementById('call-overlay');
     overlay.style.display = 'flex';
     overlay.dataset.state  = 'idle';
+
+    // Update overlay identity for this agent
+    const id = CALL_IDENTITIES[agente] || CALL_IDENTITIES.sara;
+    const nameEl  = document.getElementById('call-name');
+    const subEl   = document.getElementById('call-sub');
+    const photoEl = document.querySelector('.call-avatar-photo');
+    if (nameEl)  nameEl.textContent = id.name;
+    if (subEl)   subEl.textContent  = id.sub;
+    if (photoEl) photoEl.style.backgroundImage = `url('${id.photo}')`;
+
     setCallStatus('Iniciando llamada...', 'idle');
     callTimer = setInterval(() => {
       callSeconds++;
@@ -314,8 +334,9 @@ const Features = (() => {
         return;
       }
       if (tx) tx.textContent = '';
-      setCallStatus('SARA está pensando...', 'thinking');
-      await callSendToSARA(userText);
+      const id = CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara;
+      setCallStatus(`${id.name} está pensando...`, 'thinking');
+      await callSendToAgent(userText);
     };
 
     rec.onerror = e => {
@@ -331,11 +352,13 @@ const Features = (() => {
     rec.start();
   }
 
-  async function callSendToSARA(text) {
-    const sessionId = document.getElementById('sara-session-id')?.textContent || 'call-' + Date.now();
+  async function callSendToAgent(text) {
+    const sessionId = document.getElementById(`${callAgente}-session-id`)?.textContent
+                   || document.getElementById('sara-session-id')?.textContent
+                   || 'call-' + Date.now();
     let fullText = '';
     try {
-      const res = await fetch('/api/sara/chat', {
+      const res = await fetch(`/api/${callAgente}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, sessionId, callMode: true }),
@@ -365,12 +388,14 @@ const Features = (() => {
     const clean = fullText
       .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
       .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
+      .replace(/ALERTA_CRITICA\s*:\s*\{[^\n]*\}/gi, '')
       .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
       .replace(/[*_`#>]/g, '')
       .trim();
 
     if (!clean || !callActive) return;
-    setCallStatus('SARA está respondiendo...', 'speaking');
+    const id = CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara;
+    setCallStatus(`${id.name} está respondiendo...`, 'speaking');
     await callPlayTTS(clean);
     if (!callActive) return;
     setCallStatus('Toca el micrófono para hablar.', 'idle');
@@ -382,7 +407,7 @@ const Features = (() => {
       fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.slice(0, 2500), agente: 'sara' }),
+        body: JSON.stringify({ text: text.slice(0, 2500), agente: callAgente }),
       }).then(r => r.ok ? r.blob() : Promise.reject('elevenlabs_error'))
         .then(blob => {
           const url = URL.createObjectURL(blob);
@@ -401,7 +426,7 @@ const Features = (() => {
     const utt = new SpeechSynthesisUtterance(text.slice(0, 3000));
     utt.lang  = 'es-MX';
     utt.rate  = 1.05;
-    utt.pitch = 1.1;
+    utt.pitch = (CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara).pitch;
     const loadAndSpeak = () => {
       const voices   = window.speechSynthesis.getVoices();
       const preferred = voices.find(v => v.lang === 'es-MX' || v.lang === 'es-US' || v.lang.startsWith('es'));
@@ -485,8 +510,7 @@ const Features = (() => {
   // ── INIT ──────────────────────────────────────────────────────────────────
   function init() {
     watchBubbles();
-    initMic('sofia-input', 'sofia-mic');
-    initCallMode(); // sara-mic maneja call mode, no STT directo
+    initCallMode(); // sara-mic y sofia-mic manejan call mode, no STT directo
     loadPredictiveAlerts();
     loadTariff();
 
