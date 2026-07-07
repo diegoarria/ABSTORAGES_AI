@@ -96,70 +96,103 @@
     #call-overlay {
       display: none; position: absolute; inset: 0; z-index: 100;
       background: linear-gradient(160deg, #0a1628 0%, #0f2040 60%, #091520 100%);
-      flex-direction: column; align-items: center; justify-content: center; gap: 0;
+      flex-direction: column; align-items: center; justify-content: center;
     }
     #call-overlay.active { display: flex; }
+
     .call-photo {
-      width: 96px; height: 96px; border-radius: 50%;
+      width: 100px; height: 100px; border-radius: 50%;
       background: #1a3a8f url('/img/sara-avatar.png') center/cover no-repeat;
-      margin-bottom: 18px;
-      box-shadow: 0 0 0 0 rgba(0,180,81,.5);
-      transition: box-shadow .3s;
+      margin-bottom: 16px;
     }
+    /* Rings animate only when SARA talks */
     .call-photo.talking {
-      animation: pulse-ring 1.2s ease-out infinite;
+      animation: ring 1.4s ease-out infinite;
     }
-    @keyframes pulse-ring {
-      0%   { box-shadow: 0 0 0 0 rgba(0,180,81,.55); }
-      70%  { box-shadow: 0 0 0 18px rgba(0,180,81,0); }
+    @keyframes ring {
+      0%   { box-shadow: 0 0 0 0 rgba(0,180,81,.6); }
+      70%  { box-shadow: 0 0 0 20px rgba(0,180,81,0); }
       100% { box-shadow: 0 0 0 0 rgba(0,180,81,0); }
     }
-    .call-name { font-size: 1.1rem; font-weight: 700; color: #e8e8f0; margin-bottom: 4px; }
-    .call-sub  { font-size: .72rem; color: #7ab0e8; margin-bottom: 28px; }
+    /* Mic wave when listening */
+    .call-photo.listening {
+      animation: mic-wave 1s ease-in-out infinite alternate;
+    }
+    @keyframes mic-wave {
+      0%   { box-shadow: 0 0 0 0 rgba(37,99,235,.5); }
+      100% { box-shadow: 0 0 0 16px rgba(37,99,235,0); }
+    }
+
+    .call-name { font-size: 1.1rem; font-weight: 700; color: #e8e8f0; margin-bottom: 3px; }
+    .call-sub  { font-size: .7rem; color: #7ab0e8; margin-bottom: 22px; }
     .call-status {
-      font-size: .78rem; color: #5cdb95; margin-bottom: 32px;
-      min-height: 18px; text-align: center; padding: 0 20px;
+      font-size: .78rem; color: #5cdb95; margin-bottom: 28px;
+      min-height: 18px; text-align: center; padding: 0 24px; line-height: 1.5;
     }
-    .call-controls { display: flex; gap: 24px; align-items: center; }
-    .btn-hangup {
-      width: 56px; height: 56px; border-radius: 50%;
-      background: #e53e3e; border: none; cursor: pointer; color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      transition: background .15s, transform .15s;
+
+    /* Sound bars — visible when SARA is talking */
+    .sound-bars {
+      display: flex; gap: 3px; align-items: flex-end; height: 28px;
+      margin-bottom: 28px; opacity: 0; transition: opacity .2s;
     }
-    .btn-hangup:hover { background: #c53030; transform: scale(1.08); }
-    .btn-mic-call {
+    .sound-bars.active { opacity: 1; }
+    .bar {
+      width: 4px; background: #00B451; border-radius: 2px;
+      animation: bar-bounce 0.6s ease-in-out infinite alternate;
+    }
+    .bar:nth-child(1) { animation-delay: 0s;    animation-duration: .5s; }
+    .bar:nth-child(2) { animation-delay: .1s;   animation-duration: .7s; }
+    .bar:nth-child(3) { animation-delay: .2s;   animation-duration: .4s; }
+    .bar:nth-child(4) { animation-delay: .05s;  animation-duration: .6s; }
+    .bar:nth-child(5) { animation-delay: .15s;  animation-duration: .5s; }
+    @keyframes bar-bounce {
+      from { height: 4px; }
+      to   { height: 22px; }
+    }
+
+    .call-controls { display: flex; gap: 32px; align-items: center; }
+    .btn-mute {
       width: 46px; height: 46px; border-radius: 50%;
       background: #1a3a6a; border: 2px solid #2a5abf; cursor: pointer; color: #fff;
       display: flex; align-items: center; justify-content: center;
       transition: background .15s, border-color .15s;
     }
-    .btn-mic-call.listening { background: #00B451; border-color: #00B451; }
-    .call-hint { font-size: .68rem; color: #4a6a9a; margin-top: 24px; text-align: center; }
+    .btn-mute.muted { background: #7f1d1d; border-color: #991b1b; }
+    .btn-hangup {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #dc2626; border: none; cursor: pointer; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, transform .15s;
+    }
+    .btn-hangup:hover { background: #b91c1c; transform: scale(1.06); }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="avatar">S</div>
+    <div class="avatar"></div>
     <div class="header-info">
       <div class="name">SARA Garza · ABSTORAGES</div>
       <div class="status">● En línea</div>
     </div>
-    <button class="btn-call" id="open-call" title="Llamar a SARA" aria-label="Iniciar llamada">
+    <button class="btn-call" id="open-call" title="Llamar a SARA" aria-label="Llamar">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.86 12 19.79 19.79 0 0 1 1.78 3.38 2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
       </svg>
     </button>
   </div>
 
-  <!-- Call overlay -->
+  <!-- Call overlay — hands-free mode -->
   <div id="call-overlay">
     <div class="call-photo" id="call-photo"></div>
     <div class="call-name">SARA Garza</div>
     <div class="call-sub">Ejecutiva Comercial · ABSTORAGES</div>
-    <div class="call-status" id="call-status">● Conectando…</div>
+    <div class="call-status" id="call-status">Conectando…</div>
+    <div class="sound-bars" id="sound-bars">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div>
+    </div>
     <div class="call-controls">
-      <button class="btn-mic-call" id="btn-mic-call" title="Hablar" aria-label="Micrófono">
+      <button class="btn-mute" id="btn-mute" title="Silenciar" aria-label="Silenciar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -172,7 +205,6 @@
         </svg>
       </button>
     </div>
-    <div class="call-hint">Presiona el micrófono y habla con SARA</div>
   </div>
 
   <div class="messages" id="msgs"></div>
@@ -189,14 +221,14 @@
   </div>
 
   <script>
-    const BASE     = window.location.origin;
-    const SESSION  = 'widget_' + Math.random().toString(36).slice(2);
-    const msgsEl   = document.getElementById('msgs');
-    const inp      = document.getElementById('inp');
-    const btn      = document.getElementById('btn');
-    let closed     = false;
+    const BASE    = window.location.origin;
+    const SESSION = 'widget_' + Math.random().toString(36).slice(2);
+    const msgsEl  = document.getElementById('msgs');
+    const inp     = document.getElementById('inp');
+    const btn     = document.getElementById('btn');
+    let closed    = false;
 
-    // ── Chat functions ────────────────────────────────────────────────────────
+    // ── Chat ─────────────────────────────────────────────────────────────────
     function addBubble(role, html) {
       const d = document.createElement('div');
       d.className = `msg ${role}`;
@@ -205,12 +237,10 @@
       msgsEl.scrollTop = msgsEl.scrollHeight;
       return d;
     }
-
     function toHtml(t) {
       return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
               .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
     }
-
     function showTyping() {
       const d = document.createElement('div');
       d.className = 'typing-wrap'; d.id = 'typ';
@@ -218,11 +248,16 @@
       msgsEl.appendChild(d); msgsEl.scrollTop = msgsEl.scrollHeight;
     }
     function hideTyping() { document.getElementById('typ')?.remove(); }
-
     function closeChat() {
       closed = true;
       document.getElementById('bottom').innerHTML =
         '<div class="closed-bar">— Chat finalizado · Gracias por contactar ABSTORAGES —</div>';
+    }
+    function cleanText(t) {
+      return t.replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi,'')
+              .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi,'')
+              .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi,'')
+              .replace(/<[^>]+>/g,'').trim();
     }
 
     async function sendMessage(text) {
@@ -230,8 +265,7 @@
       addBubble('user', toHtml(text));
       inp.disabled = true; btn.disabled = true;
       showTyping();
-
-      let saraText = '';
+      let saraText = '', saraDiv = null;
       try {
         const res = await fetch(`${BASE}/api/widget/chat`, {
           method: 'POST',
@@ -239,24 +273,18 @@
           body: JSON.stringify({ message: text, sessionId: SESSION }),
         });
         hideTyping();
-
-        const reader  = res.body.getReader();
-        const decoder = new TextDecoder();
-        let saraDiv = null;
-
+        const reader = res.body.getReader();
+        const dec    = new TextDecoder();
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          for (const line of decoder.decode(value).split('\n')) {
+          for (const line of dec.decode(value).split('\n')) {
             if (!line.startsWith('data: ')) continue;
             try {
               const evt = JSON.parse(line.slice(6));
               if (evt.type === 'chunk') {
                 saraText += evt.text;
-                const clean = saraText
-                  .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
-                  .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
-                  .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '').trim();
+                const clean = cleanText(saraText);
                 if (!saraDiv) saraDiv = addBubble('sara', toHtml(clean));
                 else saraDiv.querySelector('.bubble').innerHTML = toHtml(clean);
                 msgsEl.scrollTop = msgsEl.scrollHeight;
@@ -270,7 +298,6 @@
         hideTyping();
         addBubble('sara', 'Error de conexión. Intenta de nuevo.');
       }
-
       if (!closed) { inp.disabled = false; btn.disabled = false; inp.focus(); }
       return saraText;
     }
@@ -281,57 +308,69 @@
       inp.value = '';
       await sendMessage(text);
     }
-
     btn.addEventListener('click', send);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) send(); });
-
     addBubble('sara', '¡Hola! Soy <b>SARA Garza</b>, ejecutiva comercial de <b>ABSTORAGES Logistics Solutions</b>.<br>¿Con quién tengo el gusto y de qué empresa me contactas?');
 
-    // ── Call overlay ──────────────────────────────────────────────────────────
+    // ── Call — hands-free voice conversation ──────────────────────────────────
     const overlay    = document.getElementById('call-overlay');
-    const callStatus = document.getElementById('call-status');
     const callPhoto  = document.getElementById('call-photo');
-    const btnMic     = document.getElementById('btn-mic-call');
+    const callStatus = document.getElementById('call-status');
+    const soundBars  = document.getElementById('sound-bars');
+    const btnMute    = document.getElementById('btn-mute');
     const btnHangup  = document.getElementById('btn-hangup');
     const openCallBtn= document.getElementById('open-call');
 
-    let inCall      = false;
-    let recognition = null;
-    let isListening = false;
-    let isSpeaking  = false;
-    let currentAudio= null;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const hasSpeech = !!SpeechRecognition;
+    // State machine: idle | listening | processing | speaking
+    let callState = 'idle';
+    let inCall    = false;
+    let muted     = false;
+    let activeRec = null;   // current SpeechRecognition instance
+    let activeAudio = null; // current Audio playing
 
-    function setStatus(txt) { callStatus.textContent = txt; }
+    function setStatus(txt, color) {
+      callStatus.textContent = txt;
+      callStatus.style.color = color || '#5cdb95';
+    }
 
-    function openCall() {
-      inCall = true;
-      overlay.classList.add('active');
-      openCallBtn.style.display = 'none';
-      setStatus('● En llamada');
-      if (!hasSpeech) {
-        setStatus('⚠ Voz no disponible en este navegador — usa Chrome');
+    function setSpeakingUI(on) {
+      callPhoto.classList.toggle('talking', on);
+      callPhoto.classList.toggle('listening', false);
+      soundBars.classList.toggle('active', on);
+    }
+
+    function setListeningUI(on) {
+      callPhoto.classList.toggle('listening', on && !muted);
+      callPhoto.classList.toggle('talking', false);
+      soundBars.classList.toggle('active', false);
+    }
+
+    // Stop any active audio (barge-in or hangup)
+    function stopAudio() {
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio.src = '';
+        activeAudio = null;
       }
+      setSpeakingUI(false);
     }
 
-    function hangup() {
-      inCall = false;
-      overlay.classList.remove('active');
-      openCallBtn.style.display = '';
-      if (recognition) { try { recognition.stop(); } catch {} recognition = null; }
-      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-      callPhoto.classList.remove('talking');
-      isListening = false; isSpeaking = false;
-      btnMic.classList.remove('listening');
-      setStatus('● Conectando…');
+    // Stop recognition without triggering restart
+    function stopRec() {
+      if (activeRec) {
+        activeRec._stopped = true;
+        try { activeRec.abort(); } catch {}
+        activeRec = null;
+      }
+      setListeningUI(false);
     }
 
+    // Play TTS and return when done (or interrupted)
     async function playTTS(text) {
-      if (!text) return;
-      isSpeaking = true;
-      callPhoto.classList.add('talking');
+      if (!text || !inCall) return;
+      setSpeakingUI(true);
       setStatus('● SARA está hablando…');
       try {
         const res = await fetch(`${BASE}/api/widget/tts`, {
@@ -339,78 +378,135 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text }),
         });
-        if (!res.ok) throw new Error('TTS error');
+        if (!res.ok) throw new Error('tts-error');
         const blob = await res.blob();
         const url  = URL.createObjectURL(blob);
-        currentAudio = new Audio(url);
-        await new Promise((resolve) => {
-          currentAudio.onended = resolve;
-          currentAudio.onerror = resolve;
-          currentAudio.play().catch(resolve);
+        activeAudio = new Audio(url);
+        await new Promise(resolve => {
+          activeAudio.onended = resolve;
+          activeAudio.onerror = resolve;
+          activeAudio.play().catch(resolve);
         });
         URL.revokeObjectURL(url);
-        currentAudio = null;
-      } catch {
-        // silently fall back
-      }
-      isSpeaking = false;
-      callPhoto.classList.remove('talking');
-      if (inCall) setStatus('● En llamada — presiona el micrófono para hablar');
+        activeAudio = null;
+      } catch { activeAudio = null; }
+      setSpeakingUI(false);
     }
 
+    // Core recognition loop — starts one recognition session, auto-restarts
     function startListening() {
-      if (!hasSpeech || isListening || isSpeaking) return;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'es-MX';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+      if (!inCall || muted || !SR) return;
+      stopRec(); // abort previous if any
 
-      recognition.onstart = () => {
-        isListening = true;
-        btnMic.classList.add('listening');
-        setStatus('● Escuchando… habla ahora');
-      };
+      callState = 'listening';
+      setListeningUI(true);
+      setStatus('● Escuchando…');
 
-      recognition.onresult = async (e) => {
-        const text = e.results[0][0].transcript.trim();
-        isListening = false;
-        btnMic.classList.remove('listening');
-        if (!text || !inCall) return;
-        setStatus('● Procesando…');
-        const saraReply = await sendMessage(text);
-        if (saraReply && inCall) {
-          const clean = saraReply
-            .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
-            .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
-            .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
-            .replace(/<[^>]+>/g, '').trim();
-          await playTTS(clean);
+      const rec = new SR();
+      rec._stopped = false;
+      rec.lang = 'es-MX';
+      rec.continuous = false;
+      rec.interimResults = true; // needed for barge-in detection
+      activeRec = rec;
+
+      rec.onresult = (e) => {
+        const last = e.results[e.results.length - 1];
+
+        // Barge-in: user spoke while SARA is talking → stop audio immediately
+        if (callState === 'speaking') {
+          stopAudio();
+          callState = 'listening';
+        }
+
+        if (last.isFinal) {
+          const text = last[0].transcript.trim();
+          rec._stopped = true; // prevent onend from restarting
+          activeRec = null;
+          setListeningUI(false);
+          if (text) processUserSpeech(text);
         }
       };
 
-      recognition.onerror = () => {
-        isListening = false;
-        btnMic.classList.remove('listening');
-        if (inCall) setStatus('● En llamada — presiona el micrófono para hablar');
+      rec.onerror = (e) => {
+        if (e.error === 'not-allowed') {
+          setStatus('⚠ Permite el micrófono en tu navegador', '#f59e0b');
+          inCall = false;
+        }
       };
 
-      recognition.onend = () => {
-        isListening = false;
-        btnMic.classList.remove('listening');
+      rec.onend = () => {
+        // Restart automatically unless we stopped intentionally or processing
+        if (!rec._stopped && inCall && !muted && callState === 'listening') {
+          setTimeout(startListening, 80);
+        }
       };
 
-      recognition.start();
+      try { rec.start(); } catch {}
     }
+
+    // Process what the user said
+    async function processUserSpeech(text) {
+      if (!inCall || !text) return;
+      callState = 'processing';
+      setStatus('● Procesando…', '#7ab0e8');
+
+      const raw = await sendMessage(text);
+      if (!inCall) return;
+
+      if (raw) {
+        const clean = cleanText(raw);
+        if (clean) {
+          callState = 'speaking';
+          await playTTS(clean);
+        }
+      }
+
+      if (inCall) startListening(); // go back to listening
+    }
+
+    // Open call — greeting then listen
+    async function openCall() {
+      if (!SR) {
+        alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome.');
+        return;
+      }
+      inCall = true;
+      overlay.classList.add('active');
+      openCallBtn.style.display = 'none';
+      setStatus('● En llamada');
+
+      // Play greeting via TTS
+      const greeting = '¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?';
+      callState = 'speaking';
+      await playTTS(greeting);
+
+      if (inCall) startListening();
+    }
+
+    function hangup() {
+      inCall = false;
+      callState = 'idle';
+      stopAudio();
+      stopRec();
+      overlay.classList.remove('active');
+      openCallBtn.style.display = '';
+      setStatus('Conectando…');
+      soundBars.classList.remove('active');
+    }
+
+    btnMute.addEventListener('click', () => {
+      muted = !muted;
+      btnMute.classList.toggle('muted', muted);
+      if (muted) {
+        stopRec();
+        setStatus('● Silenciado', '#f59e0b');
+      } else {
+        if (inCall && callState !== 'speaking' && callState !== 'processing') startListening();
+      }
+    });
 
     openCallBtn.addEventListener('click', openCall);
     btnHangup.addEventListener('click', hangup);
-    btnMic.addEventListener('click', () => {
-      if (isListening) {
-        recognition?.stop();
-      } else {
-        startListening();
-      }
-    });
   </script>
 </body>
 </html>
