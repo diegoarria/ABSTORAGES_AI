@@ -314,6 +314,7 @@ app.post('/api/tts', async (req, res) => {
   }
 
   const voiceId = agente === 'sofia' ? EL_VOICE_SOFIA : EL_VOICE_SARA;
+  console.log(`[TTS] agente=${agente} voiceId=${voiceId}`);
   const body = JSON.stringify({
     text: text.slice(0, 2500),
     model_id: 'eleven_multilingual_v2',
