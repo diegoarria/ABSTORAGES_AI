@@ -511,6 +511,7 @@ const Features = (() => {
   // ── INIT ──────────────────────────────────────────────────────────────────
   function init() {
     watchBubbles();
+    initMic('sofia-input', 'sofia-dictado'); // dictado de voz al textarea de SOFIA
     initCallMode(); // sara-mic y sofia-mic manejan call mode, no STT directo
     loadPredictiveAlerts();
     loadTariff();

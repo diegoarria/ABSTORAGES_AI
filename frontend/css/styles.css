@@ -2186,6 +2186,19 @@ body {
   flex-shrink: 0;
   transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
 }
+.btn-dictado {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: none;
+  border: 1px solid var(--borde2);
+  color: var(--texto3);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.btn-dictado:hover { color: var(--texto); background: var(--fondo3); }
+.btn-dictado.recording { background: rgba(255,74,74,0.15); border-color: rgba(255,74,74,0.4); color: #ff6b6b; }
 .btn-mic:hover { color: var(--texto); background: var(--fondo3); transform: translateY(-1px); }
 .btn-mic.recording {
   background: rgba(255,74,74,0.15);
