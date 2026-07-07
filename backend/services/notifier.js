@@ -1,17 +1,46 @@
 // Notificaciones al equipo cuando SARA captura un lead
-// Email (Resend) + WhatsApp al equipo + webhook externo (n8n / Zapier / CRM)
+// Canal principal: Gmail SMTP (nodemailer) — nunca va a spam, sin dominio propio
+// Fallback: Resend (requiere dominio verificado para salir de spam)
 require('dotenv').config();
+const nodemailer = require('nodemailer');
+
+const GMAIL_USER   = process.env.GMAIL_USER;   // tu Gmail: ej. diego@gmail.com
+const GMAIL_PASS   = process.env.GMAIL_PASS;   // App Password de 16 chars (sin espacios)
+const GMAIL_LIVE   = GMAIL_USER && GMAIL_PASS && !GMAIL_PASS.startsWith('xxxx');
 
 const RESEND_KEY   = process.env.RESEND_API_KEY;
 const TEAM_EMAIL   = (process.env.NOTIF_EMAIL || '').split(',').map(e => e.trim()).filter(Boolean);
 const FROM_EMAIL   = process.env.NOTIF_FROM_EMAIL || 'SARA <onboarding@resend.dev>';
-const TEAM_WA      = process.env.NOTIF_WA_NUMBER;    // ej: 528181234567
-const WEBHOOK_URL  = process.env.LEAD_WEBHOOK_URL;   // n8n / Zapier / HubSpot
+const TEAM_WA      = process.env.NOTIF_WA_NUMBER;
+const WEBHOOK_URL  = process.env.LEAD_WEBHOOK_URL;
 
 const WA_KEY  = process.env.WHATSAPP_API_KEY;
 const WA_BASE = (process.env.WHATSAPP_BASE_URL || 'https://waba-v2.360dialog.io').replace(/\/+$/, '');
 const WA_URL  = WA_BASE.endsWith('/v1') ? WA_BASE : `${WA_BASE}/v1`;
 const WA_LIVE = WA_KEY && !WA_KEY.startsWith('xxxx');
+
+// Transporte Gmail reutilizable
+const gmailTransport = GMAIL_LIVE ? nodemailer.createTransport({
+  service: 'gmail',
+  auth: { user: GMAIL_USER, pass: GMAIL_PASS },
+}) : null;
+
+async function sendEmailGmail(asunto, html) {
+  if (!gmailTransport || !TEAM_EMAIL.length) return false;
+  try {
+    await gmailTransport.sendMail({
+      from: `SARA ABSTORAGES <${GMAIL_USER}>`,
+      to: TEAM_EMAIL.join(', '),
+      subject: asunto,
+      html,
+    });
+    console.log(`[Gmail] ✅ Enviado a ${TEAM_EMAIL.join(', ')} — "${asunto}"`);
+    return true;
+  } catch (e) {
+    console.error('[Gmail] ❌ Error:', e.message);
+    return false;
+  }
+}
 
 // ── Email via Resend ───────────────────────────────────────────────────────────
 async function sendEmail(lead) {
@@ -67,17 +96,23 @@ async function sendEmail(lead) {
       </div>
     </div>`;
 
-  try {
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_KEY}` },
-      body: JSON.stringify({ from: FROM_EMAIL, to: TEAM_EMAIL, subject: `Lead SARA: ${[lead.nombre, lead.empresa, ruta].filter(v => v && v !== '—').join(' · ') || lead.id}`, html }),
-      // TEAM_EMAIL es array — Resend lo acepta directamente
-    });
-    if (!r.ok) console.error('[Email] Resend error:', await r.text());
-    else console.log(`[Email] Enviado a ${TEAM_EMAIL.join(', ')} — lead ${lead.id}`);
-  } catch (e) {
-    console.error('[Email] Error:', e.message);
+  const asunto = `🔔 Lead SARA: ${[lead.nombre, lead.empresa, ruta].filter(v => v && v !== '—').join(' · ') || lead.id}`;
+
+  // Gmail primero (nunca va a spam), Resend como fallback
+  const enviado = await sendEmailGmail(asunto, html);
+  if (!enviado) {
+    if (!RESEND_KEY || RESEND_KEY.startsWith('re_xxxx') || !TEAM_EMAIL.length) {
+      console.log(`[Email STUB] ${asunto}`); return;
+    }
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_KEY}` },
+        body: JSON.stringify({ from: FROM_EMAIL, to: TEAM_EMAIL, subject: asunto, html }),
+      });
+      if (!r.ok) console.error('[Resend] Error:', await r.text());
+      else console.log(`[Resend] Enviado — ${asunto}`);
+    } catch (e) { console.error('[Resend] Error:', e.message); }
   }
 }
 
@@ -212,17 +247,22 @@ async function sendEmailResumen(lead, motivo, historial = []) {
     </div>
   </div>`;
 
-  try {
-    const asunto = `SARA: ${estado.label.replace(/[✅🔁📋]/g,'').trim()} — ${[lead.nombre, lead.empresa, ruta].filter(v=>v&&v!=='—').join(' · ') || 'Nuevo contacto'}`;
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_KEY}` },
-      body: JSON.stringify({ from: FROM_EMAIL, to: TEAM_EMAIL, subject: asunto, html }),
-    });
-    if (!r.ok) console.error('[Email] Resend error:', await r.text());
-    else console.log(`[Email] Resumen enviado → ${motivo} — ${lead.nombre}`);
-  } catch (e) {
-    console.error('[Email] Error:', e.message);
+  const asunto = `SARA: ${estado.label.replace(/[✅🔁📋]/g,'').trim()} — ${[lead.nombre, lead.empresa, ruta].filter(v=>v&&v!=='—').join(' · ') || 'Nuevo contacto'}`;
+
+  const enviado = await sendEmailGmail(asunto, html);
+  if (!enviado) {
+    if (!RESEND_KEY || RESEND_KEY.startsWith('re_xxxx') || !TEAM_EMAIL.length) {
+      console.log(`[Email STUB] ${asunto}`); return;
+    }
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_KEY}` },
+        body: JSON.stringify({ from: FROM_EMAIL, to: TEAM_EMAIL, subject: asunto, html }),
+      });
+      if (!r.ok) console.error('[Resend] Error:', await r.text());
+      else console.log(`[Resend] Resumen enviado → ${motivo} — ${lead.nombre}`);
+    } catch (e) { console.error('[Resend] Error:', e.message); }
   }
 }
 
