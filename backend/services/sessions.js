@@ -1,52 +1,38 @@
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
 
-const STORE_FILE = path.join(__dirname, '../../data/sessions.json');
-const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
+const SECRET  = process.env.SESSION_SECRET || 'abstorages-dev-secret-2025';
+const TTL_MS  = 7 * 24 * 60 * 60 * 1000; // 7 días
 
-function load() {
-  try {
-    const raw = fs.readFileSync(STORE_FILE, 'utf8');
-    const obj = JSON.parse(raw);
-    // Limpiar expiradas al cargar
-    const now = Date.now();
-    for (const [k, v] of Object.entries(obj)) {
-      if (now - v._ts > TTL_MS) delete obj[k];
-    }
-    return obj;
-  } catch (_) {
-    return {};
-  }
+function sign(payload) {
+  const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const sig  = crypto.createHmac('sha256', SECRET).update(data).digest('base64url');
+  return `${data}.${sig}`;
 }
 
-function save(store) {
+function verify(token) {
+  if (!token) return null;
+  const [data, sig] = token.split('.');
+  if (!data || !sig) return null;
+  const expected = crypto.createHmac('sha256', SECRET).update(data).digest('base64url');
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
   try {
-    fs.mkdirSync(path.dirname(STORE_FILE), { recursive: true });
-    fs.writeFileSync(STORE_FILE, JSON.stringify(store), 'utf8');
-  } catch (_) {}
+    const payload = JSON.parse(Buffer.from(data, 'base64url').toString());
+    if (Date.now() - payload._ts > TTL_MS) return null;
+    return payload;
+  } catch { return null; }
 }
-
-const store = load();
 
 function create(user) {
-  const id = crypto.randomBytes(32).toString('hex');
-  store[id] = { ...user, _ts: Date.now() };
-  save(store);
-  return id;
+  return sign({ ...user, _ts: Date.now() });
 }
 
-function get(id) {
-  if (!id) return null;
-  const s = store[id];
-  if (!s) return null;
-  if (Date.now() - s._ts > TTL_MS) { delete store[id]; save(store); return null; }
-  return s;
+function get(token) {
+  return verify(token);
 }
 
-function destroy(id) {
-  delete store[id];
-  save(store);
+function destroy(_token) {
+  // Con JWT stateless no hay nada que borrar en servidor.
+  // El cliente borra la cookie.
 }
 
 module.exports = { create, get, destroy };
