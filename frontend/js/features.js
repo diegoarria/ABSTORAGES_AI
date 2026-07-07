@@ -404,19 +404,24 @@ const Features = (() => {
 
   function callPlayTTS(text) {
     return new Promise(resolve => {
+      console.log('[TTS-call] agente:', callAgente);
       fetch('/api/tts', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.slice(0, 2500), agente: callAgente }),
-      }).then(r => r.ok ? r.blob() : Promise.reject('elevenlabs_error'))
+      }).then(r => {
+          console.log('[TTS-call] status:', r.status);
+          return r.ok ? r.blob() : Promise.reject('http_' + r.status);
+        })
         .then(blob => {
           const url = URL.createObjectURL(blob);
           callAudio = new Audio(url);
           callAudio.play();
           callAudio.onended = () => { URL.revokeObjectURL(url); callAudio = null; resolve(); };
-          callAudio.onerror = () => { callAudio = null; callBrowserTTS(text, resolve); };
+          callAudio.onerror = () => { console.warn('[TTS-call] audio error, browser fallback'); callAudio = null; callBrowserTTS(text, resolve); };
         })
-        .catch(() => callBrowserTTS(text, resolve));
+        .catch(e => { console.warn('[TTS-call] fetch failed:', e); callBrowserTTS(text, resolve); });
     });
   }
 
