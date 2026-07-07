@@ -27,6 +27,19 @@ const vapi        = require('./backend/services/vapi');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// ─── ACTIVIDAD EN TIEMPO REAL (SSE) ───────────────────────────────────────
+const actividadClients = new Set();
+const actividadHistorial = [];
+const ACTIVIDAD_MAX = 100;
+
+function pushActividad(evento) {
+  const ev = { ...evento, timestamp: evento.timestamp || new Date().toISOString() };
+  actividadHistorial.push(ev);
+  if (actividadHistorial.length > ACTIVIDAD_MAX) actividadHistorial.shift();
+  const msg = `data: ${JSON.stringify({ type: 'actividad', ...ev })}\n\n`;
+  actividadClients.forEach(c => { try { c.write(msg); } catch {} });
+}
+
 // ─── ELEVENLABS ────────────────────────────────────────────────────────────
 const EL_KEY         = process.env.ELEVENLABS_API_KEY;
 const EL_VOICE_SARA  = process.env.ELEVENLABS_VOICE_SARA  || 'pFZP5JQG7iQjIQuC4Bku'; // Lily
@@ -314,7 +327,6 @@ app.post('/api/tts', async (req, res) => {
   }
 
   const voiceId = agente === 'sofia' ? EL_VOICE_SOFIA : EL_VOICE_SARA;
-  console.log(`[TTS] agente=${agente} voiceId=${voiceId}`);
   const body = JSON.stringify({
     text: text.slice(0, 2500),
     model_id: 'eleven_multilingual_v2',
@@ -413,6 +425,7 @@ async function handleChat(agente, req, res) {
 
   memory.addMessage(sid, 'user', message);
   saveMessage(sid, agente, 'user', message);
+  pushActividad({ agente, tipo: `MENSAJE_USUARIO`, mensaje: message.slice(0, 120), sessionId: sid });
 
   // Garantizar que toda conversación con SARA quede registrada desde el primer mensaje
   if (agente === 'sara') {
@@ -439,6 +452,8 @@ async function handleChat(agente, req, res) {
     );
     memory.addMessage(sid, 'assistant', fullText);
     saveMessage(sid, agente, 'assistant', fullText);
+    const agenteNombre = agente === 'sara' ? 'SARA' : agente === 'sofia' ? 'SOFIA' : agente === 'noa' ? 'NOA' : 'HÉCTOR';
+    pushActividad({ agente: agenteNombre, tipo: `MENSAJE_${agenteNombre}`, mensaje: fullText.replace(/[*_`#>]/g,'').slice(0,120), sessionId: sid });
 
     // Detectar señales de control
     if (/CERRAR_CHAT/i.test(fullText))
@@ -472,6 +487,7 @@ async function handleChat(agente, req, res) {
 
       if (hasCierre) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
+        pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: sid, metadata: { sessionId: sid } });
       }
 
       // Primer contacto: email inmediato al primer mensaje de la sesión.
@@ -575,6 +591,18 @@ app.get('/api/leads/:id/chat',   async (req, res) => {
 // GET — lista todas las posiciones en vivo (para el mapa del portal)
 app.get('/api/gps/live', (req, res) => {
   res.json(gpsLive.listar());
+});
+
+// ─── ACTIVIDAD STREAM ─────────────────────────────────────────────────────
+app.get('/api/actividad/stream', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+  // Enviar historial reciente al conectarse
+  res.write(`data: ${JSON.stringify({ type: 'historial', actividades: actividadHistorial })}\n\n`);
+  actividadClients.add(res);
+  req.on('close', () => actividadClients.delete(res));
 });
 
 // SSE — stream de actualizaciones en tiempo real para el mapa
