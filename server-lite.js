@@ -202,7 +202,7 @@ app.post('/api/widget/tts', async (req, res) => {
   const body = JSON.stringify({
     text: text.slice(0, 2500),
     model_id: 'eleven_multilingual_v2',
-    voice_settings: { stability: 0.55, similarity_boost: 0.78, style: 0.3, use_speaker_boost: true },
+    voice_settings: { stability: 0.55, similarity_boost: 0.78, style: 0.3, use_speaker_boost: true, speed: 1.2 },
   });
 
   try {
@@ -367,7 +367,7 @@ app.post('/api/tts', async (req, res) => {
     model_id: 'eleven_multilingual_v2',
     voice_settings: agente === 'sofia'
       ? { stability: 0.5, similarity_boost: 0.75, style: 0.0, use_speaker_boost: false }
-      : { stability: 0.55, similarity_boost: 0.78, style: 0.3, use_speaker_boost: true },
+      : { stability: 0.55, similarity_boost: 0.78, style: 0.3, use_speaker_boost: true, speed: 1.2 },
   });
 
   try {
