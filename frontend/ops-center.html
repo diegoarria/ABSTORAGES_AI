@@ -38,12 +38,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 /* ── HEADER ── */
 .hdr{height:52px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 18px;flex-shrink:0;z-index:200;gap:0}
 .brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
-.brand-mark{width:30px;height:30px;border-radius:7px;background:var(--grn);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.brand-name{font-size:12px;font-weight:800;letter-spacing:.05em;color:var(--t1)}
-.brand-sub{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--grn)}
 .hdr-sep{width:1px;height:20px;background:var(--b2);margin:0 16px}
 .hdr-nav{display:flex;gap:2px}
-.np{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;background:none;color:var(--t2);letter-spacing:.03em;transition:color .1s,background .1s;font-family:inherit}
+.np{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;background:none;color:var(--t2);letter-spacing:.03em;transition:color .15s,background .15s;font-family:inherit}
 .np:hover{color:var(--t1);background:var(--b1)}
 .np.on{background:var(--grn-d);border-color:var(--grn-b);color:var(--grn)}
 .hdr-right{margin-left:auto;display:flex;align-items:center;gap:12px}
@@ -76,8 +73,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .pbtns{margin-left:auto;display:flex;gap:6px}
 
 /* ── BUTTONS ── */
-.btn{padding:5px 11px;border-radius:var(--r);font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b3);background:var(--b1);color:var(--t2);letter-spacing:.02em;transition:background .1s,color .1s;font-family:inherit}
+.btn{padding:5px 11px;border-radius:var(--r);font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b3);background:var(--b1);color:var(--t2);letter-spacing:.02em;transition:background .15s,color .15s,border-color .15s;font-family:inherit}
 .btn:hover{background:var(--b2);color:var(--t1)}
+.btn:focus-visible{outline:2px solid var(--grn);outline-offset:2px}
 .btn-g{background:var(--grn);color:#fff;border-color:transparent}
 .btn-g:hover{background:#00a040}
 .btn-r{background:var(--cr-d);color:var(--crit);border-color:var(--cr-b)}
@@ -91,6 +89,34 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .crit-main{font-size:11.5px;font-weight:700;color:var(--crit);letter-spacing:.04em}
 .crit-sub{font-size:10.5px;color:rgba(255,58,58,.5);margin-top:1px}
 
+/* ── FILTER BAR — UX: permite filtrar en 1 clic sin scrollear ── */
+.filter-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
+.search-inp{flex:1;background:var(--s3);border:1px solid var(--b2);border-radius:6px;padding:5px 10px;color:var(--t1);font-size:11.5px;font-family:inherit;outline:none;transition:border-color .15s;min-width:0}
+.search-inp::placeholder{color:var(--t3)}
+.search-inp:focus{border-color:var(--grn-b)}
+.search-inp:focus-visible{outline:none}
+.fchips{display:flex;gap:4px;flex-shrink:0}
+.fchip{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.03em;cursor:pointer;border:1px solid var(--b1);background:none;color:var(--t3);font-family:inherit;transition:all .15s;white-space:nowrap}
+.fchip:hover{color:var(--t2);border-color:var(--b2)}
+.fchip:focus-visible{outline:2px solid var(--grn);outline-offset:2px}
+/* UX: chips activos con color de semáforo correspondiente para scan rápido */
+.fchip.on{background:var(--b2);color:var(--t1);border-color:var(--b3)}
+.fchip.on.fch-all{background:var(--b2);color:var(--t1);border-color:var(--b3)}
+.fchip.on.fch-r{background:var(--cr-d);color:var(--crit);border-color:var(--cr-b)}
+.fchip.on.fch-o{background:var(--wn-d);color:var(--warn);border-color:var(--wn-b)}
+.fchip.on.fch-g{background:var(--grn-d);color:var(--grn);border-color:var(--grn-b)}
+.fchip.on.fvd{background:rgba(0,180,81,.1);color:var(--sv);border-color:rgba(0,180,81,.28)}
+.fchip.on.fam{background:rgba(245,196,0,.1);color:var(--sa);border-color:rgba(245,196,0,.28)}
+.fchip.on.fna{background:rgba(255,140,0,.1);color:var(--sn);border-color:rgba(255,140,0,.28)}
+.fchip.on.fro{background:rgba(255,58,58,.1);color:var(--sr);border-color:rgba(255,58,58,.28)}
+.fchip.on.fne{background:rgba(94,122,140,.1);color:var(--sb);border-color:rgba(94,122,140,.28)}
+
+/* ── EMPTY STATE — UX: comunica "sin resultados" vs "error" ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;color:var(--t3);text-align:center;gap:8px}
+.empty-icon{font-size:26px;opacity:.35}
+.empty-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.empty-sub{font-size:10.5px;opacity:.6;max-width:200px}
+
 /* ── NOA PANEL BODY ── */
 .pbody{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--s2)}
 .sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 16px 5px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3)}
@@ -98,21 +124,26 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .cards{padding:0 12px 8px;display:flex;flex-direction:column;gap:7px}
 
 /* ── FOLIO CARDS ── */
-.fc{background:var(--s3);border-radius:var(--rl);overflow:hidden;border:1px solid transparent;transition:background .12s}
+.fc{background:var(--s3);border-radius:var(--rl);overflow:hidden;border:1px solid transparent;transition:background .15s,box-shadow .3s,border-color .3s}
 .fc:hover{background:var(--s3h)}
-.fc.cr{border-color:rgba(255,58,58,.18);box-shadow:0 0 0 1px rgba(255,58,58,.06),0 4px 22px rgba(255,58,58,.09)}
+/* UX: intensidad crítica escalada por tiempo — var(--ci) se actualiza via JS cada tick */
+.fc.cr{
+  border-color:rgba(255,58,58,calc(.12 + var(--ci,0) * .28));
+  box-shadow:0 0 0 1px rgba(255,58,58,calc(.04 + var(--ci,0)*.1)),
+             0 4px 24px rgba(255,58,58,calc(.06 + var(--ci,0)*.22));
+}
 .fc.at{border-color:rgba(255,140,0,.14)}
+.fc.no .fc-line{background:var(--b1)}
 .fc-line{height:2px}
 .fc.cr .fc-line{background:var(--crit)}
 .fc.at .fc-line{background:var(--warn)}
-.fc.no .fc-line{background:var(--b1)}
 
-/* ── NORMAL compact card ── */
+/* ── Compact NORMAL card ── */
 .fc.no .fc-body{display:flex;align-items:center;gap:12px;padding:10px 14px}
 .cpt-l{min-width:0;flex:1}
 .cpt-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
 
-/* ── EXPANDED card body ── */
+/* ── Expanded card body ── */
 .fc-body{padding:12px 14px 0}
 .fc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
 .fc-id{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--t1);letter-spacing:.04em}
@@ -135,6 +166,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .sw-fill{height:100%;border-radius:2px;transition:width .4s,background .3s}
 .sw-fill.ok{background:var(--grn)}
 .sw-fill.wn{background:var(--warn)}
+/* UX: barra crítica pulsa solo cuando supera el 100% — no distrae antes */
 .sw-fill.ov{background:var(--crit);animation:fpulse 1s ease infinite}
 @keyframes fpulse{0%,100%{opacity:1}50%{opacity:.45}}
 .sw-time{font-family:var(--mono);font-size:10.5px;font-weight:700;flex-shrink:0;font-variant-numeric:tabular-nums}
@@ -165,6 +197,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .esc-st.sr{color:var(--crit)}.esc-st.ok{color:var(--grn)}.esc-st.act{color:var(--warn)}.esc-st.pd{color:var(--t3)}
 .fc-acts{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--b1);background:rgba(0,0,0,.15)}
 
+/* ── NOA AI — colapsible: libera espacio para folios activos ── */
+.noa-ai-foot{flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1)}
+.noa-ai-head{display:flex;align-items:center;padding:7px 14px;cursor:pointer;user-select:none;gap:6px;transition:background .15s}
+.noa-ai-head:hover{background:var(--b1)}
+.noa-ai-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);flex:1}
+.noa-ai-hint{font-size:9.5px;color:var(--t3)}
+/* UX: flecha indica estado colapsado/expandido sin necesidad de texto */
+.noa-ai-arr{font-size:9px;color:var(--t3);transition:transform .2s;display:inline-block}
+.noa-ai-arr.open{transform:rotate(180deg)}
+.noa-ai-body{padding:0 14px 10px;display:none}
+.noa-ai-body.open{display:block}
+.noa-stream{background:var(--s3);border:1px solid var(--cr-b);border-radius:7px;padding:10px 13px;font-size:11px;line-height:1.65;color:var(--t2);max-height:110px;overflow-y:auto;white-space:pre-wrap;font-family:var(--sans)}
+.noa-stream.streaming::after{content:'▋';animation:blink .8s step-end infinite;color:var(--crit)}
+.noa-input-row{display:flex;gap:6px;margin-top:6px;align-items:flex-start}
+.noa-input-row .mta{flex:1;min-height:32px;resize:none;font-size:11.5px;border-color:var(--cr-b)}
+.noa-input-row .mta:focus{border-color:rgba(255,58,58,.45)}
+.noa-input-row .btn-r{flex-shrink:0;align-self:flex-end}
+
 /* ── HÉCTOR KPI strip ── */
 .kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
 .kpi-tile{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px}
@@ -175,10 +225,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 /* ── Cobranza table ── */
 .tbl-wrap{flex:1;overflow:auto}
 .cob-tbl{width:100%;border-collapse:collapse;min-width:460px}
-.cob-tbl thead th{position:sticky;top:0;z-index:10;background:var(--s1);padding:8px 12px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);border-bottom:1px solid var(--b1);text-align:left;cursor:pointer;user-select:none;white-space:nowrap;transition:color .1s}
+/* UX: encabezados muestran flecha activa y cursor pointer para indicar que son ordenables */
+.cob-tbl thead th{position:sticky;top:0;z-index:10;background:var(--s1);padding:8px 12px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);border-bottom:1px solid var(--b1);text-align:left;cursor:pointer;user-select:none;white-space:nowrap;transition:color .12s}
 .cob-tbl thead th:hover{color:var(--t2)}
 .cob-tbl thead th.s{color:var(--t1)}
-.cob-tbl tbody tr{border-bottom:1px solid rgba(255,255,255,.025);transition:background .1s}
+.cob-tbl thead th .sort-arrow{font-size:9px;margin-left:3px;opacity:.7}
+.cob-tbl tbody tr{border-bottom:1px solid rgba(255,255,255,.025);transition:background .12s}
 .cob-tbl tbody tr:hover{background:var(--b1)}
 .cob-tbl td{padding:9px 12px;vertical-align:middle}
 .cob-tbl tbody tr td:first-child{border-left:3px solid var(--rc,var(--b2));padding-left:13px}
@@ -206,8 +258,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .mbg.open{display:flex}
 .modal{background:var(--s4);border:1px solid var(--b3);border-radius:var(--rl);padding:22px;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 30px 100px rgba(0,0,0,.6)}
 .mtitle{font-size:13.5px;font-weight:800;color:var(--t1);display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.mx{margin-left:auto;background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;line-height:1;transition:color .1s;font-family:inherit}
+.mx{margin-left:auto;background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;line-height:1;transition:color .15s;font-family:inherit}
 .mx:hover{color:var(--t1)}
+.mx:focus-visible{outline:2px solid var(--grn);outline-offset:2px}
 .msec{margin-bottom:14px}
 .mlbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--t3);margin-bottom:7px}
 .mrow{display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--s3);border:1px solid var(--b1);border-radius:6px;margin-bottom:5px;font-size:11.5px}
@@ -219,7 +272,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .rgrp{display:flex;flex-direction:column;gap:7px}
 .rrow{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;color:var(--t2)}
 .rrow:hover{color:var(--t1)}
-.mta{width:100%;background:var(--s3);border:1px solid var(--b3);border-radius:6px;padding:10px;color:var(--t1);font-size:12px;font-family:inherit;resize:vertical;min-height:70px;outline:none;transition:border-color .12s}
+.mta{width:100%;background:var(--s3);border:1px solid var(--b3);border-radius:6px;padding:10px;color:var(--t1);font-size:12px;font-family:inherit;resize:vertical;min-height:70px;outline:none;transition:border-color .15s}
 .mta:focus{border-color:var(--grn-b)}
 
 /* ── HÉCTOR AI en modal ── */
@@ -228,17 +281,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .hec-ai-bar{display:flex;gap:6px;margin-top:7px;align-items:flex-start}
 .hec-ai-bar .mta{flex:1;min-height:34px;resize:none;font-size:11.5px}
 .hec-ai-bar .btn{flex-shrink:0;align-self:flex-end}
-
-/* ── NOA AI bar ── */
-.noa-ai-foot{flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1);padding:10px 14px}
-.noa-ai-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);margin-bottom:6px}
-.noa-stream{background:var(--s3);border:1px solid var(--cr-b);border-radius:7px;padding:10px 13px;font-size:11px;line-height:1.65;color:var(--t2);max-height:110px;overflow-y:auto;white-space:pre-wrap;font-family:var(--sans);display:none}
-.noa-stream.visible{display:block}
-.noa-stream.streaming::after{content:'▋';animation:blink .8s step-end infinite;color:var(--crit)}
-.noa-input-row{display:flex;gap:6px;margin-top:6px;align-items:flex-start}
-.noa-input-row .mta{flex:1;min-height:32px;resize:none;font-size:11.5px;border-color:var(--cr-b)}
-.noa-input-row .mta:focus{border-color:rgba(255,58,58,.45)}
-.noa-input-row .btn-r{flex-shrink:0;align-self:flex-end}
 
 /* ── TOAST ── */
 @keyframes tup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
@@ -257,16 +299,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 
   <div class="hdr-sep"></div>
 
-  <nav class="hdr-nav">
-    <button class="np on">NOA · HÉCTOR</button>
+  <nav class="hdr-nav" aria-label="Navegación principal">
+    <button class="np on" aria-current="page">NOA · HÉCTOR</button>
     <button class="np" onclick="location.href='/'">SARA</button>
     <button class="np" onclick="location.href='/'">SOFÍA</button>
   </nav>
 
   <div class="hdr-right">
-    <span class="hdr-clock" id="clock">--:--:--</span>
-    <div class="hdr-badge crit" id="badge">
-      <span class="badge-dot"></span>
+    <span class="hdr-clock" id="clock" aria-live="polite" aria-label="Reloj">--:--:--</span>
+    <div class="hdr-badge crit" id="badge" role="status" aria-live="polite">
+      <span class="badge-dot" aria-hidden="true"></span>
       <span id="badge-txt">2 alertas críticas</span>
     </div>
   </div>
@@ -275,58 +317,96 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 <div class="workspace">
 
   <!-- ══ NOA ══ -->
-  <section class="panel panel-noa">
+  <section class="panel panel-noa" aria-label="Panel NOA — Monitoreo GPS">
     <div class="phead">
-      <div class="adot noa">N</div>
+      <div class="adot noa" aria-hidden="true">N</div>
       <span class="aname noa">NOA</span>
       <span class="arole">Monitoreo GPS</span>
-      <div class="pchips" id="noa-chips"></div>
+      <div class="pchips" id="noa-chips" aria-label="Conteo de alertas"></div>
       <div class="pbtns">
-        <button class="btn" onclick="openTurno()">⇄ Turno</button>
-        <button class="btn" onclick="simBarrido()">↻ Barrer</button>
+        <button class="btn btn-sm" onclick="openTurno()" aria-label="Abrir entrega de turno">⇄ Turno</button>
+        <button class="btn btn-sm" onclick="simBarrido()" aria-label="Ejecutar barrido GPS">↻ Barrer</button>
       </div>
     </div>
 
-    <div class="crit-banner" id="crit-banner">
-      <div class="crit-pulse"></div>
+    <div class="crit-banner" id="crit-banner" role="alert" aria-live="assertive">
+      <div class="crit-pulse" aria-hidden="true"></div>
       <div>
         <div class="crit-main" id="crit-txt"></div>
         <div class="crit-sub" id="crit-sub"></div>
       </div>
     </div>
 
-    <div class="pbody"><div id="noa-out"></div></div>
+    <!-- UX: filtros rápidos + búsqueda — identifica un folio en <5s con 20+ activos -->
+    <div class="filter-bar" role="toolbar" aria-label="Filtros NOA">
+      <input class="search-inp" id="noa-search" type="search" placeholder="Buscar folio, cliente, operador…"
+        aria-label="Buscar folio o cliente" oninput="renderNOA()">
+      <div class="fchips" role="group" aria-label="Filtrar por nivel de alerta">
+        <button class="fchip fch-all on" id="fnoa-all" onclick="setNoaFilter('ALL',this)" aria-pressed="true">Todos</button>
+        <button class="fchip fch-r"      id="fnoa-cr"  onclick="setNoaFilter('CRITICO',this)" aria-pressed="false">CRÍTICO</button>
+        <button class="fchip fch-o"      id="fnoa-at"  onclick="setNoaFilter('ATENCION',this)" aria-pressed="false">ATENCIÓN</button>
+        <button class="fchip fch-g"      id="fnoa-no"  onclick="setNoaFilter('NORMAL',this)" aria-pressed="false">NORMAL</button>
+      </div>
+    </div>
 
+    <div class="pbody" role="main"><div id="noa-out"></div></div>
+
+    <!-- UX: colapsible — libera espacio para la lista de folios durante el turno -->
     <div class="noa-ai-foot">
-      <div class="noa-ai-lbl">N · NOA — Consulta AI</div>
-      <div class="noa-stream" id="noa-stream"></div>
-      <div class="noa-input-row">
-        <textarea class="mta" id="noa-ai-input" rows="1" placeholder="Pregunta a NOA sobre un folio, protocolo o zona de riesgo…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendNoaMsg();}"></textarea>
-        <button class="btn btn-r btn-sm" id="noa-send-btn" onclick="sendNoaMsg()">→</button>
+      <div class="noa-ai-head" onclick="toggleNoaAI()" role="button" tabindex="0"
+        aria-expanded="false" aria-controls="noa-ai-body"
+        onkeydown="if(event.key==='Enter'||event.key===' ')toggleNoaAI()">
+        <span class="noa-ai-lbl">N · NOA — Consulta AI</span>
+        <span class="noa-ai-hint" id="noa-ai-hint">Pregunta sobre protocolos o folios</span>
+        <span class="noa-ai-arr" id="noa-ai-arr" aria-hidden="true">▲</span>
+      </div>
+      <div class="noa-ai-body" id="noa-ai-body" aria-hidden="true">
+        <div class="noa-stream" id="noa-stream" aria-live="polite"></div>
+        <div class="noa-input-row">
+          <textarea class="mta" id="noa-ai-input" rows="1"
+            placeholder="Ej: ¿Qué hago si el operador no responde en Arco Norte?"
+            aria-label="Mensaje para NOA AI"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendNoaMsg();}"></textarea>
+          <button class="btn btn-r btn-sm" id="noa-send-btn" onclick="sendNoaMsg()" aria-label="Enviar mensaje a NOA">→</button>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- ══ HÉCTOR ══ -->
-  <section class="panel panel-hec" style="display:flex;flex-direction:column">
+  <section class="panel panel-hec" style="display:flex;flex-direction:column" aria-label="Panel HÉCTOR — Cobranza">
     <div class="phead">
-      <div class="adot hec">H</div>
+      <div class="adot hec" aria-hidden="true">H</div>
       <span class="aname hec">HÉCTOR</span>
       <span class="arole">Cobranza</span>
       <div class="pbtns">
-        <button class="btn btn-sm" id="sort-btn" onclick="cycleSort()">Días ↓</button>
+        <button class="btn btn-sm" id="sort-btn" onclick="cycleSort()" aria-label="Cambiar criterio de ordenamiento">Días ↓</button>
       </div>
     </div>
 
-    <div class="kpi-strip" id="kpi-strip"></div>
+    <div class="kpi-strip" id="kpi-strip" aria-label="KPIs de cobranza"></div>
+
+    <!-- UX: búsqueda + filtro semáforo — encontrar una cuenta específica en 1 acción -->
+    <div class="filter-bar" role="toolbar" aria-label="Filtros Cobranza">
+      <input class="search-inp" id="hec-search" type="search" placeholder="Buscar cliente o folio…"
+        aria-label="Buscar cliente o folio" oninput="tabla()">
+      <div class="fchips" role="group" aria-label="Filtrar por semáforo">
+        <button class="fchip fch-all on" id="fhec-all" onclick="setHecFilter('all',this)" aria-pressed="true">Todos</button>
+        <button class="fchip fvd"        id="fhec-vd"  onclick="setHecFilter('vd',this)"  aria-pressed="false">●&nbsp;Corriente</button>
+        <button class="fchip fam"        id="fhec-am"  onclick="setHecFilter('am',this)"  aria-pressed="false">●&nbsp;Por vencer</button>
+        <button class="fchip fna"        id="fhec-na"  onclick="setHecFilter('na',this)"  aria-pressed="false">●&nbsp;Vencido</button>
+        <button class="fchip fro"        id="fhec-ro"  onclick="setHecFilter('ro',this)"  aria-pressed="false">●&nbsp;Grave</button>
+        <button class="fchip fne"        id="fhec-ne"  onclick="setHecFilter('ne',this)"  aria-pressed="false">●&nbsp;Legal</button>
+      </div>
+    </div>
 
     <div class="tbl-wrap">
-      <table class="cob-tbl">
+      <table class="cob-tbl" aria-label="Tabla de cuentas por cobrar">
         <thead><tr>
-          <th onclick="sortBy('semaforo')">Estado</th>
-          <th onclick="sortBy('cliente')">Cliente</th>
-          <th onclick="sortBy('dias')">Días</th>
-          <th onclick="sortBy('monto')">Monto</th>
+          <th onclick="sortBy('semaforo')" aria-sort="none">Estado<span class="sort-arrow" aria-hidden="true" id="sarr-semaforo"></span></th>
+          <th onclick="sortBy('cliente')"  aria-sort="none">Cliente<span class="sort-arrow" aria-hidden="true" id="sarr-cliente"></span></th>
+          <th onclick="sortBy('dias')"     aria-sort="descending" class="s">Días<span class="sort-arrow" aria-hidden="true" id="sarr-dias">↓</span></th>
+          <th onclick="sortBy('monto')"    aria-sort="none">Monto<span class="sort-arrow" aria-hidden="true" id="sarr-monto"></span></th>
           <th>Última gestión</th>
           <th>Acción</th>
         </tr></thead>
@@ -337,9 +417,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 </div>
 
 <!-- Modal Turno -->
-<div class="mbg" id="m-turno">
+<div class="mbg" id="m-turno" role="dialog" aria-modal="true" aria-labelledby="m-turno-title">
   <div class="modal">
-    <div class="mtitle">⇄ Entrega de Turno — NOA <button class="mx" onclick="closeTurno()">✕</button></div>
+    <div class="mtitle"><span id="m-turno-title">⇄ Entrega de Turno — NOA</span><button class="mx" onclick="closeTurno()" aria-label="Cerrar">✕</button></div>
     <div id="turno-body"></div>
     <div class="mfoot">
       <button class="btn" onclick="closeTurno()">Cancelar</button>
@@ -349,16 +429,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 </div>
 
 <!-- Modal Gestión -->
-<div class="mbg" id="m-gestion">
+<div class="mbg" id="m-gestion" role="dialog" aria-modal="true" aria-labelledby="m-gestion-title">
   <div class="modal">
-    <div class="mtitle">Gestión de Cobranza <button class="mx" onclick="closeGestion()">✕</button></div>
+    <div class="mtitle"><span id="m-gestion-title">Gestión de Cobranza</span><button class="mx" onclick="closeGestion()" aria-label="Cerrar">✕</button></div>
     <div id="gestion-body"></div>
     <div class="msec" id="hec-ai-sec" style="display:none">
       <div class="mlbl" style="color:var(--grn)">H · HÉCTOR — Análisis AI</div>
-      <div class="hec-stream" id="hec-stream"></div>
+      <div class="hec-stream" id="hec-stream" aria-live="polite"></div>
       <div class="hec-ai-bar">
-        <textarea class="mta" id="hec-ai-input" rows="1" placeholder="Pregunta a HÉCTOR…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHecMsg();}"></textarea>
-        <button class="btn btn-sm btn-g" id="hec-send-btn" onclick="sendHecMsg()">→</button>
+        <textarea class="mta" id="hec-ai-input" rows="1" placeholder="Pregunta a HÉCTOR…"
+          aria-label="Mensaje para HÉCTOR AI"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHecMsg();}"></textarea>
+        <button class="btn btn-sm btn-g" id="hec-send-btn" onclick="sendHecMsg()" aria-label="Enviar a HÉCTOR">→</button>
       </div>
     </div>
     <div class="mfoot">
@@ -371,8 +453,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 <script>
 'use strict';
 // ── DATA NOA ─────────────────────────────────────────
-// Producción: AppSheets TMS GET /api/folios?estatus[]=EN_TRANSITO
-// GPS real:   WebSocket wss://gps.abstorages.com/stream
 var FOLIOS=[
   {id:'AB-2024-087',placa:'NL-NMX-12', cl:'Bimbo S.A. de C.V.',    or:'Monterrey, NL',   de:'Ciudad de México',  st:'EN_TRANSITO',gps:{la:24.7813,ln:-100.3124},min:47,op:'Carlos López G.',  pv:'Transportes Garza SA',   al:'CRITICO', inc:'Detenida en Zona de Riesgo ZR-03 (Cerro del Topo, NL)',zona:true, esc:[{nv:'Operador',h:'14:22',s:'sr'},{nv:'Proveedor',h:'14:37',s:'ok'},{nv:'Coordinador',h:'14:52',s:'act'}]},
   {id:'AB-2024-093',placa:'TAM-45-93', cl:'FEMSA Comercio',         or:'Monterrey, NL',   de:'Tampico, Tam.',     st:'EN_TRANSITO',gps:{la:23.1544,ln:-99.3204}, min:52,op:'Mario Hdz. Reyes', pv:'Fletes del Norte SA',    al:'CRITICO', inc:'Sin respuesta a barrido — SLA de 30 min superado',    zona:false,esc:[{nv:'Operador',h:'14:05',s:'sr'},{nv:'Proveedor',h:'14:20',s:'act'},{nv:'Coordinador',h:'14:35',s:'pd'}]},
@@ -384,7 +464,6 @@ var FOLIOS=[
 ];
 
 // ── DATA HÉCTOR ───────────────────────────────────────
-// Producción: ERP / AppSheets GET /api/cuentas-cobrar
 var CUENTAS=[
   {cl:'Liverpool S.A.B. de C.V.',fols:['AB-2024-045','AB-2024-046'],monto:125000,dias:65,sem:'ne',ult:'Llamada sin respuesta',      fecha:'2024-01-08',resp:'Despacho Legal'},
   {cl:'Grupo Herdez SA',         fols:['AB-2024-058'],              monto:87500, dias:38,sem:'ro',ult:'Visita pendiente — Dirección',fecha:'2024-01-12',resp:'Dirección'},
@@ -410,9 +489,63 @@ var cuentas=CUENTAS.map(function(c){return Object.assign({},c,{fols:c.fols.slice
 var sF='dias',sD='desc',gCl=null,tick=0;
 var hecSid='hec_'+Date.now(),hecStreaming=false;
 var noaSid='noa_'+Date.now(),noaStreaming=false;
+// UX: estado de filtros para ambos paneles
+var noaFilter='ALL', hecFilter='all';
+var noaAIOpen=false;
+
+// ── FILTROS ────────────────────────────────────────────
+function setNoaFilter(val, btn) {
+  noaFilter = val;
+  document.querySelectorAll('#fnoa-all,#fnoa-cr,#fnoa-at,#fnoa-no').forEach(function(b) {
+    b.classList.remove('on');
+    b.setAttribute('aria-pressed','false');
+  });
+  btn.classList.add('on');
+  btn.setAttribute('aria-pressed','true');
+  renderNOA();
+}
+
+function setHecFilter(val, btn) {
+  hecFilter = val;
+  document.querySelectorAll('#fhec-all,#fhec-vd,#fhec-am,#fhec-na,#fhec-ro,#fhec-ne').forEach(function(b) {
+    b.classList.remove('on');
+    b.setAttribute('aria-pressed','false');
+  });
+  btn.classList.add('on');
+  btn.setAttribute('aria-pressed','true');
+  tabla();
+}
+
+function getVisibleFolios() {
+  var q = (document.getElementById('noa-search').value || '').toLowerCase().trim();
+  return folios.filter(function(f) {
+    if (noaFilter !== 'ALL' && f.al !== noaFilter) return false;
+    if (q) {
+      return f.id.toLowerCase().indexOf(q) >= 0 ||
+             f.cl.toLowerCase().indexOf(q) >= 0 ||
+             f.op.toLowerCase().indexOf(q) >= 0 ||
+             f.placa.toLowerCase().indexOf(q) >= 0;
+    }
+    return true;
+  });
+}
+
+function getVisibleCuentas() {
+  var q = (document.getElementById('hec-search').value || '').toLowerCase().trim();
+  return cuentas.filter(function(c) {
+    if (hecFilter !== 'all' && c.sem !== hecFilter) return false;
+    if (q) {
+      var matchCl = c.cl.toLowerCase().indexOf(q) >= 0;
+      var matchFol = c.fols.some(function(f) { return f.toLowerCase().indexOf(q) >= 0; });
+      return matchCl || matchFol;
+    }
+    return true;
+  });
+}
 
 // ── NOA RENDER ────────────────────────────────────────
 function renderNOA(){
+  // Siempre usa folios completos para chips y banner (no filtrados)
   var cr=folios.filter(function(f){return f.al==='CRITICO';});
   var at=folios.filter(function(f){return f.al==='ATENCION';});
   var no=folios.filter(function(f){return f.al==='NORMAL';});
@@ -436,14 +569,33 @@ function renderNOA(){
     document.getElementById('crit-sub').textContent=cr.map(function(f){return f.id+': '+(f.inc||'sin barrido');}).join('  ·  ');
   }
 
+  // Aplica filtros para la lista visible
+  var visible = getVisibleFolios();
+  var vcr=visible.filter(function(f){return f.al==='CRITICO';});
+  var vat=visible.filter(function(f){return f.al==='ATENCION';});
+  var vno=visible.filter(function(f){return f.al==='NORMAL';});
+  var q = (document.getElementById('noa-search').value || '').trim();
+
+  // UX: estado vacío claro cuando el filtro no tiene resultados
+  if (!visible.length) {
+    var msg = q ? 'Sin resultados para "'+q+'"' : 'Sin folios en este nivel';
+    document.getElementById('noa-out').innerHTML =
+      '<div class="empty-state">'+
+        '<div class="empty-icon">📡</div>'+
+        '<div class="empty-title">'+msg+'</div>'+
+        '<div class="empty-sub">Prueba con otro filtro o limpia la búsqueda</div>'+
+      '</div>';
+    return;
+  }
+
   var h='';
-  if(cr.length) h+=sHdr('⚠','CRÍTICO')+'<div class="cards">'+cr.map(card).join('')+'</div>';
-  if(at.length) h+=sHdr('△','ATENCIÓN')+'<div class="cards">'+at.map(card).join('')+'</div>';
-  if(no.length) h+=sHdr('✓','NORMAL')+'<div class="cards">'+no.map(card).join('')+'</div>';
+  if(vcr.length) h+=sHdr('⚠','CRÍTICO')+'<div class="cards">'+vcr.map(card).join('')+'</div>';
+  if(vat.length) h+=sHdr('△','ATENCIÓN')+'<div class="cards">'+vat.map(card).join('')+'</div>';
+  if(vno.length) h+=sHdr('✓','NORMAL')+'<div class="cards">'+vno.map(card).join('')+'</div>';
   document.getElementById('noa-out').innerHTML=h;
 }
 
-function sHdr(i,t){return '<div class="sec-hdr">'+i+' '+t+'</div>';}
+function sHdr(i,t){return '<div class="sec-hdr"><span aria-hidden="true">'+i+'</span> '+t+'</div>';}
 
 function card(f){
   var sc=f.min>=30?'ov':f.min>=20?'wn':'ok';
@@ -452,31 +604,32 @@ function card(f){
   var ep=EM[f.st]||['bdg-tr',f.st];
   var acls='bdg-'+(f.al==='CRITICO'?'cr':f.al==='ATENCION'?'at':'no');
   var cc={CRITICO:'cr',ATENCION:'at',NORMAL:'no'}[f.al];
+  // UX: intensidad visual escala con el tiempo — más minutos = borde y sombra más intensos
+  var ci = f.al==='CRITICO' ? Math.min(f.min/60, 1) : 0;
+  var ciStyle = f.al==='CRITICO' ? ' style="--ci:'+ci.toFixed(2)+'"' : '';
 
-  // Compact NORMAL card
   if(f.al==='NORMAL'){
-    return '<div class="fc no">'+
+    return '<div class="fc no"'+ciStyle+'>'+
       '<div class="fc-line"></div>'+
       '<div class="fc-body">'+
         '<div class="cpt-l">'+
           '<div><span class="fc-id">'+f.id+'</span><span class="fc-unit"> · '+f.placa+'</span></div>'+
-          '<div class="fc-rt" style="margin-top:2px">'+f.or+' <span style="color:var(--t3)">→</span> '+f.de+'</div>'+
+          '<div class="fc-rt" style="margin-top:2px">'+f.or+' <span style="color:var(--t3)" aria-hidden="true">→</span> '+f.de+'</div>'+
         '</div>'+
         '<div class="cpt-r">'+
-          '<span class="sw-time '+sc+'">'+f.min+' min</span>'+
+          '<span class="sw-time '+sc+'" aria-label="'+f.min+' minutos desde último barrido">'+f.min+' min</span>'+
           '<span class="bdg '+ep[0]+'">'+ep[1]+'</span>'+
         '</div>'+
       '</div>'+
     '</div>';
   }
 
-  // Escalation timeline
   var escH='';
   if(f.esc.length){
     var SL={sr:'Sin respuesta',ok:'Contactado',act:'Escalado ↑',pd:'Pendiente'};
     var steps=f.esc.map(function(s){
       return '<div class="esc-step">'+
-        '<div class="esc-nd '+s.s+'"></div>'+
+        '<div class="esc-nd '+s.s+'" aria-hidden="true"></div>'+
         '<div class="esc-info">'+
           '<span class="esc-nv">'+s.nv+'</span>'+
           '<span class="esc-h">'+s.h+'</span>'+
@@ -487,38 +640,39 @@ function card(f){
     escH='<div class="esc-hdr">LOG DE ESCALACIÓN</div><div class="esc-steps">'+steps+'</div>';
   }
 
-  return '<div class="fc '+cc+'">'+
-    '<div class="fc-line"></div>'+
+  return '<div class="fc '+cc+'"'+ciStyle+' role="article" aria-label="Folio '+f.id+' — '+f.al+'">'+
+    '<div class="fc-line" aria-hidden="true"></div>'+
     '<div class="fc-body">'+
       '<div class="fc-top">'+
         '<div>'+
           '<div><span class="fc-id">'+f.id+'</span><span class="fc-unit"> · '+f.placa+'</span></div>'+
           '<div class="fc-cl">'+f.cl+'</div>'+
-          '<div class="fc-rt">'+f.or+' <span style="color:var(--t3)">→</span> '+f.de+'</div>'+
+          '<div class="fc-rt">'+f.or+' <span style="color:var(--t3)" aria-hidden="true">→</span> '+f.de+'</div>'+
         '</div>'+
         '<div class="fc-bdgs">'+
           '<span class="bdg '+ep[0]+'">'+ep[1]+'</span>'+
           '<span class="bdg '+acls+'">'+f.al+'</span>'+
         '</div>'+
       '</div>'+
-      '<div class="sw-row">'+
+      '<div class="sw-row" role="meter" aria-label="SLA Barrido: '+f.min+' de 30 minutos" aria-valuenow="'+f.min+'" aria-valuemin="0" aria-valuemax="30">'+
         '<span class="sw-lbl">SLA Barrido</span>'+
-        '<div class="sw-track"><div class="sw-fill '+sc+'" style="width:'+pct+'%"></div></div>'+
+        '<div class="sw-track" aria-hidden="true"><div class="sw-fill '+sc+'" style="width:'+pct+'%"></div></div>'+
         '<span class="sw-time '+sc+'">'+f.min+'min'+(f.min>=30?' ⚠':'')+'</span>'+
       '</div>'+
       '<div class="fc-meta">'+
         '<div class="mkv"><span class="mk">Op:</span><span class="mv">'+f.op+'</span></div>'+
         '<div class="mkv"><span class="mk">Prov:</span><span class="mv">'+f.pv+'</span></div>'+
         '<div class="mkv"><span class="mk">GPS:</span><span class="mv mmono">'+f.gps.la.toFixed(3)+', '+f.gps.ln.toFixed(3)+'</span></div>'+
-        (f.zona?'<span class="zona-tag">⚠ Zona riesgo</span>':'')+
+        (f.zona?'<span class="zona-tag" role="alert">⚠ Zona riesgo</span>':'')+
       '</div>'+
-      (f.inc?'<div class="fc-inc">'+f.inc+'</div>':'')+
+      (f.inc?'<div class="fc-inc" role="alert">'+f.inc+'</div>':'')+
       escH+
     '</div>'+
     (f.al==='CRITICO'?
       '<div class="fc-acts">'+
-        '<button class="btn btn-sm btn-g" onclick="resolver(\''+f.id+'\')">✓ Resolver</button>'+
-        '<button class="btn btn-sm" onclick="toast(\'Escalando '+f.id+' al Coordinador Regional\',\'#FF8C00\')">↑ Escalar</button>'+
+        // UX: acción primaria (resolver) en verde, secundaria (escalar) en neutro — jerarquía clara
+        '<button class="btn btn-sm btn-g" onclick="resolver(\''+f.id+'\')" aria-label="Marcar folio '+f.id+' como resuelto">✓ Resolver</button>'+
+        '<button class="btn btn-sm" onclick="toast(\'Escalando '+f.id+' al Coordinador Regional\',\'#FF8C00\')" aria-label="Escalar folio '+f.id+' al coordinador">↑ Escalar</button>'+
       '</div>':'')+
   '</div>';
 }
@@ -542,27 +696,58 @@ function tile(l,v,s,c){
 }
 
 function tabla(){
-  var sorted=cuentas.slice().sort(function(a,b){
+  var sorted=getVisibleCuentas().slice().sort(function(a,b){
     if(sF==='semaforo') return sD==='desc'?SEM[b.sem].ord-SEM[a.sem].ord:SEM[a.sem].ord-SEM[b.sem].ord;
     if(sF==='cliente')  return sD==='asc'?a.cl.localeCompare(b.cl):b.cl.localeCompare(a.cl);
     return sD==='desc'?b[sF]-a[sF]:a[sF]-b[sF];
   });
+
+  // UX: actualizar flechas de sort y aria-sort en encabezados
+  ['semaforo','cliente','dias','monto'].forEach(function(col) {
+    var arrEl = document.getElementById('sarr-'+col);
+    var th = arrEl && arrEl.parentElement;
+    if (!arrEl) return;
+    if (sF === col) {
+      arrEl.textContent = sD === 'desc' ? '↓' : '↑';
+      if (th) { th.classList.add('s'); th.setAttribute('aria-sort', sD==='desc'?'descending':'ascending'); }
+    } else {
+      arrEl.textContent = '';
+      if (th) { th.classList.remove('s'); th.setAttribute('aria-sort','none'); }
+    }
+  });
+
+  // UX: estado vacío cuando filtro o búsqueda no tiene resultados
+  if (!sorted.length) {
+    var q = (document.getElementById('hec-search').value || '').trim();
+    var msg = q ? 'Sin resultados para "'+q+'"' : 'Sin cuentas en este nivel';
+    document.getElementById('cob-body').innerHTML =
+      '<tr><td colspan="6">'+
+        '<div class="empty-state">'+
+          '<div class="empty-icon">✓</div>'+
+          '<div class="empty-title">'+msg+'</div>'+
+          '<div class="empty-sub">Prueba con otro filtro o limpia la búsqueda</div>'+
+        '</div>'+
+      '</td></tr>';
+    return;
+  }
 
   document.getElementById('cob-body').innerHTML=sorted.map(function(c){
     var s=SEM[c.sem];
     var bp=Math.min(c.dias/60*100,100);
     var bc=c.dias>=31?'var(--sr)':c.dias>=16?'var(--sn)':c.dias>=6?'var(--sa)':'var(--sv)';
     var nc=c.sem==='ne'?'var(--sb)':c.sem==='ro'?'var(--sr)':c.sem==='na'?'var(--sn)':c.sem==='am'?'var(--sa)':'var(--sv)';
-    var acts='<button class="btn btn-sm" onclick="openG(\''+E(c.cl)+'\')">+ Gestión</button>';
-    if(c.sem==='am') acts+=' <button class="btn btn-sm" style="color:var(--sa);border-color:rgba(245,196,0,.28);background:rgba(245,196,0,.07);" onclick="openP(\''+E(c.cl)+'\',\'cortesia\')">✉ Cortesía</button>';
-    if(c.sem==='na') acts+=' <button class="btn btn-sm" style="color:var(--sn);border-color:rgba(255,140,0,.28);background:var(--wn-d);" onclick="openP(\''+E(c.cl)+'\',\'formal\')">✉ Formal</button>';
-    if(c.sem==='ne') acts+=' <button class="btn btn-sm" style="color:var(--sb);border-color:rgba(94,122,140,.3);">⚖ Legal</button>';
-    return '<tr style="--rc:'+s.col+'">'+
-      '<td><div class="sem-cell"><div class="sem-dot '+c.sem+'"></div><span class="sem-lbl">'+s.lbl+'</span></div></td>'+
+    // UX: jerarquía de acciones — "Gestión" siempre disponible, plantillas solo en niveles relevantes con color semáforo
+    var acts='<button class="btn btn-sm" onclick="openG(\''+E(c.cl)+'\')" aria-label="Abrir gestión para '+E(c.cl)+'">+ Gestión</button>';
+    if(c.sem==='am') acts+=' <button class="btn btn-sm" style="color:var(--sa);border-color:rgba(245,196,0,.28);background:rgba(245,196,0,.07);" onclick="openP(\''+E(c.cl)+'\',\'cortesia\')" aria-label="Generar plantilla de cortesía para '+E(c.cl)+'">✉ Cortesía</button>';
+    if(c.sem==='na') acts+=' <button class="btn btn-sm" style="color:var(--sn);border-color:rgba(255,140,0,.28);background:var(--wn-d);" onclick="openP(\''+E(c.cl)+'\',\'formal\')" aria-label="Generar plantilla formal para '+E(c.cl)+'">✉ Formal</button>';
+    if(c.sem==='ro') acts+=' <button class="btn btn-sm" style="color:var(--sr);border-color:rgba(255,58,58,.28);background:var(--cr-d);" onclick="openP(\''+E(c.cl)+'\',\'suspension\')" aria-label="Generar aviso de suspensión para '+E(c.cl)+'">⚠ Suspensión</button>';
+    if(c.sem==='ne') acts+=' <button class="btn btn-sm" style="color:var(--sb);border-color:rgba(94,122,140,.3);" aria-label="Turnado a despacho legal — '+E(c.cl)+'">⚖ Legal</button>';
+    return '<tr style="--rc:'+s.col+'"  >'+
+      '<td><div class="sem-cell"><div class="sem-dot '+c.sem+'" aria-hidden="true"></div><span class="sem-lbl">'+s.lbl+'</span></div></td>'+
       '<td><div class="cn">'+c.cl+'</div><div class="cf">'+c.fols.join(' · ')+'</div></td>'+
-      '<td class="d-cell"><span class="d-num" style="color:'+nc+'">'+c.dias+'d</span><div class="d-bar"><div class="d-fill" style="width:'+bp+'%;background:'+bc+'"></div></div></td>'+
+      '<td class="d-cell"><span class="d-num" style="color:'+nc+'" aria-label="'+c.dias+' días vencido">'+c.dias+'d</span><div class="d-bar" aria-hidden="true"><div class="d-fill" style="width:'+bp+'%;background:'+bc+'"></div></div></td>'+
       '<td><span class="mnt">'+mxn(c.monto)+'</span></td>'+
-      '<td><div class="gl">'+c.ult+'</div><div class="gd">'+c.fecha+'</div></td>'+
+      '<td><div class="gl" title="'+c.ult+'">'+c.ult+'</div><div class="gd">'+c.fecha+'</div></td>'+
       '<td><div class="row-acts">'+acts+'</div></td>'+
     '</tr>';
   }).join('');
@@ -577,7 +762,6 @@ function resolver(id){
 }
 
 function simBarrido(){
-  // Producción: POST /api/gps/barrido actualiza posición en TMS
   folios.forEach(function(f){
     var r=Math.floor(Math.random()*10)+5;
     f.min=Math.max(2,f.min-r);
@@ -629,7 +813,7 @@ function openP(cl,tipo){
     '<div style="font-size:11px;color:var(--t3)">'+c.fols.join(', ')+' · '+mxn(c.monto)+' · '+c.dias+' días · '+SEM[c.sem].lbl+'</div></div>';
   showHecAI();
   document.getElementById('m-gestion').classList.add('open');
-  var briefing='Genera la plantilla de comunicación de tipo "'+(tipo==='cortesia'?'cortesía':'formal')+'" para esta cuenta.\n'+
+  var briefing='Genera la plantilla de comunicación de tipo "'+(tipo==='cortesia'?'cortesía':tipo==='suspension'?'aviso de suspensión':'formal')+'" para esta cuenta.\n'+
     'Cliente: '+c.cl+'\nFacturas: '+c.fols.join(', ')+'\nMonto: $'+c.monto.toLocaleString('es-MX')+'\nDías vencido: '+c.dias+'\nNivel semáforo: '+SEM[c.sem].lbl+'\nResponsable: '+c.resp;
   streamHector(briefing);
 }
@@ -649,7 +833,7 @@ function openG(cl){
       '<label class="rrow"><input type="radio" name="gt" value="pago"> Pago recibido</label>'+
       '<label class="rrow"><input type="radio" name="gt" value="acuerdo"> Acuerdo de pago</label>'+
     '</div></div>'+
-    '<div class="msec"><div class="mlbl">Notas</div><textarea class="mta" id="gnotas" placeholder="Describe el resultado…"></textarea></div>';
+    '<div class="msec"><div class="mlbl">Notas</div><textarea class="mta" id="gnotas" placeholder="Describe el resultado…" aria-label="Notas de gestión"></textarea></div>';
   showHecAI();
   document.getElementById('m-gestion').classList.add('open');
   var briefing='Necesito consejo de cobranza para esta cuenta:\n'+
@@ -727,13 +911,28 @@ function sendHecMsg(){
   streamHector(msg);
 }
 
-// ── NOA AI ───────────────────────────────────────────
+// ── NOA AI — colapsible ────────────────────────────────
+// UX: cerrado por defecto para maximizar espacio de folios
+function toggleNoaAI(){
+  noaAIOpen = !noaAIOpen;
+  var body = document.getElementById('noa-ai-body');
+  var arr  = document.getElementById('noa-ai-arr');
+  var head = document.querySelector('.noa-ai-head');
+  var hint = document.getElementById('noa-ai-hint');
+  body.className = 'noa-ai-body' + (noaAIOpen ? ' open' : '');
+  arr.className  = 'noa-ai-arr'  + (noaAIOpen ? ' open' : '');
+  head.setAttribute('aria-expanded', noaAIOpen ? 'true' : 'false');
+  body.setAttribute('aria-hidden',   noaAIOpen ? 'false' : 'true');
+  hint.style.display = noaAIOpen ? 'none' : '';
+  if (noaAIOpen) document.getElementById('noa-ai-input').focus();
+}
+
 function streamNoa(msg){
   if(noaStreaming) return;
   noaStreaming=true;
   document.getElementById('noa-send-btn').disabled=true;
   var stream=document.getElementById('noa-stream');
-  stream.classList.add('visible','streaming');
+  stream.classList.add('streaming');
 
   fetch('/api/noa/chat',{
     method:'POST',
@@ -774,7 +973,6 @@ function sendNoaMsg(){
   var msg=inp.value.trim();
   if(!msg||noaStreaming) return;
   var stream=document.getElementById('noa-stream');
-  stream.classList.add('visible');
   stream.textContent+='\n\n— '+msg+'\n\n';
   inp.value='';
   streamNoa(msg);
@@ -787,6 +985,7 @@ function fetchCuentas(){
     renderHEC();
   }).catch(function(){/* usa mock ya cargado */});
 }
+
 function confirmGestion(){
   if(gCl){
     var c=cuentas.find(function(x){return x.cl===gCl;});
@@ -802,13 +1001,16 @@ function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function E(s){return s.replace(/'/g,"\\'");}
 function toast(msg,col){
   var t=document.createElement('div');
-  t.className='toast';t.style.borderLeft='3px solid '+col;t.textContent=msg;
+  t.className='toast';
+  t.style.borderLeft='3px solid '+col;
+  t.textContent=msg;
+  t.setAttribute('role','status');
+  t.setAttribute('aria-live','polite');
   document.body.appendChild(t);
   setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},3000);
 }
 
 // ── CLOCK + SIM TICK ──────────────────────────────────
-// Producción: reemplazar setInterval con SSE/WebSocket del servidor GPS
 function updateClock(){
   document.getElementById('clock').textContent=
     new Date().toLocaleTimeString('es-MX',{hour12:false})+'  ·  '+
@@ -839,7 +1041,9 @@ document.addEventListener('DOMContentLoaded',function(){
   ['m-turno','m-gestion'].forEach(function(id){
     document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
   });
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeTurno();closeGestion();}});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){closeTurno();closeGestion();}
+  });
 });
 </script>
 </body>
