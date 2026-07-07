@@ -252,6 +252,24 @@
               .replace(/<[^>]+>/g,'').trim();
     }
 
+    // Strip markdown and special chars before sending to ElevenLabs TTS
+    function cleanForTTS(t) {
+      return t
+        .replace(/\*\*(.*?)\*\*/g, '$1')   // **bold** → bold
+        .replace(/\*(.*?)\*/g, '$1')        // *italic* → italic
+        .replace(/#{1,6}\s*/g, '')          // # headers
+        .replace(/^\s*[-•*]\s+/gm, '')      // bullet points
+        .replace(/^\s*\d+\.\s+/gm, '')      // numbered lists
+        .replace(/`[^`]*`/g, '')            // `code`
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // [link](url) → link
+        .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+        .replace(/[^\S\n]+/g, ' ')          // collapse spaces
+        .replace(/\n{2,}/g, '. ')           // double newlines → pause
+        .replace(/\n/g, ' ')                // single newlines → space
+        .replace(/\.{2,}/g, '.')            // multiple dots → one
+        .trim();
+    }
+
     async function sendMessage(text) {
       if (!text || closed) return null;
       addBubble('user', toHtml(text));
@@ -387,7 +405,7 @@
 
       const raw = await sendMessage(text);
       if (!inCall) return;
-      if (raw) { callState = 'speaking'; await playTTS(cleanText(raw)); }
+      if (raw) { callState = 'speaking'; await playTTS(cleanForTTS(cleanText(raw))); }
 
       if (inCall) {
         callState = 'listening';
@@ -491,7 +509,7 @@
       }
 
       setStatus('● En llamada');
-      await playTTS('¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?');
+      await playTTS(cleanForTTS('¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?'));
 
       if (!inCall) return;
       callState = 'listening';
