@@ -505,6 +505,12 @@ async function handleChat(agente, req, res) {
   let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
   if (callMode) systemPrompt += '\n\n🎙️ MODO LLAMADA DE VOZ: El cliente está en una llamada. Responde en máximo 2 oraciones cortas y directas. Sin listas, sin markdown, sin asteriscos. Habla natural como en una conversación telefónica. IMPORTANTE: Aunque estés en modo voz, SIEMPRE debes emitir el bloque LEAD_DATA al final de tu respuesta cuando tengas datos del cliente — es obligatorio en todos los modos.';
 
+  // Inyectar contexto TMS para SOFIA (proveedores, rutas, costos)
+  if (agente === 'sofia' && tms.ENABLED) {
+    const tmsCtx = await tms.getContextoSOFIA(message);
+    if (tmsCtx) systemPrompt += tmsCtx;
+  }
+
   const messages = [...history, { role: 'user', content: message }];
 
   memory.addMessage(sid, 'user', message);

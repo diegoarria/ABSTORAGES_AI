@@ -251,4 +251,180 @@ function formatearContactos(datos) {
   return 'DIRECTORIO DE CONTACTOS:\n' + lines.join('\n');
 }
 
-module.exports = { buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA, query, ENABLED };
+// ── Funciones específicas para SOFIA ─────────────────────────────────────────
+
+// Buscar proveedor/transportista por nombre o RFC
+async function buscarProveedor(texto) {
+  const por_nombre = await query('proveedores', {
+    pagina: 1, limite: 5,
+    filtros: { 'Razon Social': { contiene: texto } },
+    campos: ['Folio','RFC','Razon Social','Contacto','Correo','Telefono','Movil','Estatus','Comentarios','Emergencia'],
+  });
+  if (por_nombre?.datos?.length) return por_nombre.datos;
+
+  // Intentar por RFC si el texto parece un RFC
+  if (texto.length >= 6) {
+    const por_rfc = await query('proveedores', {
+      pagina: 1, limite: 5,
+      filtros: { 'RFC': { contiene: texto.toUpperCase() } },
+      campos: ['Folio','RFC','Razon Social','Contacto','Correo','Telefono','Movil','Estatus','Comentarios','Emergencia'],
+    });
+    if (por_rfc?.datos?.length) return por_rfc.datos;
+  }
+  return [];
+}
+
+// Rutas que ha manejado un proveedor + costos históricos (desde detalle_servicios)
+async function rutasProveedor(nombreProveedor) {
+  const r = await query('detalle_servicios', {
+    pagina: 1, limite: 200,
+    filtros: { 'Proveedor': { contiene: nombreProveedor } },
+    campos: ['Folio de servicio','Fecha de Servicio','Proveedor','Cliente',
+             'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
+             'Costo','Estatus Operaciones'],
+  });
+  if (!r?.datos?.length) return [];
+
+  // Agrupar por ruta
+  const mapa = {};
+  for (const s of r.datos) {
+    const origen  = s['Cuidad Origen']  || s['Estado Origen']  || '?';
+    const destino = s['Cuidad destino'] || s['Estado destino'] || '?';
+    const ruta    = `${origen} → ${destino}`;
+    if (!mapa[ruta]) mapa[ruta] = { ruta, count: 0, costos: [], ultimoFolio: '', ultimaFecha: '' };
+    mapa[ruta].count++;
+    if (s['Costo']) mapa[ruta].costos.push(Number(s['Costo']));
+    if (s['Folio de servicio']) mapa[ruta].ultimoFolio = s['Folio de servicio'];
+    if (s['Fecha de Servicio']) mapa[ruta].ultimaFecha = s['Fecha de Servicio'].slice(0,10);
+  }
+
+  return Object.values(mapa)
+    .sort((a, b) => b.count - a.count)
+    .map(r => ({
+      ruta: r.ruta,
+      servicios: r.count,
+      costoPromedio: r.costos.length ? Math.round(r.costos.reduce((a,b)=>a+b,0)/r.costos.length) : null,
+      costoMin: r.costos.length ? Math.min(...r.costos) : null,
+      costoMax: r.costos.length ? Math.max(...r.costos) : null,
+      ultimaFecha: r.ultimaFecha,
+    }));
+}
+
+// Proveedores que han manejado una ruta específica (por ciudad origen → destino)
+async function proveedoresPorRuta(origen, destino) {
+  const filtros = {};
+  if (origen)  filtros['Cuidad Origen']  = { contiene: origen };
+  if (destino) filtros['Cuidad destino'] = { contiene: destino };
+
+  const r = await query('detalle_servicios', {
+    pagina: 1, limite: 200,
+    filtros,
+    campos: ['Proveedor','Cuidad Origen','Cuidad destino','Costo','Fecha de Servicio','Estatus Operaciones'],
+  });
+  if (!r?.datos?.length) return [];
+
+  const mapa = {};
+  for (const s of r.datos) {
+    const prov = s['Proveedor']?.trim();
+    if (!prov) continue;
+    if (!mapa[prov]) mapa[prov] = { proveedor: prov, count: 0, costos: [], ultimaFecha: '' };
+    mapa[prov].count++;
+    if (s['Costo']) mapa[prov].costos.push(Number(s['Costo']));
+    if (s['Fecha de Servicio'] > mapa[prov].ultimaFecha) mapa[prov].ultimaFecha = s['Fecha de Servicio'].slice(0,10);
+  }
+
+  return Object.values(mapa)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 20)
+    .map(p => ({
+      proveedor: p.proveedor,
+      servicios: p.count,
+      costoPromedio: p.costos.length ? Math.round(p.costos.reduce((a,b)=>a+b,0)/p.costos.length) : null,
+      ultimaFecha: p.ultimaFecha,
+    }));
+}
+
+// Context builder para SOFIA
+async function getContextoSOFIA(mensajeUsuario) {
+  if (!ENABLED) return '';
+
+  const msg = mensajeUsuario.toLowerCase();
+  const stopwords = new Set(['para','como','que','con','cuando','donde','cuanto','cuantos',
+    'tiene','tienen','tengo','quiero','busco','necesito','dame','dime','cual','cuales',
+    'este','esta','estos','estas','todo','todos','alguna','alguno','proveedor','transportista']);
+
+  const palabrasClave = msg.split(/\s+/)
+    .filter(w => w.length > 4 && !stopwords.has(w))
+    .slice(0, 3);
+
+  const esProveedor  = /proveedor|transportista|flete|camión|unidad|operador|carrier/.test(msg);
+  const esRuta       = /ruta|rutas|origen|destino|maneja|cubre|atiende/.test(msg);
+  const esContacto   = /teléfono|telefono|contacto|correo|email|número|llamar/.test(msg);
+  const esCosto      = /costo|costos|precio|precios|tarifa|tarifas|cuánto|cobra/.test(msg);
+
+  const bloques = [];
+  let proveedorEncontrado = null;
+
+  // Buscar proveedor mencionado por nombre
+  for (const palabra of palabrasClave) {
+    if (palabra.length < 4) continue;
+    const resultados = await buscarProveedor(palabra);
+    if (resultados.length > 0) {
+      proveedorEncontrado = resultados[0]['Razon Social'];
+      bloques.push(formatearProveedor(resultados));
+      break;
+    }
+  }
+
+  // Rutas y costos históricos del proveedor
+  if (proveedorEncontrado && (esRuta || esCosto || esProveedor)) {
+    const rutas = await rutasProveedor(proveedorEncontrado);
+    if (rutas.length) bloques.push(formatearRutasProveedor(proveedorEncontrado, rutas));
+  }
+
+  // Proveedores disponibles para una ruta mencionada
+  if (esRuta && !proveedorEncontrado) {
+    // Detectar ciudades en el mensaje (palabras capitalizadas o en contexto de ruta)
+    const ciudades = mensajeUsuario.match(/[A-ZÁÉÍÓÚ][a-záéíóú]+(?:\s+[A-ZÁÉÍÓÚ][a-záéíóú]+)*/g) || [];
+    if (ciudades.length >= 2) {
+      const provs = await proveedoresPorRuta(ciudades[0], ciudades[1]);
+      if (provs.length) bloques.push(formatearProveedoresPorRuta(ciudades[0], ciudades[1], provs));
+    }
+  }
+
+  if (!bloques.length) return '';
+  return '\n\n---\n[DATOS TMS PROVEEDORES — uso interno SOFIA]\n' + bloques.join('\n\n') + '\n---\n';
+}
+
+// ── Formateadores SOFIA ───────────────────────────────────────────────────────
+function formatearProveedor(datos) {
+  const lines = datos.map(p => {
+    const tel = p['Telefono_limpio']?.[0] || p['Telefono'] || '—';
+    const mov = p['Movil_limpio']?.[0]    || p['Movil']    || '—';
+    return `• ${p['Razon Social']} | Folio: ${p['Folio']} | RFC: ${p['RFC'] || '—'} | Estatus: ${p['Estatus']} | Contacto: ${p['Contacto'] || '—'} | Tel: ${tel} | Móvil: ${mov} | Correo: ${p['Correo'] || '—'}${p['Emergencia'] ? ' | ⚡ Emergencia: '+p['Emergencia'] : ''}${p['Comentarios'] ? ' | Nota: '+p['Comentarios'] : ''}`;
+  });
+  return 'PROVEEDORES ENCONTRADOS EN TMS:\n' + lines.join('\n');
+}
+
+function formatearRutasProveedor(nombre, rutas) {
+  const lines = rutas.map(r =>
+    `• ${r.ruta} — ${r.servicios} servicio(s) | Costo prom: $${r.costoPromedio?.toLocaleString('es-MX') || '—'} | Rango: $${r.costoMin?.toLocaleString('es-MX') || '—'}–$${r.costoMax?.toLocaleString('es-MX') || '—'} | Último: ${r.ultimaFecha || '—'}`
+  );
+  return `RUTAS MANEJADAS POR ${nombre.toUpperCase()}:\n` + lines.join('\n');
+}
+
+function formatearProveedoresPorRuta(origen, destino, provs) {
+  const lines = provs.map(p =>
+    `• ${p.proveedor} — ${p.servicios} servicio(s) | Costo prom: $${p.costoPromedio?.toLocaleString('es-MX') || '—'} | Último servicio: ${p.ultimaFecha || '—'}`
+  );
+  return `PROVEEDORES QUE HAN CUBIERTO ${origen.toUpperCase()} → ${destino.toUpperCase()}:\n` + lines.join('\n');
+}
+
+module.exports = {
+  // SARA
+  buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
+  // SOFIA
+  buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA,
+  // Core
+  query, ENABLED,
+};
