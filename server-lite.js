@@ -399,6 +399,17 @@ app.get('/api/noa/folios', async (req, res) => {
   }
 });
 
+app.get('/api/noa/folio/:folio', async (req, res) => {
+  if (!tms.ENABLED) return res.json(null);
+  try {
+    const datos = await tms.buscarFolioNOA(req.params.folio.toUpperCase());
+    res.json(datos[0] || null);
+  } catch (e) {
+    console.error('[NOA/folio]', e.message);
+    res.json(null);
+  }
+});
+
 app.get('/api/sessions', (req, res) => res.json(memory.listSessions()));
 
 // ─── TARIFA DINÁMICA ──────────────────────────────────────────────────────

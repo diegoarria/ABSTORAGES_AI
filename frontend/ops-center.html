@@ -54,7 +54,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 /* ── WORKSPACE ── */
 .workspace{display:flex;height:calc(100vh - 52px);overflow:hidden}
 .panel{display:flex;flex-direction:column;min-height:0}
-.panel-noa{flex:6;border-right:1px solid var(--b1)}
+.panel-noa{flex:6;border-right:1px solid var(--b1);position:relative}
 .panel-hec{flex:4}
 
 /* ── PANEL HEADS ── */
@@ -196,6 +196,36 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .esc-st{font-size:10px;font-weight:700;margin-top:1px}
 .esc-st.sr{color:var(--crit)}.esc-st.ok{color:var(--grn)}.esc-st.act{color:var(--warn)}.esc-st.pd{color:var(--t3)}
 .fc-acts{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--b1);background:rgba(0,0,0,.15)}
+
+/* ── FOLIO DETAIL PANEL ── */
+.fd-overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;background:var(--s1);transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.fd-overlay.open{transform:translateX(0);pointer-events:all}
+.fd-head{height:48px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--b1);flex-shrink:0;background:var(--s2)}
+.fd-back{background:none;border:none;color:var(--t2);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:5px;line-height:1;display:flex;align-items:center;transition:background .13s}
+.fd-back:hover{background:var(--b1)}
+.fd-folio{font-size:12.5px;font-weight:800;font-family:var(--mono);color:var(--crit);letter-spacing:.03em;flex:1}
+.fd-st-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;padding:3px 8px;border-radius:20px}
+.fd-body{flex:1;overflow-y:auto;padding:14px 14px 24px}
+.fd-sec{margin-bottom:18px}
+.fd-sec-ttl{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.13em;color:var(--t3);border-bottom:1px solid var(--b1);padding-bottom:6px;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.fd-sec-ttl .fd-ico{font-size:11px;opacity:.7}
+.fd-row{display:flex;gap:4px;margin-bottom:5px;font-size:12px;line-height:1.5}
+.fd-k{color:var(--t3);font-size:11px;font-weight:600;min-width:110px;flex-shrink:0}
+.fd-v{color:var(--t1);word-break:break-word;font-family:inherit}
+.fd-v.mono{font-family:var(--mono);font-size:11px}
+.fd-route{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--s2);border-radius:8px;border:1px solid var(--b1);margin-bottom:14px}
+.fd-route-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.fd-route-or{background:var(--grn)}
+.fd-route-de{background:var(--crit)}
+.fd-route-col{flex:1}
+.fd-route-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1px}
+.fd-route-city{font-size:12.5px;font-weight:700;color:var(--t1)}
+.fd-route-addr{font-size:11px;color:var(--t2)}
+.fd-route-arrow{color:var(--t3);font-size:18px;align-self:center;padding:0 4px}
+.fd-ci-box{background:var(--s3);border:1px solid rgba(255,58,58,.25);border-radius:8px;padding:12px 14px;font-size:11.5px;line-height:1.7;color:var(--t1);white-space:pre-wrap;word-break:break-word;max-height:180px;overflow-y:auto}
+.fd-link{color:var(--t2);text-decoration:underline;text-underline-offset:2px;font-size:11.5px}
+.fd-link:hover{color:var(--crit)}
+.fd-comment{font-size:11.5px;color:var(--warn);background:rgba(255,140,0,.07);border:1px solid rgba(255,140,0,.2);border-radius:6px;padding:8px 10px;line-height:1.6;margin-top:4px}
 
 /* ── NOA AI CHAT ── */
 .noa-ai-foot{flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1);display:flex;flex-direction:column;transition:flex .2s}
@@ -425,6 +455,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
           aria-label="Mensaje para NOA"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendNoaMsg();}"></textarea>
         <button class="btn btn-r btn-sm" id="noa-send-btn" onclick="sendNoaMsg()" aria-label="Enviar">→</button>
+      </div>
+    </div>
+
+    <!-- ── FOLIO DETAIL SLIDE-IN PANEL ── -->
+    <div class="fd-overlay" id="fd-overlay" role="dialog" aria-modal="true" aria-label="Detalle de folio">
+      <div class="fd-head">
+        <button class="fd-back" onclick="cerrarFolio()" aria-label="Cerrar detalle">&#8592;</button>
+        <span class="fd-folio" id="fd-folio-id">—</span>
+        <span class="fd-st-badge" id="fd-st-badge"></span>
+      </div>
+      <div class="fd-body" id="fd-body">
+        <div style="color:var(--t3);font-size:12px;padding:20px 0;text-align:center">Cargando…</div>
       </div>
     </div>
   </section>
@@ -657,7 +699,7 @@ function card(f){
   var ciStyle = f.al==='CRITICO' ? ' style="--ci:'+ci.toFixed(2)+'"' : '';
 
   if(f.al==='NORMAL'){
-    return '<div class="fc no"'+ciStyle+'>'+
+    return '<div class="fc no"'+ciStyle+' onclick="abrirFolio(\''+f.id+'\')" style="cursor:pointer" role="button" tabindex="0" aria-label="Ver detalle folio '+f.id+'">'+
       '<div class="fc-line"></div>'+
       '<div class="fc-body">'+
         '<div class="cpt-l">'+
@@ -688,7 +730,7 @@ function card(f){
     escH='<div class="esc-hdr">LOG DE ESCALACIÓN</div><div class="esc-steps">'+steps+'</div>';
   }
 
-  return '<div class="fc '+cc+'"'+ciStyle+' role="article" aria-label="Folio '+f.id+' — '+f.al+'">'+
+  return '<div class="fc '+cc+'"'+ciStyle+' onclick="abrirFolio(\''+f.id+'\')" style="cursor:pointer" role="button" tabindex="0" aria-label="Ver detalle folio '+f.id+'">'+
     '<div class="fc-line" aria-hidden="true"></div>'+
     '<div class="fc-body">'+
       '<div class="fc-top">'+
@@ -724,8 +766,8 @@ function card(f){
     (f.al==='CRITICO'?
       '<div class="fc-acts">'+
         // UX: acción primaria (resolver) en verde, secundaria (escalar) en neutro — jerarquía clara
-        '<button class="btn btn-sm btn-g" onclick="resolver(\''+f.id+'\')" aria-label="Marcar folio '+f.id+' como resuelto">✓ Resolver</button>'+
-        '<button class="btn btn-sm" onclick="toast(\'Escalando '+f.id+' al Coordinador Regional\',\'#FF8C00\')" aria-label="Escalar folio '+f.id+' al coordinador">↑ Escalar</button>'+
+        '<button class="btn btn-sm btn-g" onclick="event.stopPropagation();resolver(\''+f.id+'\')" aria-label="Marcar folio '+f.id+' como resuelto">✓ Resolver</button>'+
+        '<button class="btn btn-sm" onclick="event.stopPropagation();toast(\'Escalando '+f.id+' al Coordinador Regional\',\'#FF8C00\')" aria-label="Escalar folio '+f.id+' al coordinador">↑ Escalar</button>'+
       '</div>':'')+
   '</div>';
 }
@@ -812,6 +854,144 @@ function resolver(id){
   if(!f) return;
   f.al='NORMAL';f.inc=null;f.zona=false;f.esc=[];
   renderNOA(); toast('Folio '+id+' marcado como resuelto','#00B451');
+}
+
+// ── FOLIO DETAIL PANEL ────────────────────────────────
+var fdOpen = false;
+
+function abrirFolio(id){
+  var ov = document.getElementById('fd-overlay');
+  var body = document.getElementById('fd-body');
+  var lbl = document.getElementById('fd-folio-id');
+  var badge = document.getElementById('fd-st-badge');
+  lbl.textContent = id;
+  badge.textContent = '';
+  badge.style.cssText = '';
+  body.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:24px 0;text-align:center">Cargando datos TMS…</div>';
+  ov.classList.add('open');
+  fdOpen = true;
+  fetch('/api/noa/folio/' + encodeURIComponent(id))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d) { body.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:24px;text-align:center">Sin datos en TMS para este folio.</div>'; return; }
+      renderFolioDetail(d);
+    })
+    .catch(function(){ body.innerHTML = '<div style="color:var(--crit);font-size:12px;padding:24px;text-align:center">Error al consultar TMS.</div>'; });
+}
+
+function cerrarFolio(){
+  document.getElementById('fd-overlay').classList.remove('open');
+  fdOpen = false;
+}
+
+function fd(label, value, mono){
+  if (!value || value === '—') return '';
+  return '<div class="fd-row"><span class="fd-k">'+label+'</span><span class="fd-v'+(mono?' mono':'')+'">'+escH(value)+'</span></div>';
+}
+function fdLink(label, url, text){
+  if (!url) return '';
+  return '<div class="fd-row"><span class="fd-k">'+label+'</span><span class="fd-v"><a href="'+escH(url)+'" target="_blank" rel="noopener" class="fd-link">'+escH(text||url)+'</a></span></div>';
+}
+function fdSec(ico, title, rows){
+  var content = rows.filter(Boolean).join('');
+  if (!content) return '';
+  return '<div class="fd-sec"><div class="fd-sec-ttl"><span class="fd-ico">'+ico+'</span>'+title+'</div>'+content+'</div>';
+}
+
+function renderFolioDetail(d){
+  var g = function(k){ return (d[k]||'').trim(); };
+
+  // status badge
+  var st = g('EstatusMonitoreoDetalle') || g('Estatus Operaciones') || '';
+  var badge = document.getElementById('fd-st-badge');
+  var stLow = st.toLowerCase();
+  if (stLow.includes('destino') || stLow.includes('descarga'))      { badge.textContent='EN DESTINO'; badge.style.cssText='background:rgba(0,180,81,.15);color:var(--grn);border:1px solid rgba(0,180,81,.3)'; }
+  else if (stLow.includes('origen') || stLow.includes('carga'))     { badge.textContent='EN CARGA'; badge.style.cssText='background:rgba(255,140,0,.12);color:var(--warn);border:1px solid rgba(255,140,0,.28)'; }
+  else if (stLow.includes('proceso') || stLow.includes('tránsito')) { badge.textContent='EN TRÁNSITO'; badge.style.cssText='background:rgba(58,150,255,.12);color:#3a96ff;border:1px solid rgba(58,150,255,.28)'; }
+  else if (st)                                                       { badge.textContent=st.toUpperCase(); badge.style.cssText='background:var(--s3);color:var(--t2);border:1px solid var(--b2)'; }
+
+  // ruta block
+  var orParts = [g('Calle Origen'), g('Colonia Origen'), g('Cuidad Origen'), g('Estado Origen')].filter(Boolean);
+  var deParts = [g('Calle destino'), g('Colonia destino'), g('Cuidad destino'), g('Estado destino')].filter(Boolean);
+  var rutaHtml = '<div class="fd-route">'+
+    '<div><div class="fd-route-dot fd-route-or" aria-hidden="true"></div></div>'+
+    '<div class="fd-route-col">'+
+      '<div class="fd-route-lbl">Origen</div>'+
+      '<div class="fd-route-city">'+(g('Cuidad Origen')||'—')+', '+(g('Estado Origen')||'—')+'</div>'+
+      (orParts.length>2?'<div class="fd-route-addr">'+escH(orParts.slice(0,2).join(', '))+'</div>':'')+
+    '</div>'+
+    '<span class="fd-route-arrow" aria-hidden="true">→</span>'+
+    '<div><div class="fd-route-dot fd-route-de" aria-hidden="true"></div></div>'+
+    '<div class="fd-route-col">'+
+      '<div class="fd-route-lbl">Destino</div>'+
+      '<div class="fd-route-city">'+(g('Cuidad destino')||'—')+', '+(g('Estado destino')||'—')+'</div>'+
+      (deParts.length>2?'<div class="fd-route-addr">'+escH(deParts.slice(0,2).join(', '))+'</div>':'')+
+    '</div>'+
+  '</div>';
+
+  // Citas — formato legible
+  function fmtDt(v){ if(!v) return ''; try{ return new Date(v).toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}); } catch(e){ return v; } }
+
+  // CI box
+  var ci = g('Comentarios CI') || g('Carta de Instruccion');
+  var ciHtml = ci ? '<div class="fd-sec"><div class="fd-sec-ttl"><span class="fd-ico">📋</span>Instrucciones al Cliente (CI)</div><div class="fd-ci-box">'+escH(ci)+'</div></div>' : '';
+
+  // estatus comentarios
+  var estComent = g('Comentarios Estatus Monitoreo');
+  var estHtml = estComent ? '<div class="fd-comment">'+escH(estComent)+'</div>' : '';
+
+  var body = document.getElementById('fd-body');
+  body.innerHTML =
+    rutaHtml +
+    fdSec('📦', 'Servicio',
+      [fd('Cliente', g('Cliente')),
+       fd('Fecha servicio', fmtDt(g('Fecha de Servicio'))),
+       fd('Mercancía', g('Mercancias')),
+       fd('Presentación', g('Presentacion')),
+       fd('Cantidad', g('Cantidad')),
+       fd('Peso', g('Peso'))]) +
+    fdSec('🚛', 'Unidad & Operador',
+      [fd('Tractor', g('Tractor')),
+       fd('Tipo tractor', g('Tipo de tractor')),
+       fd('NIV Tractor', g('NIV Tractor'), true),
+       fd('Remolque', g('Remolque')),
+       fd('Tipo remolque', g('Tipo remolque')),
+       fd('NIV Remolque', g('NIV Remolque'), true),
+       fd('Permiso SCT', g('Permiso SCT')),
+       fd('Operador', g('Operador')),
+       fd('RFC', g('RFC'), true),
+       fd('Licencia', g('Licencia'), true),
+       fd('Proveedor', g('Proveedor'))]) +
+    fdSec('⏱', 'Tiempos de Carga',
+      [fd('Cita carga', fmtDt(g('Cita de carga'))),
+       fd('Llegada a carga', fmtDt(g('Llegada a carga'))),
+       fd('Salida carga', fmtDt(g('Hora de salida carga')))]) +
+    fdSec('🏁', 'Tiempos de Descarga',
+      [fd('Cita descarga', fmtDt(g('Cita de Descarga'))),
+       fd('ETA destino', fmtDt(g('Hora estimada de llegada a destino'))),
+       fd('Llegada descarga', fmtDt(g('Llegada a descarga'))),
+       fd('Salida descarga', fmtDt(g('Hora de salida descarga')))]) +
+    fdSec('📡', 'GPS & Planner',
+      [fdLink('ProTrack365', g('GPS'), g('Usuario GPS') || 'Ver tracking'),
+       fd('Usuario GPS', g('Usuario GPS')),
+       fd('GPS Origen', g('GPSOrigen')),
+       fd('GPS Destino', g('GPSdestino')),
+       fd('Planner', g('Planner')),
+       fd('Tel. Planner', g('Telefono')),
+       fd('Correo Planner', g('Correo'))]) +
+    fdSec('📞', 'Contactos',
+      [fd('Remitente', g('Nombre Remitente')),
+       fd('Contacto remitente', g('Contacto Remitente')),
+       fd('Tel. remitente', g('Telefono Remitente')),
+       fd('Destinatario', g('Nombre Destinatario')),
+       fd('Contacto destinatario', g('Contacto Destinatario')),
+       fd('Tel. destinatario', g('Telefono Destinatario'))]) +
+    ciHtml +
+    fdSec('📊', 'Estatus Monitoreo',
+      [fd('Estatus operaciones', g('Estatus Operaciones')),
+       fd('Detalle monitoreo', g('EstatusMonitoreoDetalle')),
+       fd('Siniestro', g('Siniestro'))]) +
+    (estComent ? '<div class="fd-sec" style="margin-top:-10px">'+estHtml+'</div>' : '');
 }
 
 function simBarrido(){
@@ -1272,7 +1452,7 @@ document.addEventListener('DOMContentLoaded',function(){
     document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
   });
   document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){closeTurno();closeGestion();}
+    if(e.key==='Escape'){closeTurno();closeGestion();if(fdOpen)cerrarFolio();}
   });
 });
 </script>
