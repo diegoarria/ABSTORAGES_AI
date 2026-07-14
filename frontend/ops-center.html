@@ -783,12 +783,28 @@ function resolver(id){
 }
 
 function simBarrido(){
-  folios.forEach(function(f){
-    var r=Math.floor(Math.random()*10)+5;
-    f.min=Math.max(2,f.min-r);
-    if(f.min<=30&&f.al==='ATENCION'&&!f.zona) f.al='NORMAL';
-  });
-  renderNOA(); toast('Barrido GPS completado — posiciones actualizadas','#00B451');
+  var btn=document.querySelector('[onclick="simBarrido()"]');
+  if(btn){btn.disabled=true;btn.textContent='↻ Barriendo…';}
+  fetch('/api/noa/folios')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      // preservar alertas manuales y escalaciones que ya estaban activas
+      var prevMap={};
+      folios.forEach(function(f){prevMap[f.id]=f;});
+      FOLIOS = data;
+      folios = data.map(function(f){
+        var prev=prevMap[f.id];
+        if(prev&&prev.al!=='NORMAL') f.al=prev.al;
+        if(prev) f.esc=prev.esc;
+        return f;
+      });
+      renderNOA();
+      toast('Barrido completado — '+folios.length+' servicios actualizados','#00B451');
+    })
+    .catch(function(){toast('Error al conectar con el TMS','#FF3A3A');})
+    .finally(function(){
+      if(btn){btn.disabled=false;btn.textContent='↻ Barrer';}
+    });
 }
 
 function openTurno(){
