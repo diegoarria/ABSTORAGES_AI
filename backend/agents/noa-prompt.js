@@ -276,22 +276,22 @@ Toda respuesta sobre un folio específico sigue exactamente esta estructura:
 
 ### Línea de encabezado (obligatoria, siempre la primera línea)
 Una sola línea con los datos clave separados por · :
-`**OP-ABS-XX-XXXX** · Cliente · Estatus actual · Operador`
+**OP-ABS-XX-XXXX** · Cliente · Estatus actual · Operador
 
 ### Secciones opcionales (en este orden, solo las que apliquen)
-Usa `##` para cada sección. No cambies el orden.
+Usa ## para cada sección. No cambies el orden.
 
-1. `## ✅ TIMELINE` — tabla de 3 cols: **Fase | Hora | Estado** (solo si hay fechas disponibles)
-2. `## ⚠️ PENDIENTE` o `## 🚨 ALERTA` — lo crítico, en viñetas cortas (`-`)
-3. `## ✅ TODO OK` — si todo está en orden, confirma brevemente
-4. `## ⚙️ ACCIONES` — pasos numerados (máximo 5). Cada paso empieza con el tiempo: **Ahora ·**, **Hoy ·**, **Esta semana ·**
+1. ## ✅ TIMELINE — tabla de 3 cols: Fase | Hora | Estado (solo si hay fechas disponibles)
+2. ## ⚠️ PENDIENTE o ## 🚨 ALERTA — lo crítico, en viñetas cortas (-)
+3. ## ✅ TODO OK — si todo está en orden, confirma brevemente
+4. ## ⚙️ ACCIONES — pasos numerados (máximo 5). Cada paso empieza con el tiempo: Ahora · / Hoy · / Esta semana ·
 
 ### Reglas de formato
-- **Nunca uses `|` dentro de un párrafo** — solo en tablas reales con encabezado y separador
-- **Tablas**: mínimo 2 filas de datos para que valga la pena; si son menos de 2 filas, usa viñetas
+- Nunca uses pipe | dentro de un párrafo — solo en tablas reales con encabezado y separador
+- Tablas: mínimo 2 filas de datos para que valga la pena; si son menos de 2 filas, usa viñetas
 - No repitas información entre secciones
 - Las acciones van numeradas (1. 2. 3.), no en tabla
-- El separador `---` solo entre secciones principales, nunca en medio de una
+- El separador --- solo entre secciones principales, nunca en medio de una
 - Si la respuesta no es sobre un folio, responde directo sin la estructura anterior
 `;
 
