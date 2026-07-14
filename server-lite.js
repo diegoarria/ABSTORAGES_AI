@@ -360,49 +360,67 @@ app.get('/api/metricas', (req, res) => {
 app.get('/api/sofia/folios', (req, res) => res.json([]));
 
 // ─── NOA: folios activos desde TMS ───────────────────────────────────────────
+let _foliosCache = null; // { data: [], ts: Date }
+
+function mapFolio(s) {
+  const det = (s['EstatusMonitoreoDetalle'] || '').toLowerCase();
+  let st = 'EN_TRANSITO';
+  if (det.includes('origen') || det.includes('carga'))              st = 'EN_CARGA';
+  else if (det.includes('destino') || det.includes('descarga'))     st = 'EN_DESTINO';
+  else if (det.includes('detenida') || det.includes('resguardo'))   st = 'DETENIDA';
+
+  const comentario = (s['Comentarios Estatus Monitoreo'] || '').trim();
+  const citaDes = s['Cita de Descarga']
+    ? new Date(s['Cita de Descarga']).toLocaleString('es-MX', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false })
+    : null;
+
+  const folio = s['Folio de servicio'] || '—';
+  const esc_saved = escalaciones[folio];
+  return {
+    id:    folio,
+    placa: s['Tractor']           || '—',
+    cl:    s['Cliente']           || '—',
+    or:    [s['Cuidad Origen'],  s['Estado Origen'] ].filter(Boolean).join(', '),
+    de:    [s['Cuidad destino'], s['Estado destino']].filter(Boolean).join(', '),
+    st,
+    gps:   { la: null, ln: null, url: s['GPS'] || null, usr: s['Usuario GPS'] || null },
+    min:   0,
+    op:    s['Operador']  || '—',
+    pv:    s['Proveedor'] || '—',
+    al:    esc_saved ? esc_saved.al : 'NORMAL',
+    inc:   esc_saved ? esc_saved.inc : (comentario || null),
+    zona:  false,
+    esc:   esc_saved ? esc_saved.esc : [],
+    citaDes,
+    citaDesRaw: s['Cita de Descarga'] || null,
+    planner: s['Planner'] || null,
+  };
+}
+
 app.get('/api/noa/folios', async (req, res) => {
   if (!tms.ENABLED) return res.json([]);
   try {
     const activos = await tms.foliosActivosNOA();
-    const folios = activos.map(s => {
-      // Valores reales TMS: "En tránsito","En origen","Unidad detenida","Unidad en resguardo","En destino","Sin Información"
-      const det = (s['EstatusMonitoreoDetalle'] || '').toLowerCase();
-      let st = 'EN_TRANSITO';
-      if (det.includes('origen') || det.includes('carga'))              st = 'EN_CARGA';
-      else if (det.includes('destino') || det.includes('descarga'))     st = 'EN_DESTINO';
-      else if (det.includes('detenida') || det.includes('resguardo'))   st = 'DETENIDA';
-
-      const comentario = (s['Comentarios Estatus Monitoreo'] || '').trim();
-      const citaDes = s['Cita de Descarga']
-        ? new Date(s['Cita de Descarga']).toLocaleString('es-MX', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false })
-        : null;
-
-      const folio = s['Folio de servicio'] || '—';
-      const esc_saved = escalaciones[folio];
-      return {
-        id:    folio,
-        placa: s['Tractor']           || '—',
-        cl:    s['Cliente']           || '—',
-        or:    [s['Cuidad Origen'],  s['Estado Origen'] ].filter(Boolean).join(', '),
-        de:    [s['Cuidad destino'], s['Estado destino']].filter(Boolean).join(', '),
-        st,
-        gps:   { la: null, ln: null, url: s['GPS'] || null, usr: s['Usuario GPS'] || null },
-        min:   0,
-        op:    s['Operador']  || '—',
-        pv:    s['Proveedor'] || '—',
-        al:    esc_saved ? esc_saved.al : 'NORMAL',
-        inc:   esc_saved ? esc_saved.inc : (comentario || null),
-        zona:  false,
-        esc:   esc_saved ? esc_saved.esc : [],
-        citaDes,
-        citaDesRaw: s['Cita de Descarga'] || null,
-        planner: s['Planner'] || null,
-      };
-    });
-    res.json(folios);
+    // Only replace cache if TMS returned real data
+    if (activos && activos.length > 0) {
+      const folios = activos.map(mapFolio);
+      _foliosCache = { data: folios, ts: new Date().toISOString() };
+      return res.json(folios);
+    }
+    // TMS returned empty — serve cache if available
+    if (_foliosCache) {
+      console.warn('[NOA/folios] TMS returned 0 results — serving cache from', _foliosCache.ts);
+      return res.json(_foliosCache.data);
+    }
+    res.json([]);
   } catch (e) {
     console.error('[NOA/folios]', e.message);
-    res.json([]);
+    // TMS error — serve cache if available
+    if (_foliosCache) {
+      console.warn('[NOA/folios] TMS error — serving cache from', _foliosCache.ts);
+      return res.json(_foliosCache.data);
+    }
+    res.status(503).json([]);
   }
 });
 

@@ -1729,38 +1729,73 @@ function simTick(){
 // ── INIT ──────────────────────────────────────────────
 var _foliosRetryTimer = null;
 var _foliosRetryCount = 0;
-var _foliosRetryDelays = [5, 10, 20, 30, 60]; // segundos
+var _foliosRetryDelays = [5, 10, 20, 30, 60]; // segundos, luego sigue en 60
+
+// ── localStorage cache ─────────────────────────────────────────────────────
+var LS_KEY = 'noa_folios_v2';
+function saveFoliosLS(data) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify({ts: Date.now(), data: data})); } catch(e) {}
+}
+function loadFoliosLS() {
+  try { var c = JSON.parse(localStorage.getItem(LS_KEY)||'null'); return (c&&c.data)?c:null; } catch(e){ return null; }
+}
+
+function applyFolios(data, stale) {
+  FOLIOS = data;
+  folios = data.map(function(f){return Object.assign({},f,{esc:(f.esc||[]).slice()});});
+  detectarAlertas(folios);
+  lastBarridoAt = stale ? lastBarridoAt : Date.now();
+  updateBarridoLabel();
+  folios.forEach(function(f){ prevAlertSet[f.id]=f.al; });
+  renderNOA();
+  if (stale) {
+    // Muestra indicador sutil de datos en caché
+    var lbl = document.getElementById('last-barrido');
+    if (lbl) lbl.style.color = 'var(--warn)';
+  } else {
+    saveFoliosLS(data);
+    var lbl2 = document.getElementById('last-barrido');
+    if (lbl2) lbl2.style.color = '';
+  }
+}
 
 function loadFoliosTMS(intento){
   intento = intento || 0;
   _foliosRetryCount = intento;
   var out = document.getElementById('noa-out');
-  if (out && intento === 0) {
-    out.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t3);font-size:11px">Cargando servicios activos del TMS…</div>';
+
+  // Primera carga: muestra caché inmediatamente si existe
+  if (intento === 0) {
+    var cached = loadFoliosLS();
+    if (cached && cached.data.length > 0) {
+      applyFolios(cached.data, true); // muestra caché mientras carga
+    } else if (out) {
+      out.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t3);font-size:11px">Conectando con el TMS…</div>';
+    }
   }
+
   fetch('/api/noa/folios')
-    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(r){
+      if(r.status===503) throw new Error('TMS no disponible');
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    })
     .then(function(data){
       _foliosRetryCount = 0;
       if(_foliosRetryTimer){ clearTimeout(_foliosRetryTimer); _foliosRetryTimer=null; }
-      FOLIOS = data;
-      folios = data.map(function(f){return Object.assign({},f,{esc:(f.esc||[]).slice()});});
-      detectarAlertas(folios);
-      lastBarridoAt = Date.now();
-      updateBarridoLabel();
-      folios.forEach(function(f){ prevAlertSet[f.id]=f.al; });
-      renderNOA();
+      applyFolios(data, false);
     })
     .catch(function(e){
       var delay = _foliosRetryDelays[Math.min(intento, _foliosRetryDelays.length-1)];
-      var out2 = document.getElementById('noa-out');
-      // Si ya hay folios cargados, no borrar — solo tostar
+      // Si hay folios visibles (caché o previos), no tocar pantalla — solo tostar
       if (folios.length > 0) {
-        toast('TMS no respondió — reintentando en '+delay+'s','#FF8C00');
-      } else if (out2) {
-        out2.innerHTML = retryBanner(delay, intento);
-        iniciarCuentaRegresivaBanner(delay, intento);
+        toast('TMS lento — reintentando en '+delay+'s · Mostrando última versión','#FF8C00');
+      } else {
+        // Sin datos en absoluto: muestra banner con cuenta regresiva
+        var out2 = document.getElementById('noa-out');
+        if (out2) { out2.innerHTML = retryBanner(delay, intento); iniciarCuentaRegresivaBanner(delay, intento); }
       }
+      // Retry infinito — siempre vuelve a intentar
       _foliosRetryTimer = setTimeout(function(){ loadFoliosTMS(intento+1); }, delay*1000);
     });
 }
