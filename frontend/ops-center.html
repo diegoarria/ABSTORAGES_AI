@@ -1612,13 +1612,14 @@ function streamNoa(msg){
   }).then(function(r){
     if(!r.ok||!r.body) throw new Error('HTTP '+r.status);
     var reader=r.body.getReader(), decoder=new TextDecoder(), buf='';
-    var rafPending = false;
     var noaMsgs = document.getElementById('noa-msgs');
+    var rafId = null;
+    var isDone = false;
     function scheduleRender(){
-      if (rafPending) return;
-      rafPending = true;
-      requestAnimationFrame(function(){
-        rafPending = false;
+      if (isDone || rafId) return;
+      rafId = requestAnimationFrame(function(){
+        rafId = null;
+        if (isDone) return; // done() already rendered markdown — don't overwrite
         bubble.textContent = acc;
         noaMsgs.scrollTop = noaMsgs.scrollHeight;
       });
@@ -1631,29 +1632,24 @@ function streamNoa(msg){
         parts.forEach(function(l){
           if(!l.startsWith('data: ')) return;
           try{
-            var d = JSON.parse(l.slice(6));
-            if(d.type==='chunk'){
-              acc += d.text;
-              scheduleRender();
-            }
-            if(d.type==='done') done();
-            if(d.type==='alerta_critica') toast('⚠ ALERTA CRÍTICA — '+d.datos.folio+': '+d.datos.motivo,'#FF3A3A');
+            var ev = JSON.parse(l.slice(6));
+            if(ev.type==='chunk'){ acc += ev.text; scheduleRender(); }
+            if(ev.type==='done') done();
+            if(ev.type==='alerta_critica') toast('⚠ ALERTA CRÍTICA — '+ev.datos.folio+': '+ev.datos.motivo,'#FF3A3A');
           }catch(e){}
         });
         pump();
       }).catch(done);
     }
     function done(){
+      if (isDone) return; // guard — called twice (SSE event + ReadableStream EOF)
+      isDone = true;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
       row.classList.remove('streaming');
-      // Show plain text immediately, then render markdown on next tick
-      // to avoid blocking the main thread on large responses
-      bubble.textContent = acc;
       noaStreaming = false;
       document.getElementById('noa-send-btn').disabled = false;
-      setTimeout(function(){
-        bubble.innerHTML = renderMd(acc);
-        noaMsgs.scrollTop = noaMsgs.scrollHeight;
-      }, 0);
+      bubble.innerHTML = renderMd(acc);
+      noaMsgs.scrollTop = noaMsgs.scrollHeight;
     }
     pump();
   }).catch(function(){
