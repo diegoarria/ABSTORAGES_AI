@@ -477,47 +477,51 @@ async function buscarFolioNOA(folio) {
   return r?.datos || [];
 }
 
-// Folios activos para entrega de turno (P-MON-05)
-async function foliosActivosNOA() {
-  // Dos queries: "En Proceso" (tránsito) + "Carga" (en planta de origen)
-  const [enProceso, enCarga] = await Promise.all([
-    query('detalle_servicios', {
-      pagina: 1, limite: 30,
-      filtros: { 'Estatus Operaciones': { contiene: 'Proceso' } },
-      campos: [
-        'Folio de servicio','Fecha de Servicio','Cliente',
-        'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
-        'Cita de carga','Llegada a carga','Hora de salida carga',
-        'Cita de Descarga','Llegada a descarga',
-        'Proveedor','Operador','Tractor',
-        'GPS','Usuario GPS',
-        'EstatusMonitoreoDetalle','Comentarios Estatus Monitoreo',
-        'Planner','Telefono','Correo',
-      ],
-    }),
-    query('detalle_servicios', {
-      pagina: 1, limite: 20,
-      filtros: { 'EstatusMonitoreoDetalle': { contiene: 'origen' } },
-      campos: [
-        'Folio de servicio','Fecha de Servicio','Cliente',
-        'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
-        'Cita de carga','Llegada a carga','Hora de salida carga',
-        'Cita de Descarga','Llegada a descarga',
-        'Proveedor','Operador','Tractor',
-        'GPS','Usuario GPS',
-        'EstatusMonitoreoDetalle','Comentarios Estatus Monitoreo',
-        'Planner','Telefono','Correo',
-      ],
-    }),
-  ]);
+// Folios activos para el dashboard de NOA
+// Valores reales de EstatusMonitoreoDetalle: "En tránsito", "En origen",
+// "Unidad detenida", "Unidad en resguardo", "En destino", "Sin Información", "Servicio concluido"
+const EXCLUIR_DETALLE = ['servicio concluido', 'cancelado'];
 
-  const todos = [...(enProceso?.datos || []), ...(enCarga?.datos || [])];
-  // Deduplicar por folio
+async function foliosActivosNOA() {
+  const campos = [
+    'Folio de servicio','Fecha de Servicio','Cliente',
+    'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
+    'Cita de carga','Llegada a carga','Hora de salida carga',
+    'Cita de Descarga','Llegada a descarga',
+    'Proveedor','Operador','Tractor',
+    'GPS','Usuario GPS',
+    'EstatusMonitoreoDetalle','Comentarios Estatus Monitoreo',
+    'Planner','Telefono','Correo',
+  ];
+
+  const r = await query('detalle_servicios', {
+    pagina: 1, limite: 100,
+    filtros: { 'Estatus Operaciones': { contiene: 'Proceso' } },
+    campos,
+  });
+
+  const todos = r?.datos || [];
+
+  // Excluir "Servicio concluido" — están en "4.En Proceso" en el TMS pero ya terminaron
+  const activos = todos.filter(s => {
+    const det = (s['EstatusMonitoreoDetalle'] || '').toLowerCase();
+    return !EXCLUIR_DETALLE.some(ex => det.includes(ex));
+  });
+
+  // Deduplicar por folio — ante duplicados, priorizar el registro con info más específica
+  const PRIORIDAD = ['en tránsito','unidad detenida','unidad en resguardo','en destino','en origen'];
   const unicos = {};
-  for (const s of todos) {
+  for (const s of activos) {
     const f = s['Folio de servicio'];
-    if (f && !unicos[f]) unicos[f] = s;
+    if (!f) continue;
+    if (!unicos[f]) { unicos[f] = s; continue; }
+    const detActual = (unicos[f]['EstatusMonitoreoDetalle'] || '').toLowerCase();
+    const detNuevo  = (s['EstatusMonitoreoDetalle'] || '').toLowerCase();
+    const priActual = PRIORIDAD.findIndex(p => detActual.includes(p));
+    const priNuevo  = PRIORIDAD.findIndex(p => detNuevo.includes(p));
+    if (priNuevo !== -1 && (priActual === -1 || priNuevo < priActual)) unicos[f] = s;
   }
+
   return Object.values(unicos).sort((a, b) =>
     (b['Fecha de Servicio'] || '').localeCompare(a['Fecha de Servicio'] || ''));
 }

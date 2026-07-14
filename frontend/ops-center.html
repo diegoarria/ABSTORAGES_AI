@@ -702,7 +702,7 @@ function sHdr(i,t){return '<div class="sec-hdr"><span aria-hidden="true">'+i+'</
 function card(f){
   var sc=f.min>=30?'ov':f.min>=20?'wn':'ok';
   var pct=Math.min(f.min/30*100,100);
-  var EM={EN_TRANSITO:['bdg-tr','En Tránsito'],EN_CARGA:['bdg-ca','En Carga'],EN_DESTINO:['bdg-de','En Destino'],INCIDENCIA:['bdg-in','Incidencia']};
+  var EM={EN_TRANSITO:['bdg-tr','En Tránsito'],EN_CARGA:['bdg-ca','En Carga'],EN_DESTINO:['bdg-de','En Destino'],DETENIDA:['bdg-in','Detenida'],INCIDENCIA:['bdg-in','Incidencia']};
   var ep=EM[f.st]||['bdg-tr',f.st];
   var acls='bdg-'+(f.al==='CRITICO'?'cr':f.al==='ATENCION'?'at':'no');
   var cc={CRITICO:'cr',ATENCION:'at',NORMAL:'no'}[f.al];

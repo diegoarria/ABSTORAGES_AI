@@ -364,10 +364,12 @@ app.get('/api/noa/folios', async (req, res) => {
   try {
     const activos = await tms.foliosActivosNOA();
     const folios = activos.map(s => {
+      // Valores reales TMS: "En tránsito","En origen","Unidad detenida","Unidad en resguardo","En destino","Sin Información"
       const det = (s['EstatusMonitoreoDetalle'] || '').toLowerCase();
       let st = 'EN_TRANSITO';
-      if (det.includes('origen') || det.includes('carga')) st = 'EN_CARGA';
-      else if (det.includes('destino') || det.includes('descarga')) st = 'EN_DESTINO';
+      if (det.includes('origen') || det.includes('carga'))              st = 'EN_CARGA';
+      else if (det.includes('destino') || det.includes('descarga'))     st = 'EN_DESTINO';
+      else if (det.includes('detenida') || det.includes('resguardo'))   st = 'DETENIDA';
 
       const comentario = (s['Comentarios Estatus Monitoreo'] || '').trim();
       const citaDes = s['Cita de Descarga']
