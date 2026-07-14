@@ -7,7 +7,7 @@ const TMS_TOKEN = process.env.TMS_API_KEY  || 'b4914e954d7e43cd8830b4855f7d9e110
 const ENABLED   = !!TMS_URL;
 
 // ── HTTP util ────────────────────────────────────────────────────────────────
-const TMS_TIMEOUT_MS = 18000;
+const TMS_TIMEOUT_MS = 25000;
 
 function withTimeout(promise, ms) {
   return Promise.race([
@@ -43,7 +43,7 @@ function httpPost(url, body) {
 }
 
 // ── Core query ───────────────────────────────────────────────────────────────
-async function query(recurso, opts = {}, _intento = 0) {
+async function query(recurso, opts = {}) {
   if (!ENABLED) return null;
   try {
     const r1 = await httpPost(TMS_URL, { token: TMS_TOKEN, recurso, ...opts });
@@ -53,10 +53,6 @@ async function query(recurso, opts = {}, _intento = 0) {
     return parsed;
   } catch (e) {
     console.error('[TMS]', recurso, e.message);
-    if (_intento < 1) {
-      await new Promise(r => setTimeout(r, 1500));
-      return query(recurso, opts, _intento + 1);
-    }
     return null;
   }
 }
