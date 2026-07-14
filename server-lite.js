@@ -25,6 +25,7 @@ const leads       = require('./backend/services/leads');
 const notifier    = require('./backend/services/notifier');
 const vapi        = require('./backend/services/vapi');
 const tms         = require('./backend/services/tms');
+const eta         = require('./backend/services/eta');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -431,7 +432,26 @@ app.get('/api/noa/folio/:folio', async (req, res) => {
   if (!tms.ENABLED) return res.json(null);
   try {
     const datos = await tms.buscarFolioNOA(req.params.folio.toUpperCase());
-    res.json(datos[0] || null);
+    const d = datos[0] || null;
+    if (!d) return res.json(null);
+
+    // Calcular ETA (Google Maps si hay API key, si no cae a cita_descarga)
+    try {
+      const etaResult = await eta.calcularETA({
+        ciudad_origen:   d['Cuidad Origen'],
+        estado_origen:   d['Estado Origen'],
+        ciudad_destino:  d['Cuidad destino'],
+        estado_destino:  d['Estado destino'],
+        hora_salida_carga: d['Hora de salida carga'] || null,
+        cita_descarga:   d['Cita de Descarga'] || null,
+        estatus:         d['EstatusMonitoreoDetalle'] || '',
+      });
+      d._eta = etaResult;
+    } catch (e) {
+      console.warn('[NOA/folio/eta]', e.message);
+    }
+
+    res.json(d);
   } catch (e) {
     console.error('[NOA/folio]', e.message);
     res.json(null);

@@ -230,6 +230,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .fd-link{color:var(--t2);text-decoration:underline;text-underline-offset:2px;font-size:11.5px}
 .fd-link:hover{color:var(--crit)}
 .fd-comment{font-size:11.5px;color:var(--warn);background:rgba(255,140,0,.07);border:1px solid rgba(255,140,0,.2);border-radius:6px;padding:8px 10px;line-height:1.6;margin-top:4px}
+.fd-eta-box{border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px}
+.fd-eta-box.eta-ok{background:rgba(0,180,81,.08);border:1px solid rgba(0,180,81,.25)}
+.fd-eta-box.eta-risk{background:rgba(255,140,0,.08);border:1px solid rgba(255,140,0,.25)}
+.fd-eta-box.eta-late{background:rgba(255,58,58,.08);border:1px solid rgba(255,58,58,.25)}
+.fd-eta-box.eta-done{background:rgba(0,180,81,.06);border:1px solid rgba(0,180,81,.2)}
+.fd-eta-ico{font-size:22px;line-height:1;margin-top:1px;flex-shrink:0}
+.fd-eta-main{flex:1;min-width:0}
+.fd-eta-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+.fd-eta-label.eta-ok{color:var(--grn)}
+.fd-eta-label.eta-risk{color:var(--warn)}
+.fd-eta-label.eta-late{color:var(--crit)}
+.fd-eta-label.eta-done{color:var(--grn)}
+.fd-eta-time{font-size:18px;font-weight:800;color:var(--t1);letter-spacing:-.02em;margin-bottom:3px}
+.fd-eta-meta{font-size:11px;color:var(--t3);line-height:1.5}
 
 /* ── NOA AI CHAT ── */
 .noa-ai-foot{flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1);display:flex;flex-direction:column;transition:flex .2s}
@@ -1092,6 +1106,78 @@ function fdSec(ico, title, rows){
   return '<div class="fd-sec"><div class="fd-sec-ttl"><span class="fd-ico">'+ico+'</span>'+title+'</div>'+content+'</div>';
 }
 
+function renderETA(etaData, citaDesRaw){
+  if (!etaData) return '';
+
+  if (etaData.llegado) {
+    return '<div class="fd-eta-box eta-done">'+
+      '<div class="fd-eta-ico">✅</div>'+
+      '<div class="fd-eta-main">'+
+        '<div class="fd-eta-label eta-done">En destino</div>'+
+        '<div class="fd-eta-time">Unidad llegó</div>'+
+      '</div></div>';
+  }
+
+  if (!etaData.eta) return '';
+
+  var etaMs  = new Date(etaData.eta).getTime();
+  var now    = Date.now();
+  var citaMs = citaDesRaw ? new Date(citaDesRaw).getTime() : 0;
+  var diffMin = Math.round((etaMs - now) / 60000);
+
+  // classify
+  var cls, lbl;
+  if (etaMs < now) {
+    cls = 'eta-late'; lbl = 'RETRASADO';
+  } else if (citaMs && etaMs > citaMs) {
+    cls = 'eta-late'; lbl = 'POSIBLE RETRASO';
+  } else if (citaMs && (citaMs - etaMs) < 90 * 60000) {
+    cls = 'eta-risk'; lbl = 'LLEGADA JUSTA';
+  } else {
+    cls = 'eta-ok'; lbl = 'EN TIEMPO';
+  }
+
+  // format ETA datetime
+  var etaDate = new Date(etaMs);
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  var manana = new Date(hoy); manana.setDate(manana.getDate()+1);
+  var etaDia = new Date(etaMs); etaDia.setHours(0,0,0,0);
+  var diaLabel;
+  if (etaDia.getTime() === hoy.getTime()) diaLabel = 'Hoy';
+  else if (etaDia.getTime() === manana.getTime()) diaLabel = 'Mañana';
+  else diaLabel = etaDate.toLocaleDateString('es-MX',{weekday:'short',day:'2-digit',month:'short'});
+  var horaLabel = etaDate.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false});
+  var etaStr = diaLabel + ' ' + horaLabel;
+
+  // remaining / delay
+  var diffAbs = Math.abs(diffMin);
+  var diffH = Math.floor(diffAbs/60); var diffM = diffAbs%60;
+  var diffStr = (diffH>0?(diffH+'h '):'')+(diffM+'min');
+  var remainLabel = etaMs < now
+    ? 'Retraso estimado: ' + diffStr
+    : 'En ' + diffStr;
+
+  // extra meta
+  var meta = [];
+  if (etaData.distancia_km) meta.push(etaData.distancia_km + ' km');
+  if (etaData.duracion_min) {
+    var th=Math.floor(etaData.duracion_min/60),tm=etaData.duracion_min%60;
+    meta.push('Ruta: '+(th>0?th+'h ':'')+(tm+'min'));
+  }
+  if (etaData.salida) meta.push('Salió: '+new Date(etaData.salida).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}));
+  meta.push(etaData.source==='google' ? 'Google Maps' : 'Cita programada');
+
+  var ico = cls==='eta-late' ? '⚠️' : cls==='eta-risk' ? '🟡' : '🟢';
+
+  return '<div class="fd-eta-box '+cls+'">'+
+    '<div class="fd-eta-ico">'+ico+'</div>'+
+    '<div class="fd-eta-main">'+
+      '<div class="fd-eta-label '+cls+'">ETA — '+lbl+'</div>'+
+      '<div class="fd-eta-time">'+etaStr+'</div>'+
+      '<div class="fd-eta-meta">'+remainLabel+(meta.length?' · '+meta.join(' · '):'')+'</div>'+
+    '</div></div>';
+}
+
 function renderFolioDetail(d){
   var g = function(k){ return (d[k]||'').trim(); };
 
@@ -1134,10 +1220,13 @@ function renderFolioDetail(d){
   var estComent = g('Comentarios Estatus Monitoreo');
   var estHtml = estComent ? '<div class="fd-comment">'+escH(estComent)+'</div>' : '';
 
+  var etaHtml = renderETA(d._eta, d['Cita de Descarga'] || null);
+
   var body = document.getElementById('fd-body');
   // TMS respondió — reemplaza todo (incluyendo el quick view y el loader)
   body.innerHTML =
     rutaHtml +
+    etaHtml +
     fdSec('📦', 'Servicio',
       [fd('Cliente', g('Cliente')),
        fd('Fecha servicio', fmtDt(g('Fecha de Servicio'))),
