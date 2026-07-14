@@ -984,24 +984,84 @@ function consultarFolioEnNOA(id) {
 // ── FOLIO DETAIL PANEL ────────────────────────────────
 var fdOpen = false;
 
-function abrirFolio(id){
-  var ov = document.getElementById('fd-overlay');
+function renderFolioQuick(f){
+  // Render inmediato con datos del dashboard mientras carga TMS
+  var stMap={EN_TRANSITO:'En Tránsito',EN_CARGA:'En Carga',EN_DESTINO:'En Destino'};
+  var rows=[
+    fd('Cliente',f.cl),
+    fd('Ruta',f.or+' → '+f.de),
+    fd('Tractor / Placa',f.placa),
+    fd('Operador',f.op),
+    fd('Proveedor',f.pv),
+    f.citaDes?fd('Cita descarga',f.citaDes):'',
+    f.planner?fd('Planner',f.planner):'',
+    f.gps&&f.gps.url?fdLink('GPS',f.gps.url,f.gps.usr||'Ver tracking'):'',
+    f.inc?'<div class="fd-comment">'+escH(f.inc)+'</div>':'',
+  ].filter(Boolean).join('');
+  return fdSec('📋','Datos del dashboard',[rows]);
+}
+
+function abrirFolioTMS(id, intento){
   var body = document.getElementById('fd-body');
-  var lbl = document.getElementById('fd-folio-id');
+  if (!body) return;
+  fetch('/api/noa/folio/' + encodeURIComponent(id))
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      if (!d) { mostrarFolioSinDatos(id); return; }
+      renderFolioDetail(d);
+    })
+    .catch(function(){
+      if ((intento||0) < 2) {
+        setTimeout(function(){ abrirFolioTMS(id, (intento||0)+1); }, 2000);
+        return;
+      }
+      // Todos los reintentos fallaron — muestra lo que ya se ve + botón reintentar
+      var loader = document.getElementById('fd-tms-loader');
+      if (loader) loader.innerHTML =
+        '<div style="display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 0">'+
+        '<span style="font-size:11px;color:var(--t3)">TMS no respondió.</span>'+
+        '<button class="btn btn-sm" style="font-size:10px" onclick="abrirFolioTMS(\''+escH(id)+'\',0)">↻ Reintentar</button>'+
+        '</div>';
+    });
+}
+
+function mostrarFolioSinDatos(id){
+  var loader = document.getElementById('fd-tms-loader');
+  if (loader) loader.innerHTML =
+    '<div style="display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 0">'+
+    '<span style="font-size:11px;color:var(--t3)">Sin datos adicionales en TMS.</span>'+
+    '<button class="btn btn-sm" style="font-size:10px" onclick="abrirFolioTMS(\''+escH(id)+'\',0)">↻ Reintentar</button>'+
+    '</div>';
+}
+
+function abrirFolio(id){
+  var ov   = document.getElementById('fd-overlay');
+  var body = document.getElementById('fd-body');
+  var lbl  = document.getElementById('fd-folio-id');
   var badge = document.getElementById('fd-st-badge');
+
   lbl.textContent = id;
   badge.textContent = '';
   badge.style.cssText = '';
-  body.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:24px 0;text-align:center">Cargando datos TMS…</div>';
+
+  // Mostrar datos del dashboard inmediatamente (nunca pantalla en blanco)
+  var f = folios.find(function(x){ return x.id===id; });
+  if (f) {
+    var stBg={EN_TRANSITO:'background:rgba(58,150,255,.12);color:#3a96ff;border:1px solid rgba(58,150,255,.28)',
+              EN_CARGA:'background:rgba(255,140,0,.12);color:var(--warn);border:1px solid rgba(255,140,0,.28)',
+              EN_DESTINO:'background:rgba(0,180,81,.15);color:var(--grn);border:1px solid rgba(0,180,81,.3)'};
+    var stTxt={EN_TRANSITO:'EN TRÁNSITO',EN_CARGA:'EN CARGA',EN_DESTINO:'EN DESTINO'};
+    badge.textContent = stTxt[f.st]||f.st||'';
+    badge.style.cssText = stBg[f.st]||'background:var(--s3);color:var(--t2);border:1px solid var(--b2)';
+    body.innerHTML = renderFolioQuick(f) +
+      '<div id="fd-tms-loader" style="text-align:center;padding:12px 0;color:var(--t3);font-size:11px">Cargando detalle TMS…</div>';
+  } else {
+    body.innerHTML = '<div id="fd-tms-loader" style="color:var(--t3);font-size:12px;padding:24px 0;text-align:center">Cargando datos TMS…</div>';
+  }
+
   ov.classList.add('open');
   fdOpen = true;
-  fetch('/api/noa/folio/' + encodeURIComponent(id))
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (!d) { body.innerHTML = '<div style="color:var(--t3);font-size:12px;padding:24px;text-align:center">Sin datos en TMS para este folio.</div>'; return; }
-      renderFolioDetail(d);
-    })
-    .catch(function(){ body.innerHTML = '<div style="color:var(--crit);font-size:12px;padding:24px;text-align:center">Error al consultar TMS.</div>'; });
+  abrirFolioTMS(id, 0);
 }
 
 function cerrarFolio(){
@@ -1066,6 +1126,7 @@ function renderFolioDetail(d){
   var estHtml = estComent ? '<div class="fd-comment">'+escH(estComent)+'</div>' : '';
 
   var body = document.getElementById('fd-body');
+  // TMS respondió — reemplaza todo (incluyendo el quick view y el loader)
   body.innerHTML =
     rutaHtml +
     fdSec('📦', 'Servicio',

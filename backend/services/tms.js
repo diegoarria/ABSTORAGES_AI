@@ -7,17 +7,27 @@ const TMS_TOKEN = process.env.TMS_API_KEY  || 'b4914e954d7e43cd8830b4855f7d9e110
 const ENABLED   = !!TMS_URL;
 
 // ── HTTP util ────────────────────────────────────────────────────────────────
+const TMS_TIMEOUT_MS = 18000;
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('TMS timeout')), ms)),
+  ]);
+}
+
 function httpGet(url) {
-  return new Promise((resolve, reject) => {
+  return withTimeout(new Promise((resolve, reject) => {
     const u = new URL(url);
-    https.get({ hostname: u.hostname, path: u.pathname + u.search, headers: { 'User-Agent': 'ABSTORAGES-AI/1.0' } }, res => {
+    const req = https.get({ hostname: u.hostname, path: u.pathname + u.search, headers: { 'User-Agent': 'ABSTORAGES-AI/1.0' } }, res => {
       let d = ''; res.on('data', c => d += c); res.on('end', () => resolve(d));
-    }).on('error', reject);
-  });
+    });
+    req.on('error', reject);
+  }), TMS_TIMEOUT_MS);
 }
 
 function httpPost(url, body) {
-  return new Promise((resolve, reject) => {
+  return withTimeout(new Promise((resolve, reject) => {
     const u = new URL(url);
     const b = JSON.stringify(body);
     const req = https.request({
@@ -29,11 +39,11 @@ function httpPost(url, body) {
     });
     req.on('error', reject);
     req.write(b); req.end();
-  });
+  }), TMS_TIMEOUT_MS);
 }
 
 // ── Core query ───────────────────────────────────────────────────────────────
-async function query(recurso, opts = {}) {
+async function query(recurso, opts = {}, _intento = 0) {
   if (!ENABLED) return null;
   try {
     const r1 = await httpPost(TMS_URL, { token: TMS_TOKEN, recurso, ...opts });
@@ -42,7 +52,11 @@ async function query(recurso, opts = {}) {
     if (!parsed.ok) throw new Error(parsed.error || 'TMS error');
     return parsed;
   } catch (e) {
-    console.error('[TMS]', e.message);
+    console.error('[TMS]', recurso, e.message);
+    if (_intento < 1) {
+      await new Promise(r => setTimeout(r, 1500));
+      return query(recurso, opts, _intento + 1);
+    }
     return null;
   }
 }
