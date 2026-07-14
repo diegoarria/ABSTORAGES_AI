@@ -1612,6 +1612,17 @@ function streamNoa(msg){
   }).then(function(r){
     if(!r.ok||!r.body) throw new Error('HTTP '+r.status);
     var reader=r.body.getReader(), decoder=new TextDecoder(), buf='';
+    var rafPending = false;
+    var noaMsgs = document.getElementById('noa-msgs');
+    function scheduleRender(){
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(function(){
+        rafPending = false;
+        bubble.textContent = acc;
+        noaMsgs.scrollTop = noaMsgs.scrollHeight;
+      });
+    }
     function pump(){
       reader.read().then(function(chunk){
         if(chunk.done){done();return;}
@@ -1623,8 +1634,7 @@ function streamNoa(msg){
             var d = JSON.parse(l.slice(6));
             if(d.type==='chunk'){
               acc += d.text;
-              bubble.textContent = acc;
-              document.getElementById('noa-msgs').scrollTop = 99999;
+              scheduleRender();
             }
             if(d.type==='done') done();
             if(d.type==='alerta_critica') toast('⚠ ALERTA CRÍTICA — '+d.datos.folio+': '+d.datos.motivo,'#FF3A3A');
@@ -1635,10 +1645,15 @@ function streamNoa(msg){
     }
     function done(){
       row.classList.remove('streaming');
-      bubble.innerHTML = renderMd(acc);
-      document.getElementById('noa-msgs').scrollTop = 99999;
+      // Show plain text immediately, then render markdown on next tick
+      // to avoid blocking the main thread on large responses
+      bubble.textContent = acc;
       noaStreaming = false;
       document.getElementById('noa-send-btn').disabled = false;
+      setTimeout(function(){
+        bubble.innerHTML = renderMd(acc);
+        noaMsgs.scrollTop = noaMsgs.scrollHeight;
+      }, 0);
     }
     pump();
   }).catch(function(){
