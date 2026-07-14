@@ -197,6 +197,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .esc-st.sr{color:var(--crit)}.esc-st.ok{color:var(--grn)}.esc-st.act{color:var(--warn)}.esc-st.pd{color:var(--t3)}
 .fc-acts{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--b1);background:rgba(0,0,0,.15)}
 
+/* ── AUTO-REFRESH LABEL ── */
+.barrido-lbl{font-size:9px;color:var(--t3);font-family:var(--mono);white-space:nowrap;margin-left:2px;transition:color .2s}
+.barrido-lbl.pronto{color:var(--warn)}
+
 /* ── FOLIO DETAIL PANEL ── */
 .fd-overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;background:var(--s1);transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);pointer-events:none}
 .fd-overlay.open{transform:translateX(0);pointer-events:all}
@@ -413,7 +417,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
       <div class="pchips" id="noa-chips" aria-label="Conteo de alertas"></div>
       <div class="pbtns">
         <button class="btn btn-sm" onclick="openTurno()" aria-label="Abrir entrega de turno">⇄ Turno</button>
-        <button class="btn btn-sm" onclick="simBarrido()" aria-label="Ejecutar barrido GPS">↻ Barrer</button>
+        <button class="btn btn-sm" onclick="simBarrido()" id="barrer-btn" aria-label="Ejecutar barrido GPS">↻ Barrer</button>
+        <span class="barrido-lbl" id="last-barrido" aria-live="polite"></span>
       </div>
     </div>
 
@@ -464,6 +469,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
         <button class="fd-back" onclick="cerrarFolio()" aria-label="Cerrar detalle">&#8592;</button>
         <span class="fd-folio" id="fd-folio-id">—</span>
         <span class="fd-st-badge" id="fd-st-badge"></span>
+        <button class="btn btn-sm" onclick="consultarFolioEnNOA(document.getElementById('fd-folio-id').textContent)" aria-label="Consultar este folio con NOA" style="font-size:10px;padding:4px 9px;flex-shrink:0">Consultar NOA →</button>
       </div>
       <div class="fd-body" id="fd-body">
         <div style="color:var(--t3);font-size:12px;padding:20px 0;text-align:center">Cargando…</div>
@@ -767,7 +773,7 @@ function card(f){
       '<div class="fc-acts">'+
         // UX: acción primaria (resolver) en verde, secundaria (escalar) en neutro — jerarquía clara
         '<button class="btn btn-sm btn-g" onclick="event.stopPropagation();resolver(\''+f.id+'\')" aria-label="Marcar folio '+f.id+' como resuelto">✓ Resolver</button>'+
-        '<button class="btn btn-sm" onclick="event.stopPropagation();toast(\'Escalando '+f.id+' al Coordinador Regional\',\'#FF8C00\')" aria-label="Escalar folio '+f.id+' al coordinador">↑ Escalar</button>'+
+        '<button class="btn btn-sm" onclick="event.stopPropagation();escalarFolio(\''+f.id+'\')" aria-label="Escalar folio '+f.id+' al coordinador">↑ Escalar</button>'+
       '</div>':'')+
   '</div>';
 }
@@ -849,11 +855,130 @@ function tabla(){
 }
 
 // ── NOA ACTIONS ───────────────────────────────────────
+function escalarFolio(id){
+  var f=folios.find(function(x){return x.id===id;});
+  if(!f) return;
+  var paso={nv:'Coordinador Regional',h:new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}),s:'pd'};
+  f.esc=(f.esc||[]).concat([paso]);
+  guardarEscalacion(id,f.al,f.inc,f.esc);
+  toast('Escalando '+id+' al Coordinador Regional','#FF8C00');
+  renderNOA();
+}
+
 function resolver(id){
   var f=folios.find(function(x){return x.id===id;});
   if(!f) return;
   f.al='NORMAL';f.inc=null;f.zona=false;f.esc=[];
+  guardarEscalacion(id,'NORMAL',null,[]);
   renderNOA(); toast('Folio '+id+' marcado como resuelto','#00B451');
+}
+
+// ── AUTO-REFRESH & COUNTDOWN ──────────────────────────
+var lastBarridoAt = null;
+var AUTO_REFRESH_SECS = 5 * 60;
+var autoRefreshTimer = null;
+var countdownTimer = null;
+
+function updateBarridoLabel() {
+  var el = document.getElementById('last-barrido');
+  if (!el) return;
+  if (!lastBarridoAt) { el.textContent = ''; return; }
+  var secsAgo = Math.floor((Date.now() - lastBarridoAt) / 1000);
+  var secsNext = Math.max(0, AUTO_REFRESH_SECS - secsAgo);
+  var mm = Math.floor(secsNext / 60), ss = secsNext % 60;
+  var timeStr = new Date(lastBarridoAt).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false });
+  el.textContent = timeStr + ' · ' + mm + ':' + (ss < 10 ? '0' : '') + ss;
+  el.classList.toggle('pronto', secsNext < 60);
+}
+
+function startAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  if (countdownTimer) clearInterval(countdownTimer);
+  autoRefreshTimer = setInterval(function () { simBarrido(true); }, AUTO_REFRESH_SECS * 1000);
+  countdownTimer = setInterval(updateBarridoLabel, 5000);
+}
+
+// ── ALERTAS AUTOMÁTICAS (citas vencidas) ──────────────
+function detectarAlertas(fs) {
+  var now = Date.now();
+  fs.forEach(function (f) {
+    if (!f.citaDesRaw || f.st === 'EN_DESTINO') return;
+    var citaMs = new Date(f.citaDesRaw).getTime();
+    if (isNaN(citaMs)) return;
+    var diffMin = (now - citaMs) / 60000;
+    if (diffMin > 120 && f.al === 'NORMAL') {
+      f.al = 'CRITICO';
+      f.inc = 'Cita de descarga vencida hace ' + Math.round(diffMin / 60) + 'h — sin confirmar entrega';
+      guardarEscalacion(f.id, 'CRITICO', f.inc, f.esc);
+    } else if (diffMin > 0 && diffMin <= 120 && f.al === 'NORMAL') {
+      f.al = 'ATENCION';
+      f.inc = 'Cita de descarga vencida (' + Math.round(diffMin) + ' min) — sin confirmar entrega';
+      guardarEscalacion(f.id, 'ATENCION', f.inc, f.esc);
+    }
+  });
+}
+
+// ── ESCALACIONES PERSISTENTES ─────────────────────────
+function guardarEscalacion(folio, al, inc, esc) {
+  fetch('/api/noa/escalaciones', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ folio: folio, al: al, inc: inc || null, esc: esc || [] }),
+  }).catch(function () {});
+}
+
+// ── NOTIFICACIONES PROACTIVAS ─────────────────────────
+var prevAlertSet = {};
+
+function notificarProactivo(fs) {
+  var criticos = fs.filter(function (f) { return f.al === 'CRITICO'; });
+  var atenciones = fs.filter(function (f) { return f.al === 'ATENCION'; });
+
+  // Detectar nuevas alertas respecto al barrido anterior
+  var nuevas = criticos.concat(atenciones).filter(function (f) {
+    return !prevAlertSet[f.id] || prevAlertSet[f.id] === 'NORMAL';
+  });
+
+  // Actualizar mapa previo
+  prevAlertSet = {};
+  fs.forEach(function (f) { prevAlertSet[f.id] = f.al; });
+
+  if (!nuevas.length) return;
+
+  // Browser notification
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    var crit = nuevas.filter(function (f) { return f.al === 'CRITICO'; });
+    var body = (crit.length ? crit.length + ' CRÍTICO(S): ' + crit.map(function (f) { return f.id; }).join(', ') : '') +
+               (atenciones.length ? ' · ' + atenciones.length + ' en ATENCIÓN' : '');
+    try { new Notification('NOA · Alerta detectada', { body: body.trim(), icon: '/img/noa-avatar.png', tag: 'noa-alert' }); } catch (e) {}
+  }
+
+  // Auto-mensaje en chat de NOA (sin llamar a la API — solo muestra en la UI)
+  var h = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false });
+  var lineas = ['**Barrido ' + h + ' — ' + nuevas.length + ' nueva(s) alerta(s)**'];
+  nuevas.forEach(function (f) {
+    lineas.push((f.al === 'CRITICO' ? '⚠ CRÍTICO' : '△ ATENCIÓN') + ' — **' + f.id + '** · ' + f.cl + (f.inc ? '\n' + f.inc : ''));
+  });
+  lineas.push('\n¿Qué necesitas revisar primero?');
+
+  var foot = document.getElementById('noa-ai-foot');
+  if (foot && !foot.classList.contains('open')) toggleNoaAI();
+  addBubble('noa', lineas.join('\n\n'), true);
+  var msgs = document.getElementById('noa-msgs');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── CONSULTAR FOLIO EN NOA ────────────────────────────
+function consultarFolioEnNOA(id) {
+  cerrarFolio();
+  var foot = document.getElementById('noa-ai-foot');
+  if (foot && !foot.classList.contains('open')) toggleNoaAI();
+  var input = document.getElementById('noa-ai-input');
+  if (input) {
+    input.value = 'Dame el estatus completo y próximas acciones requeridas para el folio ' + id;
+    input.focus();
+    input.dispatchEvent(new Event('input'));
+  }
 }
 
 // ── FOLIO DETAIL PANEL ────────────────────────────────
@@ -994,24 +1119,20 @@ function renderFolioDetail(d){
     (estComent ? '<div class="fd-sec" style="margin-top:-10px">'+estHtml+'</div>' : '');
 }
 
-function simBarrido(){
-  var btn=document.querySelector('[onclick="simBarrido()"]');
+function simBarrido(auto){
+  var btn=document.getElementById('barrer-btn');
   if(btn){btn.disabled=true;btn.textContent='↻ Barriendo…';}
   fetch('/api/noa/folios')
     .then(function(r){return r.json();})
     .then(function(data){
-      // preservar alertas manuales y escalaciones que ya estaban activas
-      var prevMap={};
-      folios.forEach(function(f){prevMap[f.id]=f;});
       FOLIOS = data;
-      folios = data.map(function(f){
-        var prev=prevMap[f.id];
-        if(prev&&prev.al!=='NORMAL') f.al=prev.al;
-        if(prev) f.esc=prev.esc;
-        return f;
-      });
+      folios = data.map(function(f){return Object.assign({},f,{esc:(f.esc||[]).slice()});});
+      detectarAlertas(folios);
       renderNOA();
-      toast('Barrido completado — '+folios.length+' servicios actualizados','#00B451');
+      lastBarridoAt = Date.now();
+      updateBarridoLabel();
+      notificarProactivo(folios);
+      if(!auto) toast('Barrido completado — '+folios.length+' servicios actualizados','#00B451');
     })
     .catch(function(){toast('Error al conectar con el TMS','#FF3A3A');})
     .finally(function(){
@@ -1301,12 +1422,16 @@ function renderMd(raw){
 }
 
 // ── NOA chat send / stream ───────────────────────────────────────────────────
-function addBubble(role, text){
+function addBubble(role, text, rendered){
   var msgs = document.getElementById('noa-msgs');
   var row = document.createElement('div');
   row.className = 'nm ' + role;
-  if(role==='noa') row.innerHTML = '<div class="nm-av" aria-hidden="true"></div><div class="nm-bubble"></div>';
-  else row.innerHTML = '<div class="nm-bubble">' + esc(text) + '</div>';
+  if(role==='noa'){
+    row.innerHTML = '<div class="nm-av" aria-hidden="true"></div><div class="nm-bubble"></div>';
+    if(rendered) row.querySelector('.nm-bubble').innerHTML = renderMd(text);
+  } else {
+    row.innerHTML = '<div class="nm-bubble">' + esc(text) + '</div>';
+  }
   msgs.appendChild(row);
   msgs.scrollTop = msgs.scrollHeight;
   return row.querySelector('.nm-bubble');
@@ -1434,6 +1559,11 @@ function loadFoliosTMS(){
     .then(function(data){
       FOLIOS = data;
       folios = data.map(function(f){return Object.assign({},f,{esc:(f.esc||[]).slice()});});
+      detectarAlertas(folios);
+      lastBarridoAt = Date.now();
+      updateBarridoLabel();
+      // inicializar mapa previo sin disparar notificaciones en la carga inicial
+      folios.forEach(function(f){ prevAlertSet[f.id]=f.al; });
       renderNOA();
     })
     .catch(function(){
@@ -1446,6 +1576,10 @@ document.addEventListener('DOMContentLoaded',function(){
   setInterval(updateClock,1000);
   setInterval(simTick,5000);
   loadFoliosTMS();
+  startAutoRefresh();
+  if(typeof Notification!=='undefined'&&Notification.permission==='default'){
+    Notification.requestPermission().catch(function(){});
+  }
   renderHEC();
   fetchCuentas();
   ['m-turno','m-gestion'].forEach(function(id){

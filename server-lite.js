@@ -5,6 +5,7 @@ require('dotenv').config();
 const express = require('express');
 const path    = require('path');
 const https   = require('https');
+const fs      = require('fs');
 
 const { saveMessage, getMessages } = require('./backend/services/db');
 const auth        = require('./backend/middleware/auth');
@@ -373,8 +374,10 @@ app.get('/api/noa/folios', async (req, res) => {
         ? new Date(s['Cita de Descarga']).toLocaleString('es-MX', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false })
         : null;
 
+      const folio = s['Folio de servicio'] || '—';
+      const esc_saved = escalaciones[folio];
       return {
-        id:    s['Folio de servicio'] || '—',
+        id:    folio,
         placa: s['Tractor']           || '—',
         cl:    s['Cliente']           || '—',
         or:    [s['Cuidad Origen'],  s['Estado Origen'] ].filter(Boolean).join(', '),
@@ -384,11 +387,12 @@ app.get('/api/noa/folios', async (req, res) => {
         min:   0,
         op:    s['Operador']  || '—',
         pv:    s['Proveedor'] || '—',
-        al:    'NORMAL',
-        inc:   comentario || null,
+        al:    esc_saved ? esc_saved.al : 'NORMAL',
+        inc:   esc_saved ? esc_saved.inc : (comentario || null),
         zona:  false,
-        esc:   [],
+        esc:   esc_saved ? esc_saved.esc : [],
         citaDes,
+        citaDesRaw: s['Cita de Descarga'] || null,
         planner: s['Planner'] || null,
       };
     });
@@ -397,6 +401,28 @@ app.get('/api/noa/folios', async (req, res) => {
     console.error('[NOA/folios]', e.message);
     res.json([]);
   }
+});
+
+// ─── ESCALACIONES PERSISTENTES ───────────────────────────────────────────────
+const ESCALACIONES_PATH = path.join(__dirname, 'data', 'escalaciones.json');
+let escalaciones = {};
+try { escalaciones = JSON.parse(fs.readFileSync(ESCALACIONES_PATH, 'utf8')); } catch(e) { escalaciones = {}; }
+function saveEscalaciones() {
+  try { fs.writeFileSync(ESCALACIONES_PATH, JSON.stringify(escalaciones, null, 2)); } catch(e) {}
+}
+
+app.get('/api/noa/escalaciones', (req, res) => res.json(escalaciones));
+
+app.post('/api/noa/escalaciones', express.json(), (req, res) => {
+  const { folio, al, inc, esc } = req.body || {};
+  if (!folio) return res.status(400).json({ error: 'folio required' });
+  if (al === 'NORMAL') {
+    delete escalaciones[folio];
+  } else {
+    escalaciones[folio] = { al, inc: inc || null, esc: esc || [], ts: new Date().toISOString() };
+  }
+  saveEscalaciones();
+  res.json({ ok: true });
 });
 
 app.get('/api/noa/folio/:folio', async (req, res) => {
