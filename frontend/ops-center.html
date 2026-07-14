@@ -197,49 +197,81 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .esc-st.sr{color:var(--crit)}.esc-st.ok{color:var(--grn)}.esc-st.act{color:var(--warn)}.esc-st.pd{color:var(--t3)}
 .fc-acts{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--b1);background:rgba(0,0,0,.15)}
 
-/* ── NOA AI CHAT — half-screen panel ── */
+/* ── NOA AI CHAT ── */
 .noa-ai-foot{flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1);display:flex;flex-direction:column;transition:flex .2s}
-.noa-ai-foot.open{flex:0 0 50%;min-height:0}
-.noa-ai-head{display:flex;align-items:center;padding:8px 14px;cursor:pointer;user-select:none;gap:8px;transition:background .15s;flex-shrink:0}
+.noa-ai-foot.open{flex:0 0 52%;min-height:0}
+.noa-ai-head{display:flex;align-items:center;padding:9px 14px;cursor:pointer;user-select:none;gap:8px;transition:background .15s;flex-shrink:0;border-bottom:1px solid transparent}
 .noa-ai-head:hover{background:var(--b1)}
+.noa-ai-foot.open .noa-ai-head{border-bottom-color:var(--b1)}
 .noa-ai-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);flex:1}
 .noa-ai-hint{font-size:9.5px;color:var(--t3)}
 .noa-ai-arr{font-size:9px;color:var(--t3);transition:transform .2s;display:inline-block}
 .noa-ai-arr.open{transform:rotate(180deg)}
-/* messages list */
-.noa-msgs{flex:1;overflow-y:auto;padding:10px 14px;display:none;flex-direction:column;gap:12px;min-height:0}
+
+/* ── messages list ── */
+.noa-msgs{flex:1;overflow-y:auto;padding:16px 14px;display:none;flex-direction:column;gap:16px;min-height:0;scroll-behavior:smooth}
 .noa-msgs.open{display:flex}
-/* message rows */
-.nm{display:flex;align-items:flex-end;gap:8px;max-width:100%}
+
+/* ── message rows ── */
+.nm{display:flex;align-items:flex-start;gap:9px;width:100%}
 .nm.user{flex-direction:row-reverse}
-.nm-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;background:var(--cr-d) url('/img/noa-avatar.png') center/cover no-repeat;border:1px solid var(--cr-b)}
-/* bubbles */
-.nm-bubble{padding:10px 13px;border-radius:14px;font-size:12.5px;line-height:1.6;max-width:88%;word-break:break-word}
-.nm.noa .nm-bubble{background:var(--s3);border:1px solid var(--b2);border-bottom-left-radius:3px;color:var(--t1)}
-.nm.user .nm-bubble{background:rgba(255,58,58,.1);border:1px solid rgba(255,58,58,.2);border-bottom-right-radius:3px;color:var(--t1)}
-.nm.noa.streaming .nm-bubble::after{content:'▋';animation:blink .8s step-end infinite;color:var(--crit)}
-/* markdown inside bubble */
-.nm-bubble p{margin:0 0 7px}.nm-bubble p:last-child{margin:0}
-.nm-bubble h2,.nm-bubble h3,.nm-bubble h4{font-size:12.5px;font-weight:700;color:var(--t1);margin:10px 0 4px;letter-spacing:.01em}
+.nm-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:var(--cr-d) url('/img/noa-avatar.png') center/cover no-repeat;border:1px solid var(--cr-b)}
+
+/* ── bubbles ── */
+.nm-bubble{padding:14px 16px;border-radius:14px;font-size:13px;line-height:1.72;word-break:break-word;min-width:0;flex:1}
+.nm.noa  .nm-bubble{background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;color:var(--t1);max-width:calc(100% - 35px)}
+.nm.user .nm-bubble{background:rgba(255,58,58,.09);border:1px solid rgba(255,58,58,.18);border-top-right-radius:3px;color:var(--t1);max-width:82%;flex:0 0 auto}
+.nm.noa.streaming .nm-bubble::after{content:'▋';animation:blink .8s step-end infinite;color:var(--crit);margin-left:1px}
+
+/* ── markdown: paragraphs ── */
+.nm-bubble p{margin:0 0 10px;color:var(--t1)}
+.nm-bubble p:last-child{margin:0}
+
+/* ── markdown: headers ── */
+.nm-bubble h2{font-size:13.5px;font-weight:800;color:var(--crit);margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(255,58,58,.2);letter-spacing:.01em;display:flex;align-items:center;gap:6px}
+.nm-bubble h3{font-size:13px;font-weight:700;color:var(--t1);margin:14px 0 6px;padding-left:9px;border-left:2px solid var(--crit)}
+.nm-bubble h4{font-size:12.5px;font-weight:700;color:var(--t2);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.05em;font-size:10.5px}
 .nm-bubble h2:first-child,.nm-bubble h3:first-child,.nm-bubble h4:first-child{margin-top:0}
-.nm-bubble strong{color:var(--crit);font-weight:700}
-.nm-bubble em{color:var(--t2)}
-.nm-bubble hr{border:none;border-top:1px solid var(--b2);margin:8px 0}
-.nm-bubble ul,.nm-bubble ol{padding-left:16px;margin:4px 0}
-.nm-bubble li{margin-bottom:3px;font-size:12px}
-.nm-bubble code{background:rgba(255,58,58,.1);border:1px solid rgba(255,58,58,.18);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11px;color:var(--crit)}
-.nm-bubble pre{background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;overflow-x:auto;margin:8px 0}
-.nm-bubble pre code{background:none;border:none;padding:0;font-size:11px;color:var(--t2)}
-.nm-bubble table{border-collapse:collapse;width:100%;margin:8px 0;font-size:11.5px}
-.nm-bubble th,.nm-bubble td{padding:5px 9px;border:1px solid var(--b2);text-align:left;vertical-align:top}
-.nm-bubble th{background:var(--s2);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
-.nm-bubble .cb-check{color:var(--grn)}.nm-bubble .cb-empty{color:var(--t3)}
-/* input area */
-.noa-inp-area{display:none;gap:8px;padding:10px 14px;border-top:1px solid var(--b1);flex-shrink:0;align-items:flex-end}
+
+/* ── markdown: emphasis ── */
+.nm-bubble strong{color:var(--t1);font-weight:700;background:rgba(255,58,58,.08);padding:0 3px;border-radius:3px}
+.nm-bubble em{color:var(--t2);font-style:italic}
+
+/* ── markdown: divider ── */
+.nm-bubble hr{border:none;height:1px;background:linear-gradient(to right,rgba(255,58,58,.3),var(--b2),transparent);margin:14px 0}
+
+/* ── markdown: lists ── */
+.nm-bubble ul{list-style:none;padding-left:0;margin:6px 0 10px}
+.nm-bubble ul li{padding-left:16px;position:relative;margin-bottom:6px;color:var(--t1);line-height:1.6}
+.nm-bubble ul li::before{content:'•';position:absolute;left:0;color:var(--crit);font-weight:700}
+.nm-bubble ol{padding-left:20px;margin:6px 0 10px;counter-reset:li}
+.nm-bubble ol li{margin-bottom:6px;color:var(--t1);line-height:1.6;padding-left:4px}
+.nm-bubble ul:last-child,.nm-bubble ol:last-child{margin-bottom:0}
+
+/* ── markdown: checkboxes ── */
+.nm-bubble .cb-check{color:var(--grn);font-size:14px;line-height:1}
+.nm-bubble .cb-empty{color:var(--t3);font-size:14px;line-height:1}
+
+/* ── markdown: code ── */
+.nm-bubble code{background:rgba(255,58,58,.08);border:1px solid rgba(255,58,58,.15);border-radius:4px;padding:1px 6px;font-family:var(--mono);font-size:11.5px;color:var(--crit)}
+.nm-bubble pre{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:10px 0}
+.nm-bubble pre code{background:none;border:none;padding:0;font-size:11.5px;color:var(--t2)}
+
+/* ── markdown: tables ── */
+.nm-bubble table{border-collapse:collapse;width:100%;margin:10px 0;font-size:12px;border-radius:8px;overflow:hidden;border:1px solid var(--b2)}
+.nm-bubble thead tr{background:rgba(255,58,58,.08)}
+.nm-bubble th{padding:8px 12px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--crit);border-bottom:1px solid rgba(255,58,58,.2);white-space:nowrap}
+.nm-bubble td{padding:8px 12px;border-bottom:1px solid var(--b1);color:var(--t1);vertical-align:top;line-height:1.5}
+.nm-bubble tbody tr:last-child td{border-bottom:none}
+.nm-bubble tbody tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.nm-bubble table:last-child{margin-bottom:0}
+
+/* ── input area ── */
+.noa-inp-area{display:none;gap:8px;padding:10px 14px;border-top:1px solid var(--b1);flex-shrink:0;align-items:flex-end;background:var(--s1)}
 .noa-inp-area.open{display:flex}
-.noa-inp-area .mta{flex:1;min-height:34px;max-height:80px;resize:none;font-size:12px;border-color:rgba(255,58,58,.3)}
-.noa-inp-area .mta:focus{border-color:rgba(255,58,58,.55);box-shadow:0 0 0 2px rgba(255,58,58,.08)}
-.noa-inp-area .btn-r{flex-shrink:0;align-self:flex-end;padding:6px 14px}
+.noa-inp-area .mta{flex:1;min-height:36px;max-height:90px;resize:none;font-size:12.5px;border-color:rgba(255,58,58,.25);line-height:1.5}
+.noa-inp-area .mta:focus{border-color:rgba(255,58,58,.5);box-shadow:0 0 0 2px rgba(255,58,58,.07)}
+.noa-inp-area .btn-r{flex-shrink:0;align-self:flex-end;padding:7px 16px;font-size:13px}
 
 /* ── HÉCTOR KPI strip ── */
 .kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
@@ -968,82 +1000,125 @@ function toggleNoaAI(){
 }
 
 // ── Markdown renderer ────────────────────────────────────────────────────────
+function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escH(t){return esc(t).replace(/"/g,'&quot;');}
+
+function inlineFmt(t){
+  // escape HTML first, then apply inline markdown
+  return esc(t)
+    .replace(/\*\*\*([^*]+)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*([^*\n]+)\*/g,'<em>$1</em>')
+    .replace(/~~([^~\n]+)~~/g,'<del>$1</del>')
+    // restore inline code placeholders as-is (already escaped before)
+    .replace(/\x00IC(\d+)\x00/g,function(m,x){return m;});
+}
+
 function renderMd(raw){
-  if(!raw) return '';
-  var s = raw;
-  // protect code blocks
-  var cbs=[], ics=[];
-  s = s.replace(/```[\s\S]*?```/g, function(m){
-    var code=m.replace(/^```\w*\n?/,'').replace(/```$/,'');
-    cbs.push('<pre><code>'+esc(code)+'</code></pre>');
+  if(!raw) return '<p>'+esc(raw)+'</p>';
+
+  // 1. protect fenced code blocks
+  var cbs=[];
+  var s = raw.replace(/```(\w*)\n?([\s\S]*?)```/g, function(m,lang,code){
+    cbs.push('<pre><code>'+ esc(code.replace(/\n$/,'')) +'</code></pre>');
     return '\x00CB'+(cbs.length-1)+'\x00';
   });
+
+  // 2. protect inline code
+  var ics=[];
   s = s.replace(/`([^`\n]+)`/g, function(m,c){
     ics.push('<code>'+esc(c)+'</code>');
     return '\x00IC'+(ics.length-1)+'\x00';
   });
+
   var lines = s.split('\n'), out=[], i=0;
-  while(i<lines.length){
-    var ln=lines[i];
-    // table
-    if(ln.match(/^\|/) && i+1<lines.length && lines[i+1].match(/^\|[-:| ]+\|/)){
-      var th='<table><thead><tr>';
-      ln.split('|').slice(1,-1).forEach(function(c){th+='<th>'+inlineFmt(c.trim())+'</th>';});
-      th+='</tr></thead><tbody>'; i+=2;
-      while(i<lines.length && lines[i].match(/^\|/)){
-        th+='<tr>';
-        lines[i].split('|').slice(1,-1).forEach(function(c){th+='<td>'+inlineFmt(c.trim())+'</td>';});
-        th+='</tr>'; i++;
+
+  while(i < lines.length){
+    var ln = lines[i];
+
+    // code block placeholder
+    if(ln.match(/^\x00CB\d+\x00$/)){out.push(ln);i++;continue;}
+
+    // table: header row followed by separator row (|---|---|)
+    if(ln.match(/^\s*\|/) && i+1 < lines.length && lines[i+1].match(/^\s*\|[\s\-:|]+\|/)){
+      var tbl='<table><thead><tr>';
+      ln.split('|').slice(1,-1).forEach(function(c){
+        tbl+='<th>'+inlineFmt(c.trim().replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];}))+'</th>';
+      });
+      tbl+='</tr></thead><tbody>'; i+=2;
+      while(i<lines.length && lines[i].match(/^\s*\|/)){
+        tbl+='<tr>';
+        lines[i].split('|').slice(1,-1).forEach(function(c){
+          tbl+='<td>'+inlineFmt(c.trim().replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];}))+'</td>';
+        });
+        tbl+='</tr>'; i++;
       }
-      out.push(th+'</tbody></table>'); continue;
+      out.push(tbl+'</tbody></table>'); continue;
     }
-    // headers
-    var hm=ln.match(/^(#{1,4}) (.+)/);
-    if(hm){out.push('<h'+(hm[1].length+1)+'>'+inlineFmt(hm[2])+'</h'+(hm[1].length+1)+'>');i++;continue;}
-    // hr
-    if(ln.match(/^---+$/)){out.push('<hr>');i++;continue;}
-    // ul + checkboxes
-    if(ln.match(/^[\-\*] /)){
+
+    // ATX headers (#, ##, ###, ####)
+    var hm = ln.match(/^(#{1,4})\s+(.+)/);
+    if(hm){
+      var hlv = Math.min(hm[1].length + 1, 5); // # → h2, ## → h3, ### → h4, #### → h4
+      if(hlv > 4) hlv = 4;
+      out.push('<h'+hlv+'>'+inlineFmt(hm[2].replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];}))+'</h'+hlv+'>');
+      i++; continue;
+    }
+
+    // horizontal rule (--- only, not inside table context)
+    if(ln.match(/^-{3,}$/) || ln.match(/^\*{3,}$/) || ln.match(/^_{3,}$/)){
+      out.push('<hr>'); i++; continue;
+    }
+
+    // unordered list (- item or * item), with checkbox support
+    if(ln.match(/^[\-\*]\s/)){
       var ul='<ul>';
-      while(i<lines.length && lines[i].match(/^[\-\*] /)){
-        var it=lines[i].replace(/^[\-\*] /,'');
-        var cbm=it.match(/^\[([ xX])\] (.+)/);
-        if(cbm) ul+='<li><span class="'+(cbm[1].trim()?'cb-check':'cb-empty')+'">'+(cbm[1].trim()?'☑':'☐')+'</span> '+inlineFmt(cbm[2])+'</li>';
-        else ul+='<li>'+inlineFmt(it)+'</li>';
+      while(i<lines.length && lines[i].match(/^[\-\*]\s/)){
+        var it = lines[i].replace(/^[\-\*]\s/,'');
+        var cbm = it.match(/^\[([ xX✓])\]\s(.+)/);
+        if(cbm){
+          var done = cbm[1].trim() !== '';
+          ul+='<li><span class="'+(done?'cb-check':'cb-empty')+'">'+(done?'☑':'☐')+'</span> '+
+              inlineFmt(cbm[2].replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];}))+'</li>';
+        } else {
+          ul+='<li>'+inlineFmt(it.replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];}))+'</li>';
+        }
         i++;
       }
       out.push(ul+'</ul>'); continue;
     }
-    // ol
-    if(ln.match(/^\d+\. /)){
+
+    // ordered list
+    if(ln.match(/^\d+[\.\)]\s/)){
       var ol='<ol>';
-      while(i<lines.length && lines[i].match(/^\d+\. /)){
-        ol+='<li>'+inlineFmt(lines[i].replace(/^\d+\. /,''))+'</li>'; i++;
+      while(i<lines.length && lines[i].match(/^\d+[\.\)]\s/)){
+        ol+='<li>'+inlineFmt(lines[i].replace(/^\d+[\.\)]\s/,'').replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];}))+'</li>';
+        i++;
       }
       out.push(ol+'</ol>'); continue;
     }
-    // blank
+
+    // blank line → paragraph break
     if(!ln.trim()){i++;continue;}
-    // paragraph — collect consecutive plain lines
+
+    // paragraph — accumulate consecutive text lines
     var ps=[];
-    while(i<lines.length && lines[i].trim() && !lines[i].match(/^[#\-\*\|]/) && !lines[i].match(/^\d+\. /) && !lines[i].match(/^---/)){
-      ps.push(inlineFmt(lines[i])); i++;
+    while(i<lines.length && lines[i].trim() &&
+          !lines[i].match(/^[#\|\-\*]/) &&
+          !lines[i].match(/^\d+[\.\)]\s/) &&
+          !lines[i].match(/^\x00CB/)){
+      ps.push(inlineFmt(lines[i].replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];})));
+      i++;
     }
     if(ps.length) out.push('<p>'+ps.join('<br>')+'</p>');
   }
-  s = out.join('');
-  s = s.replace(/\x00CB(\d+)\x00/g,function(m,x){return cbs[+x];});
-  s = s.replace(/\x00IC(\d+)\x00/g,function(m,x){return ics[+x];});
-  return s;
+
+  s = out.join('\n');
+  // restore code blocks
+  s = s.replace(/\x00CB(\d+)\x00/g, function(m,x){return cbs[+x];});
+  s = s.replace(/\x00IC(\d+)\x00/g, function(m,x){return ics[+x];});
+  return s || '<p>'+esc(raw)+'</p>';
 }
-function inlineFmt(t){
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*([^*\n]+)\*/g,'<em>$1</em>')
-    .replace(/~~([^~]+)~~/g,'<del>$1</del>');
-}
-function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function escH(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ── NOA chat send / stream ───────────────────────────────────────────────────
 function addBubble(role, text){
