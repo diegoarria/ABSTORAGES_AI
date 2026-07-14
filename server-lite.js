@@ -23,6 +23,7 @@ const gpsLive     = require('./backend/services/gps-live');
 const leads       = require('./backend/services/leads');
 const notifier    = require('./backend/services/notifier');
 const vapi        = require('./backend/services/vapi');
+const tms         = require('./backend/services/tms');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -503,6 +504,13 @@ async function handleChat(agente, req, res) {
   const tariffCtx = tariff.getContext();
   let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
   if (callMode) systemPrompt += '\n\n🎙️ MODO LLAMADA DE VOZ: El cliente está en una llamada. Responde en máximo 2 oraciones cortas y directas. Sin listas, sin markdown, sin asteriscos. Habla natural como en una conversación telefónica. IMPORTANTE: Aunque estés en modo voz, SIEMPRE debes emitir el bloque LEAD_DATA al final de tu respuesta cuando tengas datos del cliente — es obligatorio en todos los modos.';
+
+  // Inyectar contexto del TMS para SARA cuando el mensaje lo amerite
+  if (agente === 'sara' && tms.ENABLED) {
+    const tmsCtx = await tms.getContextoSARA(message);
+    if (tmsCtx) systemPrompt += tmsCtx;
+  }
+
   const messages = [...history, { role: 'user', content: message }];
 
   memory.addMessage(sid, 'user', message);
