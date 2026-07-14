@@ -420,11 +420,209 @@ function formatearProveedoresPorRuta(origen, destino, provs) {
   return `PROVEEDORES QUE HAN CUBIERTO ${origen.toUpperCase()} → ${destino.toUpperCase()}:\n` + lines.join('\n');
 }
 
+// ── Funciones específicas para NOA ───────────────────────────────────────────
+
+// Buscar folio completo (P-MON-01/02/03/04/06)
+// Paso 1: servicios → ID_Servicio. Paso 2: detalle_servicios → todo el detalle operativo.
+async function buscarFolioNOA(folio) {
+  const ref = await query('servicios', {
+    pagina: 1, limite: 1,
+    filtros: { 'Folio de servicio': { contiene: folio } },
+    campos: ['ID_Servicio','Folio de servicio'],
+  });
+  const id = ref?.datos?.[0]?.['ID_Servicio'];
+  if (!id) return [];
+
+  const r = await query('detalle_servicios', {
+    pagina: 1, limite: 3,
+    filtros: { 'ID_Servicio': { contiene: id } },
+    campos: [
+      'Folio de servicio','Fecha de Servicio','Cliente',
+      // Origen
+      'Nombre Remitente','Contacto Remitente','Telefono Remitente',
+      'Cita de carga','Llegada a carga','Hora de salida carga',
+      'Estado Origen','Cuidad Origen','Colonia Origen','Calle Origen',
+      // Destino
+      'Nombre Destinatario','Contacto Destinatario','Telefono Destinatario',
+      'Cita de Descarga','Llegada a descarga','Hora de salida descarga','Hora estimada de llegada a destino',
+      'Estado destino','Cuidad destino','Colonia destino','Calle destino',
+      // Carga
+      'Mercancias','Presentacion','Cantidad','Peso',
+      // Unidad/Operador
+      'Proveedor','Tractor','Tipo de tractor','Tipo de Permiso','Permiso SCT',
+      'NIV Tractor','Remolque','Tipo remolque','NIV Remolque',
+      'Operador','RFC','Licencia',
+      // GPS
+      'GPS','Usuario GPS','GPSOrigen','GPSdestino',
+      // Planner
+      'Planner','Telefono','Correo',
+      // Instrucciones cliente
+      'Comentarios CI','Carta de Instruccion',
+      // Estatus monitoreo
+      'Estatus Operaciones','EstatusMonitoreoDetalle','Comentarios Estatus Monitoreo',
+      // Incidencias
+      'Siniestro',
+    ],
+  });
+  return r?.datos || [];
+}
+
+// Folios activos para entrega de turno (P-MON-05)
+async function foliosActivosNOA() {
+  // Dos queries: "En Proceso" (tránsito) + "Carga" (en planta de origen)
+  const [enProceso, enCarga] = await Promise.all([
+    query('detalle_servicios', {
+      pagina: 1, limite: 30,
+      filtros: { 'Estatus Operaciones': { contiene: 'Proceso' } },
+      campos: [
+        'Folio de servicio','Fecha de Servicio','Cliente',
+        'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
+        'Cita de carga','Llegada a carga','Hora de salida carga',
+        'Cita de Descarga','Llegada a descarga',
+        'Proveedor','Operador','Tractor',
+        'GPS','Usuario GPS',
+        'EstatusMonitoreoDetalle','Comentarios Estatus Monitoreo',
+        'Planner','Telefono','Correo',
+      ],
+    }),
+    query('detalle_servicios', {
+      pagina: 1, limite: 20,
+      filtros: { 'EstatusMonitoreoDetalle': { contiene: 'origen' } },
+      campos: [
+        'Folio de servicio','Fecha de Servicio','Cliente',
+        'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
+        'Cita de carga','Llegada a carga','Hora de salida carga',
+        'Cita de Descarga','Llegada a descarga',
+        'Proveedor','Operador','Tractor',
+        'GPS','Usuario GPS',
+        'EstatusMonitoreoDetalle','Comentarios Estatus Monitoreo',
+        'Planner','Telefono','Correo',
+      ],
+    }),
+  ]);
+
+  const todos = [...(enProceso?.datos || []), ...(enCarga?.datos || [])];
+  // Deduplicar por folio
+  const unicos = {};
+  for (const s of todos) {
+    const f = s['Folio de servicio'];
+    if (f && !unicos[f]) unicos[f] = s;
+  }
+  return Object.values(unicos).sort((a, b) =>
+    (b['Fecha de Servicio'] || '').localeCompare(a['Fecha de Servicio'] || ''));
+}
+
+// Context builder para NOA
+async function getContextoNOA(mensajeUsuario) {
+  if (!ENABLED) return '';
+
+  const msg = mensajeUsuario.toLowerCase();
+
+  // Detectar folio explícito: patrón OP-ABS-YY-NNNN
+  const folioMatch = mensajeUsuario.match(/OP-ABS-\d{2}-\d+/i);
+  if (folioMatch) {
+    const datos = await buscarFolioNOA(folioMatch[0].toUpperCase());
+    if (datos.length) return '\n\n---\n[DATOS TMS MONITOREO — uso interno NOA]\n' + formatearFolioNOA(datos[0]) + '\n---\n';
+  }
+
+  // Detectar intención de entrega de turno o vista de todos los activos
+  const esTurno   = /turno|activos|briefing|todos los folios|folios activos|resumen|arranque/.test(msg);
+  if (esTurno) {
+    const activos = await foliosActivosNOA();
+    if (activos.length) return '\n\n---\n[DATOS TMS MONITOREO — uso interno NOA]\n' + formatearListaActivosNOA(activos) + '\n---\n';
+  }
+
+  // Detectar búsqueda de proveedor/transportista
+  const esProveedor = /proveedor|transportista|operador|carrier/.test(msg);
+  if (esProveedor) {
+    const stopwords = new Set(['proveedor','transportista','operador','carrier','para','como','que','con','cual','cuales','este','esta']);
+    const palabras = msg.split(/\s+/).filter(w => w.length > 4 && !stopwords.has(w)).slice(0, 2);
+    for (const palabra of palabras) {
+      const provs = await buscarProveedor(palabra);
+      if (provs.length) {
+        return '\n\n---\n[DATOS TMS MONITOREO — uso interno NOA]\n' + formatearProveedor(provs) + '\n---\n';
+      }
+    }
+  }
+
+  return '';
+}
+
+// ── Formateadores NOA ──────────────────────────────────────────────────────────
+function fmt(v) { return v && String(v).trim() ? String(v).trim() : '—'; }
+function fmtFecha(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (isNaN(d)) return String(v);
+  return d.toLocaleDateString('es-MX', { day:'2-digit', month:'2-digit', year:'numeric' })
+    + ' ' + d.toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit', hour12: false });
+}
+
+function formatearFolioNOA(s) {
+  const lineas = [
+    `📋 FOLIO: ${fmt(s['Folio de servicio'])} | Fecha: ${fmtFecha(s['Fecha de Servicio'])} | Cliente: ${fmt(s['Cliente'])}`,
+    '',
+    `🗺️  RUTA: ${fmt(s['Cuidad Origen'])}, ${fmt(s['Estado Origen'])} → ${fmt(s['Cuidad destino'])}, ${fmt(s['Estado destino'])}`,
+    `   Origen: ${fmt(s['Calle Origen'])} ${fmt(s['Colonia Origen'])} | Destino: ${fmt(s['Calle destino'])} ${fmt(s['Colonia destino'])}`,
+    `   📍 Mapa Origen: ${fmt(s['GPSOrigen'])} | Mapa Destino: ${fmt(s['GPSdestino'])}`,
+    '',
+    `⏱️  TIEMPOS DE CARGA:`,
+    `   Cita carga: ${fmtFecha(s['Cita de carga'])} | Llegada: ${fmt(s['Llegada a carga'])} | Salida: ${fmt(s['Hora de salida carga'])}`,
+    `⏱️  TIEMPOS DE DESCARGA:`,
+    `   Cita descarga: ${fmtFecha(s['Cita de Descarga'])} | ETA: ${fmtFecha(s['Hora estimada de llegada a destino'])} | Llegada: ${fmt(s['Llegada a descarga'])} | Salida: ${fmt(s['Hora de salida descarga'])}`,
+    '',
+    `📦 MERCANCÍA: ${fmt(s['Mercancias'])} | ${fmt(s['Presentacion'])} x ${fmt(s['Cantidad'])} | Peso: ${fmt(s['Peso'])}`,
+    '',
+    `🚛 UNIDAD:`,
+    `   Proveedor: ${fmt(s['Proveedor'])}`,
+    `   Tractor: ${fmt(s['Tractor'])} (${fmt(s['Tipo de tractor'])}) | NIV: ${fmt(s['NIV Tractor'])}`,
+    `   Remolque: ${fmt(s['Remolque'])} (${fmt(s['Tipo remolque'])}) | NIV: ${fmt(s['NIV Remolque'])}`,
+    `   Permiso SCT: ${fmt(s['Permiso SCT'])} | Tipo: ${fmt(s['Tipo de Permiso'])}`,
+    `   GPS: ${fmt(s['GPS'])} | Usuario GPS: ${fmt(s['Usuario GPS'])}`,
+    '',
+    `👤 OPERADOR: ${fmt(s['Operador'])} | RFC: ${fmt(s['RFC'])} | Licencia: ${fmt(s['Licencia'])}`,
+    '',
+    `📞 CONTACTOS:`,
+    `   Remitente: ${fmt(s['Nombre Remitente'])} — ${fmt(s['Contacto Remitente'])} — ${fmt(s['Telefono Remitente'])}`,
+    `   Destinatario: ${fmt(s['Nombre Destinatario'])} — ${fmt(s['Contacto Destinatario'])} — ${fmt(s['Telefono Destinatario'])}`,
+    `   Planner: ${fmt(s['Planner'])} — ${fmt(s['Correo'])} — Tel: ${fmt(s['Telefono'])}`,
+    '',
+    `📊 ESTATUS MONITOREO: ${fmt(s['EstatusMonitoreoDetalle'])} | ${fmt(s['Comentarios Estatus Monitoreo'])}`,
+    s['Siniestro'] ? `🚨 SINIESTRO: ${fmt(s['Siniestro'])}` : '',
+    s['Estatus Acuses'] === false ? '⚠️  Acuse: pendiente de recibir' : '',
+    '',
+    `📝 INSTRUCCIONES DEL CLIENTE (Carta de Instrucción):`,
+    `${fmt(s['Comentarios CI'])}`,
+  ];
+  return lineas.filter(l => l !== null).join('\n');
+}
+
+function formatearListaActivosNOA(activos) {
+  const lineas = [`FOLIOS ACTIVOS (${activos.length} en total) — ENTREGA DE TURNO:\n`];
+  for (const s of activos) {
+    const ruta = `${fmt(s['Cuidad Origen'])} → ${fmt(s['Cuidad destino'])}`;
+    const citaDes = s['Cita de Descarga'] ? fmtFecha(s['Cita de Descarga']) : '—';
+    const salio   = s['Hora de salida carga'] ? '✅ En tránsito' : (s['Llegada a carga'] ? '🔄 En carga' : '🕐 Sin arrancar');
+    const llego   = s['Llegada a descarga'] ? '✅ Entregado' : '';
+    lineas.push(
+      `• ${fmt(s['Folio de servicio'])} | ${fmt(s['Cliente'])} | ${ruta}`,
+      `  Estatus: ${fmt(s['EstatusMonitoreoDetalle'])} ${salio} ${llego}`,
+      `  Cita descarga: ${citaDes} | Operador: ${fmt(s['Operador'])} | Unidad: ${fmt(s['Tractor'])}`,
+      `  GPS: ${fmt(s['GPS'])} (${fmt(s['Usuario GPS'])})`,
+      s['Comentarios Estatus Monitoreo'] ? `  Nota: ${fmt(s['Comentarios Estatus Monitoreo'])}` : '',
+      '',
+    );
+  }
+  return lineas.join('\n');
+}
+
 module.exports = {
   // SARA
   buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
   // SOFIA
   buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA,
+  // NOA
+  buscarFolioNOA, foliosActivosNOA, getContextoNOA,
   // Core
   query, ENABLED,
 };

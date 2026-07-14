@@ -511,6 +511,12 @@ async function handleChat(agente, req, res) {
     if (tmsCtx) systemPrompt += tmsCtx;
   }
 
+  // Inyectar contexto TMS para NOA (folios activos, detalle operativo, instrucciones cliente)
+  if (agente === 'noa' && tms.ENABLED) {
+    const tmsCtx = await tms.getContextoNOA(message);
+    if (tmsCtx) systemPrompt += tmsCtx;
+  }
+
   const messages = [...history, { role: 'user', content: message }];
 
   memory.addMessage(sid, 'user', message);
