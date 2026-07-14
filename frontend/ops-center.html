@@ -1195,7 +1195,9 @@ function simBarrido(auto){
       notificarProactivo(folios);
       if(!auto) toast('Barrido completado — '+folios.length+' servicios actualizados','#00B451');
     })
-    .catch(function(){toast('Error al conectar con el TMS','#FF3A3A');})
+    .catch(function(){
+      if(!auto) toast('TMS no respondió — los datos actuales se mantienen','#FF8C00');
+    })
     .finally(function(){
       if(btn){btn.disabled=false;btn.textContent='↻ Barrer';}
     });
@@ -1612,24 +1614,67 @@ function simTick(){
 }
 
 // ── INIT ──────────────────────────────────────────────
-function loadFoliosTMS(){
-  var out=document.getElementById('noa-out');
-  if(out) out.innerHTML='<div style="padding:24px;text-align:center;color:var(--t3);font-size:11px">Cargando servicios activos del TMS…</div>';
+var _foliosRetryTimer = null;
+var _foliosRetryCount = 0;
+var _foliosRetryDelays = [5, 10, 20, 30, 60]; // segundos
+
+function loadFoliosTMS(intento){
+  intento = intento || 0;
+  _foliosRetryCount = intento;
+  var out = document.getElementById('noa-out');
+  if (out && intento === 0) {
+    out.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t3);font-size:11px">Cargando servicios activos del TMS…</div>';
+  }
   fetch('/api/noa/folios')
-    .then(function(r){return r.json();})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
     .then(function(data){
+      _foliosRetryCount = 0;
+      if(_foliosRetryTimer){ clearTimeout(_foliosRetryTimer); _foliosRetryTimer=null; }
       FOLIOS = data;
       folios = data.map(function(f){return Object.assign({},f,{esc:(f.esc||[]).slice()});});
       detectarAlertas(folios);
       lastBarridoAt = Date.now();
       updateBarridoLabel();
-      // inicializar mapa previo sin disparar notificaciones en la carga inicial
       folios.forEach(function(f){ prevAlertSet[f.id]=f.al; });
       renderNOA();
     })
-    .catch(function(){
-      if(out) out.innerHTML='<div style="padding:24px;text-align:center;color:var(--t3);font-size:11px">No se pudieron cargar los folios del TMS.</div>';
+    .catch(function(e){
+      var delay = _foliosRetryDelays[Math.min(intento, _foliosRetryDelays.length-1)];
+      var out2 = document.getElementById('noa-out');
+      // Si ya hay folios cargados, no borrar — solo tostar
+      if (folios.length > 0) {
+        toast('TMS no respondió — reintentando en '+delay+'s','#FF8C00');
+      } else if (out2) {
+        out2.innerHTML = retryBanner(delay, intento);
+        iniciarCuentaRegresivaBanner(delay, intento);
+      }
+      _foliosRetryTimer = setTimeout(function(){ loadFoliosTMS(intento+1); }, delay*1000);
     });
+}
+
+function retryBanner(delay, intento){
+  return '<div id="tms-retry-banner" style="padding:28px 20px;text-align:center">'+
+    '<div style="font-size:12px;color:var(--t2);margin-bottom:8px">'+
+      (intento===0 ? 'Conectando con el TMS…' : 'TMS no respondió')+
+    '</div>'+
+    '<div style="font-size:11px;color:var(--t3);margin-bottom:14px">'+
+      'Reintentando en <span id="retry-countdown">'+delay+'</span>s'+
+    '</div>'+
+    '<button class="btn btn-sm" onclick="if(_foliosRetryTimer)clearTimeout(_foliosRetryTimer);loadFoliosTMS(0)" style="font-size:11px">'+
+      '↻ Reintentar ahora'+
+    '</button>'+
+  '</div>';
+}
+
+function iniciarCuentaRegresivaBanner(delay, intento){
+  var rem = delay;
+  var iv = setInterval(function(){
+    rem--;
+    var el = document.getElementById('retry-countdown');
+    if(!el){ clearInterval(iv); return; }
+    el.textContent = rem;
+    if(rem<=0) clearInterval(iv);
+  }, 1000);
 }
 
 document.addEventListener('DOMContentLoaded',function(){
