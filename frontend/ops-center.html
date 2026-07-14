@@ -476,16 +476,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 
 <script>
 'use strict';
-// ── DATA NOA ─────────────────────────────────────────
-var FOLIOS=[
-  {id:'AB-2024-087',placa:'NL-NMX-12', cl:'Bimbo S.A. de C.V.',    or:'Monterrey, NL',   de:'Ciudad de México',  st:'EN_TRANSITO',gps:{la:24.7813,ln:-100.3124},min:47,op:'Carlos López G.',  pv:'Transportes Garza SA',   al:'CRITICO', inc:'Detenida en Zona de Riesgo ZR-03 (Cerro del Topo, NL)',zona:true, esc:[{nv:'Operador',h:'14:22',s:'sr'},{nv:'Proveedor',h:'14:37',s:'ok'},{nv:'Coordinador',h:'14:52',s:'act'}]},
-  {id:'AB-2024-093',placa:'TAM-45-93', cl:'FEMSA Comercio',         or:'Monterrey, NL',   de:'Tampico, Tam.',     st:'EN_TRANSITO',gps:{la:23.1544,ln:-99.3204}, min:52,op:'Mario Hdz. Reyes', pv:'Fletes del Norte SA',    al:'CRITICO', inc:'Sin respuesta a barrido — SLA de 30 min superado',    zona:false,esc:[{nv:'Operador',h:'14:05',s:'sr'},{nv:'Proveedor',h:'14:20',s:'act'},{nv:'Coordinador',h:'14:35',s:'pd'}]},
-  {id:'AB-2024-088',placa:'GDL-08-88', cl:'Soriana Operadora',      or:'Monterrey, NL',   de:'Guadalajara, Jal.', st:'EN_TRANSITO',gps:{la:22.15,ln:-101.94},   min:32,op:'Juan Martínez P.',pv:'Logística Central MX',   al:'ATENCION',inc:null, zona:false,esc:[]},
-  {id:'AB-2024-092',placa:'HMO-17-92', cl:'Liverpool S.A.B.',       or:'Ciudad de México', de:'Hermosillo, Son.',  st:'EN_TRANSITO',gps:{la:29.0892,ln:-110.9606},min:31,op:'Ana González R.', pv:'Trans-Mex SA de CV',     al:'ATENCION',inc:null, zona:false,esc:[]},
-  {id:'AB-2024-089',placa:'NL-61-89',  cl:'Cemex México SA',        or:'Monterrey, NL',   de:'Mérida, Yuc.',      st:'EN_CARGA',   gps:{la:25.6866,ln:-100.3161},min:12,op:'Pedro Salinas V.',pv:'Trans. Regiomontanos',   al:'NORMAL',  inc:null, zona:false,esc:[]},
-  {id:'AB-2024-090',placa:'MEX-29-90', cl:'Grupo Herdez',           or:'Monterrey, NL',   de:'Ciudad de México',  st:'EN_TRANSITO',gps:{la:23.9,ln:-100.0},     min:8, op:'Lorena Vega M.',  pv:'Rápidos del Norte',      al:'NORMAL',  inc:null, zona:false,esc:[]},
-  {id:'AB-2024-091',placa:'LRD-33-91', cl:'Walmart de México',      or:'Saltillo, Coah.', de:'Laredo, Tam.',      st:'EN_DESTINO', gps:{la:27.5,ln:-99.5},       min:18,op:'Roberto Silva D.',pv:'Grupo Logista SA',       al:'NORMAL',  inc:null, zona:false,esc:[]}
-];
+// ── DATA NOA — cargada desde TMS en init ─────────────────────────────────────
+var FOLIOS=[];
 
 // ── DATA HÉCTOR ───────────────────────────────────────
 var CUENTAS=[
@@ -508,7 +500,7 @@ var SEM={
   ne:{lbl:'Legal',        col:'#5E7A8C',ord:0}
 };
 
-var folios=FOLIOS.map(function(f){return Object.assign({},f,{esc:f.esc.map(function(e){return Object.assign({},e);})});});
+var folios=[];
 var cuentas=CUENTAS.map(function(c){return Object.assign({},c,{fols:c.fols.slice()});});
 var sF='dias',sD='desc',gCl=null,tick=0;
 var hecSid='hec_'+Date.now(),hecStreaming=false;
@@ -686,7 +678,12 @@ function card(f){
       '<div class="fc-meta">'+
         '<div class="mkv"><span class="mk">Op:</span><span class="mv">'+f.op+'</span></div>'+
         '<div class="mkv"><span class="mk">Prov:</span><span class="mv">'+f.pv+'</span></div>'+
-        '<div class="mkv"><span class="mk">GPS:</span><span class="mv mmono">'+f.gps.la.toFixed(3)+', '+f.gps.ln.toFixed(3)+'</span></div>'+
+        (f.gps&&f.gps.url
+          ? '<div class="mkv"><span class="mk">GPS:</span><span class="mv mmono"><a href="'+f.gps.url+'" target="_blank" rel="noopener" style="color:var(--t2);text-decoration:underline;text-underline-offset:2px">'+escH(f.gps.usr||'Ver tracking')+'</a></span></div>'
+          : f.gps&&f.gps.la!=null
+            ? '<div class="mkv"><span class="mk">GPS:</span><span class="mv mmono">'+f.gps.la.toFixed(3)+', '+f.gps.ln.toFixed(3)+'</span></div>'
+            : '')+
+        (f.citaDes?'<div class="mkv"><span class="mk">Cita des:</span><span class="mv mmono">'+f.citaDes+'</span></div>':'')+
         (f.zona?'<span class="zona-tag" role="alert">⚠ Zona riesgo</span>':'')+
       '</div>'+
       (f.inc?'<div class="fc-inc" role="alert">'+f.inc+'</div>':'')+
@@ -1030,6 +1027,7 @@ function inlineFmt(t){
     .replace(/~~([^~]+)~~/g,'<del>$1</del>');
 }
 function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escH(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ── NOA chat send / stream ───────────────────────────────────────────────────
 function addBubble(role, text){
@@ -1157,11 +1155,26 @@ function simTick(){
 }
 
 // ── INIT ──────────────────────────────────────────────
+function loadFoliosTMS(){
+  var out=document.getElementById('noa-out');
+  if(out) out.innerHTML='<div style="padding:24px;text-align:center;color:var(--t3);font-size:11px">Cargando servicios activos del TMS…</div>';
+  fetch('/api/noa/folios')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      FOLIOS = data;
+      folios = data.map(function(f){return Object.assign({},f,{esc:(f.esc||[]).slice()});});
+      renderNOA();
+    })
+    .catch(function(){
+      if(out) out.innerHTML='<div style="padding:24px;text-align:center;color:var(--t3);font-size:11px">No se pudieron cargar los folios del TMS.</div>';
+    });
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   updateClock();
   setInterval(updateClock,1000);
   setInterval(simTick,5000);
-  renderNOA();
+  loadFoliosTMS();
   renderHEC();
   fetchCuentas();
   ['m-turno','m-gestion'].forEach(function(id){

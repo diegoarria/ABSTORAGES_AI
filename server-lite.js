@@ -357,6 +357,48 @@ app.get('/api/metricas', (req, res) => {
 
 app.get('/api/sofia/folios', (req, res) => res.json([]));
 
+// ─── NOA: folios activos desde TMS ───────────────────────────────────────────
+app.get('/api/noa/folios', async (req, res) => {
+  if (!tms.ENABLED) return res.json([]);
+  try {
+    const activos = await tms.foliosActivosNOA();
+    const folios = activos.map(s => {
+      const det = (s['EstatusMonitoreoDetalle'] || '').toLowerCase();
+      let st = 'EN_TRANSITO';
+      if (det.includes('origen') || det.includes('carga')) st = 'EN_CARGA';
+      else if (det.includes('destino') || det.includes('descarga')) st = 'EN_DESTINO';
+
+      const comentario = (s['Comentarios Estatus Monitoreo'] || '').trim();
+      const citaDes = s['Cita de Descarga']
+        ? new Date(s['Cita de Descarga']).toLocaleString('es-MX', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false })
+        : null;
+
+      return {
+        id:    s['Folio de servicio'] || '—',
+        placa: s['Tractor']           || '—',
+        cl:    s['Cliente']           || '—',
+        or:    [s['Cuidad Origen'],  s['Estado Origen'] ].filter(Boolean).join(', '),
+        de:    [s['Cuidad destino'], s['Estado destino']].filter(Boolean).join(', '),
+        st,
+        gps:   { la: null, ln: null, url: s['GPS'] || null, usr: s['Usuario GPS'] || null },
+        min:   0,
+        op:    s['Operador']  || '—',
+        pv:    s['Proveedor'] || '—',
+        al:    'NORMAL',
+        inc:   comentario || null,
+        zona:  false,
+        esc:   [],
+        citaDes,
+        planner: s['Planner'] || null,
+      };
+    });
+    res.json(folios);
+  } catch (e) {
+    console.error('[NOA/folios]', e.message);
+    res.json([]);
+  }
+});
+
 app.get('/api/sessions', (req, res) => res.json(memory.listSessions()));
 
 // ─── TARIFA DINÁMICA ──────────────────────────────────────────────────────
