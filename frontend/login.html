@@ -861,8 +861,10 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Credenciales incorrectas');
+      // Respetar ?next= solo para admin; para otros roles usar destino del servidor
       const next = new URLSearchParams(window.location.search).get('next');
-      window.location.href = next || '/';
+      const dest = (data.user?.role === 'admin' && next) ? next : (data.redirect || '/');
+      window.location.href = dest;
     } catch (ex) {
       err.textContent = ex.message;
       err.classList.add('show');

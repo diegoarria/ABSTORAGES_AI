@@ -103,15 +103,21 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
 });
 
+// Destino por rol tras login
+function homeForRole(role) {
+  if (role === 'operaciones') return '/ops-center.html';
+  if (role === 'cliente')     return '/tracker.html';
+  return '/'; // admin y otros
+}
+
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body || {};
-  // DEV MODE: acepta cualquier credencial, usa admin por defecto
-  let user = USERS.find(u => u.email === email && u.password === password);
-  if (!user) user = USERS.find(u => u.role === 'admin') || USERS[0];
+  const user = USERS.find(u => u.email === email && u.password === password);
+  if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
   const { password: _, ...safe } = user;
   const sid = sessions.create(safe);
   res.setHeader('Set-Cookie', `abs_session=${sid}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
-  res.json({ ok: true, user: safe });
+  res.json({ ok: true, user: safe, redirect: homeForRole(safe.role) });
 });
 
 app.post('/api/logout', (req, res) => {
@@ -778,10 +784,14 @@ app.get('/api/cuentas-cobrar', (req, res) => {
   ]);
 });
 
-// ─── LEADS ────────────────────────────────────────────────────────────────────
-app.get('/api/leads',            async (req, res) => res.json(await leads.list({ desde: req.query.desde, hasta: req.query.hasta })));
-app.get('/api/leads/stats',      async (req, res) => res.json(await leads.stats()));
-app.post('/api/leads',           (req, res) => res.json(leads.add(req.body)));
+// ─── LEADS (solo admin) ───────────────────────────────────────────────────────
+function soloAdmin(req, res, next) {
+  if (req.user?.role === 'admin') return next();
+  res.status(403).json({ error: 'Acceso restringido' });
+}
+app.get('/api/leads',            soloAdmin, async (req, res) => res.json(await leads.list({ desde: req.query.desde, hasta: req.query.hasta })));
+app.get('/api/leads/stats',      soloAdmin, async (req, res) => res.json(await leads.stats()));
+app.post('/api/leads',           soloAdmin, (req, res) => res.json(leads.add(req.body)));
 app.get('/api/leads/export.csv', async (req, res) => {
   const csv = await leads.exportCsv();
   const fecha = new Date().toISOString().slice(0,10);
