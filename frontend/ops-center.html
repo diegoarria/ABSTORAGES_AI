@@ -56,12 +56,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .panel{display:flex;flex-direction:column;min-height:0}
 .panel-noa{flex:6;border-right:1px solid var(--b1);position:relative}
 .panel-hec{flex:4}
+.panel-sof{flex:1;display:none;flex-direction:column}
 
 /* ── PAGE SWITCHING — un agente a la vez ── */
 body[data-page="noa"] .panel-hec{display:none}
+body[data-page="noa"] .panel-sof{display:none}
 body[data-page="noa"] .panel-noa{flex:1;border-right:none}
 body[data-page="hec"] .panel-noa{display:none}
+body[data-page="hec"] .panel-sof{display:none}
 body[data-page="hec"] .panel-hec{flex:1}
+body[data-page="sof"] .panel-noa{display:none}
+body[data-page="sof"] .panel-hec{display:none}
+body[data-page="sof"] .panel-sof{display:flex;flex:1}
 
 /* ── PANEL HEADS ── */
 .phead{height:48px;display:flex;align-items:center;padding:0 16px;gap:9px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
@@ -413,9 +419,7 @@ body[data-page="hec"] .panel-hec{flex:1}
 
   <nav class="hdr-nav" aria-label="Navegación principal">
     <button class="np" data-pg="noa" onclick="switchPage('noa')" aria-label="Panel NOA — Monitoreo">NOA</button>
-    <button class="np" data-pg="hec" onclick="switchPage('hec')" aria-label="Panel HÉCTOR — Cobranza">HÉCTOR</button>
-    <button class="np" onclick="location.href='/'">SARA</button>
-    <button class="np" onclick="location.href='/'">SOFÍA</button>
+    <button class="np" data-pg="sof" onclick="switchPage('sof')" aria-label="Panel SOFÍA — Operaciones">SOFÍA</button>
   </nav>
 
   <div class="hdr-right">
@@ -539,6 +543,42 @@ body[data-page="hec"] .panel-hec{flex:1}
       </table>
     </div>
   </section>
+
+  <!-- ══ SOFÍA ══ -->
+  <section class="panel panel-sof" aria-label="Panel SOFÍA — AI Operaciones">
+    <div class="phead">
+      <div class="adot" style="background:rgba(74,158,255,0.1) url('/img/sofia-avatar.png') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22);" aria-hidden="true">S</div>
+      <span class="aname" style="color:#4a9eff">SOFÍA</span>
+      <span class="arole">AI Operaciones · 24/7</span>
+      <div class="pbtns" style="margin-left:auto;display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="sofNewSession()" aria-label="Nueva sesión SOFÍA">↺ Nueva sesión</button>
+        <button class="btn btn-sm" onclick="sofClear()" aria-label="Limpiar chat">✕ Limpiar</button>
+      </div>
+    </div>
+
+    <div class="sof-msgs" id="sof-msgs" role="log" aria-live="polite" aria-label="Chat con SOFÍA"
+      style="flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:16px;min-height:0;scroll-behavior:smooth">
+      <div class="nm noa" style="display:flex;gap:10px;align-items:flex-start">
+        <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url('/img/sofia-avatar.png') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)"></div>
+        <div class="nm-bubble" style="background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65">
+          <p>Hola, soy <strong>SOFÍA Novak</strong>, AI Planner de ABSTORAGES.<br>Gestiono operaciones, coordino transportistas y monitoreo folios activos. ¿Qué necesitas?</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1);padding:10px 14px;display:flex;gap:8px;align-items:flex-end">
+      <textarea id="sof-input" rows="1" placeholder="Escribe a SOFÍA…" aria-label="Mensaje para SOFÍA"
+        style="flex:1;min-height:36px;max-height:110px;resize:none;font-size:12.5px;font-family:var(--sans);background:var(--s3);border:1px solid rgba(74,158,255,0.22);border-radius:6px;color:var(--t1);padding:8px 11px;outline:none;transition:border-color .15s;line-height:1.5"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"
+        onfocus="this.style.borderColor='rgba(74,158,255,0.5)'"
+        onblur="this.style.borderColor='rgba(74,158,255,0.22)'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sofSend();}"></textarea>
+      <button id="sof-send-btn" onclick="sofSend()"
+        style="flex-shrink:0;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:#4a9eff;color:#fff;font-family:var(--sans);transition:background .15s;align-self:flex-end"
+        aria-label="Enviar a SOFÍA">→</button>
+    </div>
+  </section>
+
 </div>
 
 <!-- Modal Turno -->
@@ -1829,10 +1869,11 @@ function iniciarCuentaRegresivaBanner(delay, intento){
 }
 
 function switchPage(p){
-  if(p!=='noa'&&p!=='hec') p='noa';
+  if(p!=='noa'&&p!=='hec'&&p!=='sof') p='noa';
   document.body.dataset.page = p;
   history.replaceState(null,'','#'+p);
-  document.title = p==='noa' ? 'NOA · Monitoreo GPS — ABSTORAGES' : 'HÉCTOR · Cobranza — ABSTORAGES';
+  var titles = {noa:'NOA · Monitoreo GPS — ABSTORAGES', hec:'HÉCTOR · Cobranza — ABSTORAGES', sof:'SOFÍA · AI Ops — ABSTORAGES'};
+  document.title = titles[p] || titles.noa;
   document.querySelectorAll('.np[data-pg]').forEach(function(btn){
     var on = btn.dataset.pg===p;
     btn.classList.toggle('on', on);
@@ -1841,7 +1882,7 @@ function switchPage(p){
 }
 
 document.addEventListener('DOMContentLoaded',function(){
-  // Inicializar desde hash (#noa o #hec), default NOA
+  // Inicializar desde hash (#noa, #hec, #sof), default NOA
   var initPage = (location.hash||'').replace('#','');
   switchPage(initPage||'noa');
 
@@ -1862,6 +1903,137 @@ document.addEventListener('DOMContentLoaded',function(){
     if(e.key==='Escape'){closeTurno();closeGestion();if(fdOpen)cerrarFolio();}
   });
 });
+
+// ── SOFÍA CHAT ────────────────────────────────────────────────────────────────
+(function(){
+  var sofSid = 'sof_' + Date.now();
+  var sofStreaming = false;
+
+  function escHtml(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function renderMdSof(text){
+    return text
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/```([\s\S]*?)```/g,'<pre style="background:var(--s2);padding:8px 10px;border-radius:5px;overflow-x:auto;font-size:11px;margin:4px 0"><code>$1</code></pre>')
+      .replace(/`([^`]+)`/g,'<code style="background:var(--s3);padding:1px 5px;border-radius:3px;font-size:11px">$1</code>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/^#{1,3}\s+(.+)/gm,'<strong style="font-size:13px">$1</strong>')
+      .replace(/^[-•]\s+(.+)/gm,'• $1')
+      .replace(/\n\n/g,'</p><p>')
+      .replace(/\n/g,'<br>')
+      .replace(/^(.+)$/,'<p>$1</p>');
+  }
+
+  function sofScrollBottom(){
+    var el=document.getElementById('sof-msgs');
+    if(!el) return;
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.scrollTop=el.scrollHeight; }); });
+  }
+
+  function sofAppendUser(text){
+    var msgs=document.getElementById('sof-msgs');
+    var d=document.createElement('div');
+    d.style.cssText='display:flex;gap:10px;align-items:flex-start;flex-direction:row-reverse';
+    d.innerHTML='<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:var(--s4);border:1px solid var(--b3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--t2)">TÚ</div>'
+      +'<div style="background:var(--s4);border:1px solid var(--b2);border-top-right-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65">'+escHtml(text)+'</div>';
+    msgs.appendChild(d);
+    sofScrollBottom();
+  }
+
+  function sofShowTyping(){
+    var msgs=document.getElementById('sof-msgs');
+    var d=document.createElement('div');
+    d.id='sof-typing'; d.style.cssText='display:flex;gap:10px;align-items:flex-start';
+    d.innerHTML='<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)"></div>'
+      +'<div style="background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;padding:9px 13px;border-radius:10px"><div class="typing-indicator" style="display:flex;gap:4px;align-items:center"><span style="width:6px;height:6px;border-radius:50%;background:#4a9eff;display:inline-block;animation:blink 1.4s ease infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#4a9eff;display:inline-block;animation:blink 1.4s ease .2s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#4a9eff;display:inline-block;animation:blink 1.4s ease .4s infinite"></span></div></div>';
+    msgs.appendChild(d);
+    sofScrollBottom();
+  }
+
+  function sofHideTyping(){ document.getElementById('sof-typing')?.remove(); }
+
+  function sofNewBubble(){
+    var msgs=document.getElementById('sof-msgs');
+    var wrap=document.createElement('div'); wrap.style.cssText='display:flex;gap:10px;align-items:flex-start';
+    var av=document.createElement('div'); av.style.cssText='width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)';
+    var bubble=document.createElement('div'); bubble.style.cssText='background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65';
+    wrap.appendChild(av); wrap.appendChild(bubble); msgs.appendChild(wrap);
+    sofScrollBottom();
+    return bubble;
+  }
+
+  window.sofSend = function(){
+    var inp=document.getElementById('sof-input');
+    var msg=(inp.value||'').trim();
+    if(!msg||sofStreaming) return;
+    inp.value=''; inp.style.height='auto';
+    sofAppendUser(msg);
+    sofShowTyping();
+    var btn=document.getElementById('sof-send-btn');
+    btn.disabled=true; sofStreaming=true;
+
+    fetch('/api/sofia/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:msg,sessionId:sofSid})})
+    .then(function(res){
+      if(!res.ok||!res.body) throw new Error('HTTP '+res.status);
+      sofHideTyping();
+      var bubble=sofNewBubble();
+      var reader=res.body.getReader(), dec=new TextDecoder(), buf='', acc='';
+      var isDone=false, rafId=null;
+      function schedRender(){
+        if(isDone||rafId) return;
+        rafId=requestAnimationFrame(function(){ rafId=null; if(isDone) return; bubble.textContent=acc; sofScrollBottom(); });
+      }
+      function done(){
+        if(isDone) return; isDone=true;
+        if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+        bubble.innerHTML=renderMdSof(acc);
+        sofScrollBottom();
+        sofStreaming=false; btn.disabled=false; inp.focus();
+      }
+      function pump(){
+        reader.read().then(function(r){
+          if(r.done){done();return;}
+          buf+=dec.decode(r.value,{stream:true});
+          var lines=buf.split('\n\n'); buf=lines.pop();
+          for(var i=0;i<lines.length;i++){
+            var line=lines[i];
+            if(!line.startsWith('data: ')) continue;
+            try{
+              var d=JSON.parse(line.slice(6));
+              if(d.type==='chunk'){acc+=d.text;schedRender();}
+              if(d.type==='done'){done();return;}
+              if(d.type==='error'){bubble.innerHTML='<em style="color:var(--crit)">'+escHtml(d.message)+'</em>';done();return;}
+            }catch(e){}
+          }
+          pump();
+        }).catch(function(){ done(); });
+      }
+      pump();
+    })
+    .catch(function(err){
+      sofHideTyping();
+      var bubble=sofNewBubble();
+      bubble.innerHTML='<em style="color:var(--crit)">No se pudo conectar con SOFÍA. ¿El servidor está corriendo?</em>';
+      console.error('[SOFÍA]',err);
+      sofStreaming=false; btn.disabled=false;
+    });
+  };
+
+  window.sofNewSession = function(){
+    sofSid='sof_'+Date.now();
+    sofClear();
+    toast('Nueva sesión SOFÍA iniciada');
+  };
+
+  window.sofClear = function(){
+    document.getElementById('sof-msgs').innerHTML='<div style="display:flex;gap:10px;align-items:flex-start">'
+      +'<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)"></div>'
+      +'<div style="background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65">'
+      +'<p>Hola, soy <strong>SOFÍA Novak</strong>, AI Planner de ABSTORAGES.<br>¿Qué necesitas?</p></div></div>';
+  };
+})();
 </script>
 </body>
 </html>

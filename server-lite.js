@@ -6,6 +6,7 @@ const express = require('express');
 const path    = require('path');
 const https   = require('https');
 const fs      = require('fs');
+const crypto  = require('crypto');
 
 const { saveMessage, getMessages } = require('./backend/services/db');
 const auth        = require('./backend/middleware/auth');
@@ -95,6 +96,18 @@ app.use('/api/widget', cors());
 app.use('/widget', cors());
 
 // ─── LOGIN / LOGOUT / ME (rutas públicas, antes del middleware de auth) ───────
+
+// PIN de verificación — almacenado solo en servidor, nunca expuesto al cliente
+const VERIFY_PIN = '1368';
+// pendingId → { user, expires }  (TTL 5 min; limpieza periódica)
+const pendingLogins = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, entry] of pendingLogins) {
+    if (entry.expires < now) pendingLogins.delete(id);
+  }
+}, 60_000);
+
 app.get('/login', (req, res) => {
   // Siempre limpia la sesión activa al entrar al login
   const match = (req.headers.cookie || '').match(/abs_session=([^;]+)/);
@@ -110,11 +123,31 @@ function homeForRole(role) {
   return '/'; // admin y otros
 }
 
+// Paso 1: verifica credenciales → emite pendingId para paso PIN
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body || {};
   const user = USERS.find(u => u.email === email && u.password === password);
   if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
   const { password: _, ...safe } = user;
+  const pendingId = crypto.randomUUID();
+  pendingLogins.set(pendingId, { user: safe, expires: Date.now() + 5 * 60 * 1000 });
+  res.json({ step: 'pin', pendingId });
+});
+
+// Paso 2: verifica PIN → crea sesión
+app.post('/api/login/pin', (req, res) => {
+  const { pendingId, pin } = req.body || {};
+  const entry = pendingLogins.get(pendingId);
+  if (!entry || entry.expires < Date.now()) {
+    pendingLogins.delete(pendingId);
+    return res.status(401).json({ error: 'Sesión expirada. Ingresa tus credenciales de nuevo.' });
+  }
+  if (String(pin) !== VERIFY_PIN) {
+    pendingLogins.delete(pendingId); // un solo intento
+    return res.status(401).json({ error: 'Código incorrecto. Acceso denegado.' });
+  }
+  pendingLogins.delete(pendingId);
+  const { user: safe } = entry;
   const sid = sessions.create(safe);
   res.setHeader('Set-Cookie', `abs_session=${sid}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
   res.json({ ok: true, user: safe, redirect: homeForRole(safe.role) });

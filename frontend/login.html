@@ -623,6 +623,74 @@
       50%     { opacity: 1;   transform: scale(1.4); }
     }
 
+    /* ── PIN SCREEN ───────────────────────────────────────────────────────────── */
+    #pin-screen { display: none; }
+    #pin-screen.active { display: block; }
+    #login-screen.hidden { display: none; }
+
+    .pin-icon {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background: rgba(74,158,255,.1);
+      border: 1.5px solid rgba(74,158,255,.22);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    .pin-boxes {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 32px 0 24px;
+    }
+    .pin-box {
+      width: 62px; height: 72px;
+      border-radius: 14px;
+      background: var(--form-s1);
+      border: 2px solid var(--form-br2);
+      color: var(--t1);
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      caret-color: transparent;
+    }
+    .pin-box:focus {
+      border-color: var(--azul);
+      box-shadow: 0 0 0 4px rgba(74,158,255,.12);
+      background: var(--form-s2);
+    }
+    .pin-box.filled {
+      border-color: rgba(74,158,255,.4);
+    }
+
+    @keyframes pinShake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-8px); }
+      40%     { transform: translateX(8px); }
+      60%     { transform: translateX(-6px); }
+      80%     { transform: translateX(6px); }
+    }
+    .pin-boxes.shake { animation: pinShake .4s ease; }
+
+    .pin-back {
+      background: none;
+      border: none;
+      color: var(--t2);
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .pin-back:hover { color: var(--t1); }
+
     /* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
     @media (max-width: 900px) {
       .panel-left { display: none; }
@@ -737,6 +805,9 @@
 
     <div class="form-wrap">
 
+      <!-- ── PASO 1: Credenciales ─────────────────────────────────────────── -->
+      <div id="login-screen">
+
       <!-- Logo en panel derecho — visible en mobile cuando el izquierdo se oculta -->
       <div class="form-logo-wrap">
         <img src="/img/logo.png" alt="ABSTORAGES" class="form-logo"
@@ -799,16 +870,39 @@
           </div>
           <span class="demo-badge">Transportista</span>
         </button>
-      </div>
-    </div>
-  </div>
+      </div><!-- /demo-users -->
 
-</div>
+      </div><!-- /login-screen -->
+
+      <!-- ── PASO 2: Verificación PIN ─────────────────────────────────────── -->
+      <div id="pin-screen">
+        <div class="pin-icon">🔐</div>
+        <div class="form-title" style="font-size:24px">Verificación</div>
+        <div class="form-subtitle" style="margin-bottom:0">Ingresa el código de 4 dígitos<br/>para confirmar tu identidad</div>
+
+        <div class="pin-boxes" id="pin-boxes">
+          <input class="pin-box" id="pin-0" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 1"/>
+          <input class="pin-box" id="pin-1" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 2"/>
+          <input class="pin-box" id="pin-2" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 3"/>
+          <input class="pin-box" id="pin-3" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Dígito 4"/>
+        </div>
+
+        <div class="error-msg" id="pin-error"></div>
+
+        <button class="pin-back" id="pin-back" style="margin-top:20px">
+          ← Volver a ingresar credenciales
+        </button>
+      </div><!-- /pin-screen -->
+
+    </div><!-- /form-wrap -->
+  </div><!-- /panel-right -->
+
+</div><!-- /layout -->
 
 <script>
   const html = document.documentElement;
 
-  // Apply saved theme before first render
+  // Tema guardado
   const saved = localStorage.getItem('abs-theme');
   if (saved) html.setAttribute('data-theme', saved);
 
@@ -816,13 +910,9 @@
   window.addEventListener('DOMContentLoaded', () => {
     const splash = document.getElementById('splash');
     const layout = document.getElementById('layout');
-
     setTimeout(() => {
       splash.classList.add('out');
-      setTimeout(() => {
-        splash.style.display = 'none';
-        layout.classList.add('visible');
-      }, 620);
+      setTimeout(() => { splash.style.display = 'none'; layout.classList.add('visible'); }, 620);
     }, 2800);
   });
 
@@ -832,7 +922,11 @@
     localStorage.setItem('abs-theme', t);
   });
 
-  // Demo buttons
+  // ── Estado del flujo ────────────────────────────────────────────────────────
+  let _pendingId = null;
+  let _pendingUser = null;
+
+  // ── Paso 1: Credenciales ────────────────────────────────────────────────────
   document.querySelectorAll('.demo-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.getElementById('email').value    = btn.dataset.email;
@@ -841,7 +935,6 @@
     });
   });
 
-  // Login form
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btn-submit');
@@ -861,10 +954,10 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Credenciales incorrectas');
-      // Respetar ?next= solo para admin; para otros roles usar destino del servidor
-      const next = new URLSearchParams(window.location.search).get('next');
-      const dest = (data.user?.role === 'admin' && next) ? next : (data.redirect || '/');
-      window.location.href = dest;
+
+      // Credenciales OK → mostrar pantalla PIN
+      _pendingId = data.pendingId;
+      showPinScreen();
     } catch (ex) {
       err.textContent = ex.message;
       err.classList.add('show');
@@ -872,6 +965,124 @@
       btn.textContent = 'Ingresar al portal';
     }
   });
+
+  // ── Paso 2: PIN ─────────────────────────────────────────────────────────────
+  function showPinScreen() {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('pin-screen').classList.add('active');
+    // Limpiar cajas y enfocar primera
+    [0,1,2,3].forEach(i => {
+      const box = document.getElementById('pin-' + i);
+      box.value = '';
+      box.classList.remove('filled');
+    });
+    document.getElementById('pin-error').classList.remove('show');
+    document.getElementById('pin-0').focus();
+  }
+
+  function showLoginScreen() {
+    document.getElementById('pin-screen').classList.remove('active');
+    document.getElementById('login-screen').classList.remove('hidden');
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = false;
+    btn.textContent = 'Ingresar al portal';
+    _pendingId = null;
+    _pendingUser = null;
+  }
+
+  document.getElementById('pin-back').addEventListener('click', showLoginScreen);
+
+  // Navegación entre cajas
+  [0,1,2,3].forEach(i => {
+    const box = document.getElementById('pin-' + i);
+
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        if (box.value === '' && i > 0) {
+          const prev = document.getElementById('pin-' + (i - 1));
+          prev.value = '';
+          prev.classList.remove('filled');
+          prev.focus();
+        } else {
+          box.value = '';
+          box.classList.remove('filled');
+        }
+        e.preventDefault();
+      }
+    });
+
+    box.addEventListener('input', () => {
+      // Solo dígitos
+      box.value = box.value.replace(/\D/g, '').slice(-1);
+      if (box.value) {
+        box.classList.add('filled');
+        if (i < 3) {
+          document.getElementById('pin-' + (i + 1)).focus();
+        } else {
+          submitPin();
+        }
+      } else {
+        box.classList.remove('filled');
+      }
+    });
+
+    // Soporte paste (ej. pegar "1368" en cualquier caja)
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      [...text.slice(0, 4)].forEach((ch, j) => {
+        const target = document.getElementById('pin-' + j);
+        if (target) { target.value = ch; target.classList.add('filled'); }
+      });
+      const last = Math.min(text.length - 1, 3);
+      document.getElementById('pin-' + last)?.focus();
+      if (text.length >= 4) submitPin();
+    });
+  });
+
+  async function submitPin() {
+    const pin = [0,1,2,3].map(i => document.getElementById('pin-' + i).value).join('');
+    if (pin.length < 4) return;
+
+    // Deshabilitar inputs durante verificación
+    [0,1,2,3].forEach(i => { document.getElementById('pin-' + i).disabled = true; });
+
+    try {
+      const res = await fetch('/api/login/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pendingId: _pendingId, pin }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // PIN incorrecto o expirado — animar y mostrar error
+        const boxes = document.getElementById('pin-boxes');
+        boxes.classList.add('shake');
+        setTimeout(() => boxes.classList.remove('shake'), 450);
+        [0,1,2,3].forEach(i => {
+          const b = document.getElementById('pin-' + i);
+          b.value = ''; b.classList.remove('filled'); b.disabled = false;
+        });
+        const errEl = document.getElementById('pin-error');
+        errEl.textContent = data.error || 'Código incorrecto. Acceso denegado.';
+        errEl.classList.add('show');
+        // Si el pendingId fue invalidado, mandar de vuelta al paso 1
+        setTimeout(() => showLoginScreen(), 2500);
+        return;
+      }
+
+      // PIN correcto → redirigir
+      const next = new URLSearchParams(window.location.search).get('next');
+      const dest = (data.user?.role === 'admin' && next) ? next : (data.redirect || '/');
+      window.location.href = dest;
+    } catch (ex) {
+      [0,1,2,3].forEach(i => { document.getElementById('pin-' + i).disabled = false; });
+      const errEl = document.getElementById('pin-error');
+      errEl.textContent = 'Error de conexión. Intenta de nuevo.';
+      errEl.classList.add('show');
+    }
+  }
 </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 const sessions = require('../services/sessions');
 
-const PUBLIC_PATHS = ['/login', '/api/login', '/api/logout', '/webhook/whatsapp', '/favicon.ico'];
+const PUBLIC_PATHS = ['/login', '/api/login', '/api/login/pin', '/api/logout', '/webhook/whatsapp', '/favicon.ico'];
 
 function parseCookie(header, name) {
   if (!header) return null;
