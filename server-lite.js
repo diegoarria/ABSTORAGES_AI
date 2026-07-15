@@ -97,8 +97,7 @@ app.use('/widget', cors());
 
 // ─── LOGIN / LOGOUT / ME (rutas públicas, antes del middleware de auth) ───────
 
-// PIN de verificación — almacenado solo en servidor, nunca expuesto al cliente
-const VERIFY_PIN = '1368';
+// PINs por usuario — definidos en users.json, campo "pin", nunca expuestos al cliente
 // pendingId → { user, expires }  (TTL 5 min; limpieza periódica)
 const pendingLogins = new Map();
 setInterval(() => {
@@ -128,9 +127,9 @@ app.post('/api/login', (req, res) => {
   const { email, password } = req.body || {};
   const user = USERS.find(u => u.email === email && u.password === password);
   if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' });
-  const { password: _, ...safe } = user;
+  const { password: _, pin: userPin, ...safe } = user;
   const pendingId = crypto.randomUUID();
-  pendingLogins.set(pendingId, { user: safe, expires: Date.now() + 5 * 60 * 1000 });
+  pendingLogins.set(pendingId, { user: safe, pin: userPin, expires: Date.now() + 5 * 60 * 1000 });
   res.json({ step: 'pin', pendingId });
 });
 
@@ -142,7 +141,7 @@ app.post('/api/login/pin', (req, res) => {
     pendingLogins.delete(pendingId);
     return res.status(401).json({ error: 'Sesión expirada. Ingresa tus credenciales de nuevo.' });
   }
-  if (String(pin) !== VERIFY_PIN) {
+  if (String(pin) !== String(entry.pin)) {
     pendingLogins.delete(pendingId); // un solo intento
     return res.status(401).json({ error: 'Código incorrecto. Acceso denegado.' });
   }

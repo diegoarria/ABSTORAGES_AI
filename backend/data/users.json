@@ -4,13 +4,15 @@
     "nombre": "Admin ABSTORAGES",
     "email": "admin@abstorages.com",
     "password": "abstorages2025",
+    "pin": "1368",
     "role": "admin"
   },
   {
     "id": "ops-001",
     "nombre": "Gabriel Díaz",
-    "email": "gabriel@abstorages.com",
-    "password": "556FF4AF9V",
+    "email": "gabriel.diaz@abstorages.com",
+    "password": "abstorages2025",
+    "pin": "1794",
     "role": "operaciones"
   },
   {
@@ -19,6 +21,7 @@
     "empresa": "Bonafont",
     "email": "rafael@bonafont.com",
     "password": "cliente123",
+    "pin": "1368",
     "role": "cliente",
     "folios": ["ABST-000101"]
   },
@@ -27,6 +30,7 @@
     "nombre": "Juan Hernández",
     "email": "juan@op.com",
     "password": "operador123",
+    "pin": "1368",
     "role": "transportista",
     "placa": "GDL-8821",
     "viajes": ["ABST-000101"]
