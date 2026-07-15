@@ -57,6 +57,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .panel-noa{flex:6;border-right:1px solid var(--b1);position:relative}
 .panel-hec{flex:4}
 
+/* ── PAGE SWITCHING — un agente a la vez ── */
+body[data-page="noa"] .panel-hec{display:none}
+body[data-page="noa"] .panel-noa{flex:1;border-right:none}
+body[data-page="hec"] .panel-noa{display:none}
+body[data-page="hec"] .panel-hec{flex:1}
+
 /* ── PANEL HEADS ── */
 .phead{height:48px;display:flex;align-items:center;padding:0 16px;gap:9px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
 .adot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
@@ -406,7 +412,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
   <div class="hdr-sep"></div>
 
   <nav class="hdr-nav" aria-label="Navegación principal">
-    <button class="np on" aria-current="page">NOA · HÉCTOR</button>
+    <button class="np" data-pg="noa" onclick="switchPage('noa')" aria-label="Panel NOA — Monitoreo">NOA</button>
+    <button class="np" data-pg="hec" onclick="switchPage('hec')" aria-label="Panel HÉCTOR — Cobranza">HÉCTOR</button>
     <button class="np" onclick="location.href='/'">SARA</button>
     <button class="np" onclick="location.href='/'">SOFÍA</button>
   </nav>
@@ -1821,7 +1828,23 @@ function iniciarCuentaRegresivaBanner(delay, intento){
   }, 1000);
 }
 
+function switchPage(p){
+  if(p!=='noa'&&p!=='hec') p='noa';
+  document.body.dataset.page = p;
+  history.replaceState(null,'','#'+p);
+  document.title = p==='noa' ? 'NOA · Monitoreo GPS — ABSTORAGES' : 'HÉCTOR · Cobranza — ABSTORAGES';
+  document.querySelectorAll('.np[data-pg]').forEach(function(btn){
+    var on = btn.dataset.pg===p;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-current', on?'page':'false');
+  });
+}
+
 document.addEventListener('DOMContentLoaded',function(){
+  // Inicializar desde hash (#noa o #hec), default NOA
+  var initPage = (location.hash||'').replace('#','');
+  switchPage(initPage||'noa');
+
   updateClock();
   setInterval(updateClock,1000);
   setInterval(simTick,5000);
