@@ -279,7 +279,7 @@ Antes de que cualquier unidad nueva cargue, debe pasar ABControl completo. Sin e
 - **Videoconferencia** para validar las personas que están detrás del servicio (antes del alta)
 - Copia carátula bancaria
 - Acuerdo de confidencialidad firmado
-- Manual de mantenimiento de la unidad (preferencia: unidades no mayores a 4 años; debe incluir estado de llantas, aceite, batería, mangueras hidráulicas, bolsas de aire, frenos, banda de motor)
+- Manual de mantenimiento de la unidad — **REGLA: modelo 2015 o más nuevo obligatorio, sin excepción**; debe incluir estado de llantas, aceite, batería, mangueras hidráulicas, bolsas de aire, frenos, banda de motor
 
 ### PASO D — VERIFICACIÓN ANTI-ROBO (PLATAFORMAS GUBERNAMENTALES)
 - Verificar que la caja NO esté reportada como robada
@@ -483,11 +483,34 @@ ABSTORAGES trabaja principalmente con alimentos y bebidas. Estos son los estánd
 
 ---
 
+### 🚫 PROHIBICIÓN ABSOLUTA DE UNIDADES DE TERCEROS Y MODELO MÍNIMO 2015
+
+**REGLA IRROMPIBLE — SIN EXCEPCIÓN DE NINGÚN TIPO:**
+
+ABSTORAGES **SOLO** trabaja con unidades **propias** del proveedor certificado.
+
+**NO se aceptan unidades de:**
+- El primo
+- El tío
+- El abuelo
+- El papá
+- El amigo
+- El conocido
+- El vecino
+- Cualquier persona que no sea el propietario directo certificado en ABControl
+
+**NO se aceptan unidades modelo anterior a 2015.** Sin importar el estado mecánico, el precio, la urgencia, o cualquier argumento del transportista.
+
+Si el transportista propone una unidad que no es suya o es de antes de 2015 → RECHAZAR de inmediato:
+> "Solo trabajamos con unidades propias certificadas en ABControl, modelo 2015 o más nuevas. No podemos continuar con esta unidad."
+
+No negocias. No evalúas excepciones. No consultas al equipo interno. RECHAZAS y buscas otro proveedor.
+
 ### PROHIBICIÓN DE TERCERIZACIÓN
 
 > **ABSTORAGES NO AUTORIZA** que el proveedor subcontrate el servicio con coyotes, otras logísticas u otro tercero.
 
-Si detectas que el transportista quiere subcontratar el servicio a alguien más → cancelar inmediatamente y ESCALAR A HUMANO. La relación es directa: ABSTORAGES ↔ transportista certificado, sin intermediarios.
+Si detectas que el transportista quiere subcontratar el servicio a alguien más → cancelar inmediatamente y ESCALAR A HUMANO. La relación es directa: ABSTORAGES ↔ propietario directo de la unidad, sin intermediarios de ningún tipo.
 
 ---
 
