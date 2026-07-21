@@ -2221,16 +2221,18 @@ document.addEventListener('DOMContentLoaded',function(){
     }, 280);
   };
 
-  function loadProveedores() {
+  function loadProveedores(_reintentado) {
     fetch('/api/sofia/proveedores')
-      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(data){
         _provData = data;
         renderList(data);
       })
-      .catch(function(){
+      .catch(function(err){
+        console.error('[proveedores] fetch falló:', err.message);
+        if (!_reintentado) return loadProveedores(true); // 1 reintento ante fallo transitorio
         var list = document.getElementById('sof-prov-list');
-        if (list) list.innerHTML = '<div style="text-align:center;padding:20px 12px;font-size:11px;color:var(--t3)">No se pudo conectar al TMS</div>';
+        if (list) list.innerHTML = '<div style="text-align:center;padding:20px 12px;font-size:11px;color:var(--t3)">No se pudo conectar al TMS<br>(' + err.message + ')</div>';
       });
   }
 
