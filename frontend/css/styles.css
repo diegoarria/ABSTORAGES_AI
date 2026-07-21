@@ -3253,3 +3253,221 @@ body[data-role="transportista"] .cmd-center-head::after {
   color: #f87171;
 }
 .call-btn-end:hover { transform: scale(1.08); background: rgba(239,68,68,.28); box-shadow: 0 0 18px rgba(239,68,68,.25); }
+
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MOBILE / PWA  —  breakpoints: < 768px (phone), < 1024px (tablet)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── PWA standalone shell ───────────────────────────────────────────────── */
+@media (display-mode: standalone) {
+  body { padding-top: env(safe-area-inset-top); }
+  .hdr { padding-top: calc(12px + env(safe-area-inset-top)); }
+}
+
+/* ── Tablet (< 1024px) ──────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .sidebar { width: 240px; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Phone (< 768px) ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+
+  /* ── Reset global ───────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-size: 14px; }
+
+  /* Botones y targets táctiles mínimo 44px */
+  button, .btn, .np, [role="button"] { min-height: 44px; min-width: 44px; }
+
+  /* ── Header mobile ──────────────────────────────────────────────────── */
+  .hdr {
+    padding: 10px 14px;
+    gap: 8px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+  .hdr-logo span { display: none; } /* Ocultar texto, solo ícono */
+  .hdr-logo { font-size: 13px; gap: 6px; }
+  .hdr-clock { display: none; }
+  .hdr-badge { font-size: 10px; padding: 3px 7px; }
+
+  /* ── Nav tabs — mover abajo como bottom bar ─────────────────────────── */
+  .hdr-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    top: auto !important;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--bg1);
+    border-top: 1px solid var(--b1);
+    padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+    z-index: 200;
+    gap: 0;
+  }
+  .np {
+    flex: 1;
+    font-size: 10px;
+    letter-spacing: .06em;
+    padding: 6px 4px;
+    border-radius: 10px;
+    border: none;
+    margin: 0 4px;
+    height: auto;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+  .np::before {
+    content: '';
+    display: block;
+    width: 20px; height: 2px;
+    border-radius: 1px;
+    background: transparent;
+    margin-bottom: 2px;
+    transition: background .2s;
+  }
+  .np.on::before { background: var(--accent); }
+
+  /* ── Main body — compensar header y bottom nav ──────────────────────── */
+  .body-wrap, .ops-body, main, .main-wrap {
+    margin-top: 56px !important;
+    margin-bottom: 70px !important;
+    height: calc(100vh - 56px - 70px) !important;
+    overflow-y: auto;
+  }
+
+  /* ── Sidebar — ocultar en mobile ────────────────────────────────────── */
+  .sidebar, .cm-panel, #cm-panel { display: none !important; }
+  .content-area, .main-content { width: 100% !important; margin-left: 0 !important; }
+
+  /* ── Chat panels — full screen ──────────────────────────────────────── */
+  .chat-panel, .sara-chat, .sof-msgs-wrap, .noa-msgs-wrap {
+    height: calc(100vh - 56px - 70px - 120px);
+  }
+  .chat-input-row, .sof-input-row, .noa-input-row {
+    position: sticky;
+    bottom: 0;
+    background: var(--bg1);
+    border-top: 1px solid var(--b1);
+    padding: 10px 12px;
+  }
+  textarea, .chat-input {
+    font-size: 16px !important; /* Evita zoom en iOS al hacer focus */
+  }
+
+  /* ── Cards y grids ───────────────────────────────────────────────────── */
+  .metrics-grid,
+  .kpi-grid,
+  .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+
+  .card, .kpi-card, .metric-card {
+    padding: 12px !important;
+    border-radius: 10px !important;
+  }
+
+  /* ── Ops Center: paneles ────────────────────────────────────────────── */
+  .panel-noa, .panel-hec, .panel-sof {
+    height: calc(100vh - 56px - 70px);
+    overflow-y: auto;
+    margin-top: 56px;
+    padding-bottom: 12px;
+  }
+
+  /* ── SOFIA: split panel → stack vertical en mobile ──────────────────── */
+  .panel-sof { flex-direction: column !important; }
+  #sof-prov-col {
+    width: 100% !important;
+    max-height: 220px;
+    border-right: none !important;
+    border-bottom: 1px solid var(--b1);
+    overflow-y: auto;
+  }
+  .sof-chat-col { flex: 1; min-height: 0; }
+
+  /* ── Tablas — scroll horizontal ─────────────────────────────────────── */
+  .table-wrap, .cob-tbl-wrap, table { overflow-x: auto; display: block; }
+
+  /* ── Leads, folios — stack vertical ────────────────────────────────────── */
+  .leads-row, .folio-row { flex-direction: column; gap: 4px; }
+
+  /* ── Modal / overlay — full screen en mobile ────────────────────────── */
+  .mbg .mcard {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ── Call overlay ────────────────────────────────────────────────────── */
+  .call-overlay {
+    padding: 30px 20px;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
+  }
+  .call-controls { gap: 16px; }
+  .call-btn { width: 52px; height: 52px; font-size: 18px; }
+
+  /* ── Login page ──────────────────────────────────────────────────────── */
+  .login-box, .login-card {
+    width: 90% !important;
+    max-width: 360px;
+    padding: 28px 20px !important;
+  }
+
+  /* ── Notificación push banner ────────────────────────────────────────── */
+  .push-banner {
+    position: fixed;
+    bottom: 78px; left: 12px; right: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--b2);
+    border-radius: 12px;
+    padding: 12px 14px;
+    z-index: 300;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 13px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  }
+  .push-banner-icon { font-size: 22px; flex-shrink: 0; }
+  .push-banner-text { flex: 1; }
+  .push-banner-title { font-weight: 700; color: var(--t1); margin-bottom: 2px; }
+  .push-banner-body  { color: var(--t2); font-size: 12px; }
+  .push-banner-btns  { display: flex; gap: 6px; margin-top: 8px; }
+  .push-banner-allow { background: var(--accent); color: #fff; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .push-banner-deny  { background: transparent; color: var(--t3); border: none; font-size: 12px; cursor: pointer; }
+}
+
+/* ── Install banner (todas las resoluciones) ────────────────────────────── */
+.install-banner {
+  display: none;
+  position: fixed;
+  bottom: 80px; left: 12px; right: 12px;
+  background: var(--bg2);
+  border: 1px solid rgba(96,165,250,.3);
+  border-radius: 14px;
+  padding: 14px 16px;
+  z-index: 250;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+}
+.install-banner.visible { display: flex; }
+.install-banner-row { display: flex; align-items: center; gap: 12px; }
+.install-banner-icon { width: 42px; height: 42px; border-radius: 10px; background: #0f1d4a; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.install-banner-title { font-weight: 700; color: var(--t1); font-size: 14px; }
+.install-banner-sub   { color: var(--t2); font-size: 12px; }
+.install-banner-btns  { display: flex; gap: 8px; }
+.install-banner-ok    { flex: 1; background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 9px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.install-banner-x     { background: var(--bg3, var(--bg2)); color: var(--t3); border: 1px solid var(--b2); border-radius: 8px; padding: 9px 14px; font-size: 13px; cursor: pointer; }

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0f1d4a"/>
+  <rect x="24" y="24" width="464" height="464" rx="96" fill="#0f1d4a"/>
+  <!-- Truck icon simplified -->
+  <rect x="80" y="210" width="260" height="140" rx="14" fill="#1e3a8a"/>
+  <path d="M340 250 L420 250 L450 300 L450 350 L340 350 Z" fill="#1e3a8a"/>
+  <rect x="80" y="210" width="260" height="90" rx="10" fill="#3b82f6" opacity="0.3"/>
+  <!-- Wheels -->
+  <circle cx="160" cy="355" r="35" fill="#0f1d4a" stroke="#60a5fa" stroke-width="8"/>
+  <circle cx="160" cy="355" r="14" fill="#60a5fa"/>
+  <circle cx="370" cy="355" r="35" fill="#0f1d4a" stroke="#60a5fa" stroke-width="8"/>
+  <circle cx="370" cy="355" r="14" fill="#60a5fa"/>
+  <!-- AB letters -->
+  <text x="256" y="175" font-family="Arial Black, sans-serif" font-size="88" font-weight="900" fill="#60a5fa" text-anchor="middle" letter-spacing="-4">AB</text>
+  <!-- Signal dots (AI) -->
+  <circle cx="390" cy="130" r="12" fill="#60a5fa" opacity="0.9"/>
+  <circle cx="420" cy="110" r="8" fill="#60a5fa" opacity="0.6"/>
+  <circle cx="450" cy="95" r="5" fill="#60a5fa" opacity="0.3"/>
+</svg>

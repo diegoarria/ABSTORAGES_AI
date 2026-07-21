@@ -30,6 +30,40 @@ const tms         = require('./backend/services/tms');
 const ordersStore = require('./backend/services/ordersStore');
 const PROVEEDORES = require('./data/proveedores.json');
 const eta         = require('./backend/services/eta');
+const webpush     = require('web-push');
+
+// ─── WEB PUSH (PWA Notifications) ────────────────────────────────────────────
+const VAPID_PUB  = process.env.VAPID_PUBLIC_KEY;
+const VAPID_PRIV = process.env.VAPID_PRIVATE_KEY;
+const VAPID_MAIL = process.env.VAPID_EMAIL || 'mailto:ops@abstorages.com';
+let pushSubs = []; // subscripciones en memoria (persistir en archivo en prod)
+
+const PUSH_SUBS_FILE = path.join(__dirname, 'data', 'push-subs.json');
+try { pushSubs = JSON.parse(fs.readFileSync(PUSH_SUBS_FILE, 'utf8')); } catch (_) {}
+
+if (VAPID_PUB && VAPID_PRIV) {
+  webpush.setVapidDetails(VAPID_MAIL, VAPID_PUB, VAPID_PRIV);
+}
+
+function savePushSubs() {
+  fs.writeFileSync(PUSH_SUBS_FILE, JSON.stringify(pushSubs));
+}
+
+async function sendPush(payload) {
+  if (!VAPID_PUB || !VAPID_PRIV || pushSubs.length === 0) return;
+  const dead = [];
+  await Promise.allSettled(pushSubs.map(async (sub, i) => {
+    try {
+      await webpush.sendNotification(sub, JSON.stringify(payload));
+    } catch (e) {
+      if (e.statusCode === 410 || e.statusCode === 404) dead.push(i);
+    }
+  }));
+  if (dead.length) {
+    pushSubs = pushSubs.filter((_, i) => !dead.includes(i));
+    savePushSubs();
+  }
+}
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -339,6 +373,11 @@ app.post('/api/gps/update', (req, res) => {
 });
 
 
+// ─── PWA: clave pública VAPID (pública, sin auth) ────────────────────────────
+app.get('/api/push/vapid-public-key', (req, res) => {
+  res.json({ publicKey: VAPID_PUB || null });
+});
+
 // ─── Vapi webhook (sin auth — Vapi llama externamente) ───────────────────────
 app.post('/api/vapi/webhook', express.json(), (req, res) => {
   res.sendStatus(200);
@@ -365,6 +404,14 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
           mensaje: `🏆 Folio ${resultado.folio} → ${resultado.proveedorId} a ${resultado.precio || '—'}`,
           metadata: { folio: resultado.folio, ganador: estado.ganador },
         });
+        sendPush({
+          title: '✅ Carrier asignado — SOFÍA',
+          body: `Folio ${resultado.folio} · ${resultado.proveedorId} · ${resultado.precio || 'precio por confirmar'}`,
+          tag: 'carrier-ganador',
+          url: '/ops-center.html#sof',
+          tipo: 'PROVEEDOR_GANADOR',
+          urgente: true,
+        }).catch(() => {});
         notifier.notificarAsignacion && notifier.notificarAsignacion(resultado.folio, resultado.proveedorId, resultado.precio)
           .catch(e => console.error('[notifier asignacion]', e.message));
       }
@@ -379,8 +426,24 @@ app.use(auth);
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 app.get('/api/me', (req, res) => {
-  const { password: _, _ts, ...safe } = req.user;
+  const { password: _, pin: __, _ts, ...safe } = req.user;
   res.json(safe);
+});
+
+// ─── PWA: suscripción push ────────────────────────────────────────────────────
+app.post('/api/push/subscribe', express.json(), (req, res) => {
+  const sub = req.body;
+  if (!sub?.endpoint) return res.status(400).json({ error: 'Suscripción inválida' });
+  const exists = pushSubs.some(s => s.endpoint === sub.endpoint);
+  if (!exists) { pushSubs.push(sub); savePushSubs(); }
+  res.json({ ok: true });
+});
+
+app.delete('/api/push/subscribe', express.json(), (req, res) => {
+  const { endpoint } = req.body || {};
+  pushSubs = pushSubs.filter(s => s.endpoint !== endpoint);
+  savePushSubs();
+  res.json({ ok: true });
 });
 
 // ─── BROADCAST / CAMPAÑAS WHATSAPP ───────────────────────────────────────────
@@ -837,6 +900,16 @@ async function handleChat(agente, req, res) {
       if (hasCierre) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
         pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: sid, metadata: { sessionId: sid } });
+
+        // Push notification al equipo
+        sendPush({
+          title: '🚛 Nueva orden — SARA',
+          body: `${lead.empresa || lead.nombre || 'Cliente'} · ${lead.origen || ''}→${lead.destino || ''} · Folio ${lead.folio || ''}`,
+          tag: 'nueva-orden',
+          url: '/',
+          tipo: 'NUEVA_ORDEN',
+          urgente: true,
+        }).catch(() => {});
 
         // Persistir orden para que SOFIA la consulte sin re-preguntar
         ordersStore.guardarOrden(lead);
