@@ -190,6 +190,13 @@
   <script>
     const BASE    = window.location.origin;
     const SESSION = 'widget_' + Math.random().toString(36).slice(2);
+    // visitorId persiste entre visitas para que SARA recuerde al cliente
+    const VISITOR_ID = (() => {
+      const key = 'abs_visitor_id';
+      let id = localStorage.getItem(key);
+      if (!id) { id = 'v_' + crypto.randomUUID(); localStorage.setItem(key, id); }
+      return id;
+    })();
     const msgsEl  = document.getElementById('msgs');
     const inp     = document.getElementById('inp');
     const btn     = document.getElementById('btn');
@@ -246,7 +253,7 @@
       try {
         const res = await fetch(`${BASE}/api/widget/chat`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text, sessionId: SESSION }),
+          body: JSON.stringify({ message: text, sessionId: SESSION, visitorId: VISITOR_ID }),
         });
         hideTyping();
         const reader = res.body.getReader(), dec = new TextDecoder();

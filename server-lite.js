@@ -22,8 +22,9 @@ const NOA_PROMPT    = require('./backend/agents/noa-prompt');
 const cors        = require('cors');
 const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
-const leads       = require('./backend/services/leads');
-const notifier    = require('./backend/services/notifier');
+const leads          = require('./backend/services/leads');
+const visitorMemory  = require('./backend/services/visitorMemory');
+const notifier       = require('./backend/services/notifier');
 const vapi        = require('./backend/services/vapi');
 const tms         = require('./backend/services/tms');
 const eta         = require('./backend/services/eta');
@@ -653,13 +654,20 @@ function buildPrompt(agente, contextBlock, tariffCtx) {
 
 // ─── CHAT (SSE streaming con memoria + tarifa dinámica) ───────────────────
 async function handleChat(agente, req, res) {
-  const { message, sessionId, callMode } = req.body;
+  const { message, sessionId, callMode, visitorId } = req.body;
   if (!message) return res.status(400).json({ error: 'message requerido' });
 
   const sid = sessionId || `web_${agente}_${Date.now()}`;
   const { contextBlock, history } = memory.buildContext(sid);
   const tariffCtx = tariff.getContext();
   let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
+
+  // Inyectar memoria del visitante en SARA para reconocer clientes que regresan
+  if (agente === 'sara' && visitorId) {
+    const visitorCtx = visitorMemory.buildContext(visitorId);
+    if (visitorCtx) systemPrompt += `\n\n${visitorCtx}`;
+  }
+
   if (callMode) systemPrompt += '\n\n🎙️ MODO LLAMADA DE VOZ: El cliente está en una llamada. Responde en máximo 2 oraciones cortas y directas. Sin listas, sin markdown, sin asteriscos. Habla natural como en una conversación telefónica. IMPORTANTE: Aunque estés en modo voz, SIEMPRE debes emitir el bloque LEAD_DATA al final de tu respuesta cuando tengas datos del cliente — es obligatorio en todos los modos.';
 
   // Inyectar contexto TMS para SOFIA (proveedores, rutas, costos)
@@ -684,7 +692,11 @@ async function handleChat(agente, req, res) {
   if (agente === 'sara') {
     const historial = memory.buildContext(sid).history || [];
     const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 160) || message.slice(0, 160);
-    leads.extractFromText(message, sid, { sara_nota: 'cotizacion_en_proceso', primer_mensaje });
+    const extracted = leads.extractFromText(message, sid, { sara_nota: 'cotizacion_en_proceso', primer_mensaje });
+    // Actualizar perfil del visitante con cualquier dato que el usuario mencione
+    if (visitorId && extracted) {
+      visitorMemory.update(visitorId, { ...extracted, sessionId: sid });
+    }
   }
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -741,6 +753,11 @@ async function handleChat(agente, req, res) {
       if (hasCierre) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
         pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: sid, metadata: { sessionId: sid } });
+      }
+
+      // Actualizar perfil del visitante con datos capturados en esta sesión
+      if (visitorId) {
+        visitorMemory.update(visitorId, { ...datosSara, sessionId: sid, resumen: lead.resumen || '' });
       }
 
       // Primer contacto: email inmediato al primer mensaje de la sesión.
