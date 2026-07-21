@@ -526,7 +526,7 @@ app.get('/api/vapi/estado/:folio', (req, res) => {
 });
 
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
-app.get('/api/sofia/proveedores', soloAdmin, async (req, res) => {
+app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./data/proveedores.json').map(p => ({
     'Razon Social': p.nombre,
     'Telefono': p.telefono,
@@ -551,7 +551,7 @@ app.get('/api/sofia/proveedores', soloAdmin, async (req, res) => {
   }
 });
 
-app.get('/api/sofia/proveedores/:nombre/rutas', soloAdmin, async (req, res) => {
+app.get('/api/sofia/proveedores/:nombre/rutas', adminUOps, async (req, res) => {
   try {
     if (!tms.ENABLED) return res.json([]);
     const rutas = await tms.rutasProveedor(decodeURIComponent(req.params.nombre));
@@ -1024,6 +1024,10 @@ app.get('/api/cuentas-cobrar', (req, res) => {
 // ─── LEADS (solo admin) ───────────────────────────────────────────────────────
 function soloAdmin(req, res, next) {
   if (req.user?.role === 'admin') return next();
+  res.status(403).json({ error: 'Acceso restringido' });
+}
+function adminUOps(req, res, next) {
+  if (req.user?.role === 'admin' || req.user?.role === 'operaciones') return next();
   res.status(403).json({ error: 'Acceso restringido' });
 }
 app.get('/api/metricas', soloAdmin, async (req, res) => {
