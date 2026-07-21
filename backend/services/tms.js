@@ -263,6 +263,15 @@ function formatearContactos(datos) {
 
 // ── Funciones específicas para SOFIA ─────────────────────────────────────────
 
+// Listar todos los proveedores (hasta limite)
+async function listarProveedores(limite = 50) {
+  const r = await query('proveedores', {
+    pagina: 1, limite,
+    campos: ['Folio','RFC','Razon Social','Contacto','Correo','Telefono','Movil','Estatus','Comentarios','Emergencia'],
+  });
+  return r?.datos || [];
+}
+
 // Buscar proveedor/transportista por nombre o RFC
 async function buscarProveedor(texto) {
   const por_nombre = await query('proveedores', {
@@ -634,7 +643,7 @@ module.exports = {
   // SARA
   buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
   // SOFIA
-  buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA,
+  listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA,
   // NOA
   buscarFolioNOA, foliosActivosNOA, getContextoNOA,
   // Core

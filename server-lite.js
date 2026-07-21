@@ -398,6 +398,43 @@ app.get('/api/metricas', (req, res) => {
 
 app.get('/api/sofia/folios', (req, res) => res.json([]));
 
+// ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
+app.get('/api/sofia/proveedores', soloAdmin, async (req, res) => {
+  try {
+    if (!tms.ENABLED) {
+      const local = require('./data/proveedores.json');
+      return res.json(local.map(p => ({
+        'Razon Social': p.nombre,
+        'Telefono': p.telefono,
+        'Estatus': p.clasificacion,
+        'RFC': '—',
+        'Correo': '—',
+        'Contacto': '—',
+        'Movil': '—',
+        'Emergencia': '—',
+        '_local': true,
+      })));
+    }
+    const q = (req.query.q || '').trim();
+    const datos = q ? await tms.buscarProveedor(q) : await tms.listarProveedores(60);
+    res.json(datos || []);
+  } catch (e) {
+    console.error('[sofia/proveedores]', e.message);
+    res.json([]);
+  }
+});
+
+app.get('/api/sofia/proveedores/:nombre/rutas', soloAdmin, async (req, res) => {
+  try {
+    if (!tms.ENABLED) return res.json([]);
+    const rutas = await tms.rutasProveedor(decodeURIComponent(req.params.nombre));
+    res.json(rutas || []);
+  } catch (e) {
+    console.error('[sofia/proveedores/rutas]', e.message);
+    res.json([]);
+  }
+});
+
 // ─── NOA: folios activos desde TMS ───────────────────────────────────────────
 let _foliosCache = null; // { data: [], ts: Date }
 
