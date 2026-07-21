@@ -206,170 +206,152 @@ const Features = (() => {
     }
   }
 
-  // ── CALL MODE ────────────────────────────────────────────────────────────
-  let callActive    = false;
-  let callSeconds   = 0;
-  let callTimer     = null;
-  let callRecog     = null;
-  let callAudio     = null;
-  let callAutoListen = false;
-  let callAgente    = 'sara';
+  // ── CALL MODE — Hands-free VAD + barge-in ────────────────────────────────
+  // No push-to-talk. Always-on listening via AudioContext AnalyserNode.
+  // If user speaks while AI talks → barge-in: AI stops instantly.
+
+  let callActive      = false;
+  let callSeconds     = 0;
+  let callTimer       = null;
+  let callAgente      = 'sara';
+  let callState       = 'idle';   // idle | listening | recording | processing | speaking
+  let callMuted       = false;
+
+  // Web Audio / VAD
+  let callAudioCtx    = null;
+  let callAnalyser    = null;
+  let callMicStream   = null;
+  let callMediaRec    = null;
+  let callAudioChunks = [];
+  let callActiveSrc   = null;   // BufferSource — stopped on barge-in
+  let callVadRafId    = null;
+  let callVadActive   = false;
+  let callSilTimer    = null;
+
+  const CALL_VAD_THR  = 0.018;  // RMS amplitude threshold
+  const CALL_SIL_MS   = 900;    // silence before sending clip
+  const CALL_MIN_BYTES= 2000;   // ignore noise clips
 
   const CALL_IDENTITIES = {
-    sara:  { name: 'SARA Garza',   sub: 'Ejecutiva Comercial · ABSTORAGES',        pitch: 1.1,  photo: '/img/sara-avatar.png'  },
-    sofia: { name: 'SOFIA Novak',  sub: 'Coordinadora de Operaciones · ABSTORAGES', pitch: 0.95, photo: '/img/sofia-avatar.png' },
-    noa:   { name: 'NOA',          sub: 'AI Monitoreo de Servicios · ABSTORAGES',   pitch: 1.0,  photo: '/img/noa-avatar.png'    },
-    hector:{ name: 'HÉCTOR',       sub: 'AI Administración y Cobranza · ABSTORAGES',pitch: 0.9,  photo: '/img/hector-avatar.png' },
+    sara:  { name: 'SARA Garza',   sub: 'Ejecutiva Comercial · ABSTORAGES',         photo: '/img/sara-avatar.png'  },
+    sofia: { name: 'SOFIA Novak',  sub: 'Coordinadora de Operaciones · ABSTORAGES', photo: '/img/sofia-avatar.png' },
+    noa:   { name: 'NOA',          sub: 'AI Monitoreo · ABSTORAGES',                photo: '/img/noa-avatar.png'   },
+    hector:{ name: 'HÉCTOR',       sub: 'AI Cobranza · ABSTORAGES',                 photo: '/img/hector-avatar.png'},
   };
-
-  function initCallMode() {
-    const overlay  = document.getElementById('call-overlay');
-    const micBtn   = document.getElementById('call-mic-btn');
-    const endBtn   = document.getElementById('call-end-btn');
-    if (!overlay || !micBtn || !endBtn) return;
-
-    ['sara', 'sofia', 'noa', 'hector'].forEach(ag => {
-      document.getElementById(`${ag}-mic`)?.addEventListener('click', () => openCall(ag));
-    });
-    endBtn.addEventListener('click', closeCall);
-    micBtn.addEventListener('click', () => {
-      if (callRecog) {
-        // Segunda pulsación: parar y enviar lo grabado
-        callAutoListen = false;
-        callRecog.stop();
-      } else {
-        // Primera pulsación: empezar a escuchar
-        callAutoListen = false;
-        callListen();
-      }
-    });
-  }
-
-  function openCall(agente = 'sara') {
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-      App.toast('Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.', 'amber', 5000);
-      return;
-    }
-    callAgente   = agente;
-    callActive   = true;
-    callSeconds  = 0;
-    const overlay = document.getElementById('call-overlay');
-    overlay.style.display = 'flex';
-    overlay.dataset.state  = 'idle';
-
-    // Update overlay identity for this agent
-    const id = CALL_IDENTITIES[agente] || CALL_IDENTITIES.sara;
-    const nameEl  = document.getElementById('call-name');
-    const subEl   = document.getElementById('call-sub');
-    const photoEl = document.querySelector('.call-avatar-photo');
-    if (nameEl)  nameEl.textContent = id.name;
-    if (subEl)   subEl.textContent  = id.sub;
-    if (photoEl) photoEl.style.backgroundImage = `url('${id.photo}')`;
-
-    setCallStatus('Iniciando llamada...', 'idle');
-    callTimer = setInterval(() => {
-      callSeconds++;
-      const m = String(Math.floor(callSeconds / 60)).padStart(1,'0');
-      const s = String(callSeconds % 60).padStart(2,'0');
-      const el = document.getElementById('call-timer');
-      if (el) el.textContent = `${m}:${s}`;
-    }, 1000);
-    callAutoListen = true;
-    setTimeout(callListen, 800);
-  }
-
-  function closeCall() {
-    callActive     = false;
-    callAutoListen = false;
-    clearInterval(callTimer);
-    if (callRecog)  { callRecog.stop(); callRecog = null; }
-    if (callAudio)  { callAudio.pause(); callAudio = null; }
-    const overlay = document.getElementById('call-overlay');
-    if (overlay) overlay.style.display = 'none';
-  }
 
   function setCallStatus(text, state) {
     const overlay = document.getElementById('call-overlay');
     const status  = document.getElementById('call-status');
-    if (overlay) overlay.dataset.state = state;
+    if (overlay) overlay.dataset.state = state || 'idle';
     if (status)  status.textContent = text;
   }
 
-  function callListen() {
-    if (!callActive) return;
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const rec = new SR();
-    rec.lang = 'es-MX';
-    rec.continuous = true;      // no cortar en silencios breves
-    rec.interimResults = true;
-    callRecog = rec;
-
-    const micBtn = document.getElementById('call-mic-btn');
-    if (micBtn) micBtn.classList.add('listening');
-    setCallStatus('Escuchando... (toca mic para enviar)', 'listening');
-    const tx = document.getElementById('call-transcript');
-    if (tx) tx.textContent = '';
-
-    let userText = '';
-
-    rec.onresult = e => {
-      // Acumular solo resultados finales + el interim más reciente
-      let final = '';
-      let interim = '';
-      for (const r of e.results) {
-        if (r.isFinal) final += r[0].transcript + ' ';
-        else interim = r[0].transcript;
-      }
-      userText = (final + interim).trim();
-      if (tx) tx.textContent = userText;
-    };
-
-    rec.onend = async () => {
-      callRecog = null;
-      if (micBtn) micBtn.classList.remove('listening');
-      if (!callActive) return;
-      if (!userText.trim()) {
-        setCallStatus('Toca el micrófono para hablar.', 'idle');
-        if (tx) tx.textContent = '';
-        return;
-      }
-      if (tx) tx.textContent = '';
-      const id = CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara;
-      setCallStatus(`${id.name} está pensando...`, 'thinking');
-      await callSendToAgent(userText);
-    };
-
-    rec.onerror = e => {
-      callRecog = null;
-      if (micBtn) micBtn.classList.remove('listening');
-      if (e.error !== 'no-speech' && e.error !== 'aborted') {
-        setCallStatus('Error de micrófono: ' + e.error, 'idle');
-      } else {
-        setCallStatus('Toca el micrófono para hablar.', 'idle');
-      }
-    };
-
-    rec.start();
+  function callStopAudio() {
+    if (callActiveSrc) {
+      try { callActiveSrc.stop(); } catch {}
+      callActiveSrc = null;
+    }
+    window.speechSynthesis?.cancel();
   }
 
-  async function callSendToAgent(text) {
-    const sessionId = document.getElementById(`${callAgente}-session-id`)?.textContent
-                   || document.getElementById('sara-session-id')?.textContent
-                   || 'call-' + Date.now();
-    let fullText = '';
+  function callVadLoop() {
+    if (!callActive || !callAnalyser) return;
+
+    const data = new Float32Array(callAnalyser.fftSize);
+    callAnalyser.getFloatTimeDomainData(data);
+    const rms = Math.sqrt(data.reduce((s, v) => s + v * v, 0) / data.length);
+    const isSpeaking = rms > CALL_VAD_THR && !callMuted;
+
+    if (isSpeaking) {
+      // Barge-in: cut AI mid-sentence instantly
+      if (callState === 'speaking') {
+        callStopAudio();
+        callState = 'listening';
+        setCallStatus('Escuchando…', 'listening');
+      }
+
+      // Start recording when user begins speaking
+      if (callState === 'listening' && !callVadActive) {
+        callVadActive   = true;
+        callState       = 'recording';
+        callAudioChunks = [];
+        try {
+          callMediaRec = new MediaRecorder(callMicStream);
+          callMediaRec.ondataavailable = e => { if (e.data.size > 0) callAudioChunks.push(e.data); };
+          callMediaRec.start();
+        } catch {}
+      }
+
+      if (callSilTimer) { clearTimeout(callSilTimer); callSilTimer = null; }
+
+    } else if (callVadActive && !callSilTimer) {
+      // User went quiet — start silence countdown
+      callSilTimer = setTimeout(() => {
+        callSilTimer  = null;
+        callVadActive = false;
+        if (callMediaRec?.state === 'recording') {
+          callMediaRec.onstop = () => {
+            const blob = new Blob(callAudioChunks, { type: callMediaRec.mimeType || 'audio/webm' });
+            callAudioChunks = [];
+            callTranscribeAndRespond(blob);
+          };
+          callMediaRec.stop();
+        }
+      }, CALL_SIL_MS);
+    }
+
+    callVadRafId = requestAnimationFrame(callVadLoop);
+  }
+
+  async function callTranscribeAndRespond(blob) {
+    if (!callActive || blob.size < CALL_MIN_BYTES) {
+      callState = 'listening';
+      setCallStatus('Escuchando…', 'listening');
+      return;
+    }
+
+    callState = 'processing';
+    setCallStatus('Procesando…', 'thinking');
+
     try {
+      // STT via ElevenLabs Scribe (public widget endpoint — no auth needed)
+      const sttRes = await fetch('/api/widget/stt', {
+        method: 'POST', body: blob,
+        headers: { 'Content-Type': blob.type || 'audio/webm' },
+      });
+      const { text } = await sttRes.json();
+
+      if (!text?.trim() || !callActive) {
+        callState = 'listening';
+        setCallStatus('Escuchando…', 'listening');
+        return;
+      }
+
+      // Show transcript briefly
+      const tx = document.getElementById('call-transcript');
+      if (tx) tx.textContent = text;
+
+      // Get AI response (streaming)
+      const sessionId = document.getElementById(`${callAgente}-session-id`)?.textContent
+                     || document.getElementById('sara-session-id')?.textContent
+                     || 'call-' + Date.now();
+      let fullText = '';
+      const id = CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara;
+      setCallStatus(`${id.name} está respondiendo…`, 'speaking');
+      callState = 'speaking';
+
       const res = await fetch(`/api/${callAgente}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, sessionId, callMode: true }),
       });
-      const reader  = res.body.getReader();
-      const decoder = new TextDecoder();
+      const reader = res.body.getReader();
+      const dec    = new TextDecoder();
       let buf = '';
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        buf += decoder.decode(value, { stream: true });
+        buf += dec.decode(value, { stream: true });
         const lines = buf.split('\n\n'); buf = lines.pop();
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
@@ -380,64 +362,198 @@ const Features = (() => {
           } catch {}
         }
       }
-    } catch {
-      setCallStatus('Error de conexión.', 'idle');
-      return;
+
+      const clean = fullText
+        .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+        .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
+        .replace(/ALERTA_CRITICA\s*:\s*\{[^\n]*\}/gi, '')
+        .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
+        .replace(/[*_`#>]/g, '').trim();
+
+      if (tx) tx.textContent = '';
+      if (!clean || !callActive) {
+        callState = 'listening';
+        setCallStatus('Escuchando…', 'listening');
+        return;
+      }
+
+      // Play TTS via Web Audio (AudioContext) — enables instant barge-in
+      await callPlayTTSWeb(clean);
+
+    } catch { /* silent — VAD resumes below */ }
+
+    if (callActive) {
+      callState = 'listening';
+      setCallStatus('Escuchando…', 'listening');
     }
-
-    const clean = fullText
-      .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
-      .replace(/LEAD_DATA\s*:\s*\{[^\n]*\}/gi, '')
-      .replace(/ALERTA_CRITICA\s*:\s*\{[^\n]*\}/gi, '')
-      .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
-      .replace(/[*_`#>]/g, '')
-      .trim();
-
-    if (!clean || !callActive) return;
-    const id = CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara;
-    setCallStatus(`${id.name} está respondiendo...`, 'speaking');
-    await callPlayTTS(clean);
-    if (!callActive) return;
-    setCallStatus('Toca el micrófono para hablar.', 'idle');
-    if (callAutoListen) setTimeout(callListen, 600);
   }
 
-  function callPlayTTS(text) {
-    return new Promise(resolve => {
-      fetch('/api/tts', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.slice(0, 2500), agente: callAgente }),
-      }).then(r => r.ok ? r.blob() : Promise.reject('http_' + r.status))
-        .then(blob => {
-          const url = URL.createObjectURL(blob);
-          callAudio = new Audio(url);
-          callAudio.play();
-          callAudio.onended = () => { URL.revokeObjectURL(url); callAudio = null; resolve(); };
-          callAudio.onerror = () => { callAudio = null; callBrowserTTS(text, resolve); };
-        })
-        .catch(() => callBrowserTTS(text, resolve));
+  async function callPlayTTSWeb(text) {
+    if (!callActive) return;
+
+    // Try ElevenLabs via /api/tts (auth-required, uses agent-specific voice)
+    if (callAudioCtx) {
+      try {
+        const res = await fetch('/api/tts', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text.slice(0, 2500), agente: callAgente }),
+        });
+        if (!res.ok) throw new Error('http');
+        const buf = await res.arrayBuffer();
+        if (!callActive) return;
+        if (callAudioCtx.state === 'suspended') await callAudioCtx.resume();
+        const decoded = await callAudioCtx.decodeAudioData(buf);
+        if (!callActive) return;
+        callActiveSrc = callAudioCtx.createBufferSource();
+        callActiveSrc.buffer = decoded;
+        callActiveSrc.connect(callAudioCtx.destination);
+        await new Promise(r => { callActiveSrc.onended = r; callActiveSrc.start(0); });
+        callActiveSrc = null;
+        return;
+      } catch { callActiveSrc = null; }
+    }
+
+    // Fallback: browser speechSynthesis
+    await new Promise(resolve => {
+      if (!window.speechSynthesis) { resolve(); return; }
+      window.speechSynthesis.cancel();
+      const utt  = new SpeechSynthesisUtterance(text.slice(0, 3000));
+      utt.lang   = 'es-MX';
+      utt.rate   = 1.05;
+      const loadAndSpeak = () => {
+        const voices    = window.speechSynthesis.getVoices();
+        const preferred = voices.find(v => v.lang === 'es-MX' || v.lang === 'es-US' || v.lang.startsWith('es'));
+        if (preferred) utt.voice = preferred;
+        utt.onend = resolve; utt.onerror = resolve;
+        window.speechSynthesis.speak(utt);
+      };
+      if (window.speechSynthesis.getVoices().length > 0) loadAndSpeak();
+      else window.speechSynthesis.addEventListener('voiceschanged', loadAndSpeak, { once: true });
     });
   }
 
-  function callBrowserTTS(text, resolve) {
-    if (!window.speechSynthesis) { resolve(); return; }
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text.slice(0, 3000));
-    utt.lang  = 'es-MX';
-    utt.rate  = 1.05;
-    utt.pitch = (CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara).pitch;
-    const loadAndSpeak = () => {
-      const voices   = window.speechSynthesis.getVoices();
-      const preferred = voices.find(v => v.lang === 'es-MX' || v.lang === 'es-US' || v.lang.startsWith('es'));
-      if (preferred) utt.voice = preferred;
-      utt.onend   = resolve;
-      utt.onerror = resolve;
-      window.speechSynthesis.speak(utt);
+  function initCallMode() {
+    const overlay = document.getElementById('call-overlay');
+    const muteBtn = document.getElementById('call-mic-btn');
+    const endBtn  = document.getElementById('call-end-btn');
+    if (!overlay || !endBtn) return;
+
+    ['sara', 'sofia', 'noa', 'hector'].forEach(ag => {
+      document.getElementById(`${ag}-mic`)?.addEventListener('click', () => openCall(ag));
+    });
+    endBtn.addEventListener('click', closeCall);
+
+    // Mic button becomes mute toggle during the call
+    if (muteBtn) {
+      muteBtn.addEventListener('click', () => {
+        if (!callActive) return;
+        callMuted = !callMuted;
+        muteBtn.classList.toggle('muted', callMuted);
+        muteBtn.title = callMuted ? 'Activar micrófono' : 'Silenciar micrófono';
+        if (callMuted && callState === 'recording') {
+          // Stop recording if mic is muted mid-utterance
+          if (callMediaRec?.state === 'recording') callMediaRec.stop();
+          callVadActive = false;
+        }
+        setCallStatus(callMuted ? 'Silenciado' : 'Escuchando…', callMuted ? 'idle' : 'listening');
+      });
+    }
+  }
+
+  async function openCall(agente = 'sara') {
+    callAgente  = agente;
+    callMuted   = false;
+    callSeconds = 0;
+
+    // Set overlay identity
+    const id      = CALL_IDENTITIES[agente] || CALL_IDENTITIES.sara;
+    const overlay = document.getElementById('call-overlay');
+    if (!overlay) return;
+    const nameEl  = document.getElementById('call-name');
+    const subEl   = document.getElementById('call-sub');
+    const photoEl = document.querySelector('.call-avatar-photo');
+    if (nameEl)  nameEl.textContent = id.name;
+    if (subEl)   subEl.textContent  = id.sub;
+    if (photoEl) photoEl.style.backgroundImage = `url('${id.photo}')`;
+    overlay.style.display = 'flex';
+    setCallStatus('Iniciando llamada…', 'idle');
+
+    // AudioContext must be created in synchronous user-gesture handler (this click)
+    try {
+      callAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const silBuf = callAudioCtx.createBuffer(1, 1, 22050);
+      const silSrc = callAudioCtx.createBufferSource();
+      silSrc.buffer = silBuf; silSrc.connect(callAudioCtx.destination); silSrc.start(0);
+    } catch {}
+
+    // Request mic
+    try {
+      callMicStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    } catch {
+      setCallStatus('⚠ Permite el micrófono para usar la llamada', 'idle');
+      if (callAudioCtx) { callAudioCtx.close().catch(() => {}); callAudioCtx = null; }
+      overlay.style.display = 'none';
+      App.toast('Permite el acceso al micrófono en el navegador', 'amber', 5000);
+      return;
+    }
+
+    // Mic → analyser (no echo — NOT connected to destination)
+    const micSrc  = callAudioCtx.createMediaStreamSource(callMicStream);
+    callAnalyser  = callAudioCtx.createAnalyser();
+    callAnalyser.fftSize = 512;
+    micSrc.connect(callAnalyser);
+
+    callActive = true;
+    callState  = 'speaking';
+
+    const muteBtn = document.getElementById('call-mic-btn');
+    if (muteBtn) { muteBtn.classList.remove('muted'); muteBtn.title = 'Silenciar micrófono'; }
+
+    // Timer
+    callTimer = setInterval(() => {
+      callSeconds++;
+      const m = String(Math.floor(callSeconds / 60)).padStart(1,'0');
+      const s = String(callSeconds % 60).padStart(2,'0');
+      const el = document.getElementById('call-timer');
+      if (el) el.textContent = `${m}:${s}`;
+    }, 1000);
+
+    // Greeting
+    setCallStatus(`${id.name} está respondiendo…`, 'speaking');
+    const GREETINGS = {
+      sara:  '¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?',
+      sofia: '¡Hola! Soy SOFIA Novak de ABSTORAGES. ¿En qué te puedo ayudar?',
+      noa:   '¡Hola! Soy NOA de ABSTORAGES. ¿Qué folio necesitas consultar?',
+      hector:'¡Hola! Soy HÉCTOR de ABSTORAGES. ¿En qué te puedo ayudar?',
     };
-    if (window.speechSynthesis.getVoices().length > 0) loadAndSpeak();
-    else window.speechSynthesis.addEventListener('voiceschanged', loadAndSpeak, { once: true });
+    await callPlayTTSWeb(GREETINGS[agente] || GREETINGS.sara);
+
+    if (callActive) {
+      callState = 'listening';
+      setCallStatus('Escuchando…', 'listening');
+      callVadRafId = requestAnimationFrame(callVadLoop);
+    }
+  }
+
+  function closeCall() {
+    callActive    = false;
+    callVadActive = false;
+    callMuted     = false;
+    clearInterval(callTimer);
+    if (callVadRafId) { cancelAnimationFrame(callVadRafId); callVadRafId = null; }
+    if (callSilTimer) { clearTimeout(callSilTimer); callSilTimer = null; }
+    callStopAudio();
+    if (callMediaRec?.state === 'recording') { try { callMediaRec.stop(); } catch {} }
+    if (callMicStream) { callMicStream.getTracks().forEach(t => t.stop()); callMicStream = null; }
+    if (callAudioCtx) { callAudioCtx.close().catch(() => {}); callAudioCtx = null; }
+    callAnalyser = null;
+    const overlay = document.getElementById('call-overlay');
+    if (overlay) overlay.style.display = 'none';
+    const tx = document.getElementById('call-transcript');
+    if (tx) tx.textContent = '';
+    const muteBtn = document.getElementById('call-mic-btn');
+    if (muteBtn) muteBtn.classList.remove('muted');
   }
 
   // ── PREDICTIVE ALERTS WIDGET ──────────────────────────────────────────────

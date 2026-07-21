@@ -3236,6 +3236,13 @@ body[data-role="transportista"] .cmd-center-head::after {
   color: #fbbf24;
   animation: micPulse .8s ease-in-out infinite;
 }
+.call-btn-mic.muted {
+  background: rgba(239,68,68,.15);
+  border-color: rgba(239,68,68,.4);
+  color: #f87171;
+}
+.call-btn-mic.muted .icon-mic-on  { display: none !important; }
+.call-btn-mic.muted .icon-mic-off { display: block !important; }
 @keyframes micPulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,.3); }
   50%      { box-shadow: 0 0 0 10px rgba(251,191,36,.0); }
