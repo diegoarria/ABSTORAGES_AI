@@ -527,27 +527,27 @@ app.get('/api/vapi/estado/:folio', (req, res) => {
 
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', soloAdmin, async (req, res) => {
+  const local = () => require('./data/proveedores.json').map(p => ({
+    'Razon Social': p.nombre,
+    'Telefono': p.telefono,
+    'Estatus': p.clasificacion,
+    'RFC': '—',
+    'Correo': '—',
+    'Contacto': '—',
+    'Movil': '—',
+    'Emergencia': '—',
+    '_local': true,
+  }));
+
   try {
-    if (!tms.ENABLED) {
-      const local = require('./data/proveedores.json');
-      return res.json(local.map(p => ({
-        'Razon Social': p.nombre,
-        'Telefono': p.telefono,
-        'Estatus': p.clasificacion,
-        'RFC': '—',
-        'Correo': '—',
-        'Contacto': '—',
-        'Movil': '—',
-        'Emergencia': '—',
-        '_local': true,
-      })));
-    }
+    if (!tms.ENABLED) return res.json(local());
+
     const q = (req.query.q || '').trim();
     const datos = q ? await tms.buscarProveedor(q) : await tms.listarProveedores(60);
-    res.json(datos || []);
+    res.json((datos && datos.length) ? datos : local());
   } catch (e) {
     console.error('[sofia/proveedores]', e.message);
-    res.json([]);
+    res.json(local());
   }
 });
 
