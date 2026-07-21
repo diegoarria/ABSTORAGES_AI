@@ -2088,10 +2088,10 @@ document.addEventListener('DOMContentLoaded',function(){
   function badge(estatus) {
     var e = (estatus || '').toUpperCase();
     var b = BADGE[e] || { bg:'rgba(255,255,255,.08)', color:'var(--t3)', label: estatus || '—' };
-    return '<span style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:2px 6px;border-radius:4px;background:'+b.bg+';color:'+b.color+'">'+escHtml(b.label)+'</span>';
+    return '<span style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:2px 6px;border-radius:4px;background:'+b.bg+';color:'+b.color+'">'+esc(b.label)+'</span>';
   }
 
-  function esc(s) { return escHtml ? escHtml(String(s||'')) : String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
   function tel(p) {
     return (p['Movil'] || p['Telefono'] || '—').toString().trim();
