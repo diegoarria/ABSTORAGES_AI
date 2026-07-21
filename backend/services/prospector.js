@@ -9,12 +9,18 @@ const LUSHA_KEY  = process.env.LUSHA_API_KEY;
 const APOLLO_BASE = 'https://api.apollo.io/v1';
 const LUSHA_BASE  = 'https://api.lusha.com/v2';
 
+// Headers estándar Apollo (key en header, no en body)
+const apolloHeaders = () => ({
+  'Content-Type': 'application/json',
+  'Cache-Control': 'no-cache',
+  'x-api-key': APOLLO_KEY,
+});
+
 // ── Apollo: buscar personas ───────────────────────────────────────────────────
 async function apolloBuscarPersonas(filtros = {}) {
   if (!APOLLO_KEY) throw new Error('APOLLO_API_KEY no configurada');
 
   const body = {
-    api_key: APOLLO_KEY,
     page: filtros.pagina || 1,
     per_page: filtros.limite || 25,
     person_titles: filtros.cargos || ['Director de Logística', 'Gerente de Operaciones', 'Director de Supply Chain', 'VP Logistics', 'Gerente de Compras', 'Director Comercial'],
@@ -29,7 +35,7 @@ async function apolloBuscarPersonas(filtros = {}) {
 
   const r = await fetch(`${APOLLO_BASE}/mixed_people/search`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
+    headers: apolloHeaders(),
     body: JSON.stringify(body),
   });
 
@@ -48,9 +54,8 @@ async function apolloEnriquecer(nombre, empresa, dominio) {
   try {
     const r = await fetch(`${APOLLO_BASE}/people/match`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: apolloHeaders(),
       body: JSON.stringify({
-        api_key: APOLLO_KEY,
         name: nombre,
         organization_name: empresa,
         domain: dominio,
@@ -155,7 +160,7 @@ async function buscar(filtros = {}) {
 async function creditosApollo() {
   if (!APOLLO_KEY) return null;
   try {
-    const r = await fetch(`${APOLLO_BASE}/auth/health?api_key=${APOLLO_KEY}`);
+    const r = await fetch(`${APOLLO_BASE}/auth/health`, { headers: apolloHeaders() });
     if (!r.ok) return null;
     const data = await r.json();
     return data;
