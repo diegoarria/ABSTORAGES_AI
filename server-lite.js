@@ -838,6 +838,70 @@ function soloAdmin(req, res, next) {
   if (req.user?.role === 'admin') return next();
   res.status(403).json({ error: 'Acceso restringido' });
 }
+app.get('/api/metricas', soloAdmin, async (req, res) => {
+  const all = await leads.list({ limit: 5000 });
+  const now = Date.now();
+  const DAY = 86_400_000;
+
+  // ── Embudo comercial ──────────────────────────────────────────────────────
+  const calificados = all.filter(l => l.intent === 'fletes_nacionales');
+  const cerrados    = calificados.filter(l =>
+    l.sara_nota === 'cierre_de_venta' || (l.folio && l.folio !== '—'));
+  const tasa_conversion = calificados.length
+    ? Math.round(cerrados.length / calificados.length * 100) : 0;
+
+  // ── Tendencia 7 días ──────────────────────────────────────────────────────
+  const tendencia = Array.from({ length: 7 }, (_, i) => {
+    const dia = new Date(now - (6 - i) * DAY);
+    const label = dia.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
+    const count = all.filter(l => {
+      const d = new Date(l.created_at);
+      return d.getDate()     === dia.getDate()  &&
+             d.getMonth()    === dia.getMonth() &&
+             d.getFullYear() === dia.getFullYear();
+    }).length;
+    return { label, count };
+  });
+
+  // ── Retención (empresas/emails con >1 servicio cerrado) ───────────────────
+  const porCliente = {};
+  cerrados.forEach(l => {
+    const key = (l.email && l.email !== '—') ? l.email
+              : (l.empresa && l.empresa !== '—') ? l.empresa
+              : (l.nombre && l.nombre !== '—') ? l.nombre : null;
+    if (key) porCliente[key] = (porCliente[key] || 0) + 1;
+  });
+  const clientes_unicos     = Object.keys(porCliente).length;
+  const clientes_recurrentes = Object.values(porCliente).filter(v => v > 1).length;
+  const tasa_retencion = clientes_unicos
+    ? Math.round(clientes_recurrentes / clientes_unicos * 100) : 0;
+
+  // ── Breakdown por intent ──────────────────────────────────────────────────
+  const intents = {};
+  all.forEach(l => {
+    const k = l.intent || 'otro';
+    intents[k] = (intents[k] || 0) + 1;
+  });
+
+  // ── Folios activos (caché NOA) ────────────────────────────────────────────
+  const folios = _foliosCache?.data || [];
+  const folios_status = {
+    total:    folios.length,
+    criticos: folios.filter(f => f.nivel === 'CRITICO').length,
+    atencion: folios.filter(f => f.nivel === 'ATENCION').length,
+    normales: folios.filter(f => f.nivel === 'NORMAL' || f.nivel === 'DETENIDA').length,
+  };
+
+  res.json({
+    embudo: { total: all.length, calificados: calificados.length, cerrados: cerrados.length, tasa_conversion },
+    tendencia,
+    retencion: { clientes_unicos, clientes_recurrentes, tasa_retencion },
+    intents,
+    folios_status,
+    generated_at: new Date().toISOString(),
+  });
+});
+
 app.get('/api/leads',            soloAdmin, async (req, res) => res.json(await leads.list({ desde: req.query.desde, hasta: req.query.hasta })));
 app.get('/api/leads/stats',      soloAdmin, async (req, res) => res.json(await leads.stats()));
 app.post('/api/leads',           soloAdmin, (req, res) => res.json(leads.add(req.body)));

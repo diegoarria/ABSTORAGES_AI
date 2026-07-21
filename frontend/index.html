@@ -370,6 +370,60 @@
           </div>
         </div>
 
+        <!-- ─── MÉTRICAS DE NEGOCIO (solo admin) ──────────────────────────────── -->
+        <div class="ops-section admin-only" id="metricas-section">
+          <div class="ops-header">
+            <span class="panel-title">Métricas de Negocio</span>
+            <span style="font-size:10px;color:var(--texto3)" id="metricas-ts"></span>
+          </div>
+
+          <!-- Fila 1: Embudo + Retención + Folios -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0">
+
+            <!-- Conversión -->
+            <div style="flex:1;min-width:180px;background:var(--bg-panel,#111128);border:1px solid var(--borde,#1e2340);border-radius:12px;padding:14px 16px">
+              <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--texto3);margin-bottom:10px">Embudo SARA</div>
+              <div style="display:flex;flex-direction:column;gap:6px" id="met-embudo">
+                <div style="font-size:11px;color:var(--texto3)">Cargando…</div>
+              </div>
+            </div>
+
+            <!-- Retención -->
+            <div style="flex:1;min-width:140px;background:var(--bg-panel,#111128);border:1px solid var(--borde,#1e2340);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between">
+              <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--texto3);margin-bottom:6px">Retención</div>
+              <div id="met-retencion-val" style="font-size:36px;font-weight:900;line-height:1;color:var(--verde);font-variant-numeric:tabular-nums">—</div>
+              <div style="font-size:10px;color:var(--texto3);margin-top:4px">Clientes que repiten</div>
+              <div id="met-retencion-sub" style="font-size:10px;color:var(--texto3);margin-top:2px"></div>
+            </div>
+
+            <!-- Folios NOA -->
+            <div style="flex:1;min-width:140px;background:var(--bg-panel,#111128);border:1px solid var(--borde,#1e2340);border-radius:12px;padding:14px 16px">
+              <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--texto3);margin-bottom:10px">Folios activos</div>
+              <div id="met-folios" style="display:flex;flex-direction:column;gap:5px">
+                <div style="font-size:11px;color:var(--texto3)">Cargando…</div>
+              </div>
+            </div>
+
+            <!-- Origen de leads -->
+            <div style="flex:1;min-width:140px;background:var(--bg-panel,#111128);border:1px solid var(--borde,#1e2340);border-radius:12px;padding:14px 16px">
+              <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--texto3);margin-bottom:10px">Tipo de contacto</div>
+              <div id="met-intents" style="display:flex;flex-direction:column;gap:5px">
+                <div style="font-size:11px;color:var(--texto3)">Cargando…</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Fila 2: Sparkline 7 días -->
+          <div style="padding:14px 16px 16px">
+            <div style="background:var(--bg-panel,#111128);border:1px solid var(--borde,#1e2340);border-radius:12px;padding:14px 16px">
+              <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--texto3);margin-bottom:12px">Leads últimos 7 días</div>
+              <div id="met-sparkline" style="display:flex;align-items:flex-end;gap:6px;height:52px"></div>
+              <div id="met-sparkline-labels" style="display:flex;gap:6px;margin-top:5px"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- KPIs de agentes (solo admin) -->
         <div class="kpi-grid admin-only">
 
@@ -1344,6 +1398,148 @@
         },
       };
     })();
+  </script>
+
+  <script>
+  // ── Métricas de negocio ───────────────────────────────────────────────────
+  (function () {
+    const COLOR = {
+      verde:    getComputedStyle(document.documentElement).getPropertyValue('--verde').trim()   || '#22c55e',
+      amarillo: getComputedStyle(document.documentElement).getPropertyValue('--warn').trim()    || '#f59e0b',
+      rojo:     getComputedStyle(document.documentElement).getPropertyValue('--error').trim()   || '#ef4444',
+      texto3:   getComputedStyle(document.documentElement).getPropertyValue('--texto3').trim()  || '#6b7280',
+      acento:   getComputedStyle(document.documentElement).getPropertyValue('--acento').trim()  || '#6366f1',
+    };
+
+    function pct(v, target, type = 'higher') {
+      if (type === 'higher') {
+        if (v >= target) return COLOR.verde;
+        if (v >= target * 0.6) return COLOR.amarillo;
+        return COLOR.rojo;
+      }
+      if (v === 0) return COLOR.verde;
+      if (v <= 2)  return COLOR.amarillo;
+      return COLOR.rojo;
+    }
+
+    function row(label, val, color, bar) {
+      return `<div style="display:flex;align-items:center;gap:8px;font-size:11px">
+        <span style="color:var(--texto3);flex:0 0 auto;width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</span>
+        <span style="font-weight:700;color:${color};font-variant-numeric:tabular-nums;width:44px;text-align:right;flex:0 0 auto">${val}</span>
+        ${bar !== undefined ? `<div style="flex:1;height:4px;border-radius:2px;background:var(--borde,#1e2340)"><div style="height:4px;border-radius:2px;background:${color};width:${Math.min(bar,100)}%"></div></div>` : ''}
+      </div>`;
+    }
+
+    function renderMetricas(d) {
+      // ── Timestamp ───────────────────────────────────────────────────────
+      const ts = document.getElementById('metricas-ts');
+      if (ts) {
+        const dt = new Date(d.generated_at);
+        ts.textContent = 'Actualizado ' + dt.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      // ── Embudo ──────────────────────────────────────────────────────────
+      const emb = document.getElementById('met-embudo');
+      if (emb && d.embudo) {
+        const { total, calificados, cerrados, tasa_conversion } = d.embudo;
+        const colorConv = pct(tasa_conversion, 30);
+        const pctCal = total ? Math.round(calificados / total * 100) : 0;
+        const pctCer = calificados ? Math.round(cerrados / calificados * 100) : 0;
+        emb.innerHTML = `
+          ${row('Total contactos', total, 'var(--texto)', undefined)}
+          <div style="height:1px;background:var(--borde,#1e2340);margin:4px 0"></div>
+          ${row('Calificados', `${calificados} (${pctCal}%)`, COLOR.acento, pctCal)}
+          ${row('Cerrados', `${cerrados} (${pctCer}%)`, COLOR.verde, pctCer)}
+          <div style="height:1px;background:var(--borde,#1e2340);margin:4px 0"></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:2px">
+            <span style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--texto3)">Conversión</span>
+            <span style="font-size:28px;font-weight:900;color:${colorConv};line-height:1;font-variant-numeric:tabular-nums">${tasa_conversion}%</span>
+          </div>
+        `;
+      }
+
+      // ── Retención ───────────────────────────────────────────────────────
+      const retVal = document.getElementById('met-retencion-val');
+      const retSub = document.getElementById('met-retencion-sub');
+      if (retVal && d.retencion) {
+        const { tasa_retencion, clientes_recurrentes, clientes_unicos } = d.retencion;
+        retVal.textContent = tasa_retencion + '%';
+        retVal.style.color = pct(tasa_retencion, 25);
+        if (retSub) retSub.textContent = `${clientes_recurrentes} de ${clientes_unicos} únicos`;
+      }
+
+      // ── Folios ──────────────────────────────────────────────────────────
+      const folDiv = document.getElementById('met-folios');
+      if (folDiv && d.folios_status) {
+        const { total, criticos, atencion, normales } = d.folios_status;
+        folDiv.innerHTML = `
+          ${row('Total activos', total, 'var(--texto)', undefined)}
+          ${row('Críticos', criticos, pct(criticos, 1, 'lower'), undefined)}
+          ${row('Atención', atencion, atencion > 0 ? COLOR.amarillo : COLOR.verde, undefined)}
+          ${row('Normales', normales, COLOR.verde, undefined)}
+        `;
+      }
+
+      // ── Intents ─────────────────────────────────────────────────────────
+      const intDiv = document.getElementById('met-intents');
+      if (intDiv && d.intents) {
+        const total = Object.values(d.intents).reduce((a, b) => a + b, 0) || 1;
+        const LABELS = {
+          fletes_nacionales: 'Fletes',
+          mudanzas:          'Mudanzas',
+          trabajo:           'Trabajo',
+          otro:              'Otro',
+        };
+        const sorted = Object.entries(d.intents).sort((a, b) => b[1] - a[1]);
+        intDiv.innerHTML = sorted.map(([k, v]) => {
+          const pctV = Math.round(v / total * 100);
+          return row(LABELS[k] || k, `${v} (${pctV}%)`, COLOR.acento, pctV);
+        }).join('');
+      }
+
+      // ── Sparkline 7 días ────────────────────────────────────────────────
+      const spark = document.getElementById('met-sparkline');
+      const labs  = document.getElementById('met-sparkline-labels');
+      if (spark && d.tendencia) {
+        const max = Math.max(...d.tendencia.map(t => t.count), 1);
+        spark.innerHTML = d.tendencia.map((t, i) => {
+          const h = Math.round(t.count / max * 48) || 2;
+          const isLast = i === d.tendencia.length - 1;
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+            <span style="font-size:9px;color:${isLast ? 'var(--texto)' : 'var(--texto3)'};font-variant-numeric:tabular-nums;font-weight:${isLast?700:400}">${t.count || ''}</span>
+            <div style="width:100%;height:${h}px;border-radius:3px 3px 0 0;background:${isLast ? COLOR.acento : 'var(--borde,#1e2340)'};transition:height .3s"></div>
+          </div>`;
+        }).join('');
+        if (labs) {
+          labs.innerHTML = d.tendencia.map((t, i) => {
+            const isLast = i === d.tendencia.length - 1;
+            return `<div style="flex:1;text-align:center;font-size:8px;color:${isLast ? 'var(--texto)' : 'var(--texto3)'};font-weight:${isLast?700:400}">${t.label}</div>`;
+          }).join('');
+        }
+      }
+    }
+
+    async function loadMetricas() {
+      try {
+        const d = await fetch('/api/metricas').then(r => {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        });
+        renderMetricas(d);
+      } catch (e) {
+        // Not admin or endpoint not ready — hide section silently
+        const sec = document.getElementById('metricas-section');
+        if (sec) sec.style.display = 'none';
+      }
+    }
+
+    // Load on portal open + refresh every 60 s
+    document.getElementById('btn-open-portal')?.addEventListener('click', () => {
+      loadMetricas();
+    });
+    loadMetricas();
+    setInterval(loadMetricas, 60_000);
+  })();
   </script>
 </body>
 </html>
