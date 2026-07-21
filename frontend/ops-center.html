@@ -55,19 +55,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13px
 .workspace{display:flex;height:calc(100vh - 52px);overflow:hidden}
 .panel{display:flex;flex-direction:column;min-height:0}
 .panel-noa{flex:6;border-right:1px solid var(--b1);position:relative}
-.panel-hec{flex:4}
+.panel-hec{flex:4;display:flex;flex-direction:column}
 .panel-sof{flex:1;display:none;flex-direction:column}
 
 /* ── PAGE SWITCHING — un agente a la vez ── */
-body[data-page="noa"] .panel-hec{display:none}
-body[data-page="noa"] .panel-sof{display:none}
+body[data-page="noa"] .panel-hec{display:none !important}
+body[data-page="noa"] .panel-sof{display:none !important}
 body[data-page="noa"] .panel-noa{flex:1;border-right:none}
-body[data-page="hec"] .panel-noa{display:none}
-body[data-page="hec"] .panel-sof{display:none}
+body[data-page="hec"] .panel-noa{display:none !important}
+body[data-page="hec"] .panel-sof{display:none !important}
 body[data-page="hec"] .panel-hec{flex:1}
-body[data-page="sof"] .panel-noa{display:none}
-body[data-page="sof"] .panel-hec{display:none}
-body[data-page="sof"] .panel-sof{display:flex;flex:1}
+body[data-page="sof"] .panel-noa{display:none !important}
+body[data-page="sof"] .panel-hec{display:none !important}
+body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 
 /* ── PANEL HEADS ── */
 .phead{height:48px;display:flex;align-items:center;padding:0 16px;gap:9px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
@@ -504,7 +504,7 @@ body[data-page="sof"] .panel-sof{display:flex;flex:1}
   </section>
 
   <!-- ══ HÉCTOR ══ -->
-  <section class="panel panel-hec" style="display:flex;flex-direction:column" aria-label="Panel HÉCTOR — Cobranza">
+  <section class="panel panel-hec" aria-label="Panel HÉCTOR — Cobranza">
     <div class="phead">
       <div class="adot hec" aria-hidden="true">H</div>
       <span class="aname hec">HÉCTOR</span>
