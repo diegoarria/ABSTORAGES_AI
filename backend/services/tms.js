@@ -7,7 +7,14 @@ const TMS_TOKEN = process.env.TMS_API_KEY  || 'b4914e954d7e43cd8830b4855f7d9e110
 const ENABLED   = !!TMS_URL;
 
 // ── HTTP util ────────────────────────────────────────────────────────────────
-const TMS_TIMEOUT_MS = 25000;
+const TMS_TIMEOUT_MS = 45000;
+
+// Fecha (AAAA-MM-DD) de hace N días, para acotar consultas pesadas a detalle_servicios
+function haceDias(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0, 10);
+}
 
 function withTimeout(promise, ms) {
   return Promise.race([
@@ -297,6 +304,7 @@ async function buscarProveedor(texto) {
 async function rutasProveedor(nombreProveedor) {
   const r = await query('detalle_servicios', {
     pagina: 1, limite: 200,
+    desde: haceDias(180),
     filtros: { 'Proveedor': { contiene: nombreProveedor } },
     campos: ['Folio de servicio','Fecha de Servicio','Proveedor','Cliente',
              'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
@@ -337,6 +345,7 @@ async function proveedoresPorRuta(origen, destino) {
 
   const r = await query('detalle_servicios', {
     pagina: 1, limite: 200,
+    desde: haceDias(180),
     filtros,
     campos: ['Proveedor','Cuidad Origen','Cuidad destino','Costo','Fecha de Servicio','Estatus Operaciones'],
   });
