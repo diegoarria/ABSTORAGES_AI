@@ -283,4 +283,22 @@ async function notificarResumen(lead, motivo, historial = []) {
   ]);
 }
 
-module.exports = { notificarLead, notificarResumen };
+async function notificarAsignacion(folio, proveedor, precio) {
+  const asunto = `🚛 Carrier asignado — Folio ${folio}`;
+  const precioStr = precio || 'por confirmar';
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:520px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:20px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">SOFÍA · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Carrier asignado · ${new Date().toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Monterrey'})}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#111;">El carrier <strong>${proveedor}</strong> aceptó el folio <strong>${folio}</strong> a <strong style="color:#16a34a;">${precioStr}</strong>.</p>
+      <p style="margin:0;font-size:13px;color:#6b7280;">SOFÍA está coordinando confirmación de condiciones y protocolo de precarga.</p>
+    </div>
+  </div>`;
+  const enviado = await sendEmailGmail(asunto, html);
+  if (!enviado) console.log(`[Notifier STUB] Carrier asignado — ${folio} → ${proveedor} @ ${precioStr}`);
+}
+
+module.exports = { notificarLead, notificarResumen, notificarAsignacion };

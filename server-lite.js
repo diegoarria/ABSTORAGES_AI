@@ -27,6 +27,8 @@ const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
 const vapi        = require('./backend/services/vapi');
 const tms         = require('./backend/services/tms');
+const ordersStore = require('./backend/services/ordersStore');
+const PROVEEDORES = require('./data/proveedores.json');
 const eta         = require('./backend/services/eta');
 
 const app  = express();
@@ -337,6 +339,42 @@ app.post('/api/gps/update', (req, res) => {
 });
 
 
+// ─── Vapi webhook (sin auth — Vapi llama externamente) ───────────────────────
+app.post('/api/vapi/webhook', express.json(), (req, res) => {
+  res.sendStatus(200);
+  setImmediate(async () => {
+    try {
+      const evento = req.body;
+      const tipo = evento.message?.type || evento.type;
+      if (tipo !== 'end-of-call-report' && tipo !== 'call-ended') return;
+
+      const resultado = vapi.procesarResultadoLlamada({ call: evento.message?.call || evento.call || evento });
+      if (!resultado) return;
+
+      console.log(`[Vapi Webhook] ${resultado.folio} | ${resultado.proveedorId} | disponible:${resultado.disponible} | precio:${resultado.precio}`);
+      pushActividad({
+        agente: 'SOFIA', tipo: 'VAPI_RESULTADO',
+        mensaje: `${resultado.proveedorId} → ${resultado.disponible ? `✅ DISPONIBLE ${resultado.precio || ''}` : '❌ No disponible'}`,
+        metadata: { folio: resultado.folio, ...resultado },
+      });
+
+      const estado = vapi.obtenerEstadoLlamadas(resultado.folio);
+      if (estado?.ganador?.proveedorId === resultado.proveedorId) {
+        pushActividad({
+          agente: 'SOFIA', tipo: 'PROVEEDOR_GANADOR',
+          mensaje: `🏆 Folio ${resultado.folio} → ${resultado.proveedorId} a ${resultado.precio || '—'}`,
+          metadata: { folio: resultado.folio, ganador: estado.ganador },
+        });
+        notifier.notificarAsignacion && notifier.notificarAsignacion(resultado.folio, resultado.proveedorId, resultado.precio)
+          .catch(e => console.error('[notifier asignacion]', e.message));
+      }
+    } catch (e) {
+      console.error('[Vapi Webhook]', e.message);
+    }
+  });
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 app.use(auth);
 app.use(express.static(path.join(__dirname, 'frontend')));
 
@@ -396,7 +434,16 @@ app.get('/api/metricas', (req, res) => {
   res.json({ folios_activos: 0, folios_hoy: 0, proveedores_activos: 0, alertas_activas: 0 });
 });
 
-app.get('/api/sofia/folios', (req, res) => res.json([]));
+app.get('/api/sofia/folios', (req, res) => {
+  res.json(ordersStore.listarOrdenes().map(o => o.folio));
+});
+
+// Estado de llamadas Vapi por folio
+app.get('/api/vapi/estado/:folio', (req, res) => {
+  const estado = vapi.obtenerEstadoLlamadas(req.params.folio.toUpperCase());
+  if (!estado) return res.status(404).json({ error: 'Sin llamadas registradas para este folio' });
+  res.json(estado);
+});
 
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', soloAdmin, async (req, res) => {
@@ -790,6 +837,20 @@ async function handleChat(agente, req, res) {
       if (hasCierre) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
         pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: sid, metadata: { sessionId: sid } });
+
+        // Persistir orden para que SOFIA la consulte sin re-preguntar
+        ordersStore.guardarOrden(lead);
+
+        // Lanzar llamadas a carriers en paralelo (stub si VAPI_API_KEY no está)
+        vapi.lanzarLlamadasProveedores(lead, PROVEEDORES)
+          .then(r => {
+            const msg = r.llamadas > 0
+              ? `Folio ${lead.folio} — ${r.llamadas} llamadas a carriers iniciadas`
+              : `Folio ${lead.folio} — sin carriers compatibles para esta ruta`;
+            pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: msg, metadata: { folio: lead.folio, ...r } });
+            console.log(`[Vapi] ${msg}`);
+          })
+          .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
       }
 
       // Actualizar perfil del visitante con datos capturados en esta sesión
