@@ -446,6 +446,23 @@ app.delete('/api/push/subscribe', express.json(), (req, res) => {
   res.json({ ok: true });
 });
 
+// Tokens nativos APNs/FCM desde Capacitor (guardados aparte, para FCM/APNs en el futuro)
+const NATIVE_TOKENS_FILE = path.join(__dirname, 'data', 'native-tokens.json');
+let nativeTokens = [];
+try { nativeTokens = JSON.parse(fs.readFileSync(NATIVE_TOKENS_FILE, 'utf8')); } catch (_) {}
+
+app.post('/api/push/subscribe-native', express.json(), (req, res) => {
+  const { token, platform } = req.body || {};
+  if (!token) return res.status(400).json({ error: 'Token requerido' });
+  const exists = nativeTokens.some(t => t.token === token);
+  if (!exists) {
+    nativeTokens.push({ token, platform, ts: new Date().toISOString() });
+    fs.writeFileSync(NATIVE_TOKENS_FILE, JSON.stringify(nativeTokens));
+  }
+  console.log(`[NativePush] Token ${platform} registrado`);
+  res.json({ ok: true });
+});
+
 // ─── BROADCAST / CAMPAÑAS WHATSAPP ───────────────────────────────────────────
 app.get('/api/broadcast/templates', (req, res) => {
   res.json(broadcast.getTemplates());
