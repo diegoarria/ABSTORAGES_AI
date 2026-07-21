@@ -1093,6 +1093,70 @@ app.get('/api/metricas', soloAdmin, async (req, res) => {
 app.get('/api/leads',            soloAdmin, async (req, res) => res.json(await leads.list({ desde: req.query.desde, hasta: req.query.hasta })));
 app.get('/api/leads/stats',      soloAdmin, async (req, res) => res.json(await leads.stats()));
 app.post('/api/leads',           soloAdmin, (req, res) => res.json(leads.add(req.body)));
+
+// ─── PROSPECTOR — SARA outbound ───────────────────────────────────────────────
+const prospector   = require('./backend/services/prospector');
+const outreach     = require('./backend/services/outreach');
+const outreachRunner = require('./backend/services/outreachRunner');
+
+// Buscar prospectos en Apollo + Lusha
+app.post('/api/prospector/buscar', soloAdmin, async (req, res) => {
+  try {
+    const filtros = req.body || {};
+    const resultados = await prospector.buscar(filtros);
+    res.json({ ok: true, total: resultados.length, prospectos: resultados });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Agregar prospectos a la secuencia de outreach
+app.post('/api/prospector/iniciar', soloAdmin, (req, res) => {
+  const { prospectos } = req.body || {};
+  if (!Array.isArray(prospectos)) return res.status(400).json({ error: 'Array de prospectos requerido' });
+  const nuevos = outreach.agregarProspectos(prospectos);
+  pushActividad({ agente: 'SARA', tipo: 'PROSPECTOR', mensaje: `${nuevos.length} prospectos añadidos a secuencia`, metadata: { total: nuevos.length } });
+  res.json({ ok: true, nuevos: nuevos.length });
+});
+
+// Listar prospectos
+app.get('/api/prospector', soloAdmin, (req, res) => {
+  res.json(outreach.listar({ estado: req.query.estado }));
+});
+
+// Stats del pipeline
+app.get('/api/prospector/stats', soloAdmin, (req, res) => {
+  res.json(outreach.stats());
+});
+
+// Marcar cita agendada manualmente
+app.post('/api/prospector/:id/cita', soloAdmin, (req, res) => {
+  const p = outreach.marcarCita(req.params.id);
+  if (!p) return res.status(404).json({ error: 'Prospecto no encontrado' });
+  pushActividad({ agente: 'SARA', tipo: 'CITA_AGENDADA', mensaje: `Cita agendada con ${p.nombre} (${p.empresa})`, metadata: { id: p.id } });
+  res.json({ ok: true, prospecto: p });
+});
+
+// Ejecutar runner manualmente (normalmente corre en intervalo)
+app.post('/api/prospector/run', soloAdmin, async (req, res) => {
+  try {
+    const r = await outreachRunner.run(pushActividad);
+    res.json({ ok: true, ...r });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Créditos Apollo
+app.get('/api/prospector/creditos', soloAdmin, async (req, res) => {
+  const c = await prospector.creditosApollo();
+  res.json(c || { error: 'No disponible' });
+});
+
+// Runner automático cada 15 minutos
+setInterval(() => {
+  outreachRunner.run(pushActividad).catch(e => console.error('[OutreachRunner]', e.message));
+}, 15 * 60 * 1000);
 app.get('/api/leads/export.csv', async (req, res) => {
   const csv = await leads.exportCsv();
   const fecha = new Date().toISOString().slice(0,10);

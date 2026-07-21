@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SARA Prospector — ABSTORAGES</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0f1e">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+:root {
+  --pr-bg:   #04080f;
+  --pr-s1:   #080f1c;
+  --pr-s2:   #0d1628;
+  --pr-acc:  #3b82f6;
+  --pr-grn:  #22c55e;
+  --pr-amb:  #f59e0b;
+  --pr-red:  #ef4444;
+  --pr-t1:   #f0f4ff;
+  --pr-t2:   #8ba3c7;
+  --pr-t3:   #4a6080;
+  --pr-b1:   rgba(255,255,255,.07);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--pr-bg); color: var(--pr-t1); font-family: -apple-system, 'Inter', sans-serif; min-height: 100vh; }
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--pr-s1); border-bottom:1px solid var(--pr-b1); position:sticky; top:0; z-index:50; }
+.hdr-logo { font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--pr-t1); display:flex; align-items:center; gap:8px; }
+.hdr-logo span { color:var(--pr-acc); }
+.hdr-nav { display:flex; gap:4px; margin-left:auto; }
+.hn { background:none; border:none; color:var(--pr-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
+.hn:hover, .hn.on { background:rgba(59,130,246,.12); color:var(--pr-acc); }
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.wrap { display:flex; height:calc(100vh - 57px); }
+.sidebar { width:300px; border-right:1px solid var(--pr-b1); display:flex; flex-direction:column; flex-shrink:0; }
+.main { flex:1; overflow-y:auto; padding:24px; }
+
+/* ── Search panel ────────────────────────────────────────────────────────── */
+.search-panel { padding:20px; display:flex; flex-direction:column; gap:14px; border-bottom:1px solid var(--pr-b1); }
+.sp-title { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--pr-t3); }
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:11px; color:var(--pr-t2); font-weight:600; }
+.field input, .field textarea, .field select {
+  background: var(--pr-s2); border:1px solid var(--pr-b1); border-radius:8px;
+  color:var(--pr-t1); font-size:13px; padding:8px 11px; outline:none; width:100%;
+  transition:border-color .15s;
+}
+.field input:focus, .field textarea:focus, .field select:focus { border-color:var(--pr-acc); }
+.field textarea { resize:none; height:64px; }
+.btn-buscar {
+  background:var(--pr-acc); color:#fff; border:none; border-radius:9px;
+  padding:10px; font-size:13px; font-weight:700; cursor:pointer; width:100%;
+  transition:opacity .15s;
+}
+.btn-buscar:hover { opacity:.85; }
+.btn-buscar:disabled { opacity:.45; cursor:not-allowed; }
+
+/* ── Stats strip ─────────────────────────────────────────────────────────── */
+.stats-strip { display:flex; gap:0; border-bottom:1px solid var(--pr-b1); }
+.stat-tile { flex:1; padding:14px 16px; text-align:center; border-right:1px solid var(--pr-b1); }
+.stat-tile:last-child { border-right:none; }
+.stat-v { font-size:22px; font-weight:800; letter-spacing:-.03em; }
+.stat-l { font-size:10px; color:var(--pr-t2); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+.stat-grn { color:var(--pr-grn); }
+.stat-acc { color:var(--pr-acc); }
+.stat-amb { color:var(--pr-amb); }
+
+/* ── Pipeline tabs ───────────────────────────────────────────────────────── */
+.pipe-tabs { display:flex; gap:4px; padding:16px 0 0; border-bottom:1px solid var(--pr-b1); margin-bottom:20px; }
+.ptab { background:none; border:none; color:var(--pr-t2); font-size:13px; font-weight:600; padding:8px 16px; cursor:pointer; border-bottom:2px solid transparent; transition:all .15s; }
+.ptab.on { color:var(--pr-acc); border-bottom-color:var(--pr-acc); }
+
+/* ── Prospect cards ──────────────────────────────────────────────────────── */
+.prospects-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
+.pc {
+  background:var(--pr-s1); border:1px solid var(--pr-b1); border-radius:12px;
+  padding:16px; display:flex; flex-direction:column; gap:10px;
+  transition:border-color .15s;
+}
+.pc:hover { border-color:rgba(59,130,246,.35); }
+.pc-head { display:flex; gap:12px; align-items:flex-start; }
+.pc-avatar {
+  width:40px; height:40px; border-radius:10px; background:var(--pr-s2);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:14px; color:var(--pr-acc); flex-shrink:0;
+  border:1px solid var(--pr-b1);
+}
+.pc-info { flex:1; min-width:0; }
+.pc-name { font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pc-title { font-size:11px; color:var(--pr-t2); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pc-co { font-size:11px; color:var(--pr-acc); font-weight:600; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.score-badge { font-size:10px; font-weight:800; padding:3px 7px; border-radius:6px; flex-shrink:0; }
+.score-high { background:rgba(34,197,94,.15); color:var(--pr-grn); }
+.score-mid  { background:rgba(245,158,11,.15); color:var(--pr-amb); }
+.score-low  { background:rgba(255,255,255,.06); color:var(--pr-t3); }
+
+.pc-chips { display:flex; gap:5px; flex-wrap:wrap; }
+.chip { font-size:10px; padding:3px 8px; border-radius:5px; background:var(--pr-s2); color:var(--pr-t2); border:1px solid var(--pr-b1); }
+.chip.has { color:var(--pr-grn); border-color:rgba(34,197,94,.25); background:rgba(34,197,94,.08); }
+
+.pc-canal { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--pr-t2); }
+.canal-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.dot-nuevo      { background:#60a5fa; }
+.dot-en_secuencia { background:var(--pr-amb); }
+.dot-respondio  { background:var(--pr-grn); }
+.dot-cita_agendada { background:#a78bfa; }
+.dot-descartado { background:var(--pr-t3); }
+
+.pc-actions { display:flex; gap:6px; margin-top:4px; }
+.btn-sm-acc { background:rgba(59,130,246,.12); color:var(--pr-acc); border:1px solid rgba(59,130,246,.25); border-radius:7px; padding:5px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; }
+.btn-sm-acc:hover { background:rgba(59,130,246,.22); }
+.btn-sm-grn { background:rgba(34,197,94,.1); color:var(--pr-grn); border:1px solid rgba(34,197,94,.25); border-radius:7px; padding:5px 10px; font-size:11px; font-weight:600; cursor:pointer; }
+
+/* ── Selección masiva ────────────────────────────────────────────────────── */
+.bulk-bar {
+  display:none; position:sticky; top:0; z-index:10;
+  background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3);
+  border-radius:10px; padding:10px 16px; margin-bottom:16px;
+  align-items:center; gap:12px;
+}
+.bulk-bar.visible { display:flex; }
+.bulk-txt { font-size:13px; font-weight:600; color:var(--pr-acc); flex:1; }
+.btn-iniciar { background:var(--pr-acc); color:#fff; border:none; border-radius:8px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer; }
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.empty { text-align:center; padding:60px 24px; color:var(--pr-t2); }
+.empty-icon { font-size:40px; margin-bottom:14px; }
+.empty h3 { font-size:16px; font-weight:700; color:var(--pr-t1); margin-bottom:8px; }
+
+/* ── Loader ──────────────────────────────────────────────────────────────── */
+.loading { display:flex; align-items:center; gap:10px; padding:40px; justify-content:center; color:var(--pr-t2); font-size:13px; }
+.spin { width:18px; height:18px; border:2px solid var(--pr-b1); border-top-color:var(--pr-acc); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Historial del prospecto ─────────────────────────────────────────────── */
+.hist-item { display:flex; gap:8px; align-items:flex-start; font-size:12px; color:var(--pr-t2); padding:6px 0; border-bottom:1px solid var(--pr-b1); }
+.hist-canal { font-weight:700; color:var(--pr-t1); min-width:70px; }
+.hist-res { font-size:11px; }
+.hist-ts { margin-left:auto; font-size:10px; color:var(--pr-t3); white-space:nowrap; }
+
+@media (max-width: 767px) {
+  .wrap { flex-direction:column; height:auto; }
+  .sidebar { width:100%; border-right:none; border-bottom:1px solid var(--pr-b1); }
+  .main { padding:16px; }
+  .prospects-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">🚛 <span>SARA</span> Prospector</div>
+  <nav class="hdr-nav">
+    <button class="hn" onclick="location.href='/'">Portal</button>
+    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <!-- ── Sidebar: Búsqueda ───────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="search-panel">
+      <div class="sp-title">Búsqueda de prospectos</div>
+
+      <div class="field">
+        <label>Industria</label>
+        <select id="f-industria">
+          <option value="">Todas</option>
+          <option value="logistics_and_supply_chain" selected>Logística & Supply Chain</option>
+          <option value="manufacturing">Manufactura</option>
+          <option value="retail">Retail & Comercio</option>
+          <option value="food_and_beverages">Alimentos & Bebidas</option>
+          <option value="automotive">Automotriz</option>
+          <option value="construction">Construcción</option>
+          <option value="pharmaceuticals">Farmacéutica</option>
+          <option value="electronics">Electrónica</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>País / Región</label>
+        <select id="f-pais">
+          <option value="Mexico" selected>México</option>
+          <option value="United States">Estados Unidos</option>
+          <option value="Colombia">Colombia</option>
+          <option value="Argentina">Argentina</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Tamaño de empresa</label>
+        <select id="f-tamano">
+          <option value="1,50">1–50 empleados</option>
+          <option value="51,200" selected>51–200 empleados</option>
+          <option value="201,500">201–500 empleados</option>
+          <option value="501,1000">501–1,000 empleados</option>
+          <option value="1001,5000">1,001–5,000 empleados</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Cargos objetivo</label>
+        <textarea id="f-cargos" placeholder="Director de Logística&#10;Gerente de Operaciones&#10;VP Supply Chain">Director de Logística
+Gerente de Operaciones
+Director de Supply Chain</textarea>
+      </div>
+
+      <div class="field">
+        <label>Palabras clave (opcional)</label>
+        <input type="text" id="f-keywords" placeholder="ej: importación, cross-border">
+      </div>
+
+      <div class="field">
+        <label>Resultados</label>
+        <select id="f-limite">
+          <option value="10">10 prospectos</option>
+          <option value="25" selected>25 prospectos</option>
+          <option value="50">50 prospectos</option>
+        </select>
+      </div>
+
+      <button class="btn-buscar" id="btn-buscar" onclick="buscar()">🔍 Buscar en Apollo + Lusha</button>
+      <div id="creditos" style="font-size:11px;color:var(--pr-t3);text-align:center"></div>
+    </div>
+
+    <!-- Stats -->
+    <div id="sidebar-stats" style="padding:16px;display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto">
+      <div class="sp-title" style="margin-bottom:4px">Pipeline SARA</div>
+      <div id="pipe-stats"></div>
+    </div>
+  </aside>
+
+  <!-- ── Main: Resultados / Pipeline ────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Bulk action bar -->
+    <div class="bulk-bar" id="bulk-bar">
+      <span class="bulk-txt" id="bulk-txt">0 seleccionados</span>
+      <button class="btn-iniciar" onclick="iniciarSecuencia()">▶ Iniciar secuencia con seleccionados</button>
+      <button class="btn-sm-acc" onclick="deseleccionarTodo()">✕ Cancelar</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pipe-tabs">
+      <button class="ptab on" data-tab="busqueda" onclick="switchTab('busqueda')">🔍 Resultados</button>
+      <button class="ptab" data-tab="secuencia" onclick="switchTab('secuencia')">⚡ En secuencia</button>
+      <button class="ptab" data-tab="respondieron" onclick="switchTab('respondieron')">💬 Respondieron</button>
+      <button class="ptab" data-tab="citas" onclick="switchTab('citas')">📅 Citas</button>
+    </div>
+
+    <div id="content-area">
+      <div class="empty">
+        <div class="empty-icon">🎯</div>
+        <h3>Busca prospectos para empezar</h3>
+        <p>SARA buscará en Apollo.io y Lusha los contactos más relevantes para ABSTORAGES.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const CANALES = { linkedin:'🔗', email:'✉️', whatsapp:'💬', vapi:'📞' };
+let resultadosBusqueda = [];
+let seleccionados = new Set();
+let tabActual = 'busqueda';
+
+// ── Cargar stats al inicio ────────────────────────────────────────────────
+async function cargarStats() {
+  try {
+    const s = await fetch('/api/prospector/stats', { credentials:'include' }).then(r => r.json());
+    const el = document.getElementById('pipe-stats');
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${tile(s.total,       'Total',       '')}
+        ${tile(s.en_secuencia,'En secuencia','amb')}
+        ${tile(s.respondieron,'Respondieron','grn')}
+        ${tile(s.citas,       'Citas',       'acc')}
+        ${tile(s.pendientes,  'Pendientes hoy','amb')}
+        ${tile(s.descartados, 'Descartados', '')}
+      </div>
+      <button onclick="runManual()" style="width:100%;margin-top:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--pr-t2);border-radius:8px;padding:8px;font-size:12px;cursor:pointer">
+        ▶ Ejecutar outreach ahora
+      </button>`;
+  } catch {}
+}
+
+function tile(v, l, cls) {
+  const col = cls==='grn'?'#22c55e':cls==='acc'?'#3b82f6':cls==='amb'?'#f59e0b':'#8ba3c7';
+  return `<div style="background:var(--pr-s1);border:1px solid var(--pr-b1);border-radius:8px;padding:10px;text-align:center">
+    <div style="font-size:20px;font-weight:800;color:${col}">${v}</div>
+    <div style="font-size:10px;color:var(--pr-t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px">${l}</div>
+  </div>`;
+}
+
+// ── Cargar créditos Apollo ────────────────────────────────────────────────
+async function cargarCreditos() {
+  try {
+    const c = await fetch('/api/prospector/creditos', { credentials:'include' }).then(r => r.json());
+    if (c?.user) {
+      document.getElementById('creditos').textContent =
+        `Apollo: ${c.user.email || ''} · ${c.user.credits_used_count || 0} créditos usados`;
+    }
+  } catch {}
+}
+
+// ── Buscar ────────────────────────────────────────────────────────────────
+async function buscar() {
+  const btn = document.getElementById('btn-buscar');
+  btn.disabled = true; btn.textContent = '⏳ Buscando…';
+
+  const cargosRaw = document.getElementById('f-cargos').value.trim();
+  const filtros = {
+    industrias:    document.getElementById('f-industria').value ? [document.getElementById('f-industria').value] : [],
+    ubicaciones:   [document.getElementById('f-pais').value],
+    tamano:        [document.getElementById('f-tamano').value],
+    cargos:        cargosRaw ? cargosRaw.split('\n').map(s=>s.trim()).filter(Boolean) : undefined,
+    palabrasClave: document.getElementById('f-keywords').value.trim().split(',').map(s=>s.trim()).filter(Boolean),
+    limite:        parseInt(document.getElementById('f-limite').value),
+  };
+
+  try {
+    const data = await fetch('/api/prospector/buscar', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(filtros),
+    }).then(r => r.json());
+
+    if (data.error) throw new Error(data.error);
+    resultadosBusqueda = data.prospectos || [];
+    seleccionados.clear();
+    switchTab('busqueda');
+    renderResultados();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '🔍 Buscar en Apollo + Lusha';
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+function renderResultados() {
+  const el = document.getElementById('content-area');
+  if (!resultadosBusqueda.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><h3>Sin resultados</h3><p>Ajusta los filtros e intenta de nuevo.</p></div>';
+    return;
+  }
+  el.innerHTML = `<div class="prospects-grid">${resultadosBusqueda.map(cardProspecto).join('')}</div>`;
+  actualizarBulkBar();
+}
+
+async function renderTab(estado) {
+  const el = document.getElementById('content-area');
+  el.innerHTML = '<div class="loading"><div class="spin"></div> Cargando…</div>';
+  try {
+    const url = '/api/prospector' + (estado ? '?estado=' + estado : '');
+    const data = await fetch(url, { credentials:'include' }).then(r => r.json());
+    if (!data.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>Nada aquí aún</h3></div>';
+      return;
+    }
+    el.innerHTML = `<div class="prospects-grid">${data.map(cardProspecto).join('')}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>${e.message}</h3></div>`;
+  }
+}
+
+function cardProspecto(p) {
+  const iniciales = (p.nombre||'?').split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+  const score = p.score || 0;
+  const scoreCls = score>=70?'score-high':score>=40?'score-mid':'score-low';
+  const estado = p.estado || 'nuevo';
+  const sel = seleccionados.has(p.id||p.email);
+  const dotCls = 'dot-' + estado.replace('_secuencia','_secuencia');
+
+  const hist = (p.historial||[]).slice(-3).reverse().map(h =>
+    `<div class="hist-item">
+      <span class="hist-canal">${CANALES[h.canal]||''} ${h.canal}</span>
+      <span class="hist-res">${h.resultado}</span>
+      <span class="hist-ts">${new Date(h.ts).toLocaleDateString('es-MX')}</span>
+    </div>`).join('');
+
+  return `<div class="pc ${sel?'sel':''}" id="pc-${p.id||p.email}" style="${sel?'border-color:var(--pr-acc);background:rgba(59,130,246,.06)':''}">
+    <div class="pc-head">
+      <div class="pc-avatar">${iniciales}</div>
+      <div class="pc-info">
+        <div class="pc-name">${p.nombre}</div>
+        <div class="pc-title">${p.cargo||'—'}</div>
+        <div class="pc-co">${p.empresa||'—'}</div>
+      </div>
+      <span class="score-badge ${scoreCls}">${score}</span>
+    </div>
+    <div class="pc-chips">
+      ${p.email?`<span class="chip has">✉ Email</span>`:'<span class="chip">✉ Sin email</span>'}
+      ${p.telefono?`<span class="chip has">📞 Tel</span>`:'<span class="chip">📞 Sin tel</span>'}
+      ${p.linkedin?`<span class="chip has">🔗 LinkedIn</span>`:'<span class="chip">🔗 LinkedIn</span>'}
+      ${p.industria?`<span class="chip">${p.industria.slice(0,18)}</span>`:''}
+    </div>
+    ${hist?`<div style="font-size:11px;color:var(--pr-t3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:4px">Historial</div>${hist}`:''}
+    <div class="pc-canal">
+      <span class="canal-dot ${dotCls}"></span>
+      <span>${estadoLabel(estado)}</span>
+      ${p.ciudad?`<span style="margin-left:auto;font-size:10px;color:var(--pr-t3)">${p.ciudad}, ${p.pais||''}</span>`:''}
+    </div>
+    <div class="pc-actions">
+      ${!p.historial ? `<button class="btn-sm-acc" onclick="toggleSel('${p.id||p.email}',this.closest('.pc'))">
+        ${sel?'✓ Seleccionado':'+ Seleccionar'}
+      </button>` : ''}
+      ${p.estado==='respondio'?`<button class="btn-sm-grn" onclick="marcarCita('${p.id}')">📅 Marcar cita</button>`:''}
+      ${p.linkedin?`<a href="${p.linkedin}" target="_blank" class="btn-sm-acc" style="text-decoration:none">🔗 LinkedIn</a>`:''}
+    </div>
+  </div>`;
+}
+
+function estadoLabel(e) {
+  const m = { nuevo:'Nuevo', en_secuencia:'En secuencia', respondio:'Respondió', cita_agendada:'Cita agendada', descartado:'Descartado', secuencia_completa:'Secuencia completa' };
+  return m[e] || e;
+}
+
+// ── Selección ─────────────────────────────────────────────────────────────
+function toggleSel(id, card) {
+  if (seleccionados.has(id)) {
+    seleccionados.delete(id);
+    card.style.borderColor = '';
+    card.style.background  = '';
+    card.querySelector('.btn-sm-acc').textContent = '+ Seleccionar';
+  } else {
+    seleccionados.add(id);
+    card.style.borderColor = 'var(--pr-acc)';
+    card.style.background  = 'rgba(59,130,246,.06)';
+    card.querySelector('.btn-sm-acc').textContent = '✓ Seleccionado';
+  }
+  actualizarBulkBar();
+}
+
+function actualizarBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  const n = seleccionados.size;
+  bar.classList.toggle('visible', n > 0);
+  document.getElementById('bulk-txt').textContent = `${n} prospecto${n!==1?'s':''} seleccionado${n!==1?'s':''}`;
+}
+
+function deseleccionarTodo() {
+  seleccionados.clear();
+  document.querySelectorAll('.pc').forEach(c => { c.style.borderColor=''; c.style.background=''; });
+  document.querySelectorAll('.pc .btn-sm-acc').forEach(b => b.textContent = '+ Seleccionar');
+  actualizarBulkBar();
+}
+
+// ── Iniciar secuencia ─────────────────────────────────────────────────────
+async function iniciarSecuencia() {
+  const ids = [...seleccionados];
+  const lista = resultadosBusqueda.filter(p => ids.includes(p.id||p.email));
+  if (!lista.length) return;
+
+  try {
+    const r = await fetch('/api/prospector/iniciar', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prospectos: lista }),
+    }).then(r => r.json());
+
+    alert(`✅ ${r.nuevos} prospectos añadidos a la secuencia de SARA.\n\nSARA los contactará automáticamente por LinkedIn → Email → WhatsApp → Llamada.`);
+    deseleccionarTodo();
+    cargarStats();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── Marcar cita ───────────────────────────────────────────────────────────
+async function marcarCita(id) {
+  await fetch(`/api/prospector/${id}/cita`, { method:'POST', credentials:'include' });
+  cargarStats();
+  renderTab('respondio');
+}
+
+// ── Run manual ────────────────────────────────────────────────────────────
+async function runManual() {
+  try {
+    const r = await fetch('/api/prospector/run', { method:'POST', credentials:'include' }).then(r=>r.json());
+    alert(`Outreach ejecutado: ${r.procesados} acciones enviadas.`);
+    cargarStats();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  tabActual = tab;
+  document.querySelectorAll('.ptab').forEach(t => t.classList.toggle('on', t.dataset.tab===tab));
+  if (tab==='busqueda') { renderResultados(); return; }
+  const estadoMap = { secuencia:'en_secuencia', respondieron:'respondio', citas:'cita_agendada' };
+  renderTab(estadoMap[tab] || '');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+cargarStats();
+cargarCreditos();
+setInterval(cargarStats, 30000);
+</script>
+<script src="/js/pwa.js"></script>
+</body>
+</html>
