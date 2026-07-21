@@ -8,6 +8,7 @@ const APOLLO_KEY = process.env.APOLLO_API_KEY;
 const LUSHA_KEY  = process.env.LUSHA_API_KEY;
 const APOLLO_BASE = 'https://api.apollo.io/v1';
 const LUSHA_BASE  = 'https://api.lusha.com/v2';
+const LUSHA_ROOT  = 'https://api.lusha.com';
 
 // Headers estándar Apollo (key en header, no en body)
 const apolloHeaders = () => ({
@@ -68,6 +69,60 @@ async function apolloEnriquecer(nombre, empresa, dominio) {
   } catch { return null; }
 }
 
+// ── Lusha: buscar personas (fallback cuando Apollo no está disponible) ───────
+async function lushaBuscarPersonas(filtros = {}) {
+  if (!LUSHA_KEY) throw new Error('LUSHA_API_KEY no configurada');
+
+  const size = Math.max(filtros.limite || 25, 10); // Lusha exige size >= 10
+  const body = {
+    pages: { page: 0, size },
+    filters: {
+      contacts: {
+        include: {
+          jobTitles: filtros.cargos || ['Director de Logística', 'Gerente de Operaciones', 'Director de Supply Chain', 'VP Logistics', 'Gerente de Compras', 'Director Comercial'],
+          locations: (filtros.ubicaciones || ['Mexico']).map(country => ({ country })),
+        },
+      },
+    },
+  };
+
+  const r = await fetch(`${LUSHA_ROOT}/prospecting/contact/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'api_key': LUSHA_KEY },
+    body: JSON.stringify(body),
+  });
+
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error(`Lusha error ${r.status}: ${err.slice(0, 200)}`);
+  }
+
+  const data = await r.json();
+  return {
+    requestId: data.requestId,
+    personas: (data.data || []).map(normalizarPersonaLusha),
+  };
+}
+
+// ── Lusha: revelar email/teléfono de contactos ya encontrados (gasta créditos) ─
+async function lushaEnriquecerContactos(requestId, contactIds) {
+  if (!LUSHA_KEY || !contactIds.length) return {};
+  try {
+    const r = await fetch(`${LUSHA_ROOT}/prospecting/contact/enrich`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'api_key': LUSHA_KEY },
+      body: JSON.stringify({ requestId, contactIds }),
+    });
+    if (!r.ok) return {};
+    const data = await r.json();
+    const porId = {};
+    (data.contacts || []).forEach(c => {
+      if (c.isSuccess && c.data) porId[c.id] = c.data;
+    });
+    return porId;
+  } catch { return {}; }
+}
+
 // ── Lusha: enriquecer con teléfono ───────────────────────────────────────────
 async function lushaEnriquecer(nombre, empresa) {
   if (!LUSHA_KEY) return null;
@@ -107,6 +162,29 @@ function normalizarPersona(p) {
   };
 }
 
+// ── Normalizar persona de Lusha (formato de búsqueda, sin email/teléfono aún) ─
+function normalizarPersonaLusha(p) {
+  return {
+    id:          p.contactId,
+    contactId:   p.contactId,
+    nombre:      p.name || '',
+    cargo:       p.jobTitle || '',
+    empresa:     p.companyName || '',
+    dominio:     (p.fqdn || '').replace(/https?:\/\//, ''),
+    email:       null,
+    linkedin:    null,
+    ciudad:      '',
+    pais:        'Mexico',
+    industria:   '',
+    empleados:   null,
+    telefono:    null,
+    score:       puntuarProspecto({ title: p.jobTitle }),
+    fuente:      'lusha',
+    estado:      'nuevo',
+    creado:      new Date().toISOString(),
+  };
+}
+
 // ── Scoring de prioridad ──────────────────────────────────────────────────────
 function puntuarProspecto(p) {
   let score = 0;
@@ -135,14 +213,25 @@ function puntuarProspecto(p) {
 
 // ── Buscar + enriquecer pipeline completo ────────────────────────────────────
 async function buscar(filtros = {}) {
-  const personas = await apolloBuscarPersonas(filtros);
+  let personas, requestId = null, fuentePrimaria = 'apollo';
 
-  // Enriquecer con Lusha en paralelo (máx 5 para no agotar créditos)
+  try {
+    personas = await apolloBuscarPersonas(filtros);
+  } catch (e) {
+    console.warn(`[prospector] Apollo no disponible (${e.message}), usando Lusha como fuente primaria`);
+    const lusha = await lushaBuscarPersonas(filtros);
+    personas = lusha.personas;
+    requestId = lusha.requestId;
+    fuentePrimaria = 'lusha';
+  }
+
+  // Enriquecer top 5 con datos de contacto (email/teléfono) para no agotar créditos
   const top = personas.sort((a, b) => b.score - a.score).slice(0, filtros.limite || 25);
+  const paraEnriquecer = top.slice(0, 5);
 
-  if (LUSHA_KEY) {
+  if (fuentePrimaria === 'apollo' && LUSHA_KEY) {
     const enriq = await Promise.allSettled(
-      top.slice(0, 5).map(p => lushaEnriquecer(p.nombre, p.empresa))
+      paraEnriquecer.map(p => lushaEnriquecer(p.nombre, p.empresa))
     );
     enriq.forEach((r, i) => {
       if (r.status === 'fulfilled' && r.value) {
@@ -150,6 +239,19 @@ async function buscar(filtros = {}) {
         if (!top[i].email && r.value.emails?.[0]) top[i].email = r.value.emails[0];
         top[i].fuente = 'apollo+lusha';
       }
+    });
+  } else if (fuentePrimaria === 'lusha' && requestId) {
+    const porId = await lushaEnriquecerContactos(requestId, paraEnriquecer.map(p => p.contactId));
+    paraEnriquecer.forEach(p => {
+      const d = porId[p.contactId];
+      if (!d) return;
+      p.email = d.emailAddresses?.[0]?.email || null;
+      p.telefono = d.phoneNumbers?.[0]?.number || null;
+      p.linkedin = d.socialLinks?.linkedin || null;
+      p.industria = d.company?.mainIndustry || '';
+      p.ciudad = d.company?.location?.city || '';
+      p.pais = d.location?.country || p.pais;
+      p.fuente = 'lusha';
     });
   }
 
@@ -167,4 +269,4 @@ async function creditosApollo() {
   } catch { return null; }
 }
 
-module.exports = { buscar, apolloEnriquecer, lushaEnriquecer, creditosApollo, puntuarProspecto };
+module.exports = { buscar, apolloEnriquecer, lushaEnriquecer, lushaBuscarPersonas, creditosApollo, puntuarProspecto };
