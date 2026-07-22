@@ -682,6 +682,61 @@ app.get('/api/noa/folio/:folio', async (req, res) => {
 
 app.get('/api/sessions', (req, res) => res.json(memory.listSessions()));
 
+// ─── HISTORIAL DE CONVERSACIONES (todas las sesiones, sin límite de tiempo) ──
+function detectarAgente(id) {
+  if (/^widget_|^web_sara_/.test(id))  return 'sara';
+  if (/^sof_|^web_sofia_/.test(id))    return 'sofia';
+  if (/^noa_|^web_noa_/.test(id))      return 'noa';
+  if (/^hec_|^web_hector_/.test(id))   return 'hector';
+  return 'desconocido';
+}
+
+app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
+  try {
+    const sesiones = await Promise.resolve(memory.listSessions());
+    const todosLeads = await leads.list({ limit: 5000 });
+    const porSesion = {};
+    todosLeads.forEach(l => { porSesion[l.session_id] = l; });
+
+    const q = (req.query.q || '').trim().toLowerCase();
+
+    let enriquecidas = sesiones.map(s => {
+      const lead = porSesion[s.id] || {};
+      return {
+        sessionId: s.id,
+        agente:    detectarAgente(s.id),
+        msgs:      s.msgs,
+        updatedAt: s.updatedAt,
+        nombre:    lead.nombre    || s.meta?.nombre    || null,
+        empresa:   lead.empresa   || s.meta?.empresa   || null,
+        telefono:  lead.telefono  || null,
+        resumen:   lead.resumen   || null,
+      };
+    });
+
+    if (q) {
+      enriquecidas = enriquecidas.filter(s =>
+        s.sessionId.toLowerCase().includes(q) ||
+        (s.nombre   && s.nombre.toLowerCase().includes(q)) ||
+        (s.empresa  && s.empresa.toLowerCase().includes(q)) ||
+        (s.telefono && String(s.telefono).toLowerCase().includes(q)) ||
+        (s.resumen  && s.resumen.toLowerCase().includes(q))
+      );
+    }
+
+    res.json(enriquecidas.sort((a, b) => b.updatedAt - a.updatedAt));
+  } catch (e) {
+    console.error('[historial/sesiones]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/historial/sesiones/:id', adminUOps, (req, res) => {
+  const historial = memory.getFullHistory(req.params.id);
+  if (!historial.length) return res.status(404).json({ error: 'Sesión no encontrada o sin mensajes' });
+  res.json({ sessionId: req.params.id, agente: detectarAgente(req.params.id), historial });
+});
+
 // ─── TARIFA DINÁMICA ──────────────────────────────────────────────────────
 app.get('/api/tarifa/contexto', (req, res) => {
   res.json(tariff.getContext());

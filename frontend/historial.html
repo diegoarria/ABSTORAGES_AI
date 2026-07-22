@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Historial de Conversaciones — ABSTORAGES</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0f1e">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<style>
+:root {
+  --h-bg:   #04080f;
+  --h-s1:   #080f1c;
+  --h-s2:   #0d1628;
+  --h-s3:   #111d33;
+  --h-acc:  #3b82f6;
+  --h-grn:  #22c55e;
+  --h-amb:  #f59e0b;
+  --h-red:  #ef4444;
+  --h-t1:   #f0f4ff;
+  --h-t2:   #8ba3c7;
+  --h-t3:   #4a6080;
+  --h-b1:   rgba(255,255,255,.07);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--h-bg); color: var(--h-t1); font-family: -apple-system, 'Inter', sans-serif; min-height: 100vh; }
+
+.hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--h-s1); border-bottom:1px solid var(--h-b1); position:sticky; top:0; z-index:50; }
+.hdr-logo { font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--h-t1); display:flex; align-items:center; gap:8px; }
+.hdr-logo span { color:var(--h-acc); }
+.hdr-nav { display:flex; gap:4px; margin-left:auto; }
+.hn { background:none; border:none; color:var(--h-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
+.hn:hover, .hn.on { background:rgba(59,130,246,.12); color:var(--h-acc); }
+
+.wrap { display:flex; height:calc(100vh - 57px); }
+.sidebar { width:340px; border-right:1px solid var(--h-b1); display:flex; flex-direction:column; flex-shrink:0; }
+.main { flex:1; overflow-y:auto; padding:24px; }
+
+.search-panel { padding:16px; border-bottom:1px solid var(--h-b1); display:flex; flex-direction:column; gap:10px; }
+.search-panel input {
+  background: var(--h-s2); border:1px solid var(--h-b1); border-radius:8px;
+  color:var(--h-t1); font-size:13px; padding:9px 12px; outline:none; width:100%;
+}
+.search-panel input:focus { border-color:var(--h-acc); }
+.count { font-size:11px; color:var(--h-t3); }
+
+.sess-list { flex:1; overflow-y:auto; padding:6px; }
+.sess-item {
+  padding:11px 12px; border-radius:10px; cursor:pointer; margin-bottom:4px;
+  border:1px solid transparent; transition:background .12s;
+}
+.sess-item:hover { background:var(--h-s2); }
+.sess-item.on { background:rgba(59,130,246,.1); border-color:rgba(59,130,246,.35); }
+.sess-top { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:3px; }
+.sess-name { font-size:13px; font-weight:700; color:var(--h-t1); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sess-badge { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.b-sara   { background:rgba(59,130,246,.15); color:#3b82f6; }
+.b-sofia  { background:rgba(34,197,94,.15);  color:#22c55e; }
+.b-noa    { background:rgba(245,158,11,.15); color:#f59e0b; }
+.b-hector { background:rgba(168,85,247,.15); color:#a855f7; }
+.b-desconocido { background:rgba(255,255,255,.08); color:var(--h-t3); }
+.sess-meta { font-size:11px; color:var(--h-t3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sess-date { font-size:10px; color:var(--h-t3); margin-top:3px; }
+
+.empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; color:var(--h-t3); gap:8px; }
+.empty-icon { font-size:40px; opacity:.5; margin-bottom:6px; }
+
+.chat-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--h-b1); }
+.chat-title { font-size:17px; font-weight:800; }
+.chat-sub { font-size:12px; color:var(--h-t3); margin-top:2px; }
+
+.msg { max-width:70%; margin-bottom:14px; display:flex; flex-direction:column; }
+.msg.user { align-items:flex-end; margin-left:auto; }
+.msg.assistant { align-items:flex-start; }
+.msg-bubble { padding:10px 14px; border-radius:12px; font-size:13.5px; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+.msg.user .msg-bubble { background:var(--h-acc); color:#fff; border-bottom-right-radius:3px; }
+.msg.assistant .msg-bubble { background:var(--h-s2); border:1px solid var(--h-b1); border-bottom-left-radius:3px; }
+.msg-time { font-size:10px; color:var(--h-t3); margin-top:4px; padding:0 4px; }
+
+.loading { text-align:center; padding:40px; color:var(--h-t3); font-size:13px; }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">🗂️ <span>Historial</span> de Conversaciones</div>
+  <nav class="hdr-nav">
+    <button class="hn" onclick="location.href='/'">Portal</button>
+    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
+    <button class="hn" onclick="location.href='/prospector.html'">Prospector</button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="search-panel">
+      <input id="buscador" type="text" placeholder="Buscar por nombre, empresa, teléfono…" oninput="buscar(this.value)">
+      <div class="count" id="contador"></div>
+    </div>
+    <div class="sess-list" id="sess-list">
+      <div class="loading">Cargando conversaciones…</div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="empty">
+      <div class="empty-icon">💬</div>
+      <h3>Selecciona una conversación</h3>
+      <p>Elige un chat de la lista para ver el historial completo.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+let TODAS = [];
+let sesionActual = null;
+let _debounce = null;
+
+const AGENTE_LABEL = { sara:'SARA', sofia:'SOFÍA', noa:'NOA', hector:'HÉCTOR', desconocido:'?' };
+
+async function cargarSesiones() {
+  try {
+    const r = await fetch('/api/historial/sesiones', { credentials:'include' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    TODAS = await r.json();
+    render(TODAS);
+  } catch (e) {
+    document.getElementById('sess-list').innerHTML =
+      '<div class="loading">No se pudo cargar el historial (' + e.message + ')</div>';
+  }
+}
+
+function buscar(q) {
+  clearTimeout(_debounce);
+  _debounce = setTimeout(async () => {
+    if (!q.trim()) { render(TODAS); return; }
+    try {
+      const r = await fetch('/api/historial/sesiones?q=' + encodeURIComponent(q.trim()), { credentials:'include' });
+      render(await r.json());
+    } catch {}
+  }, 250);
+}
+
+function fmtFecha(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleString('es-MX', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function render(lista) {
+  const list = document.getElementById('sess-list');
+  const contador = document.getElementById('contador');
+  contador.textContent = lista.length + ' conversaci' + (lista.length === 1 ? 'ón' : 'ones');
+
+  if (!lista.length) {
+    list.innerHTML = '<div class="loading">Sin resultados</div>';
+    return;
+  }
+
+  list.innerHTML = lista.map(s => {
+    const nombre = s.nombre || s.empresa || s.sessionId;
+    const meta = [s.empresa && s.empresa !== s.nombre ? s.empresa : '', s.telefono, s.resumen].filter(Boolean).join(' · ');
+    const activa = s.sessionId === sesionActual ? 'on' : '';
+    return `<div class="sess-item ${activa}" onclick="abrir('${s.sessionId.replace(/'/g,"\\'")}')">
+      <div class="sess-top">
+        <div class="sess-name">${esc(nombre)}</div>
+        <span class="sess-badge b-${s.agente}">${AGENTE_LABEL[s.agente] || s.agente}</span>
+      </div>
+      <div class="sess-meta">${esc(meta || (s.msgs + ' mensajes'))}</div>
+      <div class="sess-date">${fmtFecha(s.updatedAt)} · ${s.msgs} msj</div>
+    </div>`;
+  }).join('');
+}
+
+async function abrir(sessionId) {
+  sesionActual = sessionId;
+  render(document.getElementById('buscador').value.trim() ? TODAS.filter(matchLocal) : TODAS);
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">Cargando conversación…</div>';
+
+  try {
+    const r = await fetch('/api/historial/sesiones/' + encodeURIComponent(sessionId), { credentials:'include' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const info = TODAS.find(s => s.sessionId === sessionId) || {};
+
+    main.innerHTML = `
+      <div class="chat-header">
+        <div>
+          <div class="chat-title">${esc(info.nombre || info.empresa || sessionId)}</div>
+          <div class="chat-sub">${AGENTE_LABEL[data.agente] || data.agente} · ${data.historial.length} mensajes · ${esc(sessionId)}</div>
+        </div>
+      </div>
+      <div id="msgs"></div>
+    `;
+    const msgs = document.getElementById('msgs');
+    msgs.innerHTML = data.historial.map(m => `
+      <div class="msg ${m.role === 'user' ? 'user' : 'assistant'}">
+        <div class="msg-bubble">${esc(m.content)}</div>
+        <div class="msg-time">${fmtFecha(m.ts)}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    main.innerHTML = '<div class="loading">No se pudo cargar la conversación (' + e.message + ')</div>';
+  }
+}
+
+function matchLocal(s) { return true; } // placeholder, el filtrado real ya llegó del server
+
+cargarSesiones();
+</script>
+</body>
+</html>
