@@ -67,6 +67,7 @@ async function sendPush(payload) {
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+app.set('trust proxy', true); // Railway corre detrás de un proxy; necesario para obtener la IP real del visitante
 
 // ─── ACTIVIDAD EN TIEMPO REAL (SSE) ───────────────────────────────────────
 const actividadClients = new Set();
@@ -822,6 +823,7 @@ async function handleChat(agente, req, res) {
   if (!message) return res.status(400).json({ error: 'message requerido' });
 
   const sid = sessionId || `web_${agente}_${Date.now()}`;
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || null;
   const { contextBlock, history } = memory.buildContext(sid);
   const tariffCtx = tariff.getContext();
   let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
@@ -850,7 +852,7 @@ async function handleChat(agente, req, res) {
 
   memory.addMessage(sid, 'user', message);
   saveMessage(sid, agente, 'user', message);
-  pushActividad({ agente, tipo: `MENSAJE_USUARIO`, mensaje: message.slice(0, 120), sessionId: sid });
+  pushActividad({ agente, tipo: `MENSAJE_USUARIO`, mensaje: message.slice(0, 120), sessionId: sid, ip });
 
   // Garantizar que toda conversación con SARA quede registrada desde el primer mensaje
   if (agente === 'sara') {

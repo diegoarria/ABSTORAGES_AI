@@ -124,6 +124,7 @@ const App = (() => {
     item.innerHTML = `
       <span class="activity-agent ${agenteClass}">${agente}</span>
       <span class="activity-msg">${escapeHtml(evento.mensaje || '')}</span>
+      ${evento.ip ? `<span class="activity-ip" style="font-size:10px;color:var(--t3);margin-left:6px" title="IP del visitante">${escapeHtml(evento.ip)}</span>` : ''}
       <span class="activity-time">${time}</span>
     `;
 
