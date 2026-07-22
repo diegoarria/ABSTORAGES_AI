@@ -25,6 +25,7 @@ const gpsLive     = require('./backend/services/gps-live');
 const leads          = require('./backend/services/leads');
 const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
+const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const tms         = require('./backend/services/tms');
 const ordersStore = require('./backend/services/ordersStore');
@@ -879,6 +880,32 @@ async function handleChat(agente, req, res) {
 
   const sid = sessionId || `web_${agente}_${Date.now()}`;
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || null;
+
+  // Moderación — corte determinístico ante insultos/amenazas, sin llamar a Claude
+  if (moderacion.detectarAbuso(message)) {
+    memory.addMessage(sid, 'user', message);
+    memory.addMessage(sid, 'assistant', moderacion.MENSAJE_ABUSO);
+    saveMessage(sid, agente, 'user', message);
+    saveMessage(sid, agente, 'assistant', moderacion.MENSAJE_ABUSO);
+    pushActividad({ agente, tipo: 'ALERTA_ABUSO', mensaje: message.slice(0, 200), sessionId: sid, ip });
+    sendPush({
+      title: '⚠️ Mensaje abusivo detectado',
+      body: `${agente.toUpperCase()} · IP ${ip || 'desconocida'} · "${message.slice(0, 80)}"`,
+      tag: 'alerta-abuso',
+      url: '/',
+      tipo: 'ALERTA_ABUSO',
+      urgente: true,
+    }).catch(() => {});
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+    res.write(`data: ${JSON.stringify({ type: 'chunk', text: moderacion.MENSAJE_ABUSO })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    return res.end();
+  }
+
   const { contextBlock, history } = memory.buildContext(sid);
   const tariffCtx = tariff.getContext();
   let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
