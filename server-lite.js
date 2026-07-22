@@ -28,7 +28,7 @@ const notifier       = require('./backend/services/notifier');
 const vapi        = require('./backend/services/vapi');
 const tms         = require('./backend/services/tms');
 const ordersStore = require('./backend/services/ordersStore');
-const PROVEEDORES = require('./data/proveedores.json');
+const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
 
@@ -528,7 +528,7 @@ app.get('/api/vapi/estado/:folio', (req, res) => {
 
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
-  const local = () => require('./data/proveedores.json').map(p => ({
+  const local = () => require('./backend/data/proveedores.json').map(p => ({
     'Razon Social': p.nombre,
     'Telefono': p.telefono,
     'Estatus': p.clasificacion,

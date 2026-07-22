@@ -10,7 +10,7 @@ const { lanzarNegociacion } = require('../services/negociacion-wa');
 const SARA_SYSTEM_PROMPT = require('../agents/sara-prompt');
 
 const PROVEEDORES = (() => {
-  try { return require('../../data/proveedores.json'); } catch { return []; }
+  try { return require('../data/proveedores.json'); } catch { return []; }
 })();
 
 // POST /api/sara/chat — streaming SSE

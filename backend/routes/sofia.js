@@ -11,7 +11,7 @@ const { lanzarNegociacion } = require('../services/negociacion-wa');
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 
 const PROVEEDORES = (() => {
-  try { return require('../../data/proveedores.json'); } catch { return []; }
+  try { return require('../data/proveedores.json'); } catch { return []; }
 })();
 
 // POST /api/sofia/chat — streaming SSE
