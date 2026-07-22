@@ -896,6 +896,7 @@
         if (lead.email    && lead.email    !== '—') metaParts.push('✉ ' + lead.email);
         if (lead.origen   && lead.destino  && lead.origen !== '—') metaParts.push(lead.origen + ' → ' + lead.destino);
         if (lead.precio_cotizado && lead.precio_cotizado !== '—') metaParts.push(lead.precio_cotizado);
+        if (lead.ip) metaParts.push('🌐 ' + lead.ip);
         document.getElementById('lcm-meta').textContent = metaParts.join('  ·  ');
 
         const msgs = document.getElementById('lcm-messages');

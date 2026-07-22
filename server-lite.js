@@ -969,7 +969,7 @@ async function handleChat(agente, req, res) {
 
       // Upsert del lead con datos de SARA (más confiables que regex sobre texto libre)
       const filled = f => f && f !== '—' && f !== '' && f !== null;
-      const lead = leads.add({ ...datosSara, sara_nota, primer_mensaje, sessionId: sid });
+      const lead = leads.add({ ...datosSara, sara_nota, primer_mensaje, sessionId: sid, ip });
 
       if (hasCierre) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);

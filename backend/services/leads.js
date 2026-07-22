@@ -86,6 +86,7 @@ function add(lead) {
     if (lead.sara_nota)     existing.sara_nota    = lead.sara_nota;
     if (lead.primer_mensaje) existing.primer_mensaje = lead.primer_mensaje;
     if (lead.resumen)       existing.resumen      = lead.resumen;
+    if (lead.ip)            existing.ip           = lead.ip;
     scheduleSave();
     saveToDb(existing);
     return existing;
