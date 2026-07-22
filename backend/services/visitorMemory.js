@@ -49,7 +49,7 @@ function update(vid, data) {
         date:      new Date().toISOString(),
         resumen:   data.resumen || '',
       });
-      if (v.sessions.length > 30) v.sessions = v.sessions.slice(-30);
+      if (v.sessions.length > 500) v.sessions = v.sessions.slice(-500);
     }
   }
   save(v);

@@ -3,7 +3,7 @@ const fs   = require('fs');
 const path = require('path');
 
 const DATA_DIR   = path.join(__dirname, '../../data/sessions');
-const MAX_MSGS   = 30;   // máximo de turnos guardados por sesión
+const MAX_CONTEXT_MSGS = 30;   // máximo de turnos enviados a Claude como contexto (no se borran del disco)
 const MAX_CHARS  = 4000; // máximo de caracteres en el resumen
 
 function ensureDir() {
@@ -36,17 +36,22 @@ function saveSession(id, session) {
 function addMessage(id, role, content) {
   const session = getSession(id);
   session.history.push({ role, content, ts: Date.now() });
-  if (session.history.length > MAX_MSGS) {
-    session.history = session.history.slice(-MAX_MSGS);
-  }
+  // El historial completo se conserva siempre en disco; solo se recorta
+  // lo que se envía como contexto a Claude (ver getHistory/buildContext).
   saveSession(id, session);
   return session;
 }
 
-// Devuelve el historial como array de {role, content} listo para la API de Claude
+// Devuelve el historial completo de la sesión (sin recortar) — para revisión/auditoría
+function getFullHistory(id) {
+  const session = getSession(id);
+  return session.history.map(m => ({ role: m.role, content: m.content, ts: m.ts }));
+}
+
+// Devuelve el historial reciente como array de {role, content} listo para la API de Claude
 function getHistory(id) {
   const session = getSession(id);
-  return session.history.map(m => ({ role: m.role, content: m.content }));
+  return session.history.slice(-MAX_CONTEXT_MSGS).map(m => ({ role: m.role, content: m.content }));
 }
 
 // Devuelve el contexto completo: resumen anterior + historial reciente
@@ -60,7 +65,7 @@ function buildContext(id) {
 
   return {
     contextBlock : parts.join('\n'),
-    history      : session.history.map(m => ({ role: m.role, content: m.content })),
+    history      : session.history.slice(-MAX_CONTEXT_MSGS).map(m => ({ role: m.role, content: m.content })),
     meta         : session.meta,
   };
 }
@@ -100,4 +105,4 @@ function listSessions() {
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-module.exports = { getSession, addMessage, getHistory, buildContext, updateMeta, saveSummary, listSessions };
+module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, listSessions };
