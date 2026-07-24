@@ -53,10 +53,12 @@ async function llamarProveedor(proveedor, orden) {
     },
   };
 
-  // Usar assistantId pre-configurado si existe, si no construir inline
+  // Usar assistantId pre-configurado (voz, nombre, transcriber) pero SIEMPRE
+  // sobreescribir el modelo/prompt con el contexto real del folio — si no,
+  // SOFIA pierde la inteligencia específica de cada llamada (ruta, unidad,
+  // margen, folio) y cae al prompt genérico guardado en el dashboard de Vapi.
   if (ASSISTANT_ID) {
     payload.assistantId = ASSISTANT_ID;
-    delete payload.assistantOverrides.model;
   }
 
   if (!API_KEY || !PHONE_NUMBER_ID) {
