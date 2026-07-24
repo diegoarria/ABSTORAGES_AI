@@ -527,6 +527,31 @@ app.get('/api/vapi/estado/:folio', (req, res) => {
   res.json(estado);
 });
 
+// Llamada de prueba manual — usa la misma lógica que SOFIA para negociar con
+// proveedores, pero apuntando a un número/nombre arbitrario (para validar la
+// config de Vapi sin marcarle a un transportista real).
+app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
+  const { telefono, nombre } = req.body || {};
+  if (!telefono) return res.status(400).json({ error: 'telefono requerido (formato +52...)' });
+
+  const proveedorPrueba = { id: 'TEST', nombre: nombre || 'Prueba', telefono };
+  const ordenPrueba = {
+    folio: 'TEST-' + Date.now().toString(36).toUpperCase(),
+    ruta: 'Monterrey → Ciudad de México',
+    tipo_unidad: 'caja seca 53',
+    fecha_carga: new Date().toLocaleDateString('es-MX'),
+    tipo_carga: 'prueba de configuración',
+    peso_toneladas: '1',
+  };
+
+  try {
+    const resultado = await vapi.llamarProveedor(proveedorPrueba, ordenPrueba);
+    res.json({ ok: true, resultado });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
