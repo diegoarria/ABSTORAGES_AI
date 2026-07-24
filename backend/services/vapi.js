@@ -277,4 +277,5 @@ module.exports = {
   llamarTransportistaSinRespuesta,
   llamarCheckDeRuta,
   llamarLead,
+  llamarProveedor,
 };
