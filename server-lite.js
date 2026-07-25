@@ -531,21 +531,30 @@ app.get('/api/vapi/estado/:folio', (req, res) => {
 // proveedores, pero apuntando a un número/nombre arbitrario (para validar la
 // config de Vapi sin marcarle a un transportista real).
 app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
-  const { telefono, nombre } = req.body || {};
+  const { telefono, nombre, agente } = req.body || {};
   if (!telefono) return res.status(400).json({ error: 'telefono requerido (formato +52...)' });
 
-  const proveedorPrueba = { id: 'TEST', nombre: nombre || 'Prueba', telefono };
-  const ordenPrueba = {
-    folio: 'TEST-' + Date.now().toString(36).toUpperCase(),
-    ruta: 'Monterrey → Ciudad de México',
-    tipo_unidad: 'caja seca 53',
-    fecha_carga: new Date().toLocaleDateString('es-MX'),
-    tipo_carga: 'prueba de configuración',
-    peso_toneladas: '1',
-  };
-
   try {
-    const resultado = await vapi.llamarProveedor(proveedorPrueba, ordenPrueba);
+    let resultado;
+    if (agente === 'sara') {
+      resultado = await vapi.llamarLead({
+        id: 'TEST', nombre: nombre || 'Prueba', telefono,
+        empresa: 'Empresa de prueba',
+        origen: 'Monterrey', destino: 'Ciudad de México',
+        tipo_unidad: 'caja seca 53', precio_cotizado: '$18,500 MXN',
+      });
+    } else {
+      const proveedorPrueba = { id: 'TEST', nombre: nombre || 'Prueba', telefono };
+      const ordenPrueba = {
+        folio: 'TEST-' + Date.now().toString(36).toUpperCase(),
+        ruta: 'Monterrey → Ciudad de México',
+        tipo_unidad: 'caja seca 53',
+        fecha_carga: new Date().toLocaleDateString('es-MX'),
+        tipo_carga: 'prueba de configuración',
+        peso_toneladas: '1',
+      };
+      resultado = await vapi.llamarProveedor(proveedorPrueba, ordenPrueba);
+    }
     res.json({ ok: true, resultado });
   } catch (e) {
     res.status(500).json({ error: e.message });

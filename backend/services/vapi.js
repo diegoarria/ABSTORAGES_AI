@@ -3,12 +3,22 @@
 // El primero que confirme disponibilidad y mejor precio gana la asignación.
 require('dotenv').config();
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
+const SARA_SYSTEM_PROMPT  = require('../agents/sara-prompt');
 
-const API_KEY           = process.env.VAPI_API_KEY;
-const PHONE_NUMBER_ID   = process.env.VAPI_PHONE_NUMBER_ID;
-const ASSISTANT_ID      = process.env.VAPI_ASSISTANT_ID;
-const WEBHOOK_URL       = process.env.VAPI_WEBHOOK_URL; // URL pública del servidor
-const BASE_URL          = 'https://api.vapi.ai';
+const API_KEY               = process.env.VAPI_API_KEY;
+const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;
+const ASSISTANT_ID          = process.env.VAPI_ASSISTANT_ID;       // SOFIA
+const ASSISTANT_ID_SARA     = process.env.VAPI_ASSISTANT_ID_SARA;  // SARA (opcional)
+const WEBHOOK_URL           = process.env.VAPI_WEBHOOK_URL; // URL pública del servidor
+const BASE_URL              = 'https://api.vapi.ai';
+
+// Bloque de modo-voz — mismo criterio para cualquier agente en llamada telefónica
+const MODO_VOZ =
+  `\n\n---\n\n## 🎙️ MODO LLAMADA DE VOZ\n` +
+  `Estás en una llamada telefónica real, no en el chat escrito. Responde en oraciones cortas y naturales, ` +
+  `sin listas, sin markdown, sin asteriscos — como se habla por teléfono. ` +
+  `NO digas en voz alta tokens de control de texto como NUEVA_ORDEN, LEAD_DATA, CERRAR_CHAT o ESCALAR_HUMANO — ` +
+  `esos son solo para el chat escrito y no aplican aquí. Máximo 2 minutos de llamada.`;
 
 // Store en memoria: resultados de llamadas por folio
 const resultadosPorFolio = new Map();
@@ -27,12 +37,8 @@ async function llamarProveedor(proveedor, orden) {
   // el contexto específico de este folio (ruta, unidad, fecha, margen).
   const systemPrompt =
     SOFIA_SYSTEM_PROMPT +
-    `\n\n---\n\n## 🎙️ MODO LLAMADA DE VOZ\n` +
-    `Estás en una llamada telefónica real, no en el chat escrito. Responde en oraciones cortas y naturales, ` +
-    `sin listas, sin markdown, sin asteriscos — como se habla por teléfono. ` +
-    `NO digas en voz alta tokens de control de texto como NUEVA_ORDEN, LEAD_DATA, CERRAR_CHAT o ESCALAR_HUMANO — ` +
-    `esos son solo para el chat escrito y no aplican aquí. Máximo 2 minutos de llamada.\n\n` +
-    `## CONTEXTO DE ESTA LLAMADA\n` +
+    MODO_VOZ +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
     `Estás llamando a ${proveedor.nombre} para el folio ${orden.folio}. ` +
     `Ruta: ${orden.ruta} | Unidad: ${orden.tipo_unidad} | Fecha: ${orden.fecha_carga} | ` +
     `Carga: ${orden.tipo_carga || 'mercancía general'}, ${orden.peso_toneladas || ''} toneladas. ` +
@@ -240,35 +246,45 @@ async function llamarLead(lead) {
     `Estuve platicando contigo sobre tu solicitud de flete. ` +
     `¿Tienes un momento para confirmar los detalles?`;
 
+  // Mismo prompt completo que usa SARA en el chat de texto, + modo voz +
+  // el contexto específico de este lead (ruta, unidad, precio cotizado).
+  const systemPrompt =
+    SARA_SYSTEM_PROMPT +
+    MODO_VOZ +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
+    `Estás llamando a ${lead.nombre || 'el cliente'} de ${lead.empresa || ''} para dar seguimiento a su solicitud. ` +
+    `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio cotizado: ${lead.precio_cotizado}. ` +
+    `Objetivo: confirmar datos, resolver dudas y cerrar el acuerdo.`;
+
   if (!API_KEY || !PHONE_NUMBER_ID) {
     console.log(`[Vapi STUB] Llamada de seguimiento a ${lead.nombre} (${numero})`);
     return { status: 'stub' };
   }
 
+  const payload = {
+    phoneNumberId: PHONE_NUMBER_ID,
+    customer: { number: numero, name: lead.nombre || 'Cliente' },
+    assistantOverrides: {
+      firstMessage: primerMensaje,
+      model: {
+        provider: 'anthropic',
+        model: 'claude-haiku-4-5-20251001',
+        messages: [{ role: 'system', content: systemPrompt }],
+      },
+      ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
+    },
+  };
+
+  // Usar el assistant dedicado de SARA (voz/transcriber propios) si está
+  // configurado, pero SIEMPRE con el prompt/contexto de esta llamada arriba.
+  if (ASSISTANT_ID_SARA) {
+    payload.assistantId = ASSISTANT_ID_SARA;
+  }
+
   const res = await fetch(`${BASE_URL}/call/phone`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-    body: JSON.stringify({
-      phoneNumberId: PHONE_NUMBER_ID,
-      customer: { number: numero, name: lead.nombre || 'Cliente' },
-      assistantOverrides: {
-        firstMessage: primerMensaje,
-        model: {
-          provider: 'anthropic',
-          model: 'claude-haiku-4-5-20251001',
-          messages: [{
-            role: 'system',
-            content:
-              `Eres SARA, ejecutiva comercial de ABSTORAGES Logistics Solutions. ` +
-              `Llamas a ${lead.nombre} de ${lead.empresa} para confirmar su solicitud. ` +
-              `Ruta: ${lead.origen} → ${lead.destino}. Unidad: ${lead.tipo_unidad}. ` +
-              `Precio cotizado: ${lead.precio_cotizado}. ` +
-              `Confirma datos, resuelve dudas y cierra el acuerdo. Sé breve y profesional.`,
-          }],
-        },
-        ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
-      },
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
