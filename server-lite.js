@@ -544,6 +544,10 @@ app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
         origen: 'Monterrey', destino: 'Ciudad de México',
         tipo_unidad: 'caja seca 53', precio_cotizado: '$18,500 MXN',
       });
+    } else if (agente === 'sara-prospeccion') {
+      resultado = await vapi.llamarProspecto({
+        nombre: nombre || 'Prueba', telefono, empresa: 'Empresa de prueba', cargo: 'Gerente de Logística',
+      });
     } else if (agente === 'noa-chofer') {
       resultado = await vapi.llamarStatusChofer({
         telefono, nombre: nombre || 'Prueba', folio: 'TEST-NOA', ruta: 'Monterrey → Ciudad de México',

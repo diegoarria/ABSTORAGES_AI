@@ -243,39 +243,16 @@ async function iniciarLlamadaSimple(telefono, contexto) {
   return res.json();
 }
 
-// ── Llamada de seguimiento al lead capturado por SARA ─────────────────────────
-async function llamarLead(lead) {
-  const raw = (lead.telefono || '').replace(/\D/g, '');
-  if (raw.length < 10) {
-    console.log(`[Vapi] Teléfono inválido para llamada de seguimiento: ${lead.telefono}`);
-    return;
-  }
-  const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
-
-  const primerMensaje =
-    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy SARA. ` +
-    `Estuve platicando contigo sobre tu solicitud de flete. ` +
-    `¿Tienes un momento para confirmar los detalles?`;
-
-  // Mismo prompt completo que usa SARA en el chat de texto, + modo voz +
-  // el contexto específico de este lead (ruta, unidad, precio cotizado).
-  const systemPrompt =
-    SARA_SYSTEM_PROMPT +
-    MODO_VOZ +
-    CIERRE_ESLOGAN +
-    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
-    `Estás llamando a ${lead.nombre || 'el cliente'} de ${lead.empresa || ''} para dar seguimiento a su solicitud. ` +
-    `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio cotizado: ${lead.precio_cotizado}. ` +
-    `Objetivo: confirmar datos, resolver dudas y cerrar el acuerdo.`;
-
+// ── Helper compartido: dispara una llamada como SARA (mismo número/assistant) ─
+async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPrompt, logId }) {
   if (!API_KEY || !PHONE_NUMBER_ID_SARA) {
-    console.log(`[Vapi STUB] Llamada de seguimiento a ${lead.nombre} (${numero})`);
+    console.log(`[Vapi STUB] Llamada SARA a ${nombreCliente} (${numero})`);
     return { status: 'stub' };
   }
 
   const payload = {
     phoneNumberId: PHONE_NUMBER_ID_SARA,
-    customer: { number: numero, name: lead.nombre || 'Cliente' },
+    customer: { number: numero, name: nombreCliente || 'Cliente' },
     assistantOverrides: {
       firstMessage: primerMensaje,
       model: {
@@ -301,8 +278,71 @@ async function llamarLead(lead) {
 
   if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  console.log(`[Vapi] Llamada a lead ${lead.id} iniciada — callId ${data.id}`);
+  console.log(`[Vapi] Llamada SARA a ${logId} iniciada — callId ${data.id}`);
   return data;
+}
+
+// ── Llamada de seguimiento al lead capturado por SARA (ya cotizó/en proceso) ──
+async function llamarLead(lead) {
+  const raw = (lead.telefono || '').replace(/\D/g, '');
+  if (raw.length < 10) {
+    console.log(`[Vapi] Teléfono inválido para llamada de seguimiento: ${lead.telefono}`);
+    return;
+  }
+  const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
+
+  const primerMensaje =
+    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy SARA. ` +
+    `Estuve platicando contigo sobre tu solicitud de flete. ` +
+    `¿Tienes un momento para confirmar los detalles?`;
+
+  // Mismo prompt completo que usa SARA en el chat de texto, + modo voz +
+  // el contexto específico de este lead (ruta, unidad, precio cotizado).
+  const systemPrompt =
+    SARA_SYSTEM_PROMPT +
+    MODO_VOZ +
+    CIERRE_ESLOGAN +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
+    `Estás llamando a ${lead.nombre || 'el cliente'} de ${lead.empresa || ''} para dar seguimiento a su solicitud. ` +
+    `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio cotizado: ${lead.precio_cotizado}. ` +
+    `Objetivo: confirmar datos, resolver dudas y cerrar el acuerdo.`;
+
+  return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `lead ${lead.id}` });
+}
+
+// ── Llamada de prospección en frío (día 5 de la secuencia de outreach) ───────
+// A diferencia de llamarLead, este prospecto NUNCA ha hablado con SARA — solo
+// recibió DM de LinkedIn / email / WhatsApp sin responder. No asumas que ya
+// cotizó ni que conoce a ABSTORAGES.
+async function llamarProspecto(prospecto) {
+  const raw = (prospecto.telefono || '').replace(/\D/g, '');
+  if (raw.length < 10) {
+    console.log(`[Vapi] Teléfono inválido para llamada de prospección: ${prospecto.telefono}`);
+    return;
+  }
+  const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
+
+  const primerMensaje =
+    `${ESLOGAN}. Hola, ¿hablo con ${prospecto.nombre}? Soy SARA, de ABSTORAGES Logistics Solutions. ` +
+    `Le escribí hace unos días por LinkedIn y WhatsApp sobre servicios de flete nacional — ` +
+    `¿tiene un minuto?`;
+
+  const systemPrompt =
+    SARA_SYSTEM_PROMPT +
+    MODO_VOZ +
+    CIERRE_ESLOGAN +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
+    `Esta es una llamada de PROSPECCIÓN EN FRÍO — ${prospecto.nombre}${prospecto.cargo ? ` (${prospecto.cargo})` : ''} de ${prospecto.empresa || 'su empresa'} ` +
+    `nunca ha hablado contigo antes, solo recibió mensajes previos por LinkedIn/email/WhatsApp de la secuencia de outreach sin responder. ` +
+    `NO asumas que ya tiene una cotización o solicitud en proceso — preséntate, explica brevemente qué hace ABSTORAGES ` +
+    `(flete terrestre de carga en México, especialidad en alimentos y bebidas no refrigerados), y pregunta si tiene necesidad de servicios de flete. ` +
+    `Si muestra interés, recolecta los datos básicos (qué transporta, rutas, volumen) para que el equipo comercial le dé seguimiento por WhatsApp/correo. ` +
+    `Si no tiene interés o no es el momento, agradece y cierra cordialmente sin insistir.`;
+
+  return _llamarComoSARA({
+    numero, nombreCliente: prospecto.nombre, primerMensaje, systemPrompt,
+    logId: `prospecto ${prospecto.nombre}`,
+  });
 }
 
 // ── Llamada genérica de estatus (NOA) — usada para chofer/proveedor y cliente ─
@@ -386,6 +426,7 @@ module.exports = {
   llamarTransportistaSinRespuesta,
   llamarCheckDeRuta,
   llamarLead,
+  llamarProspecto,
   llamarProveedor,
   llamarStatusChofer,
   llamarStatusCliente,

@@ -77,7 +77,7 @@ async function enviarLinkedIn(p) {
 async function lanzarLlamadaVapi(p) {
   const vapi = require('./vapi');
   if (!p.telefono) throw new Error('Sin teléfono para llamada Vapi');
-  await vapi.llamarLead({
+  await vapi.llamarProspecto({
     nombre:   p.nombre,
     empresa:  p.empresa,
     telefono: p.telefono,
