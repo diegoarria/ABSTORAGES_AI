@@ -22,7 +22,11 @@ const MODO_VOZ =
   `Estás en una llamada telefónica real, no en el chat escrito. Responde en oraciones cortas y naturales, ` +
   `sin listas, sin markdown, sin asteriscos — como se habla por teléfono. ` +
   `NO digas en voz alta tokens de control de texto como NUEVA_ORDEN, LEAD_DATA, CERRAR_CHAT o ESCALAR_HUMANO — ` +
-  `esos son solo para el chat escrito y no aplican aquí. Máximo 2 minutos de llamada.`;
+  `esos son solo para el chat escrito y no aplican aquí. Máximo 2 minutos de llamada.\n\n` +
+  `**Interrupciones poco claras:** si la persona te interrumpe con un sonido corto o poco claro ` +
+  `(ej. "a", "eh", "mm", una palabra suelta sin sentido) y luego no dice nada más, NO intentes adivinar ` +
+  `qué quiso decir ni sigas tu idea anterior como si nada — responde siempre exactamente: ` +
+  `"Perdón, no te escuché, ¿lo puedes repetir?" y espera su respuesta.`;
 
 // Eslogan de marca — solo SOFIA y SARA (llamadas comerciales/operativas), no NOA
 const ESLOGAN = 'ABSTORAGES, la empresa de logística más confiable del país';
