@@ -7,7 +7,9 @@ const SARA_SYSTEM_PROMPT  = require('../agents/sara-prompt');
 const NOA_SYSTEM_PROMPT   = require('../agents/noa-prompt');
 
 const API_KEY               = process.env.VAPI_API_KEY;
-const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;
+const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;             // SOFIA
+const PHONE_NUMBER_ID_SARA  = process.env.VAPI_PHONE_NUMBER_ID_SARA || PHONE_NUMBER_ID;
+const PHONE_NUMBER_ID_NOA   = process.env.VAPI_PHONE_NUMBER_ID_NOA  || PHONE_NUMBER_ID;
 const ASSISTANT_ID          = process.env.VAPI_ASSISTANT_ID;       // SOFIA
 const ASSISTANT_ID_SARA     = process.env.VAPI_ASSISTANT_ID_SARA;  // SARA (opcional)
 const ASSISTANT_ID_NOA      = process.env.VAPI_ASSISTANT_ID_NOA;   // NOA (opcional)
@@ -258,13 +260,13 @@ async function llamarLead(lead) {
     `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio cotizado: ${lead.precio_cotizado}. ` +
     `Objetivo: confirmar datos, resolver dudas y cerrar el acuerdo.`;
 
-  if (!API_KEY || !PHONE_NUMBER_ID) {
+  if (!API_KEY || !PHONE_NUMBER_ID_SARA) {
     console.log(`[Vapi STUB] Llamada de seguimiento a ${lead.nombre} (${numero})`);
     return { status: 'stub' };
   }
 
   const payload = {
-    phoneNumberId: PHONE_NUMBER_ID,
+    phoneNumberId: PHONE_NUMBER_ID_SARA,
     customer: { number: numero, name: lead.nombre || 'Cliente' },
     assistantOverrides: {
       firstMessage: primerMensaje,
@@ -317,13 +319,13 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
       : `Estás llamando al cliente del folio ${folio} (ruta: ${ruta}) para darle un estatus breve y tranquilizador de su envío. ` +
         `No reveles información interna (proveedor, costos). Si el cliente tiene una duda que no puedes resolver, dile que el equipo lo contacta.`);
 
-  if (!API_KEY || !PHONE_NUMBER_ID) {
+  if (!API_KEY || !PHONE_NUMBER_ID_NOA) {
     console.log(`[Vapi STUB] NOA — llamada de estatus a ${rol} ${nombre} (${telefono}) — folio ${folio}`);
     return { status: 'stub' };
   }
 
   const payload = {
-    phoneNumberId: PHONE_NUMBER_ID,
+    phoneNumberId: PHONE_NUMBER_ID_NOA,
     customer: { number: telefono, name: nombre || rol },
     assistantOverrides: {
       firstMessage: primerMensaje,
