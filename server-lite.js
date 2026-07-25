@@ -570,6 +570,16 @@ app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
   }
 });
 
+// Diagnóstico: ver la config real (voz, modelo, prompt) de un assistant en Vapi
+app.get('/api/vapi/assistant/:id', soloAdmin, async (req, res) => {
+  try {
+    const data = await vapi.obtenerAssistant(req.params.id);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({

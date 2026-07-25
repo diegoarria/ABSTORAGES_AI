@@ -361,6 +361,16 @@ async function llamarStatusCliente({ telefono, nombre, folio, ruta }) {
   return _llamarStatusNOA({ telefono, nombre, folio, ruta, rol: 'cliente' });
 }
 
+// ── Diagnóstico: leer la config real de un assistant directo de la API ───────
+async function obtenerAssistant(id) {
+  if (!API_KEY) throw new Error('VAPI_API_KEY no configurada');
+  const res = await fetch(`${BASE_URL}/assistant/${id}`, {
+    headers: { Authorization: `Bearer ${API_KEY}` },
+  });
+  if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
 module.exports = {
   lanzarLlamadasProveedores,
   procesarResultadoLlamada,
@@ -371,4 +381,5 @@ module.exports = {
   llamarProveedor,
   llamarStatusChofer,
   llamarStatusCliente,
+  obtenerAssistant,
 };
