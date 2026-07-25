@@ -423,6 +423,15 @@ async function obtenerAssistant(id) {
   return res.json();
 }
 
+async function obtenerNumero(id) {
+  if (!API_KEY) throw new Error('VAPI_API_KEY no configurada');
+  const res = await fetch(`${BASE_URL}/phone-number/${id}`, {
+    headers: { Authorization: `Bearer ${API_KEY}` },
+  });
+  if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
 module.exports = {
   lanzarLlamadasProveedores,
   procesarResultadoLlamada,
@@ -435,4 +444,5 @@ module.exports = {
   llamarStatusChofer,
   llamarStatusCliente,
   obtenerAssistant,
+  obtenerNumero,
 };

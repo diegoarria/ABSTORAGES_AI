@@ -584,6 +584,15 @@ app.get('/api/vapi/assistant/:id', soloAdmin, async (req, res) => {
   }
 });
 
+app.get('/api/vapi/numero/:id', soloAdmin, async (req, res) => {
+  try {
+    const data = await vapi.obtenerNumero(req.params.id);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
