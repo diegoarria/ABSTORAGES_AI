@@ -4,11 +4,13 @@
 require('dotenv').config();
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 const SARA_SYSTEM_PROMPT  = require('../agents/sara-prompt');
+const NOA_SYSTEM_PROMPT   = require('../agents/noa-prompt');
 
 const API_KEY               = process.env.VAPI_API_KEY;
 const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;
 const ASSISTANT_ID          = process.env.VAPI_ASSISTANT_ID;       // SOFIA
 const ASSISTANT_ID_SARA     = process.env.VAPI_ASSISTANT_ID_SARA;  // SARA (opcional)
+const ASSISTANT_ID_NOA      = process.env.VAPI_ASSISTANT_ID_NOA;   // NOA (opcional)
 const WEBHOOK_URL           = process.env.VAPI_WEBHOOK_URL; // URL pública del servidor
 const BASE_URL              = 'https://api.vapi.ai';
 
@@ -293,6 +295,70 @@ async function llamarLead(lead) {
   return data;
 }
 
+// ── Llamada genérica de estatus (NOA) — usada para chofer/proveedor y cliente ─
+async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
+  if (!telefono) {
+    console.log(`[Vapi] NOA — sin teléfono para ${rol} del folio ${folio}, se omite llamada`);
+    return { status: 'sin_telefono' };
+  }
+
+  const esChofer = rol === 'chofer';
+  const primerMensaje = esChofer
+    ? `Hola ${nombre}, soy NOA de ABSTORAGES Logistics Solutions, llamando por el folio ${folio}. ¿Cómo va todo con el viaje?`
+    : `Hola ${nombre}, soy NOA de ABSTORAGES Logistics Solutions, te llamo para darte un estatus de tu envío, folio ${folio}.`;
+
+  const systemPrompt =
+    NOA_SYSTEM_PROMPT +
+    MODO_VOZ +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
+    (esChofer
+      ? `Estás llamando al transportista/proveedor a cargo del folio ${folio} (ruta: ${ruta}) para pedir un estatus rápido del viaje: ` +
+        `dónde va, si tiene algún incidente o retraso, y hora estimada de llegada. Es una llamada de seguimiento breve, no de negociación.`
+      : `Estás llamando al cliente del folio ${folio} (ruta: ${ruta}) para darle un estatus breve y tranquilizador de su envío. ` +
+        `No reveles información interna (proveedor, costos). Si el cliente tiene una duda que no puedes resolver, dile que el equipo lo contacta.`);
+
+  if (!API_KEY || !PHONE_NUMBER_ID) {
+    console.log(`[Vapi STUB] NOA — llamada de estatus a ${rol} ${nombre} (${telefono}) — folio ${folio}`);
+    return { status: 'stub' };
+  }
+
+  const payload = {
+    phoneNumberId: PHONE_NUMBER_ID,
+    customer: { number: telefono, name: nombre || rol },
+    assistantOverrides: {
+      firstMessage: primerMensaje,
+      model: {
+        provider: 'anthropic',
+        model: 'claude-haiku-4-5-20251001',
+        messages: [{ role: 'system', content: systemPrompt }],
+      },
+      ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
+    },
+    metadata: { folio, rol },
+  };
+
+  if (ASSISTANT_ID_NOA) payload.assistantId = ASSISTANT_ID_NOA;
+
+  const res = await fetch(`${BASE_URL}/call/phone`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  console.log(`[Vapi] NOA — llamada de estatus a ${rol} (folio ${folio}) iniciada — callId ${data.id}`);
+  return data;
+}
+
+async function llamarStatusChofer({ telefono, nombre, folio, ruta }) {
+  return _llamarStatusNOA({ telefono, nombre, folio, ruta, rol: 'chofer' });
+}
+
+async function llamarStatusCliente({ telefono, nombre, folio, ruta }) {
+  return _llamarStatusNOA({ telefono, nombre, folio, ruta, rol: 'cliente' });
+}
+
 module.exports = {
   lanzarLlamadasProveedores,
   procesarResultadoLlamada,
@@ -301,4 +367,6 @@ module.exports = {
   llamarCheckDeRuta,
   llamarLead,
   llamarProveedor,
+  llamarStatusChofer,
+  llamarStatusCliente,
 };

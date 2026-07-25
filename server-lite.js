@@ -27,6 +27,7 @@ const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
 const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
+const noaScheduler = require('./backend/services/noaScheduler');
 const tms         = require('./backend/services/tms');
 const ordersStore = require('./backend/services/ordersStore');
 const PROVEEDORES = require('./backend/data/proveedores.json');
@@ -542,6 +543,14 @@ app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
         empresa: 'Empresa de prueba',
         origen: 'Monterrey', destino: 'Ciudad de México',
         tipo_unidad: 'caja seca 53', precio_cotizado: '$18,500 MXN',
+      });
+    } else if (agente === 'noa-chofer') {
+      resultado = await vapi.llamarStatusChofer({
+        telefono, nombre: nombre || 'Prueba', folio: 'TEST-NOA', ruta: 'Monterrey → Ciudad de México',
+      });
+    } else if (agente === 'noa-cliente') {
+      resultado = await vapi.llamarStatusCliente({
+        telefono, nombre: nombre || 'Prueba', folio: 'TEST-NOA', ruta: 'Monterrey → Ciudad de México',
       });
     } else {
       const proveedorPrueba = { id: 'TEST', nombre: nombre || 'Prueba', telefono };
@@ -1355,4 +1364,5 @@ app.listen(PORT, () => {
   console.log(`  WhatsApp:  ${WA_LIVE ? '🟢 LIVE' : '🟡 stub'}`);
   console.log(`  TTS Voz:   ${EL_LIVE ? '🟢 LIVE' : '🟡 stub (agrega ELEVENLABS_API_KEY)'}`);
   console.log(`  Tarifas:   🟢 dinámicas\n`);
+  noaScheduler.iniciar(pushActividad);
 });
