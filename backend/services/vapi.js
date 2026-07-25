@@ -24,13 +24,19 @@ const MODO_VOZ =
   `NO digas en voz alta tokens de control de texto como NUEVA_ORDEN, LEAD_DATA, CERRAR_CHAT o ESCALAR_HUMANO — ` +
   `esos son solo para el chat escrito y no aplican aquí. Máximo 2 minutos de llamada.`;
 
+// Eslogan de marca — solo SOFIA y SARA (llamadas comerciales/operativas), no NOA
+const ESLOGAN = 'ABSTORAGES, la empresa de logística más confiable del país';
+const CIERRE_ESLOGAN =
+  `\n\nAntes de terminar la llamada y despedirte, SIEMPRE di exactamente esta frase de cierre: ` +
+  `"Gracias por confiar en ${ESLOGAN}, ¡hasta pronto!"`;
+
 // Store en memoria: resultados de llamadas por folio
 const resultadosPorFolio = new Map();
 
 // ── Lanzar una llamada a un proveedor ─────────────────────────────────────────
 async function llamarProveedor(proveedor, orden) {
   const primerMensaje =
-    `Hola ${proveedor.nombre}, soy SOFIA de ABSTORAGES Logistics Solutions. ` +
+    `${ESLOGAN}. Hola ${proveedor.nombre}, soy SOFIA. ` +
     `Tenemos un servicio urgente — folio ${orden.folio}. ` +
     `Necesitamos una ${orden.tipo_unidad} de ${orden.ruta} ` +
     `para el ${orden.fecha_carga}, carga de ${orden.tipo_carga || 'mercancía general'}, ` +
@@ -42,6 +48,7 @@ async function llamarProveedor(proveedor, orden) {
   const systemPrompt =
     SOFIA_SYSTEM_PROMPT +
     MODO_VOZ +
+    CIERRE_ESLOGAN +
     `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
     `Estás llamando a ${proveedor.nombre} para el folio ${orden.folio}. ` +
     `Ruta: ${orden.ruta} | Unidad: ${orden.tipo_unidad} | Fecha: ${orden.fecha_carga} | ` +
@@ -246,7 +253,7 @@ async function llamarLead(lead) {
   const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
 
   const primerMensaje =
-    `Hola ${lead.nombre || ''}, soy SARA de ABSTORAGES Logistics Solutions. ` +
+    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy SARA. ` +
     `Estuve platicando contigo sobre tu solicitud de flete. ` +
     `¿Tienes un momento para confirmar los detalles?`;
 
@@ -255,6 +262,7 @@ async function llamarLead(lead) {
   const systemPrompt =
     SARA_SYSTEM_PROMPT +
     MODO_VOZ +
+    CIERRE_ESLOGAN +
     `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
     `Estás llamando a ${lead.nombre || 'el cliente'} de ${lead.empresa || ''} para dar seguimiento a su solicitud. ` +
     `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio cotizado: ${lead.precio_cotizado}. ` +
