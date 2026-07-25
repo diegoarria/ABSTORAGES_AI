@@ -2,6 +2,7 @@
 // Cuando SOFIA recibe un folio, lanza llamadas simultáneas a toda la red.
 // El primero que confirme disponibilidad y mejor precio gana la asignación.
 require('dotenv').config();
+const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 
 const API_KEY           = process.env.VAPI_API_KEY;
 const PHONE_NUMBER_ID   = process.env.VAPI_PHONE_NUMBER_ID;
@@ -22,6 +23,22 @@ async function llamarProveedor(proveedor, orden) {
     `${orden.peso_toneladas || ''} toneladas. ` +
     `¿Tienes disponibilidad y cuál es tu mejor precio?`;
 
+  // Mismo prompt completo que usa SOFIA en el chat de texto, + modo voz +
+  // el contexto específico de este folio (ruta, unidad, fecha, margen).
+  const systemPrompt =
+    SOFIA_SYSTEM_PROMPT +
+    `\n\n---\n\n## 🎙️ MODO LLAMADA DE VOZ\n` +
+    `Estás en una llamada telefónica real, no en el chat escrito. Responde en oraciones cortas y naturales, ` +
+    `sin listas, sin markdown, sin asteriscos — como se habla por teléfono. ` +
+    `NO digas en voz alta tokens de control de texto como NUEVA_ORDEN, LEAD_DATA, CERRAR_CHAT o ESCALAR_HUMANO — ` +
+    `esos son solo para el chat escrito y no aplican aquí. Máximo 2 minutos de llamada.\n\n` +
+    `## CONTEXTO DE ESTA LLAMADA\n` +
+    `Estás llamando a ${proveedor.nombre} para el folio ${orden.folio}. ` +
+    `Ruta: ${orden.ruta} | Unidad: ${orden.tipo_unidad} | Fecha: ${orden.fecha_carga} | ` +
+    `Carga: ${orden.tipo_carga || 'mercancía general'}, ${orden.peso_toneladas || ''} toneladas. ` +
+    `Objetivo: confirmar disponibilidad y obtener el mejor precio. El margen mínimo de ABSTORAGES es 20%. ` +
+    `Si acepta, dile que le confirmamos en los próximos minutos.`;
+
   const payload = {
     phoneNumberId: PHONE_NUMBER_ID,
     customer: { number: proveedor.telefono, name: proveedor.nombre },
@@ -30,17 +47,7 @@ async function llamarProveedor(proveedor, orden) {
       model: {
         provider: 'anthropic',
         model: 'claude-haiku-4-5-20251001',
-        messages: [{
-          role: 'system',
-          content:
-            `Eres SOFIA, ejecutiva de operaciones de ABSTORAGES Logistics Solutions. ` +
-            `Estás llamando al transportista ${proveedor.nombre} para el folio ${orden.folio}. ` +
-            `Ruta: ${orden.ruta} | Unidad: ${orden.tipo_unidad} | Fecha: ${orden.fecha_carga}. ` +
-            `Tu objetivo: confirmar disponibilidad y obtener el precio más bajo posible. ` +
-            `Si tiene disponibilidad, negocia. El margen mínimo de ABSTORAGES es 20%. ` +
-            `Si acepta, dile que le confirmamos en los próximos minutos. ` +
-            `Sé directa, rápida y profesional. Máximo 2 minutos de llamada.`,
-        }],
+        messages: [{ role: 'system', content: systemPrompt }],
       },
       ...(WEBHOOK_URL && {
         serverUrl: `${WEBHOOK_URL}/api/vapi/webhook`,
