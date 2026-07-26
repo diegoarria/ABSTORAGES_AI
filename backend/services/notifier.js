@@ -301,4 +301,27 @@ async function notificarAsignacion(folio, proveedor, precio) {
   if (!enviado) console.log(`[Notifier STUB] Carrier asignado — ${folio} → ${proveedor} @ ${precioStr}`);
 }
 
-module.exports = { notificarLead, notificarResumen, notificarAsignacion };
+const AGENTE_LABEL = { sofia: 'SOFÍA', sara: 'SARA', noa: 'NOA' };
+
+async function notificarLlamada({ agente, nombre, telefono, resumen, transcript, duracionSeg, folio }) {
+  const label = AGENTE_LABEL[agente] || agente?.toUpperCase() || 'Agente';
+  const asunto = `📞 Llamada terminada — ${label}${folio ? ` · Folio ${folio}` : ''}`;
+  const duracionStr = duracionSeg ? `${Math.round(duracionSeg / 60 * 10) / 10} min` : '—';
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:20px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">${label} · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Llamada terminada · ${new Date().toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Monterrey'})}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0 0 8px;font-size:14px;color:#111;"><strong>Con:</strong> ${nombre || 'Desconocido'} ${telefono ? `(${telefono})` : ''}</p>
+      <p style="margin:0 0 8px;font-size:14px;color:#111;"><strong>Duración:</strong> ${duracionStr}</p>
+      ${resumen ? `<p style="margin:0 0 12px;font-size:14px;color:#111;"><strong>Resultado:</strong> ${resumen}</p>` : ''}
+      ${transcript ? `<p style="margin:0;font-size:12px;color:#6b7280;white-space:pre-wrap;border-top:1px solid #e5e7eb;padding-top:12px;">${transcript}</p>` : ''}
+    </div>
+  </div>`;
+  const enviado = await sendEmailGmail(asunto, html);
+  if (!enviado) console.log(`[Notifier STUB] Llamada terminada — ${label} con ${nombre}`);
+}
+
+module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada };

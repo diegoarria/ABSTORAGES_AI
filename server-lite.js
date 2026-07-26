@@ -25,6 +25,7 @@ const gpsLive     = require('./backend/services/gps-live');
 const leads          = require('./backend/services/leads');
 const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
+const callLog        = require('./backend/services/callLog');
 const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
@@ -390,34 +391,83 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
       const tipo = evento.message?.type || evento.type;
       if (tipo !== 'end-of-call-report' && tipo !== 'call-ended') return;
 
-      const resultado = vapi.procesarResultadoLlamada({ call: evento.message?.call || evento.call || evento });
-      if (!resultado) return;
+      const call = evento.message?.call || evento.call || evento;
+      const metadata = call.metadata || {};
+      const agente = metadata.agente || 'sistema';
+      const agenteLabel = agente === 'sofia' ? 'SOFIA' : agente === 'sara' ? 'SARA' : agente === 'noa' ? 'NOA' : String(agente).toUpperCase();
+      const transcript = call.transcript || '';
+      const nombre = call.customer?.name || metadata.proveedor_nombre || metadata.nombre || null;
+      const telefono = call.customer?.number || null;
+      const duracionSeg = (call.startedAt && call.endedAt)
+        ? (new Date(call.endedAt) - new Date(call.startedAt)) / 1000
+        : (evento.message?.durationSeconds || null);
 
-      console.log(`[Vapi Webhook] ${resultado.folio} | ${resultado.proveedorId} | disponible:${resultado.disponible} | precio:${resultado.precio}`);
-      pushActividad({
-        agente: 'SOFIA', tipo: 'VAPI_RESULTADO',
-        mensaje: `${resultado.proveedorId} → ${resultado.disponible ? `✅ DISPONIBLE ${resultado.precio || ''}` : '❌ No disponible'}`,
-        metadata: { folio: resultado.folio, ...resultado },
+      // Registro persistente en disco — las 3 IAs, sobrevive redeploys
+      callLog.registrar({
+        agente, folio: metadata.folio || null, nombre, telefono,
+        tipo: metadata.tipo || metadata.rol || null,
+        transcript: transcript.slice(0, 3000), duracionSeg,
+        endedReason: call.endedReason || null,
       });
 
-      const estado = vapi.obtenerEstadoLlamadas(resultado.folio);
-      if (estado?.ganador?.proveedorId === resultado.proveedorId) {
+      let yaNotificado = false;
+
+      // Lógica específica de SOFIA: negociación con proveedor (folio, ganador)
+      if (agente === 'sofia' && metadata.folio) {
+        const resultado = vapi.procesarResultadoLlamada({ call });
+        if (resultado) {
+          console.log(`[Vapi Webhook] ${resultado.folio} | ${resultado.proveedorId} | disponible:${resultado.disponible} | precio:${resultado.precio}`);
+          pushActividad({
+            agente: 'SOFIA', tipo: 'VAPI_RESULTADO',
+            mensaje: `${resultado.proveedorId} → ${resultado.disponible ? `✅ DISPONIBLE ${resultado.precio || ''}` : '❌ No disponible'}`,
+            metadata: { folio: resultado.folio, ...resultado },
+          });
+
+          const estado = vapi.obtenerEstadoLlamadas(resultado.folio);
+          if (estado?.ganador?.proveedorId === resultado.proveedorId) {
+            yaNotificado = true;
+            pushActividad({
+              agente: 'SOFIA', tipo: 'PROVEEDOR_GANADOR',
+              mensaje: `🏆 Folio ${resultado.folio} → ${resultado.proveedorId} a ${resultado.precio || '—'}`,
+              metadata: { folio: resultado.folio, ganador: estado.ganador },
+            });
+            sendPush({
+              title: '✅ Carrier asignado — SOFÍA',
+              body: `Folio ${resultado.folio} · ${resultado.proveedorId} · ${resultado.precio || 'precio por confirmar'}`,
+              tag: 'carrier-ganador',
+              url: '/ops-center.html#sof',
+              tipo: 'PROVEEDOR_GANADOR',
+              urgente: true,
+            }).catch(() => {});
+            notifier.notificarAsignacion(resultado.folio, resultado.proveedorId, resultado.precio)
+              .catch(e => console.error('[notifier asignacion]', e.message));
+          }
+        }
+      } else {
+        // Reporte genérico de fin de llamada — SARA y NOA
         pushActividad({
-          agente: 'SOFIA', tipo: 'PROVEEDOR_GANADOR',
-          mensaje: `🏆 Folio ${resultado.folio} → ${resultado.proveedorId} a ${resultado.precio || '—'}`,
-          metadata: { folio: resultado.folio, ganador: estado.ganador },
+          agente: agenteLabel, tipo: 'LLAMADA_TERMINADA',
+          mensaje: `Llamada con ${nombre || telefono || 'contacto'} terminada${duracionSeg ? ` (${Math.round(duracionSeg)}s)` : ''}`,
+          metadata: { folio: metadata.folio || null, telefono, duracionSeg },
         });
-        sendPush({
-          title: '✅ Carrier asignado — SOFÍA',
-          body: `Folio ${resultado.folio} · ${resultado.proveedorId} · ${resultado.precio || 'precio por confirmar'}`,
-          tag: 'carrier-ganador',
-          url: '/ops-center.html#sof',
-          tipo: 'PROVEEDOR_GANADOR',
-          urgente: true,
-        }).catch(() => {});
-        notifier.notificarAsignacion && notifier.notificarAsignacion(resultado.folio, resultado.proveedorId, resultado.precio)
-          .catch(e => console.error('[notifier asignacion]', e.message));
       }
+
+      // Reporte (push + email) de cada llamada terminada, salvo la de
+      // "carrier ganador" de SOFIA que ya mandó su propio push arriba.
+      if (!yaNotificado) {
+        sendPush({
+          title: `📞 Llamada terminada — ${agenteLabel}`,
+          body: `${nombre || telefono || 'Contacto'}${duracionSeg ? ` · ${Math.round(duracionSeg / 60 * 10) / 10} min` : ''}`,
+          tag: 'llamada-terminada',
+          url: '/',
+          tipo: 'LLAMADA_TERMINADA',
+        }).catch(() => {});
+      }
+
+      notifier.notificarLlamada({
+        agente, nombre, telefono, duracionSeg, folio: metadata.folio || null,
+        transcript: transcript.slice(0, 1500),
+      }).catch(e => console.error('[notifier llamada]', e.message));
     } catch (e) {
       console.error('[Vapi Webhook]', e.message);
     }
@@ -602,6 +652,11 @@ app.post('/api/vapi/numero/:id/assistant', soloAdmin, async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// Historial de llamadas (SOFIA/SARA/NOA) guardado en disco
+app.get('/api/vapi/llamadas', adminUOps, (req, res) => {
+  res.json(callLog.listar({ agente: req.query.agente, limit: Number(req.query.limit) || 200 }));
 });
 
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────

@@ -76,6 +76,7 @@ async function llamarProveedor(proveedor, orden) {
       }),
     },
     metadata: {
+      agente:       'sofia',
       folio:        orden.folio,
       proveedor_id: proveedor.id,
       proveedor_nombre: proveedor.nombre,
@@ -249,7 +250,7 @@ async function iniciarLlamadaSimple(telefono, contexto) {
 }
 
 // ── Helper compartido: dispara una llamada como SARA (mismo número/assistant) ─
-async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPrompt, logId }) {
+async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPrompt, logId, tipo }) {
   if (!API_KEY || !PHONE_NUMBER_ID_SARA) {
     console.log(`[Vapi STUB] Llamada SARA a ${nombreCliente} (${numero})`);
     return { status: 'stub' };
@@ -267,6 +268,7 @@ async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPro
       },
       ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
     },
+    metadata: { agente: 'sara', tipo: tipo || 'seguimiento', nombre: nombreCliente },
   };
 
   // Usar el assistant dedicado de SARA (voz/transcriber propios) si está
@@ -312,7 +314,7 @@ async function llamarLead(lead) {
     `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio cotizado: ${lead.precio_cotizado}. ` +
     `Objetivo: confirmar datos, resolver dudas y cerrar el acuerdo.`;
 
-  return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `lead ${lead.id}` });
+  return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `lead ${lead.id}`, tipo: 'seguimiento' });
 }
 
 // ── Llamada de prospección en frío (día 5 de la secuencia de outreach) ───────
@@ -346,7 +348,7 @@ async function llamarProspecto(prospecto) {
 
   return _llamarComoSARA({
     numero, nombreCliente: prospecto.nombre, primerMensaje, systemPrompt,
-    logId: `prospecto ${prospecto.nombre}`,
+    logId: `prospecto ${prospecto.nombre}`, tipo: 'prospeccion',
   });
 }
 
@@ -389,7 +391,7 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
       },
       ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
     },
-    metadata: { folio, rol },
+    metadata: { agente: 'noa', folio, rol },
   };
 
   if (ASSISTANT_ID_NOA) payload.assistantId = ASSISTANT_ID_NOA;
