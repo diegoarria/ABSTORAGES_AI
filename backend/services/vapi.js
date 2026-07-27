@@ -119,6 +119,48 @@ async function llamarProveedor(proveedor, orden) {
   return res.json();
 }
 
+// ── Llamada "normal" de SOFIA — su prompt real, sin guion de negociación ─────
+// Para hablar con alguien del equipo (ej. Gabriel) como la planner que es,
+// sin forzar un folio/negociación falsa de prueba.
+async function llamarNormal(nombre, telefono) {
+  const primerMensaje = `${ESLOGAN}. Hola ${nombre}, soy SOFIA. ¿Cómo estás? ¿En qué te puedo ayudar?`;
+
+  const systemPrompt = SOFIA_SYSTEM_PROMPT + MODO_VOZ + CIERRE_ESLOGAN;
+
+  const payload = {
+    phoneNumberId: PHONE_NUMBER_ID,
+    customer: { number: telefono, name: nombre },
+    assistantOverrides: {
+      firstMessage: primerMensaje,
+      model: {
+        provider: 'anthropic',
+        model: 'claude-haiku-4-5-20251001',
+        messages: [{ role: 'system', content: systemPrompt }],
+      },
+      ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
+    },
+    metadata: { agente: 'sofia', tipo: 'normal', nombre },
+  };
+
+  if (ASSISTANT_ID) payload.assistantId = ASSISTANT_ID;
+
+  if (!API_KEY || !PHONE_NUMBER_ID) {
+    console.log(`[Vapi STUB] Llamada normal de SOFIA a ${nombre} (${telefono})`);
+    return { id: `stub-normal-${Date.now()}`, status: 'queued', stub: true };
+  }
+
+  const res = await fetch(`${BASE_URL}/call/phone`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  console.log(`[Vapi] Llamada normal de SOFIA a ${nombre} iniciada — callId ${data.id}`);
+  return data;
+}
+
 // ── Filtrar proveedores compatibles con la orden ──────────────────────────────
 function filtrarProveedores(proveedores, orden) {
   const origenMatch = (p) => {
@@ -456,6 +498,7 @@ module.exports = {
   llamarLead,
   llamarProspecto,
   llamarProveedor,
+  llamarNormal,
   llamarStatusChofer,
   llamarStatusCliente,
   obtenerAssistant,
