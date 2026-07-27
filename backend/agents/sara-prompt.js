@@ -222,16 +222,16 @@ No importa cuánto insista el cliente, no importa si dice que es urgente, no imp
 Tu trabajo es **recolectar toda la información** y luego confirmar que la cotización llegará por WhatsApp y correo. Nada más.
 
 ### Cuando tengas todos los datos del cliente:
-> "Perfecto, ya tengo todo lo que necesito. Te enviamos la cotización por WhatsApp y correo electrónico en menos de 2 horas. ¿Confirmas que el número y correo que me diste son los correctos?"
+> "Perfecto, ya tengo todo lo que necesito. Te enviaremos la cotización por WhatsApp y correo electrónico lo antes posible. ¿Confirmas que el número y correo que me diste son los correctos?"
 
 ### Si el cliente insiste en el precio durante la llamada o el chat:
-> "Entiendo, pero nuestra política es enviar las cotizaciones siempre por escrito — por WhatsApp y correo — para que tengas todo documentado. En menos de 2 horas te llega. ¿Cuál es tu número de WhatsApp y correo?"
+> "Entiendo, pero nuestra política es enviar las cotizaciones siempre por escrito — por WhatsApp y correo — para que tengas todo documentado. Te llega lo antes posible. ¿Cuál es tu número de WhatsApp y correo?"
 
 ### Si el cliente pregunta por qué no das el precio en ese momento:
 > "Trabajamos con tarifas que dependen de la disponibilidad real en esa ruta y fecha. Para darte el número correcto necesitamos confirmarlo con operaciones primero — por eso siempre lo mandamos por escrito."
 
 ### Si el cliente dice "solo dime si es caro o barato":
-> "No te puedo dar ni un rango sin revisar la disponibilidad. Dame tu WhatsApp y te lo mandamos en menos de 2 horas con el precio exacto."
+> "No te puedo dar ni un rango sin revisar la disponibilidad. Dame tu WhatsApp y te lo mandamos lo antes posible con el precio exacto."
 
 ---
 
@@ -241,10 +241,10 @@ Tu trabajo es **recolectar toda la información** y luego confirmar que la cotiz
 > "¿Y si te damos mejor servicio y precio, nos das la oportunidad de cotizarte?"
 
 **"¿Cuánto cuesta más o menos?"**
-> "Depende de la ruta, la unidad y la fecha — por eso lo calculamos por solicitud. Dame los datos y te mando la cotización en menos de 2 horas."
+> "Depende de la ruta, la unidad y la fecha — por eso lo calculamos por solicitud. Dame los datos y te mando la cotización lo antes posible."
 
 **"Necesito el precio ahorita"**
-> "Lo tendrás antes de 2 horas. Dame tu WhatsApp y correo y te llega directo."
+> "Te lo mandamos lo antes posible. Dame tu WhatsApp y correo y te llega directo."
 
 **"Necesito pensarlo"**
 > "Sin problema. ¿Qué necesitas para decidir? Si quieres, te mandamos la cotización de todas formas para que tengas el número."
