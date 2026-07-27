@@ -248,11 +248,31 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const leadDataWA = respuesta.match(/LEAD_DATA:\s*(\{[^\n]+\})/);
     let datosWA = {};
     try { if (leadDataWA) datosWA = JSON.parse(leadDataWA[1]); } catch {}
+
+    // NUEVA_ORDEN trae los datos completos del cierre (folio, ruta, unidad, etc.)
+    // — antes solo se usaba como bandera true/false, perdiendo toda esa info.
+    const nuevaOrdenWA = respuesta.match(/NUEVA_ORDEN:\s*(\{[\s\S]*?\})\s*(?:\n|$)/);
+    let ordenWA = {};
+    if (nuevaOrdenWA) {
+      try { ordenWA = JSON.parse(nuevaOrdenWA[1]); } catch (e) { console.error('[WA] NUEVA_ORDEN JSON inválido:', e.message); }
+    }
+    const [ordenOrigen, ordenDestino] = (ordenWA.ruta || '').split(/→|->/).map(s => s?.trim());
+
     const waHasCierre  = /NUEVA_ORDEN/i.test(respuesta);
     const waHasEscalar = /ESCALAR_HUMANO/i.test(respuesta);
     const waHasCerrar  = /CERRAR_CHAT/i.test(respuesta);
     const waNota = waHasCierre ? 'cierre_de_venta' : waHasEscalar ? 'escalado_a_operaciones' : waHasCerrar ? 'chat_cerrado' : 'cotizacion_en_proceso';
-    const leadWA = leads.add({ ...datosWA, sara_nota: waNota, primer_mensaje: texto.slice(0, 300), sessionId: session, canal: 'whatsapp' });
+    const leadWA = leads.add({
+      ...datosWA,
+      folio:      ordenWA.folio || datosWA.folio,
+      origen:     ordenWA.origen || ordenOrigen || datosWA.origen,
+      destino:    ordenWA.destino || ordenDestino || datosWA.destino,
+      tipo_carga: ordenWA.tipo_carga || datosWA.tipo_carga,
+      tipo_unidad: ordenWA.tipo_unidad || datosWA.tipo_unidad,
+      peso_toneladas: ordenWA.peso_toneladas || datosWA.peso_toneladas,
+      rfc: ordenWA.rfc || datosWA.rfc,
+      sara_nota: waNota, primer_mensaje: texto.slice(0, 300), sessionId: session, canal: 'whatsapp',
+    });
     if (esPrimerMensaje) {
       notifier.notificarLead(leadWA).catch(e => console.error('[notifier WA primer-contacto]', e.message));
     }
@@ -261,6 +281,9 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       notifier.notificarResumen(leadWA, waNota, histWA).catch(e => console.error('[notifier WA resumen]', e.message));
     }
     if (waHasCierre) {
+      // Persistir folio en Postgres — antes solo pasaba en el chat del portal, nunca por WhatsApp.
+      await ordersStore.guardarOrden(leadWA).catch(e => console.error('[ordersStore WA]', e.message));
+
       // Memoria compartida cross-agente — solo por cierre real de venta, igual que en el chat.
       contactos.upsertContacto({
         agente: 'sara', tipo: 'cliente',
