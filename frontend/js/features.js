@@ -600,6 +600,17 @@ const Features = (() => {
       .catch(() => {});
   }
 
+  const TARIFF_COMPACT_LIMIT = 6;
+
+  function tariffRutaTile(ruta, precio) {
+    return `
+      <div class="tariff-ruta">
+        <span class="tariff-ruta-label">${ruta}</span>
+        <span class="tariff-ruta-val">$${precio.toLocaleString('es-MX')}</span>
+      </div>
+    `;
+  }
+
   function renderTariff(data) {
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     set('tariff-diesel',  `$${data.diesel}/L`);
@@ -614,15 +625,37 @@ const Features = (() => {
     }
 
     const rutas = document.getElementById('tariff-rutas');
-    if (rutas && data.rutas) {
-      rutas.innerHTML = Object.entries(data.rutas).map(([ruta, precio]) => `
-        <div class="tariff-ruta">
-          <span class="tariff-ruta-label">${ruta}</span>
-          <span class="tariff-ruta-val">$${precio.toLocaleString('es-MX')}</span>
-        </div>
-      `).join('');
+    const entradas = data.rutas ? Object.entries(data.rutas) : [];
+    if (rutas) {
+      rutas.innerHTML = entradas.slice(0, TARIFF_COMPACT_LIMIT).map(([r, p]) => tariffRutaTile(r, p)).join('');
     }
+
+    const btnVerTodas = document.getElementById('tariff-ver-todas');
+    if (btnVerTodas) {
+      btnVerTodas.style.display = entradas.length > TARIFF_COMPACT_LIMIT ? '' : 'none';
+      btnVerTodas.textContent = `Ver todas (${entradas.length}) →`;
+    }
+
+    window._tariffRutasCompletas = entradas;
   }
+
+  window.TariffModal = {
+    open() {
+      const modal = document.getElementById('tariff-modal');
+      const cont = document.getElementById('tariff-modal-rutas');
+      if (cont && window._tariffRutasCompletas) {
+        cont.innerHTML = window._tariffRutasCompletas.map(([r, p]) => tariffRutaTile(r, p)).join('');
+      }
+      if (modal) modal.style.display = 'flex';
+    },
+    close() {
+      const modal = document.getElementById('tariff-modal');
+      if (modal) modal.style.display = 'none';
+    },
+  };
+  document.getElementById('tariff-modal')?.addEventListener('click', e => {
+    if (e.target.id === 'tariff-modal') TariffModal.close();
+  });
 
   // ── INIT ──────────────────────────────────────────────────────────────────
   function init() {
