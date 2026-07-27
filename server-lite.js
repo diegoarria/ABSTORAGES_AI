@@ -686,6 +686,25 @@ app.post('/api/admin/db-migrate', soloAdmin, async (req, res) => {
   }
 });
 
+// Diagnóstico: guarda una orden sintética vía ordersStore para confirmar
+// que la persistencia en Postgres funciona de punta a punta.
+app.post('/api/admin/test-orden', soloAdmin, async (req, res) => {
+  try {
+    const folio = 'ABST-' + String(Math.floor(Math.random() * 900000) + 100000);
+    const resultado = await ordersStore.guardarOrden({
+      folio, nombre: 'Test Diagnóstico', empresa: 'TEST DIAGNOSTICO SA',
+      telefono: '8100000000', email: 'test@diagnostico.com', rfc: 'TES010101AAA',
+      origen: 'Monterrey', destino: 'Ciudad de México',
+      tipo_unidad: 'caja seca 53', tipo_carga: 'prueba', peso_toneladas: '1',
+      precio_cotizado: '10000',
+    });
+    const relectura = await ordersStore.obtenerOrdenPorFolio(folio);
+    res.json({ ok: true, folio, guardado: resultado, relectura });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
