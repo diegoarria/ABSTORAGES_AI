@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Memoria de Agentes — ABSTORAGES</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#10161d">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #10161d;
+    --surface: #1a222c;
+    --surface-2: #212b37;
+    --border: #2b3644;
+    --border-strong: #3a4756;
+    --text: #eef1f4;
+    --text-muted: #7e8b99;
+    --sara: #ff7a3d;
+    --sara-bg: #3a2416;
+    --sofia: #4fd1c5;
+    --sofia-bg: #16302e;
+    --noa: #c084fc;
+    --noa-bg: #2b2038;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .hdr{display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--surface); border-bottom:1px solid var(--border);}
+  .hdr-logo{font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--text);}
+  .hdr-nav{display:flex; gap:4px; margin-left:auto;}
+  .hn{background:none; border:none; color:var(--text-muted); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer;}
+  .hn:hover{background:rgba(255,255,255,.06); color:var(--text);}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:32px 28px 60px;}
+  .top{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px;}
+  .brand-eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em;
+    color:var(--text-muted); text-transform:uppercase; margin:0 0 6px;
+  }
+  h1{
+    font-family:'Oswald',sans-serif; font-weight:600; font-size:26px;
+    letter-spacing:.01em; margin:0; text-transform:uppercase;
+  }
+  .updated{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted);}
+
+  .tabs{display:flex; gap:10px; margin-bottom:22px;}
+  .tab{
+    flex:1; position:relative; cursor:pointer; padding:16px 18px 14px;
+    background:var(--surface); border:1px solid var(--border);
+    border-bottom:3px solid var(--border);
+    border-radius:8px 8px 0 0; transition:.15s;
+  }
+  .tab:hover{border-color:var(--border-strong);}
+  .tab.active{background:var(--surface-2);}
+  .tab .name{
+    font-family:'Oswald',sans-serif; font-weight:600; font-size:17px;
+    letter-spacing:.03em; margin:0 0 2px;
+  }
+  .tab .role{font-size:12px; color:var(--text-muted); margin:0;}
+  .tab .count{
+    position:absolute; top:14px; right:16px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; padding:2px 8px;
+    border-radius:20px;
+  }
+  .tab[data-agent="SARA"].active{border-bottom-color:var(--sara);}
+  .tab[data-agent="SOFIA"].active{border-bottom-color:var(--sofia);}
+  .tab[data-agent="NOA"].active{border-bottom-color:var(--noa);}
+  .tab[data-agent="SARA"] .count{background:var(--sara-bg); color:var(--sara);}
+  .tab[data-agent="SOFIA"] .count{background:var(--sofia-bg); color:var(--sofia);}
+  .tab[data-agent="NOA"] .count{background:var(--noa-bg); color:var(--noa);}
+
+  .controls{display:flex; gap:10px; margin-bottom:16px;}
+  .search{
+    flex:1; background:var(--surface); border:1px solid var(--border); border-radius:6px;
+    padding:10px 14px; color:var(--text); font-size:13px; font-family:'Inter',sans-serif;
+  }
+  .search:focus{outline:none; border-color:var(--border-strong);}
+  .filter{
+    background:var(--surface); border:1px solid var(--border); border-radius:6px;
+    padding:10px 14px; color:var(--text-muted); font-size:12px; cursor:pointer;
+  }
+  .filter.on{color:var(--text); border-color:var(--border-strong);}
+
+  .board{display:grid; grid-template-columns: 380px 1fr; gap:18px; align-items:start;}
+
+  .list{display:flex; flex-direction:column; gap:8px; max-height:70vh; overflow-y:auto;}
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--border);
+    border-radius:0 8px 8px 0; padding:12px 14px; cursor:pointer; transition:.12s;
+  }
+  .card:hover{border-color:var(--border-strong); border-left-color:var(--border-strong);}
+  .card.sel{background:var(--surface-2); border-left-width:3px;}
+  .card .row1{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .card .nombre{font-size:14px; font-weight:500; margin:0;}
+  .card .empresa{font-size:12px; color:var(--text-muted); margin:2px 0 8px;}
+  .tipo-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.05em;
+    padding:2px 7px; border-radius:3px; text-transform:uppercase; white-space:nowrap;
+  }
+  .tipo-cliente{background:#1e3a2e; color:#7fd9a8;}
+  .tipo-proveedor{background:#2e2a1c; color:#e0c273;}
+  .tipo-operador{background:#26313e; color:#8fb8d6;}
+  .card .meta{display:flex; gap:12px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--text-muted);}
+
+  .detail{
+    background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:22px 26px;
+    min-height:480px;
+  }
+  .d-head{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:16px;}
+  .d-head .nombre{font-family:'Oswald',sans-serif; font-size:20px; font-weight:600; margin:0 0 3px; letter-spacing:.01em;}
+  .d-head .empresa{font-size:13px; color:var(--text-muted); margin:0;}
+  .agent-badge{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
+    padding:4px 10px; border-radius:4px; text-transform:uppercase; height:fit-content;
+  }
+  .fields{display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; margin-bottom:20px;}
+  .field label{display:block; font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px;}
+  .field .val{font-family:'IBM Plex Mono',monospace; font-size:13px;}
+  .field .val.wide{font-family:'Inter',sans-serif; font-size:13px;}
+
+  .sec-title{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin:0 0 10px; padding-top:12px; border-top:1px solid var(--border);}
+  .bitacora{display:flex; flex-direction:column; gap:0;}
+  .evento{display:flex; gap:14px; padding:10px 0; border-bottom:1px solid var(--border);}
+  .evento:last-child{border-bottom:none;}
+  .evento .fecha{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted); width:96px; flex-shrink:0; padding-top:1px;}
+  .evento .canal{font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); display:block; margin-bottom:2px;}
+  .evento .resumen{font-size:13px; line-height:1.5;}
+  .empty-msg{padding:24px; text-align:center; color:var(--text-muted); font-size:13px; border:1px dashed var(--border); border-radius:8px;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">🧠 Memoria de Agentes</div>
+  <nav class="hdr-nav">
+    <button class="hn" onclick="location.href='/'">Portal</button>
+    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
+    <button class="hn" onclick="location.href='/prospector.html'">Prospector</button>
+    <button class="hn" onclick="location.href='/historial.html'">Historial</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <p class="brand-eyebrow">ABSTORAGES · Sistema multiagente</p>
+      <h1>Memoria de agentes</h1>
+    </div>
+    <p class="updated" id="updated"></p>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="controls">
+    <input class="search" id="searchInput" placeholder="Buscar por nombre, empresa o tipo de carga…">
+    <div class="filter" data-tipo="todos" id="f-todos">Todos</div>
+    <div class="filter" data-tipo="cliente" id="f-cliente">Clientes</div>
+    <div class="filter" data-tipo="proveedor" id="f-proveedor">Proveedores</div>
+    <div class="filter" data-tipo="operador" id="f-operador">Operadores</div>
+  </div>
+
+  <div class="board">
+    <div class="list" id="list"></div>
+    <div class="detail" id="detail"></div>
+  </div>
+
+</div>
+
+<script>
+const AGENTES = {
+  SARA:  { role: "Ventas · Clientes",                              color: "#ff7a3d", bg: "#3a2416" },
+  SOFIA: { role: "Operaciones · Proveedores",                      color: "#4fd1c5", bg: "#16302e" },
+  NOA:   { role: "Monitoreo · Clientes, proveedores y operadores",  color: "#c084fc", bg: "#2b2038" },
+};
+
+let activeAgent = "SARA";
+let activeTipo = "todos";
+let activeContactId = null;
+let searchQuery = "";
+let contactosCache = []; // de la tab activa
+let counts = { SARA: 0, SOFIA: 0, NOA: 0 };
+let _debounce = null;
+
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtFecha(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
+}
+function fmtFechaHora(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function renderTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = Object.entries(AGENTES).map(([key,a])=>`
+    <div class="tab ${key===activeAgent?'active':''}" data-agent="${key}" onclick="selectAgent('${key}')">
+      <div class="count">${counts[key]}</div>
+      <p class="name" style="color:${key===activeAgent?a.color:'var(--text)'}">${key}</p>
+      <p class="role">${a.role}</p>
+    </div>
+  `).join('');
+}
+
+async function selectAgent(key){
+  activeAgent = key;
+  activeTipo = "todos";
+  activeContactId = null;
+  searchQuery = "";
+  document.getElementById('searchInput').value = "";
+  renderTabs();
+  renderFilters();
+  await cargarContactos();
+}
+
+function renderFilters(){
+  ['todos','cliente','proveedor','operador'].forEach(t=>{
+    const btn = document.getElementById('f-'+t);
+    btn.classList.toggle('on', activeTipo===t);
+    btn.onclick = async ()=>{ activeTipo = t; renderFilters(); await cargarContactos(); };
+  });
+}
+
+function tipoLabel(t){
+  return t==='cliente' ? 'Cliente' : t==='proveedor' ? 'Proveedor' : 'Operador';
+}
+
+async function cargarContactos() {
+  const list = document.getElementById('list');
+  list.innerHTML = '<div class="empty-msg">Cargando…</div>';
+  try {
+    const params = new URLSearchParams({ agente: activeAgent });
+    if (activeTipo !== 'todos') params.set('tipo', activeTipo);
+    if (searchQuery.trim()) params.set('q', searchQuery.trim());
+    const r = await fetch('/api/contactos?' + params.toString(), { credentials: 'include' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    contactosCache = await r.json();
+    counts[activeAgent] = contactosCache.length;
+    renderTabs();
+    renderList();
+  } catch (e) {
+    list.innerHTML = '<div class="empty-msg">No se pudo cargar (' + esc(e.message) + ')</div>';
+  }
+}
+
+function renderList(){
+  const agent = AGENTES[activeAgent];
+  const list = document.getElementById('list');
+  if (contactosCache.length === 0) {
+    list.innerHTML = '<div class="empty-msg">Sin resultados para este filtro.</div>';
+    document.getElementById('detail').innerHTML = '';
+    return;
+  }
+  if (!activeContactId || !contactosCache.find(c=>c.id===activeContactId)) {
+    activeContactId = contactosCache[0].id;
+  }
+  list.innerHTML = contactosCache.map(c=>`
+    <div class="card ${c.id===activeContactId?'sel':''}" style="border-left-color:${c.id===activeContactId?agent.color:'var(--border)'}" onclick="selectContacto('${c.id}')">
+      <div class="row1">
+        <p class="nombre">${esc(c.nombre_completo)}</p>
+        <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
+      </div>
+      <p class="empresa">${esc(c.empresa || '—')}</p>
+      <div class="meta">
+        <span>${esc(c.telefono || '—')}</span>
+        <span>Últ. contacto: ${fmtFecha(c.fecha_ultimo_contacto)}</span>
+      </div>
+    </div>
+  `).join('');
+  renderDetail();
+}
+
+function selectContacto(id){
+  activeContactId = id;
+  renderList();
+}
+
+async function renderDetail(){
+  const agent = AGENTES[activeAgent];
+  const c = contactosCache.find(x=>x.id===activeContactId);
+  const detail = document.getElementById('detail');
+  if(!c){ detail.innerHTML = ''; return; }
+  detail.innerHTML = '<div class="empty-msg">Cargando bitácora…</div>';
+
+  let data;
+  try {
+    const r = await fetch('/api/contactos/' + encodeURIComponent(c.id), { credentials: 'include' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    data = await r.json();
+  } catch (e) {
+    detail.innerHTML = '<div class="empty-msg">No se pudo cargar el detalle (' + esc(e.message) + ')</div>';
+    return;
+  }
+
+  detail.innerHTML = `
+    <div class="d-head">
+      <div>
+        <p class="nombre">${esc(data.nombre_completo)}</p>
+        <p class="empresa">${esc(data.empresa || '—')}</p>
+      </div>
+      <div class="agent-badge" style="background:${agent.bg}; color:${agent.color};">${esc(data.agente_asignado)}</div>
+    </div>
+    <div class="fields">
+      <div class="field"><label>Teléfono</label><div class="val">${esc(data.telefono || '—')}</div></div>
+      <div class="field"><label>Email</label><div class="val">${esc(data.email || '—')}</div></div>
+      <div class="field"><label>Tipo de carga / mercancía</label><div class="val">${esc(data.tipo_carga || '—')}</div></div>
+      <div class="field"><label>Clasificación</label><div class="val wide">${tipoLabel(data.tipo)}</div></div>
+      <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
+      <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
+    </div>
+    ${data.notas ? `<div class="field" style="margin-bottom:6px;"><label>Notas</label><div class="val wide">${esc(data.notas)}</div></div>` : ''}
+    <p class="sec-title">Bitácora de interacciones (${data.interacciones.length})</p>
+    <div class="bitacora">
+      ${data.interacciones.length ? data.interacciones.map(e=>`
+        <div class="evento">
+          <div class="fecha">${fmtFechaHora(e.fecha)}</div>
+          <div>
+            <span class="canal">${esc(e.agente)} · ${esc(e.canal || 'otro')}</span>
+            <p class="resumen">${esc(e.resumen || '—')}</p>
+          </div>
+        </div>
+      `).join('') : '<div class="empty-msg">Sin interacciones registradas.</div>'}
+    </div>
+  `;
+}
+
+document.getElementById('searchInput').addEventListener('input', (e)=>{
+  searchQuery = e.target.value;
+  clearTimeout(_debounce);
+  _debounce = setTimeout(cargarContactos, 300);
+});
+
+document.getElementById('updated').textContent = 'Cargado: ' + new Date().toLocaleString('es-MX', { dateStyle:'medium', timeStyle:'short' });
+
+renderTabs();
+renderFilters();
+cargarContactos();
+</script>
+</body>
+</html>

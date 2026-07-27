@@ -198,6 +198,35 @@ CREATE TABLE IF NOT EXISTS alertas (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ─── CONTACTOS (memoria compartida cross-agente SARA/SOFIA/NOA) ──────────────
+CREATE TABLE IF NOT EXISTS contactos (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  agente_asignado VARCHAR(10) NOT NULL, -- SARA, SOFIA, NOA — dueño original, nunca cambia
+  tipo VARCHAR(20) NOT NULL, -- cliente, proveedor, operador
+  nombre_completo VARCHAR(255) NOT NULL,
+  telefono VARCHAR(20),
+  email VARCHAR(255),
+  empresa VARCHAR(255),
+  tipo_carga TEXT,
+  notas TEXT,
+  fecha_primer_contacto TIMESTAMPTZ DEFAULT NOW(),
+  fecha_ultimo_contacto TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ─── INTERACCIONES (bitácora por contacto, puede haber de varios agentes) ────
+CREATE TABLE IF NOT EXISTS interacciones (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  contacto_id UUID REFERENCES contactos(id),
+  agente VARCHAR(10) NOT NULL, -- SARA, SOFIA, NOA — quién tuvo esta interacción específica
+  fecha TIMESTAMPTZ DEFAULT NOW(),
+  canal VARCHAR(20), -- whatsapp, llamada, chat, otro
+  resumen TEXT,
+  link_transcript TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ─── INDICES ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_folios_estatus ON folios(estatus);
 CREATE INDEX IF NOT EXISTS idx_folios_cliente ON folios(cliente_id);
@@ -208,6 +237,11 @@ CREATE INDEX IF NOT EXISTS idx_conversaciones_session ON conversaciones(session_
 CREATE INDEX IF NOT EXISTS idx_actividad_log_created ON actividad_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_alertas_resuelta ON alertas(resuelta);
 CREATE INDEX IF NOT EXISTS idx_proveedores_clasificacion ON proveedores(clasificacion);
+CREATE INDEX IF NOT EXISTS idx_contactos_telefono ON contactos(telefono);
+CREATE INDEX IF NOT EXISTS idx_contactos_email ON contactos(email);
+CREATE INDEX IF NOT EXISTS idx_contactos_agente ON contactos(agente_asignado);
+CREATE INDEX IF NOT EXISTS idx_interacciones_contacto ON interacciones(contacto_id);
+CREATE INDEX IF NOT EXISTS idx_interacciones_agente ON interacciones(agente);
 
 -- ─── FUNCIÓN UPDATED_AT ──────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -223,7 +257,7 @@ DO $$
 DECLARE
   t TEXT;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['clientes','prospectos','proveedores','unidades','tarifario','folios']
+  FOREACH t IN ARRAY ARRAY['clientes','prospectos','proveedores','unidades','tarifario','folios','contactos']
   LOOP
     EXECUTE format('DROP TRIGGER IF EXISTS trg_updated_at_%s ON %s;', t, t);
     EXECUTE format('

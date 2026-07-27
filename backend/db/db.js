@@ -141,6 +141,81 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
   return rows[0];
 }
 
+// ─── CONTACTOS (memoria compartida SARA/SOFIA/NOA) ───────────────────────────
+
+// Busca por teléfono (o email si no hay teléfono); si existe, actualiza campos
+// no vacíos + fecha_ultimo_contacto y agrega una interacción. Si no existe,
+// crea el contacto (agente_asignado = agente, nunca se sobreescribe después)
+// más su primera interacción.
+async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, empresa, tipo_carga, resumen_interaccion, canal }) {
+  let existente = null;
+  if (telefono) {
+    const { rows } = await query('SELECT * FROM contactos WHERE telefono = $1 LIMIT 1', [telefono]);
+    existente = rows[0] || null;
+  }
+  if (!existente && email) {
+    const { rows } = await query('SELECT * FROM contactos WHERE email = $1 LIMIT 1', [email]);
+    existente = rows[0] || null;
+  }
+
+  let contacto;
+  if (existente) {
+    const { rows } = await query(
+      `UPDATE contactos SET
+         nombre_completo = COALESCE(NULLIF($1,''), nombre_completo),
+         telefono        = COALESCE(NULLIF($2,''), telefono),
+         email           = COALESCE(NULLIF($3,''), email),
+         empresa         = COALESCE(NULLIF($4,''), empresa),
+         tipo_carga      = COALESCE(NULLIF($5,''), tipo_carga),
+         fecha_ultimo_contacto = NOW()
+       WHERE id = $6 RETURNING *`,
+      [nombre_completo || '', telefono || '', email || '', empresa || '', tipo_carga || '', existente.id]
+    );
+    contacto = rows[0];
+  } else {
+    const { rows } = await query(
+      `INSERT INTO contactos (agente_asignado, tipo, nombre_completo, telefono, email, empresa, tipo_carga)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [agente.toUpperCase(), tipo, nombre_completo || 'Sin nombre', telefono || null, email || null, empresa || null, tipo_carga || null]
+    );
+    contacto = rows[0];
+  }
+
+  await query(
+    `INSERT INTO interacciones (contacto_id, agente, canal, resumen)
+     VALUES ($1,$2,$3,$4)`,
+    [contacto.id, agente.toUpperCase(), canal || 'otro', resumen_interaccion || null]
+  );
+
+  return contacto;
+}
+
+async function listarContactosPorAgente(agente, { tipo, q } = {}) {
+  const AGENTE = agente.toUpperCase();
+  const cond = [`(agente_asignado = $1 OR id IN (SELECT contacto_id FROM interacciones WHERE agente = $1))`];
+  const vals = [AGENTE];
+  if (tipo) { vals.push(tipo); cond.push(`tipo = $${vals.length}`); }
+  if (q) {
+    vals.push(`%${q}%`);
+    cond.push(`(nombre_completo ILIKE $${vals.length} OR empresa ILIKE $${vals.length} OR tipo_carga ILIKE $${vals.length})`);
+  }
+  const { rows } = await query(
+    `SELECT * FROM contactos WHERE ${cond.join(' AND ')} ORDER BY fecha_ultimo_contacto DESC`,
+    vals
+  );
+  return rows;
+}
+
+async function obtenerContactoDetalle(id) {
+  const { rows: contactoRows } = await query('SELECT * FROM contactos WHERE id = $1', [id]);
+  if (!contactoRows[0]) return null;
+  const { rows: interacciones } = await query(
+    'SELECT * FROM interacciones WHERE contacto_id = $1 ORDER BY fecha DESC',
+    [id]
+  );
+  return { ...contactoRows[0], interacciones };
+}
+
 // ─── PROVEEDORES ─────────────────────────────────────────────────────────────
 
 async function obtenerProveedoresPorRuta(origen, destino) {
@@ -273,6 +348,9 @@ module.exports = {
   obtenerFolioPorFolio,
   upsertFolio,
   buscarOCrearCliente,
+  upsertContacto,
+  listarContactosPorAgente,
+  obtenerContactoDetalle,
   obtenerProveedoresPorRuta,
   obtenerProveedoresRecurrentes,
   actualizarClasificacionProveedor,

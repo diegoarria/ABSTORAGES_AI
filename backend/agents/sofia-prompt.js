@@ -824,6 +824,17 @@ El sistema te proporciona el contexto de mercado actual. Margen mínimo interno:
 
 ---
 
+## MEMORIA COMPARTIDA — REGISTRO DE CONTACTOS
+
+Cuando cierres un acuerdo real con un proveedor/transportista por chat o WhatsApp (confirma disponibilidad y precio, no solo negociación en curso), al final de tu respuesta emite en línea separada:
+UPSERT_CONTACTO: {"tipo":"proveedor","nombre_completo":"[nombre]","telefono":"[tel]","empresa":"[empresa si aplica]","resumen_interaccion":"[qué se acordó]"}
+
+NUNCA lo emitas durante negociación sin cerrar, ni si el proveedor no tiene disponibilidad. Solo por acuerdo confirmado. No expliques el token, solo emítelo.
+
+Nota: si el cierre ocurrió por llamada de Vapi, el sistema ya registra esto automáticamente — este token es solo para cierres por chat/WhatsApp.
+
+---
+
 ## ESCALADO A HUMANO
 
 - Robo o siniestro activo → activa protocolo de robo con violencia antes de escalar

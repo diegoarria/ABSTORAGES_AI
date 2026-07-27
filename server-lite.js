@@ -32,6 +32,7 @@ const noaScheduler = require('./backend/services/noaScheduler');
 const db          = require('./backend/db/db');
 const tms         = require('./backend/services/tms');
 const ordersStore = require('./backend/services/ordersStore');
+const contactos   = require('./backend/services/contactos');
 const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
@@ -106,6 +107,7 @@ async function sendWhatsApp(to, text) {
   text = text
     .replace(/LEAD_DATA\s*:[\s\S]*$/gi, '')
     .replace(/NUEVA_ORDEN\s*:[\s\S]*$/gi, '')
+    .replace(/UPSERT_CONTACTO\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();
@@ -257,6 +259,16 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     if (waHasCierre || waHasEscalar || waHasCerrar) {
       const histWA = memory.buildContext(session).history || [];
       notifier.notificarResumen(leadWA, waNota, histWA).catch(e => console.error('[notifier WA resumen]', e.message));
+    }
+    if (waHasCierre) {
+      // Memoria compartida cross-agente — solo por cierre real de venta, igual que en el chat.
+      contactos.upsertContacto({
+        agente: 'sara', tipo: 'cliente',
+        nombre_completo: leadWA.nombre, telefono: leadWA.telefono, email: leadWA.email,
+        empresa: leadWA.empresa, tipo_carga: leadWA.tipo_carga,
+        resumen_interaccion: leadWA.resumen || `Folio ${leadWA.folio} — ${leadWA.origen} → ${leadWA.destino}`,
+        canal: 'whatsapp',
+      }).catch(e => console.error('[contactos]', e.message));
     }
   } catch (err) {
     console.error('[WhatsApp webhook error]', err.message);
@@ -453,6 +465,16 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
             }).catch(() => {});
             notifier.notificarAsignacion(resultado.folio, resultado.proveedorId, resultado.precio)
               .catch(e => console.error('[notifier asignacion]', e.message));
+
+            // Memoria compartida cross-agente — solo por acuerdo real confirmado (ganador).
+            const proveedorInfo = PROVEEDORES.find(p => p.id === resultado.proveedorId);
+            contactos.upsertContacto({
+              agente: 'sofia', tipo: 'proveedor',
+              nombre_completo: proveedorInfo?.nombre || resultado.proveedorId,
+              telefono: proveedorInfo?.telefono || null,
+              resumen_interaccion: `Folio ${resultado.folio} confirmado a ${resultado.precio || 'precio por confirmar'}`,
+              canal: 'llamada',
+            }).catch(e => console.error('[contactos]', e.message));
           }
         }
       } else {
@@ -700,6 +722,40 @@ app.post('/api/admin/test-orden', soloAdmin, async (req, res) => {
     });
     const relectura = await ordersStore.obtenerOrdenPorFolio(folio);
     res.json({ ok: true, folio, guardado: resultado, relectura });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─── CONTACTOS (memoria compartida SARA/SOFIA/NOA) ──────────────────────────
+app.get('/api/contactos', adminUOps, async (req, res) => {
+  const agente = (req.query.agente || '').toUpperCase();
+  if (!['SARA', 'SOFIA', 'NOA'].includes(agente)) {
+    return res.status(400).json({ error: 'agente requerido: SARA, SOFIA o NOA' });
+  }
+  const lista = await contactos.listarPorAgente(agente, { tipo: req.query.tipo, q: req.query.q });
+  res.json(lista);
+});
+
+app.get('/api/contactos/:id', adminUOps, async (req, res) => {
+  const detalle = await contactos.obtenerDetalle(req.params.id);
+  if (!detalle) return res.status(404).json({ error: 'Contacto no encontrado' });
+  res.json(detalle);
+});
+
+// Diagnóstico: crea un contacto sintético para probar la persistencia sin
+// depender de que un agente cierre una venta/acuerdo real en una prueba.
+app.post('/api/admin/test-contacto', soloAdmin, async (req, res) => {
+  try {
+    const agente = (req.body?.agente || 'sara').toLowerCase();
+    const contacto = await contactos.upsertContacto({
+      agente, tipo: req.body?.tipo || 'cliente',
+      nombre_completo: 'Contacto de Prueba', telefono: '8199999999',
+      email: 'test@contacto.com', empresa: 'EMPRESA PRUEBA SA',
+      tipo_carga: 'prueba', resumen_interaccion: 'Interacción de prueba generada por diagnóstico',
+      canal: 'chat',
+    });
+    res.json({ ok: true, contacto });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -1196,6 +1252,16 @@ async function handleChat(agente, req, res) {
         // Persistir orden para que SOFIA la consulte sin re-preguntar
         await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
 
+        // Memoria compartida cross-agente — solo se guarda porque aquí SÍ hubo
+        // cierre de venta real (NUEVA_ORDEN), nunca por un prospecto sin cerrar.
+        contactos.upsertContacto({
+          agente: 'sara', tipo: 'cliente',
+          nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
+          empresa: lead.empresa, tipo_carga: lead.tipo_carga,
+          resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
+          canal: 'chat',
+        }).catch(e => console.error('[contactos]', e.message));
+
         // Lanzar llamadas a carriers en paralelo (stub si VAPI_API_KEY no está)
         vapi.lanzarLlamadasProveedores(lead, PROVEEDORES)
           .then(r => {
@@ -1233,6 +1299,27 @@ async function handleChat(agente, req, res) {
         const faltantes = ['nombre','email','telefono','empresa','tipo_carga','tipo_unidad']
           .filter(k => !filled(lead[k])).join(', ');
         console.log(`[lead] ${sid} — en proceso, faltan: ${faltantes}`);
+      }
+    } else if (agente === 'sofia' || agente === 'noa') {
+      // Marcador UPSERT_CONTACTO — respaldo para cuando SOFIA/NOA cierran un
+      // acuerdo (proveedor) o confirman un operador/coordinación por chat,
+      // fuera de los hooks determinísticos de folios/llamadas de Vapi.
+      const contactoMatch = fullText.match(/UPSERT_CONTACTO:\s*(\{[^\n]+\})/);
+      if (contactoMatch) {
+        try {
+          const datos = JSON.parse(contactoMatch[1]);
+          contactos.upsertContacto({
+            agente,
+            tipo: datos.tipo || (agente === 'sofia' ? 'proveedor' : 'operador'),
+            nombre_completo: datos.nombre_completo || datos.nombre,
+            telefono: datos.telefono, email: datos.email, empresa: datos.empresa,
+            tipo_carga: datos.tipo_carga,
+            resumen_interaccion: datos.resumen_interaccion || datos.resumen,
+            canal: 'chat',
+          }).catch(e => console.error('[contactos]', e.message));
+        } catch (e) {
+          console.error('[UPSERT_CONTACTO] JSON inválido:', e.message);
+        }
       }
     }
 
@@ -1481,7 +1568,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -1489,6 +1576,7 @@ function limpiarControlParaCliente(texto) {
   return texto
     .replace(/LEAD_DATA:\s*\{[^\n]*\}?/gi, '')
     .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/UPSERT_CONTACTO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();
