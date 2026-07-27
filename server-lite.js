@@ -567,8 +567,8 @@ app.get('/api/metricas', (req, res) => {
   res.json({ folios_activos: 0, folios_hoy: 0, proveedores_activos: 0, alertas_activas: 0 });
 });
 
-app.get('/api/sofia/folios', (req, res) => {
-  res.json(ordersStore.listarOrdenes().map(o => o.folio));
+app.get('/api/sofia/folios', async (req, res) => {
+  res.json((await ordersStore.listarOrdenes()).map(o => o.folio));
 });
 
 // Estado de llamadas Vapi por folio
@@ -1145,7 +1145,7 @@ async function handleChat(agente, req, res) {
         }).catch(() => {});
 
         // Persistir orden para que SOFIA la consulte sin re-preguntar
-        ordersStore.guardarOrden(lead);
+        await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
 
         // Lanzar llamadas a carriers en paralelo (stub si VAPI_API_KEY no está)
         vapi.lanzarLlamadasProveedores(lead, PROVEEDORES)

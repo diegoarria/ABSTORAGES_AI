@@ -225,6 +225,7 @@ DECLARE
 BEGIN
   FOREACH t IN ARRAY ARRAY['clientes','prospectos','proveedores','unidades','tarifario','folios']
   LOOP
+    EXECUTE format('DROP TRIGGER IF EXISTS trg_updated_at_%s ON %s;', t, t);
     EXECUTE format('
       CREATE TRIGGER trg_updated_at_%s
       BEFORE UPDATE ON %s

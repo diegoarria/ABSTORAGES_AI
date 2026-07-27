@@ -1,21 +1,30 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
-const pool = new Pool({
+// Sin DATABASE_URL, este módulo queda inerte — cada función revisa `pool`
+// antes de consultar, así requerirlo nunca truena si Postgres no está configurado.
+const pool = process.env.DATABASE_URL ? new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL) ? false : { rejectUnauthorized: false },
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-});
+}) : null;
 
-pool.on('error', (err) => {
-  console.error('[DB] Error inesperado en cliente inactivo:', err);
-});
+if (pool) {
+  pool.on('error', (err) => {
+    console.error('[DB] Error inesperado en cliente inactivo:', err);
+  });
+}
 
-const query = (text, params) => pool.query(text, params);
+function requerirPool() {
+  if (!pool) throw new Error('DATABASE_URL no configurada');
+  return pool;
+}
 
-const getClient = () => pool.connect();
+const query = (text, params) => requerirPool().query(text, params);
+
+const getClient = () => requerirPool().connect();
 
 // ─── FOLIOS ──────────────────────────────────────────────────────────────────
 
@@ -68,6 +77,66 @@ async function obtenerFolioActivo() {
      ORDER BY f.created_at DESC`
   );
   return rows;
+}
+
+async function obtenerFolioPorFolio(folio) {
+  const { rows } = await query(
+    `SELECT f.*, c.nombre_comercial as cliente_nombre, c.razon_social as cliente_razon_social,
+            p.razon_social as proveedor_nombre
+     FROM folios f
+     LEFT JOIN clientes c ON f.cliente_id = c.id
+     LEFT JOIN proveedores p ON f.proveedor_id = p.id
+     WHERE f.folio = $1`,
+    [folio]
+  );
+  return rows[0] || null;
+}
+
+// Inserta el folio si no existe, o actualiza los campos si SARA/SOFIA lo
+// vuelven a reportar (el folio lo genera SARA en el prompt, no esta función).
+async function upsertFolio(datos) {
+  const { rows } = await query(
+    `INSERT INTO folios (folio, cliente_id, origen, destino, tipo_unidad, mercancia, peso, fecha_carga, precio_cliente, condiciones_especiales)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+     ON CONFLICT (folio) DO UPDATE SET
+       cliente_id            = COALESCE(EXCLUDED.cliente_id, folios.cliente_id),
+       origen                = COALESCE(EXCLUDED.origen, folios.origen),
+       destino               = COALESCE(EXCLUDED.destino, folios.destino),
+       tipo_unidad           = COALESCE(EXCLUDED.tipo_unidad, folios.tipo_unidad),
+       mercancia             = COALESCE(EXCLUDED.mercancia, folios.mercancia),
+       peso                  = COALESCE(EXCLUDED.peso, folios.peso),
+       fecha_carga           = COALESCE(EXCLUDED.fecha_carga, folios.fecha_carga),
+       precio_cliente        = COALESCE(EXCLUDED.precio_cliente, folios.precio_cliente),
+       condiciones_especiales = COALESCE(EXCLUDED.condiciones_especiales, folios.condiciones_especiales)
+     RETURNING *`,
+    [datos.folio, datos.cliente_id, datos.origen, datos.destino, datos.tipo_unidad,
+     datos.mercancia, datos.peso, datos.fecha_carga, datos.precio_cliente, datos.condiciones_especiales]
+  );
+  return rows[0];
+}
+
+// ─── CLIENTES ────────────────────────────────────────────────────────────────
+
+// Encuentra un cliente por RFC (si viene) o por razon_social+teléfono; si no
+// existe, lo crea. Devuelve el registro completo (incluye id).
+async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
+  if (rfc) {
+    const { rows } = await query('SELECT * FROM clientes WHERE rfc = $1 LIMIT 1', [rfc]);
+    if (rows[0]) return rows[0];
+  }
+  if (razon_social && telefono) {
+    const { rows } = await query(
+      'SELECT * FROM clientes WHERE razon_social = $1 AND contacto_comercial_tel = $2 LIMIT 1',
+      [razon_social, telefono]
+    );
+    if (rows[0]) return rows[0];
+  }
+  const { rows } = await query(
+    `INSERT INTO clientes (razon_social, rfc, contacto_comercial_tel, contacto_comercial_email, estatus)
+     VALUES ($1,$2,$3,$4,'ACTIVO') RETURNING *`,
+    [razon_social || 'Sin nombre', rfc || null, telefono || null, email || null]
+  );
+  return rows[0];
 }
 
 // ─── PROVEEDORES ─────────────────────────────────────────────────────────────
@@ -181,6 +250,7 @@ async function obtenerMetricas() {
 }
 
 module.exports = {
+  pool,
   query,
   getClient,
   crearFolio,
@@ -188,6 +258,9 @@ module.exports = {
   actualizarEstatusFolio,
   obtenerFoliosPorEstatus,
   obtenerFolioActivo,
+  obtenerFolioPorFolio,
+  upsertFolio,
+  buscarOCrearCliente,
   obtenerProveedoresPorRuta,
   obtenerProveedoresRecurrentes,
   actualizarClasificacionProveedor,
