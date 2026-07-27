@@ -222,7 +222,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
     memory.addMessage(session, 'assistant', respuesta);
     saveMessage(session, 'sara', 'assistant', respuesta);
-    const bloques = splitForWhatsApp(respuesta);
+    const bloques = splitForWhatsApp(limpiarControlParaCliente(respuesta));
     for (const bloque of bloques) await sendWhatsApp(phone, bloque);
     const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
     if (metaMatch) memory.updateMeta(session, { empresa: metaMatch[1].trim() });
@@ -1092,13 +1092,16 @@ async function handleChat(agente, req, res) {
   res.flushHeaders();
 
   let fullText = '';
+  const filtroControl = crearFiltroControlStream(visible => {
+    res.write(`data: ${JSON.stringify({ type: 'chunk', text: visible })}\n\n`);
+  });
   try {
     await chatStream(
       systemPrompt,
       messages,
       (chunk) => {
-        fullText += chunk;
-        res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
+        fullText += chunk; // texto crudo completo — se sigue usando para parsear LEAD_DATA/NUEVA_ORDEN internamente
+        filtroControl(chunk); // solo lo "seguro" llega al cliente
       },
       () => {},
     );
@@ -1436,6 +1439,60 @@ app.get('/api/gps/stream', (req, res) => {
 
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
+// ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
+// Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
+// cliente final, ni en WhatsApp ni en el chat del portal/widget.
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO'];
+const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
+
+// Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
+function limpiarControlParaCliente(texto) {
+  return texto
+    .replace(/LEAD_DATA:\s*\{[^\n]*\}?/gi, '')
+    .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/CERRAR_CHAT/gi, '')
+    .replace(/ESCALAR_HUMANO/gi, '')
+    .trim();
+}
+
+// Filtro para streaming chunk-a-chunk (SSE) — retiene una pequeña cola por si
+// un marcador queda partido entre dos chunks, y corta todo lo que venga
+// después en cuanto detecta el inicio de un token de control.
+function crearFiltroControlStream(onVisible) {
+  let buffer = '';
+  let cortado = false;
+  return function(chunk) {
+    if (cortado) return;
+    buffer += chunk;
+
+    let idxCorte = -1;
+    for (const marker of CONTROL_MARKERS) {
+      const idx = buffer.indexOf(marker);
+      if (idx !== -1 && (idxCorte === -1 || idx < idxCorte)) idxCorte = idx;
+    }
+    if (idxCorte !== -1) {
+      const visible = buffer.slice(0, idxCorte);
+      if (visible) onVisible(visible);
+      cortado = true;
+      buffer = '';
+      return;
+    }
+
+    let colaSegura = buffer.length;
+    for (let len = Math.min(CONTROL_MARKER_MAXLEN - 1, buffer.length); len > 0; len--) {
+      const tail = buffer.slice(-len);
+      if (CONTROL_MARKERS.some(m => m.startsWith(tail))) {
+        colaSegura = buffer.length - len;
+        break;
+      }
+    }
+    if (colaSegura > 0) {
+      onVisible(buffer.slice(0, colaSegura));
+      buffer = buffer.slice(colaSegura);
+    }
+  };
+}
+
 function splitForWhatsApp(text, maxLen = 1500) {
   if (text.length <= maxLen) return [text];
   const chunks = [];

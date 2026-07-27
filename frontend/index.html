@@ -879,6 +879,7 @@
       const bg  = isUser ? 'var(--bg-user,#2a2a4a)' : 'var(--bg-panel,#111128)';
       const align = isUser ? 'flex-end' : 'flex-start';
       const clean = (m.content || '')
+        .replace(/LEAD_DATA:\s*\{[^\n]*\}?/gi, '')
         .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
         .replace(/CERRAR_CHAT|ESCALAR_HUMANO/gi, '')
         .trim();
