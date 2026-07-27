@@ -198,9 +198,12 @@ app.post('/api/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-// WhatsApp webhook — sin auth (viene de 360dialog / Meta Cloud API)
+// WhatsApp webhook — sin auth (viene de Twilio)
 app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (req, res) => {
-  res.sendStatus(200);
+  // TwiML vacío — un body como "OK" (res.sendStatus por default) se reenvía
+  // como mensaje real al usuario si no es XML válido.
+  res.set('Content-Type', 'text/xml');
+  res.send('<?xml version="1.0" encoding="UTF-8"?><Response></Response>');
   console.log('[WA-IN] body:', JSON.stringify(req.body).slice(0, 600));
   try {
     // Twilio manda form-urlencoded: From="whatsapp:+52...", Body="texto", NumMedia="0"
