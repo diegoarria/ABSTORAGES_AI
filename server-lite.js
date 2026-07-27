@@ -580,7 +580,12 @@ app.get('/api/metricas', (req, res) => {
 });
 
 app.get('/api/sofia/folios', async (req, res) => {
-  res.json((await ordersStore.listarOrdenes()).map(o => o.folio));
+  try {
+    res.json((await ordersStore.listarOrdenes()).map(o => o.folio));
+  } catch (e) {
+    console.error('[sofia/folios]', e.message);
+    res.json([]);
+  }
 });
 
 // Estado de llamadas Vapi por folio

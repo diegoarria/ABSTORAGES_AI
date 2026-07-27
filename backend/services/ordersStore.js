@@ -51,11 +51,21 @@ function parsearPrecio(precio) {
   return isNaN(n) ? null : n;
 }
 
+// Todas las funciones que tocan Postgres atrapan sus propios errores — si la
+// base no responde (o DATABASE_URL apunta a algo inalcanzable), degradamos a
+// memoria/lista vacía en vez de dejar que el error tumbe el proceso completo.
 async function guardarOrden(datos) {
   if (!datos?.folio) return;
   const folio = normalizarFolio(datos.folio);
+  const enMemoria = () => {
+    store.set(folio, { ...datos, folio, guardado: new Date().toISOString() });
+    console.log(`[OrdersStore] Orden guardada en memoria: ${folio}`);
+    return store.get(folio);
+  };
 
-  if (USA_DB) {
+  if (!USA_DB) return enMemoria();
+
+  try {
     const cliente = await db.buscarOCrearCliente({
       razon_social: datos.empresa && datos.empresa !== '—' ? datos.empresa : datos.nombre,
       rfc: datos.rfc && datos.rfc !== '—' ? datos.rfc : null,
@@ -76,10 +86,10 @@ async function guardarOrden(datos) {
     });
     console.log(`[OrdersStore] Orden guardada en Postgres: ${folio}`);
     return { ...datos, folio, cliente_id: cliente.id, guardado: guardado.updated_at || guardado.created_at };
+  } catch (e) {
+    console.error(`[OrdersStore] Postgres falló guardando ${folio}, cae a memoria:`, e.message);
+    return enMemoria();
   }
-
-  store.set(folio, { ...datos, folio, guardado: new Date().toISOString() });
-  console.log(`[OrdersStore] Orden guardada en memoria: ${folio}`);
 }
 
 async function obtenerOrden(texto) {
@@ -92,13 +102,23 @@ async function obtenerOrden(texto) {
 async function obtenerOrdenPorFolio(folio) {
   if (!folio) return null;
   const norm = normalizarFolio(folio);
-  if (USA_DB) return db.obtenerFolioPorFolio(norm);
-  return store.get(norm) || null;
+  if (!USA_DB) return store.get(norm) || null;
+  try {
+    return await db.obtenerFolioPorFolio(norm);
+  } catch (e) {
+    console.error(`[OrdersStore] Postgres falló consultando ${norm}:`, e.message);
+    return store.get(norm) || null;
+  }
 }
 
 async function listarOrdenes() {
-  if (USA_DB) return db.obtenerFolioActivo();
-  return Array.from(store.values());
+  if (!USA_DB) return Array.from(store.values());
+  try {
+    return await db.obtenerFolioActivo();
+  } catch (e) {
+    console.error('[OrdersStore] Postgres falló listando folios:', e.message);
+    return Array.from(store.values());
+  }
 }
 
 module.exports = { guardarOrden, obtenerOrden, obtenerOrdenPorFolio, extraerFolio, listarOrdenes };
