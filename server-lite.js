@@ -92,39 +92,36 @@ const EL_VOICE_SARA  = process.env.ELEVENLABS_VOICE_SARA  || 'pFZP5JQG7iQjIQuC4B
 const EL_VOICE_SOFIA = process.env.ELEVENLABS_VOICE_SOFIA || 'EXAVITQu4vr4xnSDxMaL'; // Bella
 const EL_LIVE = EL_KEY && !EL_KEY.startsWith('xxxx');
 
-// ─── WHATSAPP ──────────────────────────────────────────────────────────────
-const WA_KEY      = process.env.WHATSAPP_API_KEY;
-const WA_PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID; // 360dialog Cloud API
-const WA_LIVE     = WA_KEY && !WA_KEY.startsWith('xxxx');
+// ─── WHATSAPP (Twilio) ───────────────────────────────────────────────────────
+const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, ''); // ej. +19383884379
+const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 
 async function sendWhatsApp(to, text) {
   if (!WA_LIVE) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
   }
-  // 360dialog WABA v2 — formato sin messaging_product
-  const payload = JSON.stringify({ to, type: 'text', text: { body: text } });
   console.log(`[WA] Enviando a ${to}: ${text.slice(0, 60)}...`);
   try {
-    const r = await fetch('https://waba-v2.360dialog.io/v1/messages', {
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const body = new URLSearchParams({
+      From: `whatsapp:${TWILIO_WA_FROM}`,
+      To:   `whatsapp:${to.replace(/^whatsapp:/, '')}`,
+      Body: text,
+    });
+    const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
-      body: payload,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${auth}`,
+      },
+      body,
     });
     const resp = await r.text();
-    if (!r.ok) {
-      console.error(`[WA] Error ${r.status}: ${resp}`);
-      // Fallback: intentar con messaging_product (Cloud API format)
-      const r2 = await fetch('https://waba-v2.360dialog.io/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
-        body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } }),
-      });
-      const resp2 = await r2.text();
-      console.log(`[WA] Fallback status ${r2.status}: ${resp2.slice(0, 300)}`);
-    } else {
-      console.log(`[WA] OK → ${to}: ${resp.slice(0, 100)}`);
-    }
+    if (!r.ok) console.error(`[WA] Error ${r.status}: ${resp.slice(0, 300)}`);
+    else        console.log(`[WA] OK → ${to}`);
   } catch (e) {
     console.error('[WA] Error enviando:', e.message);
   }
@@ -202,19 +199,15 @@ app.post('/api/logout', (req, res) => {
 });
 
 // WhatsApp webhook — sin auth (viene de 360dialog / Meta Cloud API)
-app.post('/webhook/whatsapp', async (req, res) => {
+app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (req, res) => {
   res.sendStatus(200);
   console.log('[WA-IN] body:', JSON.stringify(req.body).slice(0, 600));
   try {
-    // Formato Meta Cloud API (360dialog DCHUB)
-    const value = req.body?.entry?.[0]?.changes?.[0]?.value;
-    // Formato legacy 360dialog (fallback)
-    const msgs = value?.messages ?? req.body?.messages;
-    if (!msgs?.length) { console.log('[WA-IN] sin mensajes, ignorando'); return; }
-    const msg = msgs[0];
-    if (msg.type !== 'text') { console.log('[WA-IN] tipo no texto:', msg.type); return; }
-    const phone   = msg.from;
-    const texto   = msg.text.body.trim();
+    // Twilio manda form-urlencoded: From="whatsapp:+52...", Body="texto", NumMedia="0"
+    if (!req.body?.From || !req.body?.Body) { console.log('[WA-IN] sin From/Body, ignorando'); return; }
+    if (Number(req.body.NumMedia || 0) > 0 && !req.body.Body.trim()) { console.log('[WA-IN] solo media, sin texto, ignorando'); return; }
+    const phone   = req.body.From.replace(/^whatsapp:/, '');
+    const texto   = req.body.Body.trim();
     const session = `wa_${phone}`;
     const { contextBlock, history } = memory.buildContext(session);
     const esPrimerMensaje = history.length === 0; // capturado antes de agregar el mensaje actual
