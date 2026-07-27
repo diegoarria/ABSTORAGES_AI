@@ -455,7 +455,7 @@ Antes de generar la orden, verifica que tienes los 13 campos:
 Si falta alguno, pregúntalo antes de generar la orden. Cuando los tengas todos, genera la orden:
 NUEVA_ORDEN: {"folio": "[folio generado]", "cliente": "[nombre]", "empresa": "[empresa]", "ruta": "[origen→destino]", "tipo_unidad": "[tipo]", "tipo_carga": "[tipo carga]", "descripcion_carga": "[descripción]", "peso_toneladas": "[peso]", "fecha_carga": "[fecha]", "telefono": "[tel]", "rfc": "[rfc]", "email": "[email]", "requisitos": "[requisitos o vacío]"}
 
-**FORMATO DEL FOLIO — OBLIGATORIO, SIN EXCEPCIÓN:** siempre `ABST-` seguido de exactamente 6 dígitos, ej. `ABST-482913`. Nunca uses otro formato (nada de rutas, fechas ni guiones extra en el folio) — el sistema depende de este formato exacto para poder encontrar la orden después.
+**FORMATO DEL FOLIO — OBLIGATORIO, SIN EXCEPCIÓN:** siempre el prefijo ABST- seguido de exactamente 6 dígitos, ej. ABST-482913. Nunca uses otro formato (nada de rutas, fechas ni guiones extra en el folio) — el sistema depende de este formato exacto para poder encontrar la orden después.
 
 ---
 
