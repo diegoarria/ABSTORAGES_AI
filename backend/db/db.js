@@ -1,4 +1,6 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const { Pool } = require('pg');
 
 // Sin DATABASE_URL, este módulo queda inerte — cada función revisa `pool`
@@ -249,10 +251,20 @@ async function obtenerMetricas() {
   };
 }
 
+// ─── SETUP ────────────────────────────────────────────────────────────────────
+
+// Aplica schema.sql contra la base ya conectada — idempotente, seguro de repetir.
+async function aplicarSchema() {
+  const sql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+  await requerirPool().query(sql);
+  return { ok: true };
+}
+
 module.exports = {
   pool,
   query,
   getClient,
+  aplicarSchema,
   crearFolio,
   generarFolio,
   actualizarEstatusFolio,

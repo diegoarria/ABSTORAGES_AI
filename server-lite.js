@@ -29,6 +29,7 @@ const callLog        = require('./backend/services/callLog');
 const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
+const db          = require('./backend/db/db');
 const tms         = require('./backend/services/tms');
 const ordersStore = require('./backend/services/ordersStore');
 const PROVEEDORES = require('./backend/data/proveedores.json');
@@ -657,6 +658,16 @@ app.post('/api/vapi/numero/:id/assistant', soloAdmin, async (req, res) => {
 // Historial de llamadas (SOFIA/SARA/NOA) guardado en disco
 app.get('/api/vapi/llamadas', adminUOps, (req, res) => {
   res.json(callLog.listar({ agente: req.query.agente, limit: Number(req.query.limit) || 200 }));
+});
+
+// Setup one-shot: aplica backend/db/schema.sql contra DATABASE_URL — idempotente
+app.post('/api/admin/db-migrate', soloAdmin, async (req, res) => {
+  try {
+    await db.aplicarSchema();
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
