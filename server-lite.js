@@ -99,6 +99,21 @@ const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^wha
 const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 
 async function sendWhatsApp(to, text) {
+  // ── BLOQUEO ABSOLUTO — ningún token de control sale nunca por WhatsApp ──
+  // Se aplica AQUÍ, dentro de la función que de verdad manda el mensaje, sin
+  // importar qué código haya llamado a sendWhatsApp ni si ya se "limpió" antes.
+  const antes = text;
+  text = text
+    .replace(/LEAD_DATA\s*:[\s\S]*$/gi, '')
+    .replace(/NUEVA_ORDEN\s*:[\s\S]*$/gi, '')
+    .replace(/CERRAR_CHAT/gi, '')
+    .replace(/ESCALAR_HUMANO/gi, '')
+    .trim();
+  if (text !== antes.trim()) {
+    console.warn(`[WA] ⚠️ Se bloqueó un token de control que iba a salir hacia ${to}`);
+  }
+  if (!text) { console.log(`[WA] Mensaje vacío tras filtrar control, no se envía a ${to}`); return; }
+
   if (!WA_LIVE) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
     return;
