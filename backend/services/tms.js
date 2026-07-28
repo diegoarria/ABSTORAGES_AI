@@ -1,7 +1,7 @@
 // TMS — cliente API sobre Google Sheets (Google Apps Script)
 // Solo lectura. Maneja el redirect 302 que Google Apps Script hace siempre.
 const https = require('https');
-const wialon = require('./wialon');
+const gpsProviders = require('./gpsProviders');
 
 const TMS_URL   = process.env.TMS_API_URL  || 'https://script.google.com/macros/s/AKfycbwcL5IyR3sTohDhihoxPSsg7bPxeR3J4gt7mIJ_aieZ3Pn7ouFqgNPfR322iIRT7r3n/exec';
 const TMS_TOKEN = process.env.TMS_API_KEY  || 'b4914e954d7e43cd8830b4855f7d9e110b13400cb88d4353b4e4e0306a0bf4ee';
@@ -593,10 +593,10 @@ function fmtFecha(v) {
 
 async function formatearFolioNOA(s) {
   let lineaGpsVivo = '';
-  if (wialon.esUrlWialon(s['GPS'])) {
-    const ubic = await wialon.obtenerUbicacion(s['GPS']);
+  if (gpsProviders.esUrlSoportada(s['GPS'])) {
+    const ubic = await gpsProviders.obtenerUbicacion(s['GPS']);
     if (ubic) {
-      lineaGpsVivo = `\n📍 UBICACIÓN GPS EN VIVO (Wialon, hace segundos): ${ubic.direccion || `${ubic.lat}, ${ubic.lng}`}` +
+      lineaGpsVivo = `\n📍 UBICACIÓN GPS EN VIVO (hace segundos): ${ubic.direccion || `${ubic.lat}, ${ubic.lng}`}` +
         ` | Velocidad: ${ubic.speedKmh ?? '—'} km/h | Última actualización: ${fmtFecha(ubic.timestamp)}` +
         `\n   Usa este dato real para el kilómetro/carretera y velocidad — no inventes ni uses únicamente el campo de comentarios.`;
     }

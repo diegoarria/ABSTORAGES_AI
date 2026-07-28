@@ -3,9 +3,11 @@
 // (hosting.wialon.com/locator/...?t=TOKEN) usa ese mismo token como
 // credencial de sesión restringida de su API pública (Remote API).
 // No requiere API key propia — el token ya viene en la URL que guarda el TMS.
+const { reverseGeocode } = require('./geocode');
+
 const API_URL = 'https://hst-api.wialon.com/wialon/ajax.html';
 
-function esUrlWialon(url) {
+function esUrl(url) {
   return typeof url === 'string' && /wialon\.(com|us)\b/i.test(url);
 }
 
@@ -33,31 +35,18 @@ async function obtenerUnidad(sid, id) {
   return data.item;
 }
 
-async function reverseGeocode(lat, lng) {
-  try {
-    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=16`, {
-      headers: { 'User-Agent': 'ABSTORAGES-ops/1.0 (contacto@abstorages.com)' },
-    });
-    const data = await r.json();
-    return data.display_name || null;
-  } catch {
-    return null;
-  }
-}
-
 // Cache corta por token — evita re-loguear en Wialon si preguntan por el
 // mismo folio varias veces seguidas (ej. cliente + equipo interno).
 const cache = new Map();
 const TTL_MS = 2 * 60 * 1000;
 
 async function obtenerUbicacion(url, { conDireccion = true } = {}) {
-  if (!esUrlWialon(url)) return null;
+  if (!esUrl(url)) return null;
   const token = extraerToken(url);
   if (!token) return null;
 
   const cached = cache.get(token);
   if (cached && Date.now() - cached.ts < TTL_MS) {
-    // Si ya se pidió con dirección antes, o esta vez no se necesita, sirve del cache.
     if (cached.data.direccion || !conDireccion) return cached.data;
   }
 
@@ -71,9 +60,6 @@ async function obtenerUbicacion(url, { conDireccion = true } = {}) {
     if (!unidad || !unidad.pos) return null;
 
     const { x: lng, y: lat, s: speedKmh, c: rumbo, t: ts } = unidad.pos;
-    // Nominatim (gratuito) pide máx. 1 req/seg — se omite en consultas masivas
-    // (ej. mapa con todas las unidades activas) y solo se usa para consultas
-    // puntuales de un folio (respuesta al cliente).
     const direccion = conDireccion ? await reverseGeocode(lat, lng) : null;
 
     const data = {
@@ -90,4 +76,4 @@ async function obtenerUbicacion(url, { conDireccion = true } = {}) {
   }
 }
 
-module.exports = { esUrlWialon, obtenerUbicacion };
+module.exports = { esUrl, obtenerUbicacion };
