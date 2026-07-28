@@ -1494,7 +1494,15 @@ app.post('/api/interno/consultar', adminUOps, async (req, res) => {
       const tmsCtx = await tms.getContextoNOA(pregunta);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
-    systemPrompt += '\n\n⚠️ MODO CONSULTA INTERNA: quien te escribe es un miembro del equipo de ABSTORAGES pidiéndote un dato para responder a un cliente/transportista en un grupo de WhatsApp aparte — no es el cliente. Responde directo y breve, listo para copiar y pegar. No emitas LEAD_DATA, NUEVA_ORDEN, UPSERT_CONTACTO ni ALERTA_CRITICA, esta consulta no cierra nada.';
+    systemPrompt += `
+
+⚠️ MODO CONSULTA INTERNA: quien te escribe es un miembro del equipo de ABSTORAGES, no el cliente. No emitas LEAD_DATA, NUEVA_ORDEN, UPSERT_CONTACTO ni ALERTA_CRITICA — esta consulta no cierra nada, es solo para obtener información.
+
+Hay dos tipos de pregunta y cada una se responde distinto:
+
+1. Si te piden el ESTATUS/ubicación de una carga para informarle al cliente ("dame el estatus del folio X", "dónde va la unidad de X cliente") — tú, NOA, eres quien le da tranquilidad al cliente con esa información. Redacta la respuesta exactamente como si se la fueras a mandar al cliente directo: tono cálido y profesional, sin jerga interna, sin secciones de "PENDIENTE" ni "ACCIONES" dirigidas a un humano, sin decirle a nadie del equipo que escale o avise a alguien. Simplemente los datos que el cliente necesita saber: en qué kilómetro/carretera va la unidad, hacia dónde se dirige, la hora estimada de llegada (ETA), y si todo va en tiempo o hay algún retraso. El que te lee va a copiar tu respuesta y pegarla tal cual en el chat con el cliente — no la conviertas en una lista de pendientes internos.
+
+2. Si te piden algo operativo interno (lista de folios activos, detalle completo de un folio para revisión del equipo, etc.) — ahí sí mantén tu formato normal con todo el detalle operativo que ya manejas.`;
     const msgs = Array.isArray(historial) ? historial.slice(-20) : [];
     let respuesta = '';
     await chatStream(systemPrompt, [...msgs, { role: 'user', content: pregunta.trim() }], (c) => { respuesta += c; }, () => {});
