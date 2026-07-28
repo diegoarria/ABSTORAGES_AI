@@ -96,10 +96,27 @@ const EL_LIVE = EL_KEY && !EL_KEY.startsWith('xxxx');
 // ─── WHATSAPP (Twilio) ───────────────────────────────────────────────────────
 const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, ''); // ej. +19383884379
+const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, ''); // ej. +19383884379 (NOA — histórico/default)
 const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 
-async function sendWhatsApp(to, text) {
+// Un número de WhatsApp por agente — cada uno contesta con su propia identidad,
+// igual que sus números de llamada en Vapi (nunca mezclar personas).
+const WA_NUMBERS = {
+  noa:   TWILIO_WA_FROM,
+  sara:  (process.env.TWILIO_WHATSAPP_NUMBER_SARA  || '').replace(/^whatsapp:/, ''),
+  sofia: (process.env.TWILIO_WHATSAPP_NUMBER_SOFIA || '').replace(/^whatsapp:/, ''),
+};
+
+// A qué agente le corresponde contestar según el número al que le escribieron (req.body.To).
+function agenteParaNumeroWA(numero) {
+  const limpio = (numero || '').replace(/^whatsapp:/, '');
+  for (const [agente, num] of Object.entries(WA_NUMBERS)) {
+    if (num && num === limpio) return agente;
+  }
+  return 'noa'; // fallback histórico — número original antes de separar por agente
+}
+
+async function sendWhatsApp(to, text, agente = 'noa') {
   // ── BLOQUEO ABSOLUTO — ningún token de control sale nunca por WhatsApp ──
   // Se aplica AQUÍ, dentro de la función que de verdad manda el mensaje, sin
   // importar qué código haya llamado a sendWhatsApp ni si ya se "limpió" antes.
@@ -124,8 +141,9 @@ async function sendWhatsApp(to, text) {
   console.log(`[WA] Enviando a ${to}: ${text.slice(0, 60)}...`);
   try {
     const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const from = WA_NUMBERS[agente] || TWILIO_WA_FROM;
     const body = new URLSearchParams({
-      From: `whatsapp:${TWILIO_WA_FROM}`,
+      From: `whatsapp:${from}`,
       To:   `whatsapp:${to.replace(/^whatsapp:/, '')}`,
       Body: text,
     });
@@ -224,67 +242,137 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
   res.send('<?xml version="1.0" encoding="UTF-8"?><Response></Response>');
   console.log('[WA-IN] body:', JSON.stringify(req.body).slice(0, 600));
   try {
-    // Twilio manda form-urlencoded: From="whatsapp:+52...", Body="texto", NumMedia="0"
+    // Twilio manda form-urlencoded: From="whatsapp:+52...", To="whatsapp:+52...", Body="texto", NumMedia="0"
     if (!req.body?.From || !req.body?.Body) { console.log('[WA-IN] sin From/Body, ignorando'); return; }
     if (Number(req.body.NumMedia || 0) > 0 && !req.body.Body.trim()) { console.log('[WA-IN] solo media, sin texto, ignorando'); return; }
-    const phone   = req.body.From.replace(/^whatsapp:/, '');
-    const texto   = req.body.Body.trim();
-    const session = `wa_${phone}`;
+    const phone  = req.body.From.replace(/^whatsapp:/, '');
+    const texto  = req.body.Body.trim();
+    // El agente que contesta depende del número al que le escribieron — cada
+    // agente tiene su propio número de WhatsApp, igual que su número de Vapi.
+    const agente  = agenteParaNumeroWA(req.body.To);
+    const agenteU = agente.toUpperCase();
+    // NOA conserva su clave de sesión histórica (wa_${phone}) para no romper
+    // continuidad de conversaciones ya guardadas; SARA/SOFIA son números nuevos.
+    const session = agente === 'noa' ? `wa_${phone}` : `wa_${agente}_${phone}`;
     const { contextBlock, history } = memory.buildContext(session);
     const esPrimerMensaje = history.length === 0; // capturado antes de agregar el mensaje actual
     const tariffCtx = tariff.getContext();
-    // Este número de WhatsApp es el de NOA — ella contesta todo lo que llegue aquí,
-    // no SARA (decisión explícita: el número/identidad debe coincidir en llamadas y WhatsApp).
-    let systemPrompt = buildPrompt('noa', contextBlock, tariffCtx);
-    if (tms.ENABLED) {
+    let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
+    if (agente === 'sofia' && tms.ENABLED) {
+      const tmsCtx = await tms.getContextoSOFIA(texto);
+      if (tmsCtx) systemPrompt += tmsCtx;
+    }
+    if (agente === 'noa' && tms.ENABLED) {
       const tmsCtx = await tms.getContextoNOA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
     memory.addMessage(session, 'user', texto);
-    saveMessage(session, 'noa', 'user', texto);
+    saveMessage(session, agente, 'user', texto);
     let respuesta = '';
     await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
     memory.addMessage(session, 'assistant', respuesta);
-    saveMessage(session, 'noa', 'assistant', respuesta);
+    saveMessage(session, agente, 'assistant', respuesta);
     const bloques = splitForWhatsApp(limpiarControlParaCliente(respuesta));
-    for (const bloque of bloques) await sendWhatsApp(phone, bloque);
+    for (const bloque of bloques) await sendWhatsApp(phone, bloque, agente);
     const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
     if (metaMatch) memory.updateMeta(session, { empresa: metaMatch[1].trim() });
 
-    // NOA — alerta crítica detectada en la conversación de WhatsApp
-    if (/ALERTA_CRITICA/i.test(respuesta)) {
-      try {
-        const m = respuesta.match(/ALERTA_CRITICA:\s*(\{[^\n]+\})/);
-        const datos = m ? JSON.parse(m[1]) : {};
-        pushActividad({ agente: 'NOA', tipo: 'ALERTA_CRITICA', mensaje: `🚨 ${datos.motivo || 'Alerta crítica'} — folio ${datos.folio || '—'}`, metadata: datos });
-        sendPush({
-          title: '🚨 ALERTA CRÍTICA — NOA',
-          body: `${datos.motivo || 'Revisar de inmediato'} · Folio ${datos.folio || '—'}`,
-          tag: 'alerta-critica', url: '/ops-center.html#noa', tipo: 'ALERTA_CRITICA', urgente: true,
-        }).catch(() => {});
-      } catch (e) { console.error('[WA] ALERTA_CRITICA inválida:', e.message); }
-    }
+    if (agente === 'sara') {
+      // Mismo flujo de captura/cierre que el chat del portal — WhatsApp es
+      // otro canal de entrada para SARA, no un agente distinto.
+      const hasCierre  = /NUEVA_ORDEN/i.test(respuesta);
+      const hasEscalar = /ESCALAR_HUMANO/i.test(respuesta);
+      const hasCerrar  = /CERRAR_CHAT/i.test(respuesta);
+      const sara_nota  = hasCierre ? 'cierre_de_venta' : hasEscalar ? 'escalado_a_operaciones' : hasCerrar ? 'chat_cerrado' : 'cotizacion_en_proceso';
 
-    // Memoria compartida cross-agente — solo si NOA confirma algo real (alta de
-    // operador o coordinación cerrada), nunca en chequeos rutinarios.
-    const contactoMatchWA = respuesta.match(/UPSERT_CONTACTO:\s*(\{[^\n]+\})/);
-    if (contactoMatchWA) {
-      try {
-        const datos = JSON.parse(contactoMatchWA[1]);
+      const leadDataMatch = respuesta.match(/LEAD_DATA:\s*(\{[^\n]+\})/);
+      let datosSara = {};
+      if (leadDataMatch) { try { datosSara = JSON.parse(leadDataMatch[1]); } catch {} }
+
+      const primer_mensaje = (history.find(m => m.role === 'user')?.content || texto).slice(0, 300);
+      const lead = leads.add({ ...datosSara, sara_nota, primer_mensaje, sessionId: session, canal: 'whatsapp' });
+
+      if (hasCierre) {
+        pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: session });
+        sendPush({
+          title: '🚛 Nueva orden — SARA (WhatsApp)',
+          body: `${lead.empresa || lead.nombre || 'Cliente'} · ${lead.origen || ''}→${lead.destino || ''} · Folio ${lead.folio || ''}`,
+          tag: 'nueva-orden', url: '/', tipo: 'NUEVA_ORDEN', urgente: true,
+        }).catch(() => {});
+        await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore WA]', e.message));
         contactos.upsertContacto({
-          agente: 'noa',
-          tipo: datos.tipo || 'operador',
-          nombre_completo: datos.nombre_completo || datos.nombre,
-          telefono: datos.telefono, email: datos.email, empresa: datos.empresa,
-          tipo_carga: datos.tipo_carga,
-          resumen_interaccion: datos.resumen_interaccion || datos.resumen,
+          agente: 'sara', tipo: 'cliente',
+          nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
+          empresa: lead.empresa, tipo_carga: lead.tipo_carga,
+          resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
           canal: 'whatsapp',
         }).catch(e => console.error('[contactos]', e.message));
-      } catch (e) { console.error('[UPSERT_CONTACTO WA] JSON inválido:', e.message); }
+        vapi.lanzarLlamadasProveedores(lead, PROVEEDORES)
+          .then(r => pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: `Folio ${lead.folio} — ${r.llamadas} llamadas a carriers iniciadas`, metadata: { folio: lead.folio, ...r } }))
+          .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
+      }
+
+      if (esPrimerMensaje) {
+        notifier.notificarLead(lead).catch(e => console.error('[notifier WA primer-contacto]', e.message));
+      }
+      if (hasCierre || hasEscalar || hasCerrar) {
+        const histWA = memory.buildContext(session).history || [];
+        notifier.notificarResumen(lead, sara_nota, histWA).catch(e => console.error('[notifier WA resumen]', e.message));
+      }
+    } else if (agente === 'sofia') {
+      // Marcador UPSERT_CONTACTO — respaldo para cuando SOFIA cierra un acuerdo
+      // con un proveedor por WhatsApp en vez de por llamada de Vapi.
+      const contactoMatchWA = respuesta.match(/UPSERT_CONTACTO:\s*(\{[^\n]+\})/);
+      if (contactoMatchWA) {
+        try {
+          const datos = JSON.parse(contactoMatchWA[1]);
+          contactos.upsertContacto({
+            agente: 'sofia',
+            tipo: datos.tipo || 'proveedor',
+            nombre_completo: datos.nombre_completo || datos.nombre,
+            telefono: datos.telefono, email: datos.email, empresa: datos.empresa,
+            tipo_carga: datos.tipo_carga,
+            resumen_interaccion: datos.resumen_interaccion || datos.resumen,
+            canal: 'whatsapp',
+          }).catch(e => console.error('[contactos]', e.message));
+        } catch (e) { console.error('[UPSERT_CONTACTO WA] JSON inválido:', e.message); }
+      }
+    } else if (agente === 'noa') {
+      // NOA — alerta crítica detectada en la conversación de WhatsApp
+      if (/ALERTA_CRITICA/i.test(respuesta)) {
+        try {
+          const m = respuesta.match(/ALERTA_CRITICA:\s*(\{[^\n]+\})/);
+          const datos = m ? JSON.parse(m[1]) : {};
+          pushActividad({ agente: 'NOA', tipo: 'ALERTA_CRITICA', mensaje: `🚨 ${datos.motivo || 'Alerta crítica'} — folio ${datos.folio || '—'}`, metadata: datos });
+          sendPush({
+            title: '🚨 ALERTA CRÍTICA — NOA',
+            body: `${datos.motivo || 'Revisar de inmediato'} · Folio ${datos.folio || '—'}`,
+            tag: 'alerta-critica', url: '/ops-center.html#noa', tipo: 'ALERTA_CRITICA', urgente: true,
+          }).catch(() => {});
+        } catch (e) { console.error('[WA] ALERTA_CRITICA inválida:', e.message); }
+      }
+
+      // Memoria compartida cross-agente — solo si NOA confirma algo real (alta de
+      // operador o coordinación cerrada), nunca en chequeos rutinarios.
+      const contactoMatchWA = respuesta.match(/UPSERT_CONTACTO:\s*(\{[^\n]+\})/);
+      if (contactoMatchWA) {
+        try {
+          const datos = JSON.parse(contactoMatchWA[1]);
+          contactos.upsertContacto({
+            agente: 'noa',
+            tipo: datos.tipo || 'operador',
+            nombre_completo: datos.nombre_completo || datos.nombre,
+            telefono: datos.telefono, email: datos.email, empresa: datos.empresa,
+            tipo_carga: datos.tipo_carga,
+            resumen_interaccion: datos.resumen_interaccion || datos.resumen,
+            canal: 'whatsapp',
+          }).catch(e => console.error('[contactos]', e.message));
+        } catch (e) { console.error('[UPSERT_CONTACTO WA] JSON inválido:', e.message); }
+      }
     }
 
     if (esPrimerMensaje) {
-      pushActividad({ agente: 'NOA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp: ${phone}`, sessionId: session });
+      pushActividad({ agente: agenteU, tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp (${agenteU}): ${phone}`, sessionId: session });
     }
   } catch (err) {
     console.error('[WhatsApp webhook error]', err.message);
@@ -685,6 +773,15 @@ app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
 app.get('/api/vapi/assistant/:id', soloAdmin, async (req, res) => {
   try {
     const data = await vapi.obtenerAssistant(req.params.id);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/vapi/numeros', soloAdmin, async (req, res) => {
+  try {
+    const data = await vapi.listarNumeros();
     res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
