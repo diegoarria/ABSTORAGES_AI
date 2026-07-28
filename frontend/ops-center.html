@@ -432,6 +432,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
   </nav>
 
   <div class="hdr-right">
+    <button class="btn btn-sm" onclick="toggleAsistente()" aria-label="Preguntar a un agente" style="border-color:var(--grn-b);color:var(--grn)">💬 Preguntar a un agente</button>
     <span class="hdr-clock" id="clock" aria-live="polite" aria-label="Reloj">--:--:--</span>
     <div class="hdr-badge crit" id="badge" role="status" aria-live="polite">
       <span class="badge-dot" aria-hidden="true"></span>
@@ -2252,6 +2253,120 @@ document.addEventListener('DOMContentLoaded',function(){
     _provLoaded = true;
     loadProveedores();
   }
+})();
+</script>
+<!-- ══ ASISTENTE INTERNO — preguntar a un agente sin efectos secundarios ══
+     Para grupos de WhatsApp con clientes/transportistas donde la IA no puede
+     participar directamente: el equipo pregunta aquí y copia la respuesta. -->
+<style>
+.asis-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;align-items:flex-end;justify-content:flex-end;padding:18px}
+.asis-overlay.on{display:flex}
+.asis-box{width:380px;max-width:calc(100vw - 36px);max-height:70vh;background:var(--s1);border:1px solid var(--b2);border-radius:var(--rl);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.asis-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--b1);background:var(--s2)}
+.asis-head b{font-size:12px;letter-spacing:.03em}
+.asis-close{margin-left:auto;background:none;border:none;color:var(--t2);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px}
+.asis-close:hover{color:var(--t1)}
+.asis-agentes{display:flex;gap:6px;padding:10px 14px 0}
+.asis-ag{flex:1;padding:6px 0;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.03em;cursor:pointer;border:1px solid var(--b2);background:var(--s3);color:var(--t2);font-family:inherit}
+.asis-ag.on{background:var(--grn-d);border-color:var(--grn-b);color:var(--grn)}
+.asis-log{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:120px}
+.asis-msg{font-size:12px;line-height:1.55;padding:8px 10px;border-radius:8px;max-width:92%}
+.asis-msg.q{align-self:flex-end;background:var(--s4);color:var(--t1)}
+.asis-msg.a{align-self:flex-start;background:var(--grn-d);border:1px solid var(--grn-b);color:var(--t1);white-space:pre-wrap;position:relative}
+.asis-copy{margin-top:6px;font-size:10px;font-weight:700;color:var(--grn);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
+.asis-copy:hover{text-decoration:underline}
+.asis-empty{color:var(--t3);font-size:11.5px;text-align:center;margin:auto}
+.asis-inbar{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--b1);background:var(--s2)}
+.asis-inp{flex:1;background:var(--s3);border:1px solid var(--b2);border-radius:6px;padding:7px 10px;color:var(--t1);font-size:12px;font-family:inherit;outline:none;resize:none}
+.asis-inp:focus{border-color:var(--grn-b)}
+.asis-send{background:var(--grn);color:#fff;border:none;border-radius:6px;padding:0 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.asis-send:disabled{opacity:.5;cursor:default}
+</style>
+<div class="asis-overlay" id="asis-overlay" onclick="if(event.target===this)toggleAsistente(false)">
+  <div class="asis-box" role="dialog" aria-label="Preguntar a un agente">
+    <div class="asis-head">
+      <b>💬 Preguntar a un agente</b>
+      <button class="asis-close" onclick="toggleAsistente(false)" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="asis-agentes">
+      <button class="asis-ag on" data-ag="sara"  onclick="asisElegirAgente('sara')">SARA</button>
+      <button class="asis-ag"    data-ag="sofia" onclick="asisElegirAgente('sofia')">SOFÍA</button>
+      <button class="asis-ag"    data-ag="noa"   onclick="asisElegirAgente('noa')">NOA</button>
+    </div>
+    <div class="asis-log" id="asis-log"><div class="asis-empty">Pregunta algo (folio, tarifa, estatus…) y copia la respuesta al grupo de WhatsApp del cliente/transportista.</div></div>
+    <div class="asis-inbar">
+      <textarea class="asis-inp" id="asis-inp" rows="1" placeholder="Ej. ¿Cómo va el folio ABST-000123?" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();asisPreguntar();}"></textarea>
+      <button class="asis-send" id="asis-send" onclick="asisPreguntar()">Enviar</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var asisAgente = 'sara';
+  var asisHistorial = { sara: [], sofia: [], noa: [] };
+
+  window.toggleAsistente = function(force) {
+    var ov = document.getElementById('asis-overlay');
+    var show = typeof force === 'boolean' ? force : !ov.classList.contains('on');
+    ov.classList.toggle('on', show);
+    if (show) document.getElementById('asis-inp').focus();
+  };
+
+  window.asisElegirAgente = function(ag) {
+    asisAgente = ag;
+    document.querySelectorAll('.asis-ag').forEach(function(b){ b.classList.toggle('on', b.dataset.ag === ag); });
+    asisRenderLog();
+  };
+
+  function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function asisRenderLog() {
+    var log = document.getElementById('asis-log');
+    var hist = asisHistorial[asisAgente];
+    if (!hist.length) {
+      log.innerHTML = '<div class="asis-empty">Pregunta algo (folio, tarifa, estatus…) y copia la respuesta al grupo de WhatsApp del cliente/transportista.</div>';
+      return;
+    }
+    log.innerHTML = hist.map(function(m, i) {
+      if (m.role === 'user') return '<div class="asis-msg q">' + esc(m.content) + '</div>';
+      return '<div class="asis-msg a">' + esc(m.content) + '<br><button class="asis-copy" onclick="asisCopiar(' + i + ')">📋 Copiar</button></div>';
+    }).join('');
+    log.scrollTop = log.scrollHeight;
+  }
+
+  window.asisCopiar = function(i) {
+    var texto = asisHistorial[asisAgente][i].content;
+    navigator.clipboard.writeText(texto).catch(function(){});
+  };
+
+  window.asisPreguntar = function() {
+    var inp = document.getElementById('asis-inp');
+    var pregunta = inp.value.trim();
+    if (!pregunta) return;
+    var btn = document.getElementById('asis-send');
+    inp.value = '';
+    btn.disabled = true;
+    var hist = asisHistorial[asisAgente];
+    hist.push({ role: 'user', content: pregunta });
+    asisRenderLog();
+
+    fetch('/api/interno/consultar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ agente: asisAgente, pregunta: pregunta, historial: hist.slice(0, -1) }),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      hist.push({ role: 'assistant', content: data.respuesta || data.error || 'Sin respuesta' });
+      asisRenderLog();
+    })
+    .catch(function(e) {
+      hist.push({ role: 'assistant', content: 'Error: ' + e.message });
+      asisRenderLog();
+    })
+    .finally(function() { btn.disabled = false; inp.focus(); });
+  };
 })();
 </script>
 <script src="/js/pwa.js"></script>

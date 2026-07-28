@@ -1472,6 +1472,31 @@ app.post('/api/sofia/chat', (req, res) => handleChat('sofia',  req, res));
 app.post('/api/hector/chat',(req, res) => handleChat('hector', req, res));
 app.post('/api/noa/chat',   (req, res) => handleChat('noa',    req, res));
 
+// ─── ASISTENTE INTERNO (equipo consulta a un agente, sin efectos secundarios) ──
+// Para grupos de WhatsApp con clientes/transportistas donde la IA no puede
+// participar directamente (limitación de la plataforma, no del código): el
+// equipo consulta aquí y copia la respuesta al grupo. A diferencia de
+// handleChat, esto NUNCA dispara leads.add, ordersStore.guardarOrden,
+// llamadas de Vapi, emails ni contactos.upsertContacto — es solo consulta.
+const AGENTES_INTERNOS = ['sara', 'sofia', 'noa'];
+app.post('/api/interno/consultar', adminUOps, async (req, res) => {
+  const { agente, pregunta, historial } = req.body || {};
+  if (!AGENTES_INTERNOS.includes(agente)) return res.status(400).json({ error: 'agente inválido' });
+  if (!pregunta || !pregunta.trim()) return res.status(400).json({ error: 'pregunta requerida' });
+  try {
+    const tariffCtx = tariff.getContext();
+    let systemPrompt = buildPrompt(agente, '', tariffCtx);
+    systemPrompt += '\n\n⚠️ MODO CONSULTA INTERNA: quien te escribe es un miembro del equipo de ABSTORAGES pidiéndote un dato para responder a un cliente/transportista en un grupo de WhatsApp aparte — no es el cliente. Responde directo y breve, listo para copiar y pegar. No emitas LEAD_DATA, NUEVA_ORDEN, UPSERT_CONTACTO ni ALERTA_CRITICA, esta consulta no cierra nada.';
+    const msgs = Array.isArray(historial) ? historial.slice(-20) : [];
+    let respuesta = '';
+    await chatStream(systemPrompt, [...msgs, { role: 'user', content: pregunta.trim() }], (c) => { respuesta += c; }, () => {});
+    res.json({ respuesta: limpiarControlParaCliente(respuesta) });
+  } catch (e) {
+    console.error('[interno/consultar]', e.message);
+    res.status(500).json({ error: 'No se pudo consultar al agente' });
+  }
+});
+
 // ─── CUENTAS POR COBRAR ────────────────────────────────────────────────────────
 // Producción: conectar a ERP / AppSheets GET /api/cxc
 app.get('/api/cuentas-cobrar', (req, res) => {
