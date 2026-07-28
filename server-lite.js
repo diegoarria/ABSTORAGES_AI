@@ -1486,6 +1486,14 @@ app.post('/api/interno/consultar', adminUOps, async (req, res) => {
   try {
     const tariffCtx = tariff.getContext();
     let systemPrompt = buildPrompt(agente, '', tariffCtx);
+    if (agente === 'sofia' && tms.ENABLED) {
+      const tmsCtx = await tms.getContextoSOFIA(pregunta);
+      if (tmsCtx) systemPrompt += tmsCtx;
+    }
+    if (agente === 'noa' && tms.ENABLED) {
+      const tmsCtx = await tms.getContextoNOA(pregunta);
+      if (tmsCtx) systemPrompt += tmsCtx;
+    }
     systemPrompt += '\n\n⚠️ MODO CONSULTA INTERNA: quien te escribe es un miembro del equipo de ABSTORAGES pidiéndote un dato para responder a un cliente/transportista en un grupo de WhatsApp aparte — no es el cliente. Responde directo y breve, listo para copiar y pegar. No emitas LEAD_DATA, NUEVA_ORDEN, UPSERT_CONTACTO ni ALERTA_CRITICA, esta consulta no cierra nada.';
     const msgs = Array.isArray(historial) ? historial.slice(-20) : [];
     let respuesta = '';
