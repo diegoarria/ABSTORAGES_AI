@@ -2261,7 +2261,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <style>
 .asis-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;align-items:flex-end;justify-content:flex-end;padding:18px}
 .asis-overlay.on{display:flex}
-.asis-box{width:380px;max-width:calc(100vw - 36px);max-height:70vh;background:var(--s1);border:1px solid var(--b2);border-radius:var(--rl);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.asis-box{width:480px;max-width:calc(100vw - 36px);max-height:78vh;background:var(--s1);border:1px solid var(--b2);border-radius:var(--rl);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .asis-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--b1);background:var(--s2)}
 .asis-head b{font-size:12px;letter-spacing:.03em}
 .asis-close{margin-left:auto;background:none;border:none;color:var(--t2);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px}
@@ -2270,11 +2270,29 @@ document.addEventListener('DOMContentLoaded',function(){
 .asis-ag{flex:1;padding:6px 0;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.03em;cursor:pointer;border:1px solid var(--b2);background:var(--s3);color:var(--t2);font-family:inherit}
 .asis-ag.on{background:var(--grn-d);border-color:var(--grn-b);color:var(--grn)}
 .asis-log{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:120px}
-.asis-msg{font-size:12px;line-height:1.55;padding:8px 10px;border-radius:8px;max-width:92%}
-.asis-msg.q{align-self:flex-end;background:var(--s4);color:var(--t1)}
-.asis-msg.a{align-self:flex-start;background:var(--grn-d);border:1px solid var(--grn-b);color:var(--t1);white-space:pre-wrap;position:relative}
-.asis-copy{margin-top:6px;font-size:10px;font-weight:700;color:var(--grn);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
+.asis-msg{font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:8px;max-width:94%}
+.asis-msg.q{align-self:flex-end;background:var(--s4);color:var(--t1);white-space:pre-wrap}
+.asis-msg.a{align-self:stretch;max-width:100%;background:var(--s2);border:1px solid var(--b1);color:var(--t1);position:relative;overflow-x:auto}
+.asis-copy{margin-top:8px;font-size:10px;font-weight:700;color:var(--grn);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
 .asis-copy:hover{text-decoration:underline}
+
+/* ── Markdown renderizado dentro de la respuesta del agente (estilo ChatGPT/Claude) ── */
+.asis-p{margin:0 0 8px}
+.asis-p:last-child{margin-bottom:0}
+.asis-h{font-weight:800;letter-spacing:.02em;color:var(--t1);margin:12px 0 6px}
+.asis-h:first-child{margin-top:0}
+.asis-h1{font-size:14px}
+.asis-h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--grn)}
+.asis-h3{font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:.04em}
+.asis-hr{border:none;border-top:1px solid var(--b1);margin:12px 0}
+.asis-ul,.asis-ol{margin:0 0 8px;padding-left:18px}
+.asis-ul li,.asis-ol li{margin-bottom:3px}
+.asis-a strong{color:var(--t1);font-weight:700}
+.asis-code{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11px}
+.asis-table{border-collapse:collapse;width:100%;margin:6px 0 10px;font-size:11.5px}
+.asis-table th,.asis-table td{border:1px solid var(--b1);padding:5px 8px;text-align:left}
+.asis-table th{background:var(--s3);color:var(--t2);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em}
+.asis-table td{color:var(--t1)}
 .asis-empty{color:var(--t3);font-size:11.5px;text-align:center;margin:auto}
 .asis-inbar{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--b1);background:var(--s2)}
 .asis-inp{flex:1;background:var(--s3);border:1px solid var(--b2);border-radius:6px;padding:7px 10px;color:var(--t1);font-size:12px;font-family:inherit;outline:none;resize:none}
@@ -2320,6 +2338,69 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+  // Negritas/código en línea — se aplica DESPUÉS de escapar HTML, así que
+  // los símbolos de markdown (**, `) sobreviven el escape sin riesgo de XSS.
+  function asisInline(s) {
+    return esc(s)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`([^`]+)`/g, '<code class="asis-code">$1</code>');
+  }
+
+  // Markdown → HTML mínimo (headers, tablas, listas, hr, negritas) para que
+  // las respuestas de los agentes se vean como en ChatGPT/Claude, no como
+  // texto crudo con "**" y "##" literales.
+  function asisMdToHtml(texto) {
+    var lines = String(texto || '').split('\n');
+    var html = '';
+    var inList = null;
+    function closeList() { if (inList) { html += '</' + inList + '>'; inList = null; } }
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+
+      // Tabla: fila con | seguida de fila separadora |---|---|
+      if (/^\s*\|.*\|\s*$/.test(line) && lines[i+1] && /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(lines[i+1])) {
+        closeList();
+        var cells = function(l) { return l.split('|').map(function(c){return c.trim();}).filter(function(c,idx,arr){ return !((idx===0||idx===arr.length-1) && c===''); }); };
+        var head = cells(line);
+        i += 2;
+        var rows = [];
+        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { rows.push(cells(lines[i])); i++; }
+        i--; // el for hace i++ otra vez
+        html += '<table class="asis-table"><thead><tr>' + head.map(function(c){return '<th>'+asisInline(c)+'</th>';}).join('') + '</tr></thead><tbody>' +
+          rows.map(function(r){ return '<tr>' + r.map(function(c){return '<td>'+asisInline(c)+'</td>';}).join(''); }).join('</tr>') + (rows.length?'</tr>':'') +
+          '</tbody></table>';
+        continue;
+      }
+
+      if (/^\s*-{3,}\s*$/.test(line)) { closeList(); html += '<hr class="asis-hr">'; continue; }
+
+      var hMatch = line.match(/^(#{1,6})\s+(.*)$/);
+      if (hMatch) { closeList(); html += '<div class="asis-h asis-h' + Math.min(hMatch[1].length,3) + '">' + asisInline(hMatch[2]) + '</div>'; continue; }
+
+      var olMatch = line.match(/^\s*\d+\.\s+(.*)$/);
+      if (olMatch) {
+        if (inList !== 'ol') { closeList(); html += '<ol class="asis-ol">'; inList = 'ol'; }
+        html += '<li>' + asisInline(olMatch[1]) + '</li>';
+        continue;
+      }
+
+      var ulMatch = line.match(/^\s*[-•]\s+(.*)$/);
+      if (ulMatch) {
+        if (inList !== 'ul') { closeList(); html += '<ul class="asis-ul">'; inList = 'ul'; }
+        html += '<li>' + asisInline(ulMatch[1]) + '</li>';
+        continue;
+      }
+
+      if (/^\s*$/.test(line)) { closeList(); continue; }
+
+      closeList();
+      html += '<p class="asis-p">' + asisInline(line) + '</p>';
+    }
+    closeList();
+    return html;
+  }
+
   function asisRenderLog() {
     var log = document.getElementById('asis-log');
     var hist = asisHistorial[asisAgente];
@@ -2329,7 +2410,7 @@ document.addEventListener('DOMContentLoaded',function(){
     }
     log.innerHTML = hist.map(function(m, i) {
       if (m.role === 'user') return '<div class="asis-msg q">' + esc(m.content) + '</div>';
-      return '<div class="asis-msg a">' + esc(m.content) + '<br><button class="asis-copy" onclick="asisCopiar(' + i + ')">📋 Copiar</button></div>';
+      return '<div class="asis-msg a"><div class="asis-a">' + asisMdToHtml(m.content) + '</div><button class="asis-copy" onclick="asisCopiar(' + i + ')">📋 Copiar</button></div>';
     }).join('');
     log.scrollTop = log.scrollHeight;
   }
