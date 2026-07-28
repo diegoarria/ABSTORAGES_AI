@@ -31,6 +31,7 @@ const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
 const db          = require('./backend/db/db');
 const tms         = require('./backend/services/tms');
+const wialon      = require('./backend/services/wialon');
 const ordersStore = require('./backend/services/ordersStore');
 const contactos   = require('./backend/services/contactos');
 const PROVEEDORES = require('./backend/data/proveedores.json');
@@ -958,6 +959,13 @@ app.get('/api/noa/folios', async (req, res) => {
     // Only replace cache if TMS returned real data
     if (activos && activos.length > 0) {
       const folios = activos.map(mapFolio);
+      // Ubicación real (Wialon) para las unidades que la tengan — sin geocodificar
+      // (evita saturar Nominatim en una consulta masiva), solo lat/lng para el mapa.
+      await Promise.all(folios.map(async (f) => {
+        if (!wialon.esUrlWialon(f.gps.url)) return;
+        const ubic = await wialon.obtenerUbicacion(f.gps.url, { conDireccion: false }).catch(() => null);
+        if (ubic) { f.gps.la = ubic.lat; f.gps.ln = ubic.lng; }
+      }));
       _foliosCache = { data: folios, ts: new Date().toISOString() };
       return res.json(folios);
     }
@@ -1021,6 +1029,11 @@ app.get('/api/noa/folio/:folio', async (req, res) => {
       d._eta = etaResult;
     } catch (e) {
       console.warn('[NOA/folio/eta]', e.message);
+    }
+
+    if (wialon.esUrlWialon(d['GPS'])) {
+      const ubic = await wialon.obtenerUbicacion(d['GPS']).catch(() => null);
+      if (ubic) d._gpsVivo = ubic;
     }
 
     res.json(d);

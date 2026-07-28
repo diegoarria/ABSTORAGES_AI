@@ -1,6 +1,7 @@
 // TMS — cliente API sobre Google Sheets (Google Apps Script)
 // Solo lectura. Maneja el redirect 302 que Google Apps Script hace siempre.
 const https = require('https');
+const wialon = require('./wialon');
 
 const TMS_URL   = process.env.TMS_API_URL  || 'https://script.google.com/macros/s/AKfycbwcL5IyR3sTohDhihoxPSsg7bPxeR3J4gt7mIJ_aieZ3Pn7ouFqgNPfR322iIRT7r3n/exec';
 const TMS_TOKEN = process.env.TMS_API_KEY  || 'b4914e954d7e43cd8830b4855f7d9e110b13400cb88d4353b4e4e0306a0bf4ee';
@@ -554,7 +555,7 @@ async function getContextoNOA(mensajeUsuario) {
   const folioMatch = mensajeUsuario.match(/OP-ABS-\d{2}-\d+/i);
   if (folioMatch) {
     const datos = await buscarFolioNOA(folioMatch[0].toUpperCase());
-    if (datos.length) return '\n\n---\n[DATOS TMS MONITOREO — uso interno NOA]\n' + formatearFolioNOA(datos[0]) + '\n---\n';
+    if (datos.length) return '\n\n---\n[DATOS TMS MONITOREO — uso interno NOA]\n' + await formatearFolioNOA(datos[0]) + '\n---\n';
   }
 
   // Detectar intención de entrega de turno o vista de todos los activos
@@ -590,7 +591,16 @@ function fmtFecha(v) {
     + ' ' + d.toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit', hour12: false });
 }
 
-function formatearFolioNOA(s) {
+async function formatearFolioNOA(s) {
+  let lineaGpsVivo = '';
+  if (wialon.esUrlWialon(s['GPS'])) {
+    const ubic = await wialon.obtenerUbicacion(s['GPS']);
+    if (ubic) {
+      lineaGpsVivo = `\n📍 UBICACIÓN GPS EN VIVO (Wialon, hace segundos): ${ubic.direccion || `${ubic.lat}, ${ubic.lng}`}` +
+        ` | Velocidad: ${ubic.speedKmh ?? '—'} km/h | Última actualización: ${fmtFecha(ubic.timestamp)}` +
+        `\n   Usa este dato real para el kilómetro/carretera y velocidad — no inventes ni uses únicamente el campo de comentarios.`;
+    }
+  }
   const lineas = [
     `📋 FOLIO: ${fmt(s['Folio de servicio'])} | Fecha: ${fmtFecha(s['Fecha de Servicio'])} | Cliente: ${fmt(s['Cliente'])}`,
     '',
@@ -610,7 +620,7 @@ function formatearFolioNOA(s) {
     `   Tractor: ${fmt(s['Tractor'])} (${fmt(s['Tipo de tractor'])}) | NIV: ${fmt(s['NIV Tractor'])}`,
     `   Remolque: ${fmt(s['Remolque'])} (${fmt(s['Tipo remolque'])}) | NIV: ${fmt(s['NIV Remolque'])}`,
     `   Permiso SCT: ${fmt(s['Permiso SCT'])} | Tipo: ${fmt(s['Tipo de Permiso'])}`,
-    `   GPS: ${fmt(s['GPS'])} | Usuario GPS: ${fmt(s['Usuario GPS'])}`,
+    `   GPS: ${fmt(s['GPS'])} | Usuario GPS: ${fmt(s['Usuario GPS'])}${lineaGpsVivo}`,
     '',
     `👤 OPERADOR: ${fmt(s['Operador'])} | RFC: ${fmt(s['RFC'])} | Licencia: ${fmt(s['Licencia'])}`,
     '',
