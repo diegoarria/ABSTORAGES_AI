@@ -780,6 +780,15 @@ app.get('/api/vapi/assistant/:id', soloAdmin, async (req, res) => {
   }
 });
 
+app.patch('/api/vapi/assistant/:id', soloAdmin, async (req, res) => {
+  try {
+    const data = await vapi.actualizarAssistant(req.params.id, req.body || {});
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get('/api/vapi/numeros', soloAdmin, async (req, res) => {
   try {
     const data = await vapi.listarNumeros();

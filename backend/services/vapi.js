@@ -493,6 +493,20 @@ async function listarNumeros() {
   return res.json();
 }
 
+// Actualiza cualquier campo del assistant (ej. voice, model, firstMessage).
+// Vapi reemplaza el objeto anidado completo, no hace merge profundo — quien
+// llame debe mandar el objeto completo del campo que está cambiando.
+async function actualizarAssistant(id, payload) {
+  if (!API_KEY) throw new Error('VAPI_API_KEY no configurada');
+  const res = await fetch(`${BASE_URL}/assistant/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
 // Asigna un assistant a un número para que conteste llamadas ENTRANTES
 async function asignarAssistantANumero(numeroId, assistantId) {
   if (!API_KEY) throw new Error('VAPI_API_KEY no configurada');
@@ -518,6 +532,7 @@ module.exports = {
   llamarStatusChofer,
   llamarStatusCliente,
   obtenerAssistant,
+  actualizarAssistant,
   obtenerNumero,
   listarNumeros,
   asignarAssistantANumero,
