@@ -410,8 +410,8 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
 
   const esChofer = rol === 'chofer';
   const primerMensaje = esChofer
-    ? `Hola ${nombre}, soy NOA de ABSTORAGES Logistics Solutions, llamando por el folio ${folio}. ¿Cómo va todo con el viaje?`
-    : `Hola ${nombre}, soy NOA de ABSTORAGES Logistics Solutions, te llamo para darte un estatus de tu envío, folio ${folio}.`;
+    ? `Hola ${nombre}, soy Noa de ABSTORAGES Logistics Solutions, llamando por el folio ${folio}. ¿Cómo va todo con el viaje?`
+    : `Hola ${nombre}, soy Noa de ABSTORAGES Logistics Solutions, te llamo para darte un estatus de tu envío, folio ${folio}.`;
 
   const systemPrompt =
     NOA_SYSTEM_PROMPT +
