@@ -34,6 +34,7 @@ const tms         = require('./backend/services/tms');
 const gpsProviders = require('./backend/services/gpsProviders');
 const ordersStore = require('./backend/services/ordersStore');
 const contactos   = require('./backend/services/contactos');
+const alertasStaff = require('./backend/services/alertasStaff');
 const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
@@ -127,6 +128,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/NUEVA_ORDEN\s*:[\s\S]*$/gi, '')
     .replace(/UPSERT_CONTACTO\s*:[\s\S]*$/gi, '')
     .replace(/ALERTA_CRITICA\s*:[\s\S]*$/gi, '')
+    .replace(/ESTATUS_SEGUIMIENTO\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();
@@ -350,7 +352,19 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
             body: `${datos.motivo || 'Revisar de inmediato'} · Folio ${datos.folio || '—'}`,
             tag: 'alerta-critica', url: '/ops-center.html#noa', tipo: 'ALERTA_CRITICA', urgente: true,
           }).catch(() => {});
+          // Mensaje directo por WhatsApp al equipo — automático, nadie tiene que ordenarlo.
+          alertasStaff.alertarCriticoStaff(datos).catch(e => console.error('[alertasStaff]', e.message));
         } catch (e) { console.error('[WA] ALERTA_CRITICA inválida:', e.message); }
+      }
+
+      // NOA — estatus de seguimiento armado con info extraída de la conversación
+      if (/ESTATUS_SEGUIMIENTO/i.test(respuesta)) {
+        try {
+          const m = respuesta.match(/ESTATUS_SEGUIMIENTO:\s*(\{[^\n]+\})/);
+          const datos = m ? JSON.parse(m[1]) : {};
+          pushActividad({ agente: 'NOA', tipo: 'ESTATUS_SEGUIMIENTO', mensaje: `📦 Estatus folio ${datos.folio || '—'} enviado al equipo`, metadata: datos });
+          alertasStaff.enviarEstatusSeguimiento(datos).catch(e => console.error('[alertasStaff]', e.message));
+        } catch (e) { console.error('[WA] ESTATUS_SEGUIMIENTO inválido:', e.message); }
       }
 
       // Memoria compartida cross-agente — solo si NOA confirma algo real (alta de
@@ -558,6 +572,10 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
       // Resumen auto-generado por Vapi (analysisPlan.summaryPlan) — llega en
       // el reporte de fin de llamada, no hay que pedirlo aparte.
       const resumen = evento.message?.analysis?.summary || call.analysis?.summary || null;
+      // Datos estructurados auto-extraídos por Vapi (analysisPlan.structuredDataPlan) —
+      // NOA no puede decir tokens de control en voz, así que en llamadas la alerta
+      // crítica y el estatus de seguimiento se detectan así, no por regex de texto.
+      const structuredData = evento.message?.analysis?.structuredData || call.analysis?.structuredData || null;
 
       // Registro persistente en disco — las 3 IAs, sobrevive redeploys
       callLog.registrar({
@@ -618,6 +636,24 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
           mensaje: `Llamada con ${nombre || telefono || 'contacto'} terminada${duracionSeg ? ` (${Math.round(duracionSeg)}s)` : ''}` + (resumen ? ` — ${resumen}` : ''),
           metadata: { folio: metadata.folio || null, telefono, duracionSeg, resumen },
         });
+
+        // NOA — alerta crítica o estatus de seguimiento detectados en la llamada
+        // (no puede decirlos en voz, así que salen del análisis estructurado de Vapi).
+        if (agente === 'noa' && structuredData) {
+          if (structuredData.alerta_critica) {
+            const datosAlerta = { folio: structuredData.folio || metadata.folio || null, motivo: structuredData.motivo || 'Alerta detectada en llamada' };
+            pushActividad({ agente: 'NOA', tipo: 'ALERTA_CRITICA', mensaje: `🚨 ${datosAlerta.motivo} — folio ${datosAlerta.folio || '—'}`, metadata: datosAlerta });
+            sendPush({
+              title: '🚨 ALERTA CRÍTICA — NOA', body: `${datosAlerta.motivo} · Folio ${datosAlerta.folio || '—'}`,
+              tag: 'alerta-critica', url: '/ops-center.html#noa', tipo: 'ALERTA_CRITICA', urgente: true,
+            }).catch(() => {});
+            alertasStaff.alertarCriticoStaff(datosAlerta).catch(e => console.error('[alertasStaff]', e.message));
+          } else if (structuredData.estatus_relevante && structuredData.estatus_resumen) {
+            const datosEstatus = { folio: structuredData.folio || metadata.folio || null, resumen: structuredData.estatus_resumen };
+            pushActividad({ agente: 'NOA', tipo: 'ESTATUS_SEGUIMIENTO', mensaje: `📦 Estatus folio ${datosEstatus.folio || '—'} enviado al equipo`, metadata: datosEstatus });
+            alertasStaff.enviarEstatusSeguimiento(datosEstatus).catch(e => console.error('[alertasStaff]', e.message));
+          }
+        }
       }
 
       // Reporte (push + email) de cada llamada terminada, salvo la de
@@ -1506,7 +1542,24 @@ async function handleChat(agente, req, res) {
     if (agente === 'noa' && /ALERTA_CRITICA/i.test(fullText)) {
       try {
         const m = fullText.match(/ALERTA_CRITICA:\s*(\{[^\n]+\})/);
-        if (m) res.write(`data: ${JSON.stringify({ type: 'alerta_critica', datos: JSON.parse(m[1]) })}\n\n`);
+        if (m) {
+          const datos = JSON.parse(m[1]);
+          res.write(`data: ${JSON.stringify({ type: 'alerta_critica', datos })}\n\n`);
+          // Mensaje directo por WhatsApp al equipo — automático, nadie tiene que ordenarlo.
+          alertasStaff.alertarCriticoStaff(datos).catch(e => console.error('[alertasStaff]', e.message));
+        }
+      } catch {}
+    }
+
+    // NOA — estatus de seguimiento armado con info extraída de la conversación
+    if (agente === 'noa' && /ESTATUS_SEGUIMIENTO/i.test(fullText)) {
+      try {
+        const m = fullText.match(/ESTATUS_SEGUIMIENTO:\s*(\{[^\n]+\})/);
+        if (m) {
+          const datos = JSON.parse(m[1]);
+          res.write(`data: ${JSON.stringify({ type: 'estatus_seguimiento', datos })}\n\n`);
+          alertasStaff.enviarEstatusSeguimiento(datos).catch(e => console.error('[alertasStaff]', e.message));
+        }
       } catch {}
     }
 
@@ -1775,7 +1828,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -1785,6 +1838,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '')
     .replace(/UPSERT_CONTACTO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/ALERTA_CRITICA:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/ESTATUS_SEGUIMIENTO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();

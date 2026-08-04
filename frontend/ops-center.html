@@ -465,6 +465,15 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
       </div>
     </div>
 
+    <!-- Llamada en vivo -->
+    <div id="noa-live-calls" style="display:none;border:1px solid var(--b1);border-radius:8px;background:var(--s2);margin:0 0 10px">
+      <div style="padding:10px 14px 8px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);display:flex;align-items:center;gap:6px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#ff4a4a;box-shadow:0 0 0 0 rgba(255,74,74,.6);animation:sof-live-pulse 1.4s infinite" aria-hidden="true"></span>
+        Llamada en vivo
+      </div>
+      <div id="noa-live-transcript" style="max-height:220px;overflow-y:auto;padding:0 14px 10px;font-size:11.5px;line-height:1.55;color:var(--t2)"></div>
+    </div>
+
     <!-- UX: filtros rápidos + búsqueda — identifica un folio en <5s con 20+ activos -->
     <div class="filter-bar" role="toolbar" aria-label="Filtros NOA">
       <input class="search-inp" id="noa-search" type="search" placeholder="Buscar folio, cliente, operador…"
@@ -1928,23 +1937,60 @@ function switchPage(p){
   });
 }
 
-// ─── Llamadas en vivo de SOFÍA (SSE) ─────────────────────────────────────────
+// ─── Llamadas en vivo — SOFÍA y NOA (una sola conexión SSE) ──────────────────
 (function(){
-  var box = document.getElementById('sof-live-calls');
-  var log = document.getElementById('sof-live-transcript');
-  if (!box || !log) return;
-  var callsActivas = {}; // callId -> hora del último evento
-  var hideTimer = null;
-
   function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 
-  function marcarActividad(callId){
-    callsActivas[callId] = Date.now();
-    box.style.display = 'block';
-    clearTimeout(hideTimer);
-    // Si no llega nada nuevo en 90s (llamada terminó y ya se mostró el resumen), ocultar.
-    hideTimer = setTimeout(function(){ box.style.display = 'none'; log.innerHTML = ''; callsActivas = {}; }, 90000);
+  function widget(boxId, logId, agenteLabel, color){
+    var box = document.getElementById(boxId);
+    var log = document.getElementById(logId);
+    if (!box || !log) return null;
+    var hideTimer = null;
+
+    function marcarActividad(){
+      box.style.display = 'block';
+      clearTimeout(hideTimer);
+      // Si no llega nada nuevo en 90s (llamada terminó y ya se mostró el resumen), ocultar.
+      hideTimer = setTimeout(function(){ box.style.display = 'none'; log.innerHTML = ''; }, 90000);
+    }
+
+    return {
+      handle: function(data){
+        if (data.tipo === 'LLAMADA_VIVO') {
+          marcarActividad();
+          var line = document.createElement('div');
+          line.style.cssText = 'margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed var(--b1)';
+          var esAsistente = data.metadata?.role === 'assistant';
+          line.innerHTML = '<strong style="color:' + (esAsistente ? color : 'var(--t1)') + '">' +
+            esc(esAsistente ? agenteLabel : (data.mensaje||'').split(':')[0]) + ':</strong> ' +
+            esc(data.metadata?.texto || '');
+          log.appendChild(line);
+          log.scrollTop = log.scrollHeight;
+        } else if (data.tipo === 'LLAMADA_ESTADO') {
+          marcarActividad();
+          var st = document.createElement('div');
+          st.style.cssText = 'font-size:10px;color:var(--t3);margin:2px 0 6px';
+          st.textContent = '— ' + (data.mensaje||'');
+          log.appendChild(st);
+          log.scrollTop = log.scrollHeight;
+        } else if (data.tipo === 'LLAMADA_TERMINADA' || data.tipo === 'PROVEEDOR_GANADOR' || data.tipo === 'VAPI_RESULTADO') {
+          var end = document.createElement('div');
+          end.style.cssText = 'font-size:11px;font-weight:700;color:var(--t1);margin-top:4px';
+          end.textContent = data.mensaje || 'Llamada terminada';
+          log.appendChild(end);
+          log.scrollTop = log.scrollHeight;
+          // Deja el resumen visible unos segundos y luego limpia para la próxima llamada.
+          clearTimeout(hideTimer);
+          hideTimer = setTimeout(function(){ box.style.display = 'none'; log.innerHTML = ''; }, 12000);
+        }
+      }
+    };
   }
+
+  var widgets = {
+    SOFIA: widget('sof-live-calls', 'sof-live-transcript', 'SOFÍA', '#4a9eff'),
+    NOA:   widget('noa-live-calls', 'noa-live-transcript', 'NOA', 'var(--cr-fg, #ff8a4a)'),
+  };
 
   function conectar(){
     var es = new EventSource('/api/actividad/stream');
@@ -1952,37 +1998,8 @@ function switchPage(p){
       var data;
       try { data = JSON.parse(e.data); } catch(err){ return; }
       if (data.type !== 'actividad') return;
-      if ((data.agente||'').toUpperCase() !== 'SOFIA') return;
-
-      if (data.tipo === 'LLAMADA_VIVO') {
-        var callId = data.metadata?.callId || 'call';
-        marcarActividad(callId);
-        var line = document.createElement('div');
-        line.style.cssText = 'margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed var(--b1)';
-        var esSofia = data.metadata?.role === 'assistant';
-        line.innerHTML = '<strong style="color:' + (esSofia ? '#4a9eff' : 'var(--t1)') + '">' +
-          esc(esSofia ? 'SOFÍA' : (data.mensaje||'').split(':')[0]) + ':</strong> ' +
-          esc(data.metadata?.texto || '');
-        log.appendChild(line);
-        log.scrollTop = log.scrollHeight;
-      } else if (data.tipo === 'LLAMADA_ESTADO') {
-        var callId2 = data.metadata?.callId || 'call';
-        marcarActividad(callId2);
-        var st = document.createElement('div');
-        st.style.cssText = 'font-size:10px;color:var(--t3);margin:2px 0 6px';
-        st.textContent = '— ' + (data.mensaje||'');
-        log.appendChild(st);
-        log.scrollTop = log.scrollHeight;
-      } else if (data.tipo === 'LLAMADA_TERMINADA' || data.tipo === 'PROVEEDOR_GANADOR' || data.tipo === 'VAPI_RESULTADO') {
-        var end = document.createElement('div');
-        end.style.cssText = 'font-size:11px;font-weight:700;color:var(--t1);margin-top:4px';
-        end.textContent = data.mensaje || 'Llamada terminada';
-        log.appendChild(end);
-        log.scrollTop = log.scrollHeight;
-        // Deja el resumen visible unos segundos y luego limpia para la próxima llamada.
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(function(){ box.style.display = 'none'; log.innerHTML = ''; callsActivas = {}; }, 12000);
-      }
+      var w = widgets[(data.agente||'').toUpperCase()];
+      if (w) w.handle(data);
     };
     es.onerror = function(){ es.close(); setTimeout(conectar, 4000); };
   }

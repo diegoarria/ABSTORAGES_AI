@@ -54,7 +54,7 @@ const SOFIA_VOZ_EXTRA =
   `Si fue solo un cruce breve sin que te haya dicho nada claro, retoma tu idea exactamente donde ibas — ` +
   `no te detengas a mitad de frase y no te quedes en silencio esperando; sigue la conversación.`;
 
-const SOFIA_VOZ_TUNING = {
+const VOZ_TUNING_RAPIDA = {
   startSpeakingPlan: { waitSeconds: 0.4, smartEndpointingPlan: { provider: 'vapi' } },
   stopSpeakingPlan: { numWords: 3, voiceSeconds: 0.2, backoffSeconds: 0.5 },
   serverMessages: ['status-update', 'transcript', 'speech-update', 'end-of-call-report', 'hang'],
@@ -94,7 +94,7 @@ async function llamarProveedor(proveedor, orden) {
         model: 'claude-haiku-4-5-20251001',
         messages: [{ role: 'system', content: systemPrompt }],
       },
-      ...SOFIA_VOZ_TUNING,
+      ...VOZ_TUNING_RAPIDA,
       ...(WEBHOOK_URL && {
         serverUrl: `${WEBHOOK_URL}/api/vapi/webhook`,
       }),
@@ -161,7 +161,7 @@ async function llamarNormal(nombre, telefono) {
         model: 'claude-haiku-4-5-20251001',
         messages: [{ role: 'system', content: systemPrompt }],
       },
-      ...SOFIA_VOZ_TUNING,
+      ...VOZ_TUNING_RAPIDA,
       ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
     },
     metadata: { agente: 'sofia', tipo: 'normal', nombre },
@@ -456,6 +456,7 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
         model: 'claude-haiku-4-5-20251001',
         messages: [{ role: 'system', content: systemPrompt }],
       },
+      ...VOZ_TUNING_RAPIDA,
       ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
     },
     metadata: { agente: 'noa', folio, rol },

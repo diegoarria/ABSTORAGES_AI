@@ -1,0 +1,7 @@
+{
+  "dante":   { "nombre": "Dante",   "telefono": "+528117902939" },
+  "rafael":  { "nombre": "Rafael",  "telefono": "+528181391745" },
+  "manuel":  { "nombre": "Manuel",  "telefono": "+528111810222" },
+  "gabriel": { "nombre": "Gabriel", "telefono": "+528182746336" },
+  "diego":   { "nombre": "Diego",   "telefono": "+528124376863" }
+}
