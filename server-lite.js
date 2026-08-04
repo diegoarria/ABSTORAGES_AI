@@ -555,6 +555,9 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
       const duracionSeg = (call.startedAt && call.endedAt)
         ? (new Date(call.endedAt) - new Date(call.startedAt)) / 1000
         : (evento.message?.durationSeconds || null);
+      // Resumen auto-generado por Vapi (analysisPlan.summaryPlan) — llega en
+      // el reporte de fin de llamada, no hay que pedirlo aparte.
+      const resumen = evento.message?.analysis?.summary || call.analysis?.summary || null;
 
       // Registro persistente en disco — las 3 IAs, sobrevive redeploys
       callLog.registrar({
@@ -562,6 +565,7 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
         tipo: metadata.tipo || metadata.rol || null,
         transcript: transcript.slice(0, 3000), duracionSeg,
         endedReason: call.endedReason || null,
+        resumen,
       });
 
       let yaNotificado = false;
@@ -573,8 +577,8 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
           console.log(`[Vapi Webhook] ${resultado.folio} | ${resultado.proveedorId} | disponible:${resultado.disponible} | precio:${resultado.precio}`);
           pushActividad({
             agente: 'SOFIA', tipo: 'VAPI_RESULTADO',
-            mensaje: `${resultado.proveedorId} → ${resultado.disponible ? `✅ DISPONIBLE ${resultado.precio || ''}` : '❌ No disponible'}`,
-            metadata: { folio: resultado.folio, ...resultado },
+            mensaje: `${resultado.proveedorId} → ${resultado.disponible ? `✅ DISPONIBLE ${resultado.precio || ''}` : '❌ No disponible'}` + (resumen ? ` — ${resumen}` : ''),
+            metadata: { folio: resultado.folio, ...resultado, resumen },
           });
 
           const estado = vapi.obtenerEstadoLlamadas(resultado.folio);
@@ -611,8 +615,8 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
         // Reporte genérico de fin de llamada — SARA y NOA
         pushActividad({
           agente: agenteLabel, tipo: 'LLAMADA_TERMINADA',
-          mensaje: `Llamada con ${nombre || telefono || 'contacto'} terminada${duracionSeg ? ` (${Math.round(duracionSeg)}s)` : ''}`,
-          metadata: { folio: metadata.folio || null, telefono, duracionSeg },
+          mensaje: `Llamada con ${nombre || telefono || 'contacto'} terminada${duracionSeg ? ` (${Math.round(duracionSeg)}s)` : ''}` + (resumen ? ` — ${resumen}` : ''),
+          metadata: { folio: metadata.folio || null, telefono, duracionSeg, resumen },
         });
       }
 
@@ -630,7 +634,7 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
 
       notifier.notificarLlamada({
         agente, nombre, telefono, duracionSeg, folio: metadata.folio || null,
-        transcript: transcript.slice(0, 1500),
+        transcript: transcript.slice(0, 1500), resumen,
       }).catch(e => console.error('[notifier llamada]', e.message));
     } catch (e) {
       console.error('[Vapi Webhook]', e.message);
