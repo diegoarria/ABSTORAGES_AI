@@ -121,6 +121,13 @@ function add(lead) {
   return entry;
 }
 
+function marcarSeguimientoEnviado(id) {
+  const entry = cache.find(l => l.id === id);
+  if (!entry) return;
+  entry.seguimiento_enviado = true;
+  scheduleSave();
+}
+
 async function getById(id) {
   if (pool) {
     try {
@@ -255,4 +262,4 @@ function extractFromText(text, sessionId, extras = {}) {
                precio_cotizado: precio, resumen, sessionId, ...extras });
 }
 
-module.exports = { add, getById, list, stats, exportCsv, extractFromText };
+module.exports = { add, getById, list, stats, exportCsv, extractFromText, marcarSeguimientoEnviado };

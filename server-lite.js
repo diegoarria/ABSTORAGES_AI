@@ -35,6 +35,7 @@ const gpsProviders = require('./backend/services/gpsProviders');
 const ordersStore = require('./backend/services/ordersStore');
 const contactos   = require('./backend/services/contactos');
 const alertasStaff = require('./backend/services/alertasStaff');
+const saraProactivo = require('./backend/services/saraProactivo');
 const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
@@ -1474,6 +1475,22 @@ async function handleChat(agente, req, res) {
             console.log(`[Vapi] ${msg}`);
           })
           .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
+
+        // Confirmación proactiva por WhatsApp — folio ya cerrado, aunque el
+        // lead venga del chat web y no de WhatsApp. Fuera de la ventana de
+        // 24h se manda vía plantilla aprobada (saraProactivo), no texto libre.
+        saraProactivo.enviarConfirmacionVenta(lead.telefono, lead.nombre, lead.folio)
+          .catch(e => console.error('[saraProactivo venta]', e.message));
+        // Y SARA le marca por teléfono para confirmar en viva voz — sin que
+        // nadie tenga que activarlo, dispara sola en cuanto cierra la venta.
+        vapi.llamarConfirmacionVenta(lead).catch(e => console.error('[vapi confirmacion-venta]', e.message));
+      } else if (datosSara.precio_cotizado && lead.telefono && lead.telefono !== '—') {
+        // SARA acaba de cotizar un precio en esta respuesta — se lo manda también
+        // por WhatsApp como respaldo, por si el lead sale del chat web.
+        const ruta = (lead.origen && lead.origen !== '—' && lead.destino && lead.destino !== '—')
+          ? `${lead.origen} → ${lead.destino}` : null;
+        saraProactivo.enviarCotizacion(lead.telefono, lead.nombre, ruta, datosSara.precio_cotizado)
+          .catch(e => console.error('[saraProactivo cotizacion]', e.message));
       }
 
       // Actualizar perfil del visitante con datos capturados en esta sesión
@@ -1494,9 +1511,6 @@ async function handleChat(agente, req, res) {
         const histMsg = memory.buildContext(sid).history || [];
         notifier.notificarResumen(lead, sara_nota, histMsg)
           .catch(e => console.error('[notifier]', e.message));
-        if (process.env.VAPI_FOLLOWUP === 'true' && hasCierre) {
-          vapi.llamarLead(lead).catch(e => console.error('[vapi-followup]', e.message));
-        }
       } else {
         const faltantes = ['nombre','email','telefono','empresa','tipo_carga','tipo_unidad']
           .filter(k => !filled(lead[k])).join(', ');
@@ -1898,6 +1912,38 @@ function splitForWhatsApp(text, maxLen = 1500) {
   return chunks;
 }
 
+// ─── SEGUIMIENTO PROACTIVO DE LEADS (SARA) ───────────────────────────────────
+// Cada 30 min revisa leads que llevan >2h sin cerrar venta y sin seguimiento
+// enviado — les manda WhatsApp + llamada de seguimiento, una sola vez por lead.
+const SEGUIMIENTO_MIN_HORAS = 2;
+const SEGUIMIENTO_MAX_HORAS = 7 * 24; // no perseguir leads de hace semanas
+async function revisarLeadsSinRespuesta() {
+  try {
+    const rows = await leads.list({ limit: 500 });
+    const ahora = Date.now();
+    for (const lead of rows) {
+      if (!lead.telefono || lead.telefono === '—') continue;
+      if (lead.sara_nota === 'cierre_de_venta') continue;
+      if (lead.seguimiento_enviado) continue;
+      const horas = (ahora - new Date(lead.created_at).getTime()) / 3600000;
+      if (horas < SEGUIMIENTO_MIN_HORAS || horas > SEGUIMIENTO_MAX_HORAS) continue;
+
+      const resumenSolicitud = lead.resumen ||
+        ((lead.origen && lead.origen !== '—' && lead.destino && lead.destino !== '—') ? `${lead.origen} → ${lead.destino}` : 'tu solicitud de flete');
+      try {
+        await saraProactivo.enviarSeguimientoLead(lead.telefono, lead.nombre !== '—' ? lead.nombre : null, resumenSolicitud);
+        vapi.llamarLead(lead).catch(e => console.error(`[SARA seguimiento] Error llamando a lead ${lead.id}:`, e.message));
+        leads.marcarSeguimientoEnviado(lead.id);
+        console.log(`[SARA seguimiento] WhatsApp + llamada disparados a lead ${lead.id} (${lead.telefono})`);
+      } catch (e) {
+        console.error(`[SARA seguimiento] Error con lead ${lead.id}:`, e.message);
+      }
+    }
+  } catch (e) {
+    console.error('[SARA seguimiento] Error revisando leads:', e.message);
+  }
+}
+
 // ─── START ────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n  ABSTORAGES AI Portal (modo lite)`);
@@ -1907,4 +1953,5 @@ app.listen(PORT, () => {
   console.log(`  TTS Voz:   ${EL_LIVE ? '🟢 LIVE' : '🟡 stub (agrega ELEVENLABS_API_KEY)'}`);
   console.log(`  Tarifas:   🟢 dinámicas\n`);
   noaScheduler.iniciar(pushActividad);
+  setInterval(revisarLeadsSinRespuesta, 30 * 60 * 1000);
 });

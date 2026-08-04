@@ -384,6 +384,32 @@ async function llamarLead(lead) {
   return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `lead ${lead.id}`, tipo: 'seguimiento' });
 }
 
+// ── Llamada de confirmación — SARA acaba de cerrar la venta (NUEVA_ORDEN) ────
+async function llamarConfirmacionVenta(lead) {
+  const raw = (lead.telefono || '').replace(/\D/g, '');
+  if (raw.length < 10) {
+    console.log(`[Vapi] Teléfono inválido para llamada de confirmación de venta: ${lead.telefono}`);
+    return;
+  }
+  const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
+
+  const primerMensaje =
+    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy SARA. ` +
+    `Te confirmo que tu servicio quedó registrado con el folio ${lead.folio || ''}. ¿Tienes un segundo?`;
+
+  const systemPrompt =
+    SARA_SYSTEM_PROMPT +
+    MODO_VOZ +
+    CIERRE_ESLOGAN +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
+    `Acabas de cerrar la venta con ${lead.nombre || 'el cliente'} de ${lead.empresa || ''} — folio ${lead.folio}. ` +
+    `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio: ${lead.precio_cotizado}. ` +
+    `Objetivo: confirmarle en voz que el servicio quedó registrado, que el equipo de operaciones ya está buscando transportista, ` +
+    `y resolver cualquier duda última que tenga. No renegocies el precio ni cambies datos del folio en esta llamada — si pide un cambio, dile que el equipo lo contacta.`;
+
+  return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `confirmación folio ${lead.folio}`, tipo: 'confirmacion_venta' });
+}
+
 // ── Llamada de prospección en frío (día 5 de la secuencia de outreach) ───────
 // A diferencia de llamarLead, este prospecto NUNCA ha hablado con SARA — solo
 // recibió DM de LinkedIn / email / WhatsApp sin responder. No asumas que ya
@@ -484,6 +510,60 @@ async function llamarStatusCliente({ telefono, nombre, folio, ruta }) {
   return _llamarStatusNOA({ telefono, nombre, folio, ruta, rol: 'cliente' });
 }
 
+// ── Llamada de NOA al equipo (staff) por alerta crítica — folio en riesgo real ─
+// A diferencia del status normal, esta llamada es urgente: NOA explica la
+// situación de viva voz y responde preguntas del equipo sobre lo que sabe.
+async function llamarAlertaStaff({ telefono, nombreStaff, folio, motivo }) {
+  if (!telefono) return { status: 'sin_telefono' };
+
+  const primerMensaje =
+    `Hola ${nombreStaff || ''}, soy Noa, de monitoreo ABSTORAGES. Te marco por una alerta crítica ` +
+    `${folio ? `del folio ${folio}` : 'de un servicio activo'} — ${motivo || 'necesito reportarte algo urgente'}.`;
+
+  const systemPrompt =
+    NOA_SYSTEM_PROMPT +
+    MODO_VOZ +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
+    `Le estás llamando a ${nombreStaff || 'un miembro del equipo ABSTORAGES'} porque se activó el protocolo de alerta crítica (P-MON-04) ` +
+    `${folio ? `para el folio ${folio}` : ''}. Motivo: ${motivo || 'sin detalle adicional'}. ` +
+    `Explica la situación con lo que sabes, responde sus preguntas, y confirma que el equipo está al tanto y tomando acción. ` +
+    `No minimices la situación ni des información que no tengas — si no sabes algo, dilo directo.`;
+
+  if (!API_KEY || !PHONE_NUMBER_ID_NOA) {
+    console.log(`[Vapi STUB] NOA — llamada de alerta crítica a ${nombreStaff} (${telefono}) — folio ${folio}`);
+    return { status: 'stub' };
+  }
+
+  const payload = {
+    phoneNumberId: PHONE_NUMBER_ID_NOA,
+    customer: { number: telefono, name: nombreStaff || 'Equipo' },
+    assistantOverrides: {
+      firstMessage: primerMensaje,
+      model: {
+        provider: 'anthropic',
+        model: 'claude-haiku-4-5-20251001',
+        messages: [{ role: 'system', content: systemPrompt }],
+      },
+      ...VOZ_TUNING_RAPIDA,
+      ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
+    },
+    metadata: { agente: 'noa', folio: folio || null, tipo: 'alerta_critica_staff' },
+  };
+
+  if (ASSISTANT_ID_NOA) payload.assistantId = ASSISTANT_ID_NOA;
+
+  const res = await fetch(`${BASE_URL}/call/phone`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  console.log(`[Vapi] NOA — llamada de alerta crítica a ${nombreStaff} iniciada — callId ${data.id}`);
+  return data;
+}
+
 // ── Diagnóstico: leer la config real de un assistant directo de la API ───────
 async function obtenerAssistant(id) {
   if (!API_KEY) throw new Error('VAPI_API_KEY no configurada');
@@ -545,11 +625,13 @@ module.exports = {
   llamarTransportistaSinRespuesta,
   llamarCheckDeRuta,
   llamarLead,
+  llamarConfirmacionVenta,
   llamarProspecto,
   llamarProveedor,
   llamarNormal,
   llamarStatusChofer,
   llamarStatusCliente,
+  llamarAlertaStaff,
   obtenerAssistant,
   actualizarAssistant,
   obtenerNumero,
