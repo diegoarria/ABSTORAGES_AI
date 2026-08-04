@@ -518,6 +518,31 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
     try {
       const evento = req.body;
       const tipo = evento.message?.type || evento.type;
+
+      // ─── Eventos EN VIVO (llamada en curso) — se transmiten por SSE para
+      // poder ver la llamada mientras ocurre, sin esperar al reporte final.
+      if (tipo === 'transcript' || tipo === 'status-update' || tipo === 'speech-update') {
+        const callVivo = evento.message?.call || evento.call || {};
+        const metaVivo = callVivo.metadata || {};
+        const agenteVivo = metaVivo.agente || 'sistema';
+        const agenteVivoLabel = agenteVivo === 'sofia' ? 'SOFIA' : agenteVivo === 'sara' ? 'SARA' : agenteVivo === 'noa' ? 'NOA' : String(agenteVivo).toUpperCase();
+
+        if (tipo === 'transcript' && evento.message?.transcriptType === 'final') {
+          pushActividad({
+            agente: agenteVivoLabel, tipo: 'LLAMADA_VIVO',
+            mensaje: `${evento.message.role === 'assistant' ? agenteVivoLabel : (callVivo.customer?.name || metaVivo.proveedor_nombre || metaVivo.nombre || 'Contacto')}: ${evento.message.transcript}`,
+            metadata: { callId: callVivo.id, folio: metaVivo.folio || null, role: evento.message.role, texto: evento.message.transcript },
+          });
+        } else if (tipo === 'status-update') {
+          pushActividad({
+            agente: agenteVivoLabel, tipo: 'LLAMADA_ESTADO',
+            mensaje: `Llamada con ${callVivo.customer?.name || metaVivo.proveedor_nombre || metaVivo.nombre || callVivo.customer?.number || 'contacto'} — ${evento.message.status}`,
+            metadata: { callId: callVivo.id, folio: metaVivo.folio || null, status: evento.message.status },
+          });
+        }
+        return;
+      }
+
       if (tipo !== 'end-of-call-report' && tipo !== 'call-ended') return;
 
       const call = evento.message?.call || evento.call || evento;

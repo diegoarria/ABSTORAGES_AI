@@ -45,6 +45,21 @@ const CIERRE_ESLOGAN =
 // Store en memoria: resultados de llamadas por folio
 const resultadosPorFolio = new Map();
 
+// Ajustes de voz de SOFIA: responde más rápido y no se queda callada si hay
+// cruce de voces — solo corta si la interrupción es real (3+ palabras), y
+// retoma la conversación casi de inmediato en vez de quedarse en silencio.
+const SOFIA_VOZ_EXTRA =
+  `\n\n**Si se cruzan las voces (hablan al mismo tiempo):** no te quedes callada ni sueltes la conversación. ` +
+  `Si la interrupción fue real (la persona dijo algo con sentido), deja que termine y responde a eso. ` +
+  `Si fue solo un cruce breve sin que te haya dicho nada claro, retoma tu idea exactamente donde ibas — ` +
+  `no te detengas a mitad de frase y no te quedes en silencio esperando; sigue la conversación.`;
+
+const SOFIA_VOZ_TUNING = {
+  startSpeakingPlan: { waitSeconds: 0.4, smartEndpointingPlan: { provider: 'vapi' } },
+  stopSpeakingPlan: { numWords: 3, voiceSeconds: 0.2, backoffSeconds: 0.5 },
+  serverMessages: ['status-update', 'transcript', 'speech-update', 'end-of-call-report', 'hang'],
+};
+
 // ── Lanzar una llamada a un proveedor ─────────────────────────────────────────
 async function llamarProveedor(proveedor, orden) {
   const primerMensaje =
@@ -60,6 +75,7 @@ async function llamarProveedor(proveedor, orden) {
   const systemPrompt =
     SOFIA_SYSTEM_PROMPT +
     MODO_VOZ +
+    SOFIA_VOZ_EXTRA +
     CIERRE_ESLOGAN +
     `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
     `Estás llamando a ${proveedor.nombre} para el folio ${orden.folio}. ` +
@@ -78,6 +94,7 @@ async function llamarProveedor(proveedor, orden) {
         model: 'claude-haiku-4-5-20251001',
         messages: [{ role: 'system', content: systemPrompt }],
       },
+      ...SOFIA_VOZ_TUNING,
       ...(WEBHOOK_URL && {
         serverUrl: `${WEBHOOK_URL}/api/vapi/webhook`,
       }),
@@ -132,7 +149,7 @@ async function llamarProveedor(proveedor, orden) {
 async function llamarNormal(nombre, telefono) {
   const primerMensaje = `${ESLOGAN}. Hola ${nombre}, soy SOFIA. ¿Cómo estás? ¿En qué te puedo ayudar?`;
 
-  const systemPrompt = SOFIA_SYSTEM_PROMPT + MODO_VOZ + CIERRE_ESLOGAN;
+  const systemPrompt = SOFIA_SYSTEM_PROMPT + MODO_VOZ + SOFIA_VOZ_EXTRA + CIERRE_ESLOGAN;
 
   const payload = {
     phoneNumberId: PHONE_NUMBER_ID,
@@ -144,6 +161,7 @@ async function llamarNormal(nombre, telefono) {
         model: 'claude-haiku-4-5-20251001',
         messages: [{ role: 'system', content: systemPrompt }],
       },
+      ...SOFIA_VOZ_TUNING,
       ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
     },
     metadata: { agente: 'sofia', tipo: 'normal', nombre },
