@@ -303,6 +303,38 @@ async function notificarAsignacion(folio, proveedor, precio) {
 
 const AGENTE_LABEL = { sofia: 'SOFÍA', sara: 'SARA', noa: 'NOA' };
 
+// Aviso de "llamada en curso" — a diferencia de notificarLlamada (que avisa al
+// terminar), esto avisa apenas se conecta, para saber en tiempo real que una
+// IA está al teléfono. Va directo a Diego, no a la lista general de NOTIF_EMAIL.
+const DIEGO_EMAIL = 'diego.arria@abstorages.com';
+
+async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
+  const label = AGENTE_LABEL[agente?.toLowerCase()] || agente?.toUpperCase() || 'Agente';
+  const asunto = `📞 ${label} está en llamada${folio ? ` · Folio ${folio}` : ''}`;
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:20px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">${label} · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Llamada en curso · ${new Date().toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Monterrey'})}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0 0 8px;font-size:14px;color:#111;"><strong>Con:</strong> ${nombre || 'Desconocido'} ${telefono ? `(${telefono})` : ''}</p>
+      <p style="margin:0;font-size:12px;color:#6b7280;">Puedes ver la transcripción en vivo en el ops-center.</p>
+    </div>
+  </div>`;
+
+  if (!gmailTransport) {
+    console.log(`[Notifier STUB] ${label} en llamada con ${nombre || telefono || 'contacto'}`);
+    return;
+  }
+  try {
+    await gmailTransport.sendMail({ from: `SARA ABSTORAGES <${GMAIL_USER}>`, to: DIEGO_EMAIL, subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de llamada en curso enviado a ${DIEGO_EMAIL}`);
+  } catch (e) {
+    console.error('[Gmail] ❌ Error notificando llamada en curso:', e.message);
+  }
+}
+
 async function notificarLlamada({ agente, nombre, telefono, resumen, transcript, duracionSeg, folio }) {
   const label = AGENTE_LABEL[agente] || agente?.toUpperCase() || 'Agente';
   const asunto = `📞 Llamada terminada — ${label}${folio ? ` · Folio ${folio}` : ''}`;
@@ -324,4 +356,4 @@ async function notificarLlamada({ agente, nombre, telefono, resumen, transcript,
   if (!enviado) console.log(`[Notifier STUB] Llamada terminada — ${label} con ${nombre}`);
 }
 
-module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada };
+module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada };

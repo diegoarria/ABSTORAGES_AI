@@ -333,6 +333,7 @@ async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPro
         model: 'claude-haiku-4-5-20251001',
         messages: [{ role: 'system', content: systemPrompt }],
       },
+      ...VOZ_TUNING_RAPIDA,
       ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
     },
     metadata: { agente: 'sara', tipo: tipo || 'seguimiento', nombre: nombreCliente },

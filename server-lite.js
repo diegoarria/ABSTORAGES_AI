@@ -81,6 +81,7 @@ app.set('trust proxy', true); // Railway corre detrás de un proxy; necesario pa
 const actividadClients = new Set();
 const actividadHistorial = [];
 const ACTIVIDAD_MAX = 100;
+const callsEnVivoNotificadas = new Set(); // callId ya avisado como "en llamada"
 
 function pushActividad(evento) {
   const ev = { ...evento, timestamp: evento.timestamp || new Date().toISOString() };
@@ -549,11 +550,26 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
             metadata: { callId: callVivo.id, folio: metaVivo.folio || null, role: evento.message.role, texto: evento.message.transcript },
           });
         } else if (tipo === 'status-update') {
+          const nombreContacto = callVivo.customer?.name || metaVivo.proveedor_nombre || metaVivo.nombre || callVivo.customer?.number || 'contacto';
           pushActividad({
             agente: agenteVivoLabel, tipo: 'LLAMADA_ESTADO',
-            mensaje: `Llamada con ${callVivo.customer?.name || metaVivo.proveedor_nombre || metaVivo.nombre || callVivo.customer?.number || 'contacto'} — ${evento.message.status}`,
+            mensaje: `Llamada con ${nombreContacto} — ${evento.message.status}`,
             metadata: { callId: callVivo.id, folio: metaVivo.folio || null, status: evento.message.status },
           });
+
+          // Llamada recién conectada — avisar en la plataforma y por correo,
+          // una sola vez por callId (no repetir si Vapi manda el status de nuevo).
+          if (evento.message.status === 'in-progress' && callVivo.id && !callsEnVivoNotificadas.has(callVivo.id)) {
+            callsEnVivoNotificadas.add(callVivo.id);
+            pushActividad({
+              agente: agenteVivoLabel, tipo: 'LLAMADA_INICIADA',
+              mensaje: `📞 ${agenteVivoLabel} está en llamada con ${nombreContacto}`,
+              metadata: { callId: callVivo.id, folio: metaVivo.folio || null, telefono: callVivo.customer?.number || null },
+            });
+            notifier.notificarLlamadaIniciada({
+              agente: agenteVivoLabel, nombre: nombreContacto, telefono: callVivo.customer?.number || null, folio: metaVivo.folio || null,
+            }).catch(e => console.error('[notifier inicio-llamada]', e.message));
+          }
         }
         return;
       }

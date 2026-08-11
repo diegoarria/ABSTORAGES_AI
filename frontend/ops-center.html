@@ -1956,7 +1956,14 @@ function switchPage(p){
 
     return {
       handle: function(data){
-        if (data.tipo === 'LLAMADA_VIVO') {
+        if (data.tipo === 'LLAMADA_INICIADA') {
+          marcarActividad();
+          var start = document.createElement('div');
+          start.style.cssText = 'font-size:11px;font-weight:700;color:' + color + ';margin-bottom:4px';
+          start.textContent = data.mensaje || (agenteLabel + ' está en llamada');
+          log.appendChild(start);
+          log.scrollTop = log.scrollHeight;
+        } else if (data.tipo === 'LLAMADA_VIVO') {
           marcarActividad();
           var line = document.createElement('div');
           line.style.cssText = 'margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed var(--b1)';
