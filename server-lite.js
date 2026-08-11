@@ -527,6 +527,17 @@ app.get('/api/push/vapid-public-key', (req, res) => {
   res.json({ publicKey: VAPID_PUB || null });
 });
 
+// En llamadas entrantes Vapi no manda metadata.agente (eso solo lo mandamos
+// nosotros en llamadas que origina el sistema) — se deduce por assistantId.
+const AGENTE_POR_ASSISTANT_ID = {
+  [process.env.VAPI_ASSISTANT_ID]:      'sofia',
+  [process.env.VAPI_ASSISTANT_ID_SARA]: 'sara',
+  [process.env.VAPI_ASSISTANT_ID_NOA]:  'noa',
+};
+function deducirAgente(call) {
+  return call?.metadata?.agente || AGENTE_POR_ASSISTANT_ID[call?.assistantId] || 'sistema';
+}
+
 // ─── Vapi webhook (sin auth — Vapi llama externamente) ───────────────────────
 app.post('/api/vapi/webhook', express.json(), (req, res) => {
   res.sendStatus(200);
@@ -540,7 +551,7 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
       if (tipo === 'transcript' || tipo === 'status-update' || tipo === 'speech-update') {
         const callVivo = evento.message?.call || evento.call || {};
         const metaVivo = callVivo.metadata || {};
-        const agenteVivo = metaVivo.agente || 'sistema';
+        const agenteVivo = deducirAgente(callVivo);
         const agenteVivoLabel = agenteVivo === 'sofia' ? 'SOFIA' : agenteVivo === 'sara' ? 'SARA' : agenteVivo === 'noa' ? 'NOA' : String(agenteVivo).toUpperCase();
 
         if (tipo === 'transcript' && evento.message?.transcriptType === 'final') {
@@ -578,7 +589,7 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
 
       const call = evento.message?.call || evento.call || evento;
       const metadata = call.metadata || {};
-      const agente = metadata.agente || 'sistema';
+      const agente = deducirAgente(call);
       const agenteLabel = agente === 'sofia' ? 'SOFIA' : agente === 'sara' ? 'SARA' : agente === 'noa' ? 'NOA' : String(agente).toUpperCase();
       const transcript = call.transcript || '';
       const nombre = call.customer?.name || metadata.proveedor_nombre || metadata.nombre || null;
