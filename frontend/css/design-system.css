@@ -1,0 +1,232 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ABSTORAGES — DESIGN SYSTEM
+   Fuente única de verdad para color, tipografía, spacing, sombra y radio
+   en toda la plataforma. Cada página local hace alias de sus variables
+   viejas a estos tokens (--verde: var(--brand-green)) en vez de reescribir
+   cada uso — así el look nuevo se propaga sin tocar miles de líneas.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Marca — verde/azul ABSTORAGES, versión corporativa (sin glow neón) ── */
+  --brand-green:       #0EA968;
+  --brand-green-light: #14C17D;
+  --brand-green-dim:   rgba(14, 169, 104, .12);
+  --brand-green-glow:  rgba(14, 169, 104, .28);
+
+  --brand-blue:        #2F6FED;
+  --brand-blue-light:  #5B93FF;
+  --brand-blue-dim:    rgba(47, 111, 237, .12);
+  --brand-blue-glow:   rgba(47, 111, 237, .28);
+
+  --warn:      #F0A93B;
+  --warn-dim:  rgba(240, 169, 59, .14);
+  --critical:      #FF5C5C;
+  --critical-dim:  rgba(255, 92, 92, .14);
+
+  /* ── Neutros oscuros — grafito, no negro puro ── */
+  --ink-950: #0B0E13;
+  --ink-900: #10151C;
+  --ink-800: #161D27;
+  --ink-700: #1E2733;
+  --ink-600: #29323F;
+  --line:        rgba(255, 255, 255, .08);
+  --line-strong: rgba(255, 255, 255, .14);
+
+  --text-100: #EDF1F5;
+  --text-300: #9BA9B8;
+  --text-500: #66788C;
+
+  /* ── Tipografía ── */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+
+  --fs-3xs: 10px;  /* solo para meta ultra-secundario, evitar en lo posible */
+  --fs-2xs: 11px;
+  --fs-xs:  12px;
+  --fs-sm:  13px;
+  --fs-base:14px;
+  --fs-md:  15px;
+  --fs-lg:  16px;
+  --fs-xl:  19px;
+  --fs-2xl: 23px;
+  --fs-3xl: 28px;
+  --fs-4xl: 34px;
+
+  --lh-tight: 1.25;
+  --lh-body:  1.55;
+
+  --ls-eyebrow: .08em;
+
+  /* ── Spacing (grid de 4px) ── */
+  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+
+  /* ── Radio ── */
+  --r-sm: 6px;  --r-md: 10px;  --r-lg: 14px;  --r-full: 999px;
+
+  /* ── Elevación — neutra, sin tinte de color (glow reservado a pulse dots) ── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.35);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.45);
+}
+
+/* ── Modo claro — mismos tokens, recalculados WCAG-AA sobre fondo claro ── */
+[data-theme="light"] {
+  --brand-green:       #0B7A4B;
+  --brand-green-light: #0EA968;
+  --brand-green-dim:   rgba(11, 122, 75, .08);
+  --brand-green-glow:  rgba(11, 122, 75, .18);
+
+  --brand-blue:        #1D54B3;
+  --brand-blue-light:  #2F6FED;
+  --brand-blue-dim:    rgba(29, 84, 179, .08);
+  --brand-blue-glow:   rgba(29, 84, 179, .18);
+
+  --warn:      #B45309;
+  --warn-dim:  rgba(180, 83, 9, .10);
+  --critical:      #C4322E;
+  --critical-dim:  rgba(196, 50, 46, .10);
+
+  --ink-950: #F7F9FB;
+  --ink-900: #FFFFFF;
+  --ink-800: #F0F3F7;
+  --ink-700: #E6EBF1;
+  --ink-600: #D8E0E8;
+  --line:        rgba(15, 23, 42, .08);
+  --line-strong: rgba(15, 23, 42, .16);
+
+  --text-100: #111827;
+  --text-300: #4B5768;
+  --text-500: #71808F;
+
+  --shadow-sm: 0 1px 2px rgba(15,23,42,.06);
+  --shadow-md: 0 4px 14px rgba(15,23,42,.08);
+  --shadow-lg: 0 14px 36px rgba(15,23,42,.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   COMPONENTES BASE
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Botones ── */
+.ds-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  font-family: var(--font-sans); font-size: var(--fs-sm); font-weight: 600;
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--r-md);
+  border: 1px solid transparent; cursor: pointer; transition: all .15s ease;
+  line-height: 1;
+}
+.ds-btn-sm { font-size: var(--fs-xs); padding: 6px var(--sp-3); }
+.ds-btn-primary { background: var(--brand-green); color: #fff; }
+.ds-btn-primary:hover { background: var(--brand-green-light); }
+.ds-btn-secondary { background: var(--ink-800); color: var(--text-100); border-color: var(--line-strong); }
+.ds-btn-secondary:hover { border-color: var(--brand-blue); color: var(--brand-blue-light); }
+.ds-btn-ghost { background: transparent; color: var(--text-300); border-color: transparent; }
+.ds-btn-ghost:hover { background: var(--ink-800); color: var(--text-100); }
+.ds-btn-danger { background: var(--critical); color: #fff; }
+.ds-btn-danger:hover { filter: brightness(1.08); }
+
+/* ── Tarjetas ── */
+.ds-card {
+  background: var(--ink-900); border: 1px solid var(--line); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.ds-card-elevated { box-shadow: var(--shadow-md); }
+
+/* ── Badges / chips / status-pills ── */
+.ds-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: var(--ls-eyebrow);
+  padding: 3px 8px; border-radius: var(--r-full);
+}
+.ds-badge-green    { background: var(--brand-green-dim); color: var(--brand-green-light); }
+.ds-badge-blue      { background: var(--brand-blue-dim);  color: var(--brand-blue-light); }
+.ds-badge-warn      { background: var(--warn-dim);        color: var(--warn); }
+.ds-badge-critical  { background: var(--critical-dim);    color: var(--critical); }
+.ds-badge-neutral   { background: var(--ink-800);         color: var(--text-300); }
+
+/* ── Puntos de estado en vivo — único lugar donde se permite glow de color ── */
+.ds-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.ds-dot-live {
+  background: var(--brand-green);
+  box-shadow: 0 0 0 0 var(--brand-green-glow);
+  animation: ds-pulse 1.6s infinite;
+}
+.ds-dot-critical {
+  background: var(--critical);
+  box-shadow: 0 0 0 0 var(--critical-dim);
+  animation: ds-pulse-critical 1.4s infinite;
+}
+@keyframes ds-pulse {
+  0%   { box-shadow: 0 0 0 0 var(--brand-green-glow); }
+  70%  { box-shadow: 0 0 0 7px rgba(0,0,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}
+@keyframes ds-pulse-critical {
+  0%   { box-shadow: 0 0 0 0 var(--critical-dim); }
+  70%  { box-shadow: 0 0 0 8px rgba(0,0,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}
+
+/* ── Inputs / textarea / select ── */
+.ds-input {
+  font-family: var(--font-sans); font-size: var(--fs-sm); color: var(--text-100);
+  background: var(--ink-800); border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-3); outline: none; transition: border-color .15s, box-shadow .15s;
+  width: 100%;
+}
+.ds-input::placeholder { color: var(--text-500); }
+.ds-input:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 3px var(--brand-blue-dim); }
+
+/* ── Tablas ── */
+.ds-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.ds-table th {
+  text-align: left; font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: var(--ls-eyebrow); color: var(--text-500);
+  padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--line-strong);
+}
+.ds-table td { padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--line); color: var(--text-100); }
+.ds-table tr:hover td { background: var(--ink-800); }
+
+/* ── Tabs / nav-pills ── */
+.ds-tab {
+  font-family: var(--font-sans); font-size: var(--fs-xs); font-weight: 700;
+  color: var(--text-300); background: transparent; border: 1px solid transparent;
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--r-md); cursor: pointer; transition: all .15s;
+}
+.ds-tab:hover { color: var(--text-100); }
+.ds-tab.on { background: var(--brand-blue-dim); border-color: var(--brand-blue); color: var(--brand-blue-light); }
+
+/* ── Modales ── */
+.ds-modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; z-index: 200;
+}
+.ds-modal {
+  background: var(--ink-900); border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg); max-width: 520px; width: 92%; padding: var(--sp-6);
+}
+
+/* ── Eyebrow / section headers ── */
+.ds-eyebrow {
+  font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: var(--ls-eyebrow); color: var(--text-500);
+}
+
+/* ── Encabezados — tratamiento consistente aunque el marcado sea div/span ── */
+.ds-h1 { font-family: var(--font-sans); font-size: var(--fs-3xl); font-weight: 800; line-height: var(--lh-tight); color: var(--text-100); letter-spacing: -.01em; }
+.ds-h2 { font-family: var(--font-sans); font-size: var(--fs-2xl); font-weight: 800; line-height: var(--lh-tight); color: var(--text-100); letter-spacing: -.01em; }
+.ds-h3 { font-family: var(--font-sans); font-size: var(--fs-xl);  font-weight: 700; line-height: var(--lh-tight); color: var(--text-100); }
+
+/* ── Avatares con anillo de color por agente ── */
+.ds-avatar { border-radius: 50%; background-position: center; background-size: cover; flex-shrink: 0; }
+.ds-avatar-sara  { border: 1.5px solid var(--brand-green); box-shadow: 0 0 0 3px var(--brand-green-dim); }
+.ds-avatar-sofia { border: 1.5px solid var(--brand-blue);  box-shadow: 0 0 0 3px var(--brand-blue-dim); }
+.ds-avatar-noa   { border: 1.5px solid var(--warn);        box-shadow: 0 0 0 3px var(--warn-dim); }
+
+/* ── Estados vacíos / loading ── */
+.ds-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--sp-2); padding: var(--sp-12) var(--sp-4); text-align: center; color: var(--text-500);
+}
+.ds-loading { text-align: center; padding: var(--sp-8); color: var(--text-500); font-size: var(--fs-sm); }

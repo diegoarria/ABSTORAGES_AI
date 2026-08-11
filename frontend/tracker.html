@@ -4,12 +4,17 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
   <title>ABSTORAGES · Rastreo de Unidad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/design-system.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Alias hacia los tokens corporativos de design-system.css */
     :root {
-      --verde: #00e87a; --rojo: #ff4a4a; --azul: #4a9eff; --amber: #f5a623;
-      --fondo: #07090e; --s1: #0d1117; --s2: #111620; --br: rgba(255,255,255,.07);
-      --t1: #edf0f4; --t2: #7e8899; --sans: 'system-ui', sans-serif;
+      --verde: var(--brand-green); --rojo: var(--critical); --azul: var(--brand-blue); --amber: var(--warn);
+      --fondo: var(--ink-950); --s1: var(--ink-900); --s2: var(--ink-800); --br: var(--line);
+      --t1: var(--text-100); --t2: var(--text-300); --sans: var(--font-sans);
     }
     html, body { height: 100%; background: var(--fondo); color: var(--t1); font-family: var(--sans); }
     body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 20px; }
@@ -39,11 +44,11 @@
       margin: 0 auto;
       transition: border-color .4s, background .4s;
     }
-    .status-circle.activo { border-color: var(--verde); background: rgba(0,232,122,.1); animation: pulseGreen 2s infinite; }
-    .status-circle.error  { border-color: var(--rojo);  background: rgba(255,74,74,.1); }
+    .status-circle.activo { border-color: var(--verde); background: rgba(14,169,104,.1); animation: pulseGreen 2s infinite; }
+    .status-circle.error  { border-color: var(--rojo);  background: rgba(255,92,92,.1); }
     @keyframes pulseGreen {
-      0%,100% { box-shadow: 0 0 0 0 rgba(0,232,122,.4); }
-      50%      { box-shadow: 0 0 0 12px rgba(0,232,122,0); }
+      0%,100% { box-shadow: 0 0 0 0 rgba(14,169,104,.4); }
+      50%      { box-shadow: 0 0 0 12px rgba(14,169,104,0); }
     }
 
     .status-label { text-align: center; font-size: 14px; font-weight: 600; color: var(--t2); }
@@ -67,8 +72,8 @@
       background: var(--s2); border-radius: 8px;
       padding: 10px 12px;
     }
-    .coord-label { font-size: 9px; color: var(--t2); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-    .coord-val   { font-size: 14px; font-weight: 700; font-family: monospace; }
+    .coord-label { font-size: 11px; color: var(--t2); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+    .coord-val   { font-size: 14px; font-weight: 700; font-family: var(--font-mono); }
 
     .vel-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
     .vel-num  { font-size: 36px; font-weight: 800; color: var(--verde); }
@@ -81,14 +86,14 @@
       cursor: pointer; transition: all .2s;
     }
     .btn-toggle.iniciar  { background: var(--verde); color: #07090e; }
-    .btn-toggle.detener  { background: rgba(255,74,74,.15); border: 1px solid rgba(255,74,74,.3); color: var(--rojo); }
+    .btn-toggle.detener  { background: rgba(255,92,92,.15); border: 1px solid rgba(255,92,92,.3); color: var(--rojo); }
     .btn-toggle:active { transform: scale(.97); }
 
     .last-update { text-align: center; font-size: 11px; color: var(--t2); }
 
     .warn {
-      background: rgba(245,166,35,.1);
-      border: 1px solid rgba(245,166,35,.25);
+      background: rgba(240,169,59,.1);
+      border: 1px solid rgba(240,169,59,.25);
       border-radius: 8px;
       padding: 10px 14px;
       font-size: 12px;

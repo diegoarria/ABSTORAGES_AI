@@ -12,29 +12,37 @@
 <meta name="apple-mobile-web-app-title" content="Ops Center">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/design-system.css">
 <style>
+/* Alias hacia los tokens corporativos de design-system.css — mismos nombres
+   de variable de siempre para no reescribir cada var() ya usado en la
+   página, pero apuntando al nuevo sistema de color/tipografía compartido.
+   --warn no se redeclara: coincide de nombre con design-system.css y ya
+   hereda el valor correcto directamente (evita auto-referencia circular). */
 :root {
-  --bg:   #04080F;
-  --s1:   #070E1B;
-  --s2:   #091626;
-  --s3:   #0D1E35;
-  --s3h:  #112540;
-  --s4:   #142C48;
-  --grn:  #00B451;
-  --grn-d:rgba(0,180,81,0.09);
-  --grn-b:rgba(0,180,81,0.22);
-  --crit: #FF3A3A;
-  --cr-d: rgba(255,58,58,0.08);
-  --cr-b: rgba(255,58,58,0.22);
-  --warn: #FF8C00;
-  --wn-d: rgba(255,140,0,0.08);
-  --wn-b: rgba(255,140,0,0.2);
-  --sv:#00B451; --sa:#F5C400; --sn:#FF8C00; --sr:#FF3A3A; --sb:#5E7A8C;
-  --t1:#D4E8F8; --t2:#5E85A0; --t3:#2E4A5E;
-  --b1:rgba(255,255,255,0.05); --b2:rgba(255,255,255,0.09); --b3:rgba(255,255,255,0.15);
-  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
-  --mono:ui-monospace,'SF Mono','Cascadia Code','Consolas',monospace;
-  --r:7px; --rl:10px;
+  --bg:   var(--ink-950);
+  --s1:   var(--ink-900);
+  --s2:   var(--ink-800);
+  --s3:   var(--ink-700);
+  --s3h:  var(--ink-600);
+  --s4:   var(--ink-600);
+  --grn:  var(--brand-green);
+  --grn-d:var(--brand-green-dim);
+  --grn-b:var(--brand-green-glow);
+  --crit: var(--critical);
+  --cr-d: var(--critical-dim);
+  --cr-b: rgba(255,92,92,0.22);
+  --wn-d: var(--warn-dim);
+  --wn-b: rgba(240,169,59,0.22);
+  --sv:var(--brand-green); --sa:#F5C400; --sn:var(--warn); --sr:var(--critical); --sb:#5E7A8C;
+  --t1:var(--text-100); --t2:var(--text-300); --t3:var(--text-500);
+  --b1:var(--line); --b2:var(--line-strong); --b3:rgba(255,255,255,0.18);
+  --sans:var(--font-sans);
+  --mono:var(--font-mono);
+  --r:var(--r-sm); --rl:var(--r-md);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
@@ -79,14 +87,14 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 
 /* ── PANEL HEADS ── */
 .phead{height:48px;display:flex;align-items:center;padding:0 16px;gap:9px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
-.adot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
+.adot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
 .adot.noa{background:var(--cr-d) url('/img/noa-avatar.png') center/cover no-repeat;color:transparent;border:1px solid var(--cr-b)}
 .adot.hec{background:var(--grn-d) url('/img/hector-avatar.png') center/cover no-repeat;color:transparent;border:1px solid var(--grn-b)}
 .aname{font-size:12.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
 .aname.noa{color:var(--crit)}.aname.hec{color:var(--grn)}
-.arole{font-size:10.5px;color:var(--t3);padding-left:7px;border-left:1px solid var(--b2);margin-left:4px}
+.arole{font-size:11px;color:var(--t3);padding-left:7px;border-left:1px solid var(--b2);margin-left:4px}
 .pchips{display:flex;gap:5px}
-.chip{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:.04em}
+.chip{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.04em}
 .ch-r{background:var(--cr-d);color:var(--crit);border:1px solid var(--cr-b)}
 .ch-o{background:var(--wn-d);color:var(--warn);border:1px solid var(--wn-b)}
 .ch-g{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn-b)}
@@ -97,17 +105,17 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .btn:hover{background:var(--b2);color:var(--t1)}
 .btn:focus-visible{outline:2px solid var(--grn);outline-offset:2px}
 .btn-g{background:var(--grn);color:#fff;border-color:transparent}
-.btn-g:hover{background:#00a040}
+.btn-g:hover{background:#0EA968}
 .btn-r{background:var(--cr-d);color:var(--crit);border-color:var(--cr-b)}
 .btn-r:hover{background:rgba(255,58,58,.15)}
-.btn-sm{padding:3px 9px;font-size:10.5px;border-radius:5px}
+.btn-sm{padding:3px 9px;font-size:11px;border-radius:5px}
 
 /* ── CRITICAL BANNER ── */
 .crit-banner{display:flex;align-items:flex-start;gap:12px;padding:10px 18px;background:rgba(255,58,58,.055);border-bottom:1px solid rgba(255,58,58,.15);flex-shrink:0}
 .crit-pulse{width:10px;height:10px;border-radius:50%;background:var(--crit);flex-shrink:0;margin-top:3px;animation:ring 1.6s ease-out infinite}
 @keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,58,58,.5)}70%{box-shadow:0 0 0 7px rgba(255,58,58,0)}100%{box-shadow:0 0 0 0 rgba(255,58,58,0)}}
 .crit-main{font-size:11.5px;font-weight:700;color:var(--crit);letter-spacing:.04em}
-.crit-sub{font-size:10.5px;color:rgba(255,58,58,.5);margin-top:1px}
+.crit-sub{font-size:11px;color:rgba(255,58,58,.5);margin-top:1px}
 
 /* ── FILTER BAR — UX: permite filtrar en 1 clic sin scrollear ── */
 .filter-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
@@ -116,7 +124,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .search-inp:focus{border-color:var(--grn-b)}
 .search-inp:focus-visible{outline:none}
 .fchips{display:flex;gap:4px;flex-shrink:0}
-.fchip{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.03em;cursor:pointer;border:1px solid var(--b1);background:none;color:var(--t3);font-family:inherit;transition:all .15s;white-space:nowrap}
+.fchip{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.03em;cursor:pointer;border:1px solid var(--b1);background:none;color:var(--t3);font-family:inherit;transition:all .15s;white-space:nowrap}
 .fchip:hover{color:var(--t2);border-color:var(--b2)}
 .fchip:focus-visible{outline:2px solid var(--grn);outline-offset:2px}
 /* UX: chips activos con color de semáforo correspondiente para scan rápido */
@@ -135,17 +143,22 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;color:var(--t3);text-align:center;gap:8px}
 .empty-icon{font-size:26px;opacity:.35}
 .empty-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
-.empty-sub{font-size:10.5px;opacity:.6;max-width:200px}
+.empty-sub{font-size:11px;opacity:.6;max-width:200px}
 
 /* ── NOA PANEL BODY ── */
 .pbody{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--s2)}
-.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 16px 5px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3)}
+.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 16px 5px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3)}
 .sec-hdr::after{content:'';flex:1;height:1px;background:var(--b1)}
 .cards{padding:0 12px 8px;display:flex;flex-direction:column;gap:7px}
 
 /* ── FOLIO CARDS ── */
 .fc{background:var(--s3);border-radius:var(--rl);overflow:hidden;border:1px solid transparent;transition:background .15s,box-shadow .3s,border-color .3s}
 .fc:hover{background:var(--s3h)}
+
+/* ── SOFÍA — tarjeta de proveedor (generada por JS, ver renderCard()) ──
+   El contenido interno usa estilos inline por celda, pero la tarjeta en sí
+   ahora sí tiene una regla propia — antes .sof-prov-card no existía en CSS. */
+.sof-prov-card:hover { background: var(--s2) !important; }
 /* UX: intensidad crítica escalada por tiempo — var(--ci) se actualiza via JS cada tick */
 .fc.cr{
   border-color:rgba(255,58,58,calc(.12 + var(--ci,0) * .28));
@@ -167,11 +180,11 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .fc-body{padding:12px 14px 0}
 .fc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
 .fc-id{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--t1);letter-spacing:.04em}
-.fc-unit{font-size:9.5px;color:var(--t3);margin-left:5px}
+.fc-unit{font-size:11px;color:var(--t3);margin-left:5px}
 .fc-cl{font-size:11.5px;color:var(--t2);margin-top:1px}
-.fc-rt{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--t3);margin-top:2px}
+.fc-rt{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t3);margin-top:2px}
 .fc-bdgs{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
-.bdg{padding:2px 7px;border-radius:4px;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.bdg{padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .bdg-tr{background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.18)}
 .bdg-ca{background:rgba(245,196,0,.1);color:#F5C400;border:1px solid rgba(245,196,0,.2)}
 .bdg-de{background:var(--grn-d);color:var(--grn);border:1px solid var(--grn-b)}
@@ -181,7 +194,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 
 /* ── SLA Sweep bar ── */
 .sw-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
-.sw-lbl{font-size:9.5px;color:var(--t3);flex-shrink:0;width:60px}
+.sw-lbl{font-size:11px;color:var(--t3);flex-shrink:0;width:60px}
 .sw-track{flex:1;height:3px;background:var(--b2);border-radius:2px;overflow:hidden}
 .sw-fill{height:100%;border-radius:2px;transition:width .4s,background .3s}
 .sw-fill.ok{background:var(--grn)}
@@ -189,19 +202,19 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 /* UX: barra crítica pulsa solo cuando supera el 100% — no distrae antes */
 .sw-fill.ov{background:var(--crit);animation:fpulse 1s ease infinite}
 @keyframes fpulse{0%,100%{opacity:1}50%{opacity:.45}}
-.sw-time{font-family:var(--mono);font-size:10.5px;font-weight:700;flex-shrink:0;font-variant-numeric:tabular-nums}
+.sw-time{font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;font-variant-numeric:tabular-nums}
 .sw-time.ok{color:var(--grn)}.sw-time.wn{color:var(--warn)}.sw-time.ov{color:var(--crit)}
 
 /* ── Card meta row ── */
 .fc-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:9px}
-.mkv{display:flex;align-items:center;gap:4px;font-size:10.5px}
+.mkv{display:flex;align-items:center;gap:4px;font-size:11px}
 .mk{color:var(--t3)}.mv{color:var(--t2);font-weight:500}
-.mmono{font-family:var(--mono);font-size:10px}
-.zona-tag{margin-left:auto;font-size:9.5px;font-weight:800;color:var(--crit);text-transform:uppercase;letter-spacing:.06em;background:var(--cr-d);border:1px solid var(--cr-b);padding:2px 7px;border-radius:4px;flex-shrink:0}
-.fc-inc{font-size:10.5px;color:rgba(255,58,58,.7);background:rgba(255,58,58,.05);border:1px solid rgba(255,58,58,.12);border-radius:5px;padding:5px 10px;margin-bottom:10px}
+.mmono{font-family:var(--mono);font-size:11px}
+.zona-tag{margin-left:auto;font-size:11px;font-weight:800;color:var(--crit);text-transform:uppercase;letter-spacing:.06em;background:var(--cr-d);border:1px solid var(--cr-b);padding:2px 7px;border-radius:4px;flex-shrink:0}
+.fc-inc{font-size:11px;color:rgba(255,58,58,.7);background:rgba(255,58,58,.05);border:1px solid rgba(255,58,58,.12);border-radius:5px;padding:5px 10px;margin-bottom:10px}
 
 /* ── Escalation timeline ── */
-.esc-hdr{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);margin-bottom:9px}
+.esc-hdr{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);margin-bottom:9px}
 .esc-steps{position:relative}
 .esc-step{display:flex;align-items:flex-start;gap:10px;padding-bottom:9px;position:relative}
 .esc-step:not(:last-child)::after{content:'';position:absolute;left:4px;top:13px;bottom:0;width:1px;background:linear-gradient(to bottom,var(--b2),transparent)}
@@ -212,13 +225,13 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .esc-nd.pd{background:transparent;border:1px solid var(--b3)}
 .esc-info{flex:1}
 .esc-nv{font-size:11px;font-weight:600;color:var(--t2)}
-.esc-h{font-family:var(--mono);font-size:10px;color:var(--t3);margin-left:5px}
-.esc-st{font-size:10px;font-weight:700;margin-top:1px}
+.esc-h{font-family:var(--mono);font-size:11px;color:var(--t3);margin-left:5px}
+.esc-st{font-size:11px;font-weight:700;margin-top:1px}
 .esc-st.sr{color:var(--crit)}.esc-st.ok{color:var(--grn)}.esc-st.act{color:var(--warn)}.esc-st.pd{color:var(--t3)}
 .fc-acts{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--b1);background:rgba(0,0,0,.15)}
 
 /* ── AUTO-REFRESH LABEL ── */
-.barrido-lbl{font-size:9px;color:var(--t3);font-family:var(--mono);white-space:nowrap;margin-left:2px;transition:color .2s}
+.barrido-lbl{font-size:11px;color:var(--t3);font-family:var(--mono);white-space:nowrap;margin-left:2px;transition:color .2s}
 .barrido-lbl.pronto{color:var(--warn)}
 
 /* ── FOLIO DETAIL PANEL ── */
@@ -228,10 +241,10 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .fd-back{background:none;border:none;color:var(--t2);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:5px;line-height:1;display:flex;align-items:center;transition:background .13s}
 .fd-back:hover{background:var(--b1)}
 .fd-folio{font-size:12.5px;font-weight:800;font-family:var(--mono);color:var(--crit);letter-spacing:.03em;flex:1}
-.fd-st-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;padding:3px 8px;border-radius:20px}
+.fd-st-badge{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;padding:3px 8px;border-radius:20px}
 .fd-body{flex:1;overflow-y:auto;padding:14px 14px 24px}
 .fd-sec{margin-bottom:18px}
-.fd-sec-ttl{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.13em;color:var(--t3);border-bottom:1px solid var(--b1);padding-bottom:6px;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.fd-sec-ttl{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.13em;color:var(--t3);border-bottom:1px solid var(--b1);padding-bottom:6px;margin-bottom:10px;display:flex;align-items:center;gap:7px}
 .fd-sec-ttl .fd-ico{font-size:11px;opacity:.7}
 .fd-row{display:flex;gap:4px;margin-bottom:5px;font-size:12px;line-height:1.5}
 .fd-k{color:var(--t3);font-size:11px;font-weight:600;min-width:110px;flex-shrink:0}
@@ -242,7 +255,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .fd-route-or{background:var(--grn)}
 .fd-route-de{background:var(--crit)}
 .fd-route-col{flex:1}
-.fd-route-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1px}
+.fd-route-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1px}
 .fd-route-city{font-size:12.5px;font-weight:700;color:var(--t1)}
 .fd-route-addr{font-size:11px;color:var(--t2)}
 .fd-route-arrow{color:var(--t3);font-size:18px;align-self:center;padding:0 4px}
@@ -257,7 +270,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .fd-eta-box.eta-done{background:rgba(0,180,81,.06);border:1px solid rgba(0,180,81,.2)}
 .fd-eta-ico{font-size:22px;line-height:1;margin-top:1px;flex-shrink:0}
 .fd-eta-main{flex:1;min-width:0}
-.fd-eta-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+.fd-eta-label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
 .fd-eta-label.eta-ok{color:var(--grn)}
 .fd-eta-label.eta-risk{color:var(--warn)}
 .fd-eta-label.eta-late{color:var(--crit)}
@@ -271,9 +284,9 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .noa-ai-head{display:flex;align-items:center;padding:9px 14px;cursor:pointer;user-select:none;gap:8px;transition:background .15s;flex-shrink:0;border-bottom:1px solid transparent}
 .noa-ai-head:hover{background:var(--b1)}
 .noa-ai-foot.open .noa-ai-head{border-bottom-color:var(--b1)}
-.noa-ai-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);flex:1}
-.noa-ai-hint{font-size:9.5px;color:var(--t3)}
-.noa-ai-arr{font-size:9px;color:var(--t3);transition:transform .2s;display:inline-block}
+.noa-ai-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--crit);flex:1}
+.noa-ai-hint{font-size:11px;color:var(--t3)}
+.noa-ai-arr{font-size:11px;color:var(--t3);transition:transform .2s;display:inline-block}
 .noa-ai-arr.open{transform:rotate(180deg)}
 
 /* ── messages list ── */
@@ -298,7 +311,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 /* ── markdown: headers ── */
 .nm-bubble h2{font-size:13.5px;font-weight:800;color:var(--crit);margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(255,58,58,.2);letter-spacing:.01em;display:flex;align-items:center;gap:6px}
 .nm-bubble h3{font-size:13px;font-weight:700;color:var(--t1);margin:14px 0 6px;padding-left:9px;border-left:2px solid var(--crit)}
-.nm-bubble h4{font-size:12.5px;font-weight:700;color:var(--t2);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.05em;font-size:10.5px}
+.nm-bubble h4{font-size:12.5px;font-weight:700;color:var(--t2);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.05em;font-size:11px}
 .nm-bubble h2:first-child,.nm-bubble h3:first-child,.nm-bubble h4:first-child{margin-top:0}
 
 /* ── markdown: emphasis ── */
@@ -328,7 +341,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 /* ── markdown: tables ── */
 .nm-bubble table{border-collapse:collapse;width:100%;margin:10px 0;font-size:12px;border-radius:8px;overflow:hidden;border:1px solid var(--b2)}
 .nm-bubble thead tr{background:rgba(255,58,58,.08)}
-.nm-bubble th{padding:8px 12px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--crit);border-bottom:1px solid rgba(255,58,58,.2);white-space:nowrap}
+.nm-bubble th{padding:8px 12px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--crit);border-bottom:1px solid rgba(255,58,58,.2);white-space:nowrap}
 .nm-bubble td{padding:8px 12px;border-bottom:1px solid var(--b1);color:var(--t1);vertical-align:top;line-height:1.5}
 .nm-bubble tbody tr:last-child td{border-bottom:none}
 .nm-bubble tbody tr:nth-child(even) td{background:rgba(255,255,255,.02)}
@@ -344,18 +357,18 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 /* ── HÉCTOR KPI strip ── */
 .kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0}
 .kpi-tile{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px}
-.kpi-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:5px}
+.kpi-l{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:5px}
 .kpi-v{font-size:17px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
-.kpi-s{font-size:9.5px;color:var(--t3);margin-top:4px}
+.kpi-s{font-size:11px;color:var(--t3);margin-top:4px}
 
 /* ── Cobranza table ── */
 .tbl-wrap{flex:1;overflow:auto}
 .cob-tbl{width:100%;border-collapse:collapse;min-width:460px}
 /* UX: encabezados muestran flecha activa y cursor pointer para indicar que son ordenables */
-.cob-tbl thead th{position:sticky;top:0;z-index:10;background:var(--s1);padding:8px 12px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);border-bottom:1px solid var(--b1);text-align:left;cursor:pointer;user-select:none;white-space:nowrap;transition:color .12s}
+.cob-tbl thead th{position:sticky;top:0;z-index:10;background:var(--s1);padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);border-bottom:1px solid var(--b1);text-align:left;cursor:pointer;user-select:none;white-space:nowrap;transition:color .12s}
 .cob-tbl thead th:hover{color:var(--t2)}
 .cob-tbl thead th.s{color:var(--t1)}
-.cob-tbl thead th .sort-arrow{font-size:9px;margin-left:3px;opacity:.7}
+.cob-tbl thead th .sort-arrow{font-size:11px;margin-left:3px;opacity:.7}
 .cob-tbl tbody tr{border-bottom:1px solid rgba(255,255,255,.025);transition:background .12s}
 .cob-tbl tbody tr:hover{background:var(--b1)}
 .cob-tbl td{padding:9px 12px;vertical-align:middle}
@@ -367,16 +380,16 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .sem-dot.na{background:var(--sn);box-shadow:0 0 6px rgba(255,140,0,.45)}
 .sem-dot.ro{background:var(--sr);box-shadow:0 0 6px rgba(255,58,58,.5)}
 .sem-dot.ne{background:var(--sb)}
-.sem-lbl{font-size:10.5px;color:var(--t3);white-space:nowrap}
+.sem-lbl{font-size:11px;color:var(--t3);white-space:nowrap}
 .cn{font-size:12px;font-weight:600;color:var(--t1)}
-.cf{font-size:9.5px;color:var(--t3);font-family:var(--mono);margin-top:1px}
+.cf{font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:1px}
 .d-cell{text-align:left}
 .d-num{font-family:var(--mono);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;display:block}
 .d-bar{height:2px;background:var(--b2);border-radius:1px;margin-top:3px;width:44px;overflow:hidden}
 .d-fill{height:100%;border-radius:1px}
 .mnt{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--t1);font-variant-numeric:tabular-nums}
-.gl{font-size:10.5px;color:var(--t2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gd{font-size:9.5px;color:var(--t3);font-family:var(--mono);margin-top:1px}
+.gl{font-size:11px;color:var(--t2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gd{font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:1px}
 .row-acts{display:flex;gap:4px}
 
 /* ── MODAL ── */
@@ -388,11 +401,11 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .mx:hover{color:var(--t1)}
 .mx:focus-visible{outline:2px solid var(--grn);outline-offset:2px}
 .msec{margin-bottom:14px}
-.mlbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--t3);margin-bottom:7px}
+.mlbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--t3);margin-bottom:7px}
 .mrow{display:flex;align-items:center;gap:10px;padding:7px 11px;background:var(--s3);border:1px solid var(--b1);border-radius:6px;margin-bottom:5px;font-size:11.5px}
 .mid{font-family:var(--mono);font-weight:600;color:var(--t1)}
 .mcl{color:var(--t2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mal{font-size:10px;font-weight:700;flex-shrink:0}
+.mal{font-size:11px;font-weight:700;flex-shrink:0}
 .tpl{background:var(--s3);border:1px solid var(--grn-b);border-radius:7px;padding:13px;font-size:11.5px;line-height:1.75;color:var(--t2);white-space:pre-wrap;font-family:var(--sans)}
 .mfoot{margin-top:18px;display:flex;gap:8px;justify-content:flex-end}
 .rgrp{display:flex;flex-direction:column;gap:7px}
@@ -420,7 +433,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
     <div style="background:#fff;border-radius:7px;padding:3px 9px;display:flex;align-items:center;flex-shrink:0">
       <img src="/img/logo.png" alt="ABSTORAGES" style="height:26px;width:auto;display:block">
     </div>
-    <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:var(--grn);padding-left:2px">AI Ops Center</span>
+    <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:var(--grn);padding-left:2px">AI Ops Center</span>
   </a>
 
   <div class="hdr-sep"></div>
@@ -467,8 +480,8 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 
     <!-- Llamada en vivo -->
     <div id="noa-live-calls" style="display:none;border:1px solid var(--b1);border-radius:8px;background:var(--s2);margin:0 0 10px">
-      <div style="padding:10px 14px 8px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);display:flex;align-items:center;gap:6px">
-        <span style="width:7px;height:7px;border-radius:50%;background:#ff4a4a;box-shadow:0 0 0 0 rgba(255,74,74,.6);animation:sof-live-pulse 1.4s infinite" aria-hidden="true"></span>
+      <div style="padding:10px 14px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);display:flex;align-items:center;gap:6px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#FF5C5C;box-shadow:0 0 0 0 rgba(255,74,74,.6);animation:sof-live-pulse 1.4s infinite" aria-hidden="true"></span>
         Llamada en vivo
       </div>
       <div id="noa-live-transcript" style="max-height:220px;overflow-y:auto;padding:0 14px 10px;font-size:11.5px;line-height:1.55;color:var(--t2)"></div>
@@ -513,7 +526,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
         <button class="fd-back" onclick="cerrarFolio()" aria-label="Cerrar detalle">&#8592;</button>
         <span class="fd-folio" id="fd-folio-id">—</span>
         <span class="fd-st-badge" id="fd-st-badge"></span>
-        <button class="btn btn-sm" onclick="consultarFolioEnNOA(document.getElementById('fd-folio-id').textContent)" aria-label="Consultar este folio con NOA" style="font-size:10px;padding:4px 9px;flex-shrink:0">Consultar NOA →</button>
+        <button class="btn btn-sm" onclick="consultarFolioEnNOA(document.getElementById('fd-folio-id').textContent)" aria-label="Consultar este folio con NOA" style="font-size:11px;padding:4px 9px;flex-shrink:0">Consultar NOA →</button>
       </div>
       <div class="fd-body" id="fd-body">
         <div style="color:var(--t3);font-size:12px;padding:20px 0;text-align:center">Cargando…</div>
@@ -571,22 +584,22 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 
       <!-- Cabecera proveedores -->
       <div style="flex-shrink:0;padding:12px 14px 10px;border-bottom:1px solid var(--b1)">
-        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);margin-bottom:8px">Proveedores TMS</div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);margin-bottom:8px">Proveedores TMS</div>
         <div style="position:relative">
           <input id="sof-prov-search" type="text" placeholder="Buscar proveedor o RFC…"
             style="width:100%;box-sizing:border-box;font-size:12px;font-family:var(--sans);background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--t1);padding:7px 10px 7px 30px;outline:none;transition:border-color .15s"
-            onfocus="this.style.borderColor='rgba(74,158,255,0.5)'"
+            onfocus="this.style.borderColor='rgba(47,111,237,0.5)'"
             onblur="this.style.borderColor='var(--b2)'"
             oninput="sofProvSearch(this.value)" />
           <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--t3);pointer-events:none">🔍</span>
         </div>
-        <div id="sof-prov-count" style="font-size:10px;color:var(--t3);margin-top:6px"></div>
+        <div id="sof-prov-count" style="font-size:11px;color:var(--t3);margin-top:6px"></div>
       </div>
 
       <!-- Llamadas en vivo -->
       <div id="sof-live-calls" style="flex-shrink:0;display:none;border-bottom:1px solid var(--b1);background:var(--s2)">
-        <div style="padding:10px 14px 8px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);display:flex;align-items:center;gap:6px">
-          <span style="width:7px;height:7px;border-radius:50%;background:#ff4a4a;box-shadow:0 0 0 0 rgba(255,74,74,.6);animation:sof-live-pulse 1.4s infinite" aria-hidden="true"></span>
+        <div style="padding:10px 14px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);display:flex;align-items:center;gap:6px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#FF5C5C;box-shadow:0 0 0 0 rgba(255,74,74,.6);animation:sof-live-pulse 1.4s infinite" aria-hidden="true"></span>
           Llamada en vivo
         </div>
         <div id="sof-live-transcript" style="max-height:220px;overflow-y:auto;padding:0 14px 10px;font-size:11.5px;line-height:1.55;color:var(--t2)"></div>
@@ -602,8 +615,8 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
     <!-- ── Chat SOFÍA (columna derecha) ── -->
     <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0">
       <div class="phead">
-        <div class="adot" style="background:rgba(74,158,255,0.1) url('/img/sofia-avatar.png') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22);" aria-hidden="true">S</div>
-        <span class="aname" style="color:#4a9eff">SOFÍA</span>
+        <div class="adot" style="background:rgba(47,111,237,0.1) url('/img/sofia-avatar.png') center/cover no-repeat;border:1px solid rgba(47,111,237,0.22);" aria-hidden="true">S</div>
+        <span class="aname" style="color:#2F6FED">SOFÍA</span>
         <span class="arole">AI Operaciones · 24/7</span>
         <div class="pbtns" style="margin-left:auto;display:flex;gap:6px">
           <button class="btn btn-sm" onclick="sofNewSession()" aria-label="Nueva sesión SOFÍA">↺ Nueva sesión</button>
@@ -614,7 +627,7 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
       <div class="sof-msgs" id="sof-msgs" role="log" aria-live="polite" aria-label="Chat con SOFÍA"
         style="flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:16px;min-height:0;scroll-behavior:smooth">
         <div class="nm noa" style="display:flex;gap:10px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url('/img/sofia-avatar.png') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)"></div>
+          <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(47,111,237,0.1) url('/img/sofia-avatar.png') center/cover no-repeat;border:1px solid rgba(47,111,237,0.22)"></div>
           <div class="nm-bubble" style="background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65">
             <p>Hola, soy <strong>SOFÍA Novak</strong>, AI Planner de ABSTORAGES.<br>Gestiono operaciones, coordino transportistas y monitoreo folios activos. ¿Qué necesitas?</p>
           </div>
@@ -623,13 +636,13 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 
       <div style="flex-shrink:0;border-top:1px solid var(--b1);background:var(--s1);padding:10px 14px;display:flex;gap:8px;align-items:flex-end">
         <textarea id="sof-input" rows="1" placeholder="Escribe a SOFÍA…" aria-label="Mensaje para SOFÍA"
-          style="flex:1;min-height:36px;max-height:110px;resize:none;font-size:12.5px;font-family:var(--sans);background:var(--s3);border:1px solid rgba(74,158,255,0.22);border-radius:6px;color:var(--t1);padding:8px 11px;outline:none;transition:border-color .15s;line-height:1.5"
+          style="flex:1;min-height:36px;max-height:110px;resize:none;font-size:12.5px;font-family:var(--sans);background:var(--s3);border:1px solid rgba(47,111,237,0.22);border-radius:6px;color:var(--t1);padding:8px 11px;outline:none;transition:border-color .15s;line-height:1.5"
           oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"
-          onfocus="this.style.borderColor='rgba(74,158,255,0.5)'"
-          onblur="this.style.borderColor='rgba(74,158,255,0.22)'"
+          onfocus="this.style.borderColor='rgba(47,111,237,0.5)'"
+          onblur="this.style.borderColor='rgba(47,111,237,0.22)'"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sofSend();}"></textarea>
         <button id="sof-send-btn" onclick="sofSend()"
-          style="flex-shrink:0;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:#4a9eff;color:#fff;font-family:var(--sans);transition:background .15s;align-self:flex-end"
+          style="flex-shrink:0;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:#2F6FED;color:#fff;font-family:var(--sans);transition:background .15s;align-self:flex-end"
           aria-label="Enviar a SOFÍA">→</button>
       </div>
     </div>
@@ -1146,7 +1159,7 @@ function abrirFolioTMS(id, intento){
       if (loader) loader.innerHTML =
         '<div style="display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 0">'+
         '<span style="font-size:11px;color:var(--t3)">TMS no respondió.</span>'+
-        '<button class="btn btn-sm" style="font-size:10px" onclick="abrirFolioTMS(\''+escH(id)+'\',0)">↻ Reintentar</button>'+
+        '<button class="btn btn-sm" style="font-size:11px" onclick="abrirFolioTMS(\''+escH(id)+'\',0)">↻ Reintentar</button>'+
         '</div>';
     });
 }
@@ -1156,7 +1169,7 @@ function mostrarFolioSinDatos(id){
   if (loader) loader.innerHTML =
     '<div style="display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 0">'+
     '<span style="font-size:11px;color:var(--t3)">Sin datos adicionales en TMS.</span>'+
-    '<button class="btn btn-sm" style="font-size:10px" onclick="abrirFolioTMS(\''+escH(id)+'\',0)">↻ Reintentar</button>'+
+    '<button class="btn btn-sm" style="font-size:11px" onclick="abrirFolioTMS(\''+escH(id)+'\',0)">↻ Reintentar</button>'+
     '</div>';
 }
 
@@ -1976,7 +1989,7 @@ function switchPage(p){
         } else if (data.tipo === 'LLAMADA_ESTADO') {
           marcarActividad();
           var st = document.createElement('div');
-          st.style.cssText = 'font-size:10px;color:var(--t3);margin:2px 0 6px';
+          st.style.cssText = 'font-size:11px;color:var(--t3);margin:2px 0 6px';
           st.textContent = '— ' + (data.mensaje||'');
           log.appendChild(st);
           log.scrollTop = log.scrollHeight;
@@ -1995,7 +2008,7 @@ function switchPage(p){
   }
 
   var widgets = {
-    SOFIA: widget('sof-live-calls', 'sof-live-transcript', 'SOFÍA', '#4a9eff'),
+    SOFIA: widget('sof-live-calls', 'sof-live-transcript', 'SOFÍA', '#2F6FED'),
     NOA:   widget('noa-live-calls', 'noa-live-transcript', 'NOA', 'var(--cr-fg, #ff8a4a)'),
   };
 
@@ -2067,7 +2080,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var msgs=document.getElementById('sof-msgs');
     var d=document.createElement('div');
     d.style.cssText='display:flex;gap:10px;align-items:flex-start;flex-direction:row-reverse';
-    d.innerHTML='<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:var(--s4);border:1px solid var(--b3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--t2)">TÚ</div>'
+    d.innerHTML='<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:var(--s4);border:1px solid var(--b3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--t2)">TÚ</div>'
       +'<div style="background:var(--s4);border:1px solid var(--b2);border-top-right-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65">'+escHtml(text)+'</div>';
     msgs.appendChild(d);
     sofScrollBottom();
@@ -2077,8 +2090,8 @@ document.addEventListener('DOMContentLoaded',function(){
     var msgs=document.getElementById('sof-msgs');
     var d=document.createElement('div');
     d.id='sof-typing'; d.style.cssText='display:flex;gap:10px;align-items:flex-start';
-    d.innerHTML='<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)"></div>'
-      +'<div style="background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;padding:9px 13px;border-radius:10px"><div class="typing-indicator" style="display:flex;gap:4px;align-items:center"><span style="width:6px;height:6px;border-radius:50%;background:#4a9eff;display:inline-block;animation:blink 1.4s ease infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#4a9eff;display:inline-block;animation:blink 1.4s ease .2s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#4a9eff;display:inline-block;animation:blink 1.4s ease .4s infinite"></span></div></div>';
+    d.innerHTML='<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(47,111,237,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(47,111,237,0.22)"></div>'
+      +'<div style="background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;padding:9px 13px;border-radius:10px"><div class="typing-indicator" style="display:flex;gap:4px;align-items:center"><span style="width:6px;height:6px;border-radius:50%;background:#2F6FED;display:inline-block;animation:blink 1.4s ease infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#2F6FED;display:inline-block;animation:blink 1.4s ease .2s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#2F6FED;display:inline-block;animation:blink 1.4s ease .4s infinite"></span></div></div>';
     msgs.appendChild(d);
     sofScrollBottom();
   }
@@ -2088,7 +2101,7 @@ document.addEventListener('DOMContentLoaded',function(){
   function sofNewBubble(){
     var msgs=document.getElementById('sof-msgs');
     var wrap=document.createElement('div'); wrap.style.cssText='display:flex;gap:10px;align-items:flex-start';
-    var av=document.createElement('div'); av.style.cssText='width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)';
+    var av=document.createElement('div'); av.style.cssText='width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(47,111,237,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(47,111,237,0.22)';
     var bubble=document.createElement('div'); bubble.style.cssText='background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65';
     wrap.appendChild(av); wrap.appendChild(bubble); msgs.appendChild(wrap);
     sofScrollBottom();
@@ -2161,7 +2174,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   window.sofClear = function(){
     document.getElementById('sof-msgs').innerHTML='<div style="display:flex;gap:10px;align-items:flex-start">'
-      +'<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(74,158,255,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(74,158,255,0.22)"></div>'
+      +'<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(47,111,237,0.1) url(\'/img/sofia-avatar.png\') center/cover no-repeat;border:1px solid rgba(47,111,237,0.22)"></div>'
       +'<div style="background:var(--s3);border:1px solid var(--b2);border-top-left-radius:3px;color:var(--t1);max-width:calc(100% - 35px);padding:9px 13px;border-radius:10px;font-size:12.5px;line-height:1.65">'
       +'<p>Hola, soy <strong>SOFÍA Novak</strong>, AI Planner de ABSTORAGES.<br>¿Qué necesitas?</p></div></div>';
   };
@@ -2199,21 +2212,21 @@ document.addEventListener('DOMContentLoaded',function(){
     var correo = esc(p['Correo'] || '—');
     var contacto = esc(p['Contacto'] || '—');
     var telefono = esc(tel(p));
-    var emergencia = p['Emergencia'] ? '<div style="font-size:10px;color:#f59e0b;margin-top:3px">⚡ Emergencia: '+esc(p['Emergencia'])+'</div>' : '';
-    var comentarios = p['Comentarios'] ? '<div style="font-size:10px;color:var(--t3);margin-top:3px;font-style:italic">'+esc(p['Comentarios'])+'</div>' : '';
+    var emergencia = p['Emergencia'] ? '<div style="font-size:11px;color:#f59e0b;margin-top:3px">⚡ Emergencia: '+esc(p['Emergencia'])+'</div>' : '';
+    var comentarios = p['Comentarios'] ? '<div style="font-size:11px;color:var(--t3);margin-top:3px;font-style:italic">'+esc(p['Comentarios'])+'</div>' : '';
     var isSelected = _selected === (p['Razon Social'] || p['Folio']);
-    var borderColor = isSelected ? 'rgba(74,158,255,0.5)' : 'var(--b1)';
-    var bgColor     = isSelected ? 'rgba(74,158,255,0.06)' : 'transparent';
+    var borderColor = isSelected ? 'rgba(47,111,237,0.5)' : 'var(--b1)';
+    var bgColor     = isSelected ? 'rgba(47,111,237,0.06)' : 'transparent';
 
     var rutas = '';
     if (isSelected && p._rutas) {
       if (p._rutas.length === 0) {
-        rutas = '<div style="font-size:10px;color:var(--t3);padding:8px 0">Sin rutas registradas en TMS</div>';
+        rutas = '<div style="font-size:11px;color:var(--t3);padding:8px 0">Sin rutas registradas en TMS</div>';
       } else {
         rutas = '<div style="margin-top:8px;border-top:1px solid var(--b1);padding-top:8px">'
-          + '<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:6px">Rutas históricas</div>'
+          + '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:6px">Rutas históricas</div>'
           + p._rutas.map(function(r){
-              return '<div style="font-size:10px;color:var(--t2);padding:3px 0;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;gap:8px">'
+              return '<div style="font-size:11px;color:var(--t2);padding:3px 0;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;gap:8px">'
                 + '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.ruta)+'</span>'
                 + '<span style="flex-shrink:0;color:var(--t3)">'+r.servicios+'srv · $'+(r.costoPromedio?r.costoPromedio.toLocaleString('es-MX'):'—')+'</span>'
                 + '</div>';
@@ -2221,7 +2234,7 @@ document.addEventListener('DOMContentLoaded',function(){
           + '</div>';
       }
     } else if (isSelected && !p._rutas) {
-      rutas = '<div style="font-size:10px;color:var(--t3);padding:8px 0 0">Cargando rutas…</div>';
+      rutas = '<div style="font-size:11px;color:var(--t3);padding:8px 0 0">Cargando rutas…</div>';
     }
 
     return '<div class="sof-prov-card" data-key="'+esc(p['Razon Social'] || p['Folio'])+'" '
@@ -2231,15 +2244,15 @@ document.addEventListener('DOMContentLoaded',function(){
       + '<span style="font-size:12px;font-weight:700;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+nombre+'</span>'
       + badge(p['Estatus'])
       + '</div>'
-      + '<div style="font-size:10.5px;color:var(--t2)">📞 '+telefono+'</div>'
-      + (contacto !== '—' ? '<div style="font-size:10px;color:var(--t3)">'+contacto+'</div>' : '')
+      + '<div style="font-size:11px;color:var(--t2)">📞 '+telefono+'</div>'
+      + (contacto !== '—' ? '<div style="font-size:11px;color:var(--t3)">'+contacto+'</div>' : '')
       + (isSelected
         ? '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--b1)">'
-          + '<div style="font-size:10px;color:var(--t3)">RFC: '+rfc+'</div>'
-          + (correo !== '—' ? '<div style="font-size:10px;color:var(--t3)">'+correo+'</div>' : '')
+          + '<div style="font-size:11px;color:var(--t3)">RFC: '+rfc+'</div>'
+          + (correo !== '—' ? '<div style="font-size:11px;color:var(--t3)">'+correo+'</div>' : '')
           + emergencia + comentarios + rutas
           + '<button onclick="event.stopPropagation();sofProvChat(\''+nombre+'\')" '
-          + 'style="margin-top:8px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:5px;border:none;background:#4a9eff;color:#fff;cursor:pointer;font-family:var(--sans)">💬 Preguntar a SOFÍA</button>'
+          + 'style="margin-top:8px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:5px;border:none;background:#2F6FED;color:#fff;cursor:pointer;font-family:var(--sans)">💬 Preguntar a SOFÍA</button>'
           + '</div>'
         : '')
       + '</div>';
@@ -2368,7 +2381,7 @@ document.addEventListener('DOMContentLoaded',function(){
 .asis-msg{font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:8px;max-width:94%}
 .asis-msg.q{align-self:flex-end;background:var(--s4);color:var(--t1);white-space:pre-wrap}
 .asis-msg.a{align-self:stretch;max-width:100%;background:var(--s2);border:1px solid var(--b1);color:var(--t1);position:relative;overflow-x:auto}
-.asis-copy{margin-top:8px;font-size:10px;font-weight:700;color:var(--grn);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
+.asis-copy{margin-top:8px;font-size:11px;font-weight:700;color:var(--grn);cursor:pointer;background:none;border:none;padding:0;font-family:inherit}
 .asis-copy:hover{text-decoration:underline}
 
 /* ── Markdown renderizado dentro de la respuesta del agente (estilo ChatGPT/Claude) ── */
@@ -2386,7 +2399,7 @@ document.addEventListener('DOMContentLoaded',function(){
 .asis-code{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11px}
 .asis-table{border-collapse:collapse;width:100%;margin:6px 0 10px;font-size:11.5px}
 .asis-table th,.asis-table td{border:1px solid var(--b1);padding:5px 8px;text-align:left}
-.asis-table th{background:var(--s3);color:var(--t2);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em}
+.asis-table th{background:var(--s3);color:var(--t2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
 .asis-table td{color:var(--t1)}
 .asis-empty{color:var(--t3);font-size:11.5px;text-align:center;margin:auto}
 .asis-inbar{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--b1);background:var(--s2)}
