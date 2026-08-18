@@ -86,14 +86,24 @@ function listarConversaciones() {
     // Último agente que respondió en el hilo — solo para la etiqueta visual
     // en 1:1; en grupo se etiqueta genérico porque puede haber más de uno.
     const ultimoAgente = [...mensajes].reverse().find(m => m.agent)?.agent;
+    // Personas reales que escribieron en el hilo (no el nombre del grupo en
+    // sí) — dedup por teléfono, para mostrar quién participó.
+    const participantes = [...new Map(
+      mensajes.filter(m => m.direction === 'incoming' && m.sender_phone)
+        .map(m => [m.sender_phone, { nombre: m.sender_name || null, telefono: m.sender_phone }])
+    ).values()];
     return {
       sessionId: `2chat:${canalUuid}`,
       agente: esGrupo ? 'grupo' : (ultimoAgente || 'desconocido'),
       msgs: mensajes.length,
       updatedAt: new Date(ultimo.timestamp).getTime(),
-      nombre: esGrupo ? 'Grupo ABSTORAGES (WhatsApp)' : (primerEntrante?.sender_name || 'Contacto WhatsApp'),
+      // El nombre real del grupo se resuelve aparte (vía API de 2Chat, no
+      // vive en estos mensajes) — server-lite.js lo sobreescribe si lo tiene
+      // en caché; este es solo el fallback.
+      nombre: esGrupo ? 'Grupo de WhatsApp' : (primerEntrante?.sender_name || 'Contacto WhatsApp'),
       empresa: null,
       telefono: esGrupo ? null : (primerEntrante?.sender_phone || null),
+      participantes,
       resumen: null,
     };
   });

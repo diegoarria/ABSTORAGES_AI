@@ -453,6 +453,23 @@ const TWOCHAT_NUMEROS = {
 };
 const TWOCHAT_PREFIJO = { sofia: '🟩 SOFIA:', noa: '🟨 NOA:' };
 
+// Nombre real de cada grupo de WhatsApp (wa_group_name) — no viaja en los
+// mensajes guardados, se resuelve vía API de 2Chat con caché de 10 min para
+// no pegarle a la API en cada carga del historial.
+let _nombresGruposCache = { ts: 0, porUuid: {} };
+async function obtenerNombresGruposWA() {
+  if (Date.now() - _nombresGruposCache.ts < 10 * 60 * 1000) return _nombresGruposCache.porUuid;
+  const porUuid = {};
+  for (const num of Object.values(TWOCHAT_NUMEROS).filter(Boolean)) {
+    try {
+      const r = await twochat.listarGrupos(num);
+      (r.data || []).forEach(g => { porUuid[g.uuid] = g.wa_group_name; });
+    } catch (e) { console.error('[2Chat] Error listando grupos de', num, ':', e.message); }
+  }
+  _nombresGruposCache = { ts: Date.now(), porUuid };
+  return porUuid;
+}
+
 // Compara números por los últimos 10 dígitos — WhatsApp antepone un "1" extra
 // a los celulares mexicanos en el JID (52 1 XXXXXXXXXX) que no aparece en el
 // E.164 normal (+52XXXXXXXXXX), así que comparar el string completo no sirve.
@@ -1427,7 +1444,13 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
     // Conversaciones de WhatsApp vía 2Chat (grupo + 1:1) — viven en su propio
     // store (no en `memory`), se fusionan aquí para que aparezcan en el mismo
     // historial en vez de necesitar una pantalla aparte.
-    enriquecidas = enriquecidas.concat(grupoWA.listarConversaciones());
+    const nombresGrupos = await obtenerNombresGruposWA().catch(() => ({}));
+    const conversacionesWA = grupoWA.listarConversaciones().map(c => {
+      if (c.agente !== 'grupo') return c;
+      const canalUuid = c.sessionId.replace(/^2chat:/, '');
+      return { ...c, nombre: nombresGrupos[canalUuid] || c.nombre };
+    });
+    enriquecidas = enriquecidas.concat(conversacionesWA);
 
     if (q) {
       enriquecidas = enriquecidas.filter(s =>

@@ -305,7 +305,12 @@ function render(lista) {
 
   list.innerHTML = lista.map(s => {
     const nombre = s.nombre || s.empresa || s.sessionId;
-    const meta = [s.empresa && s.empresa !== s.nombre ? s.empresa : '', s.telefono, s.resumen].filter(Boolean).join(' · ');
+    // En grupo no hay un solo teléfono — se listan las personas que
+    // escribieron (nombre + número de cada una) en vez de un solo dato.
+    const participantesTxt = (!s.telefono && s.participantes && s.participantes.length)
+      ? s.participantes.map(p => p.nombre && p.nombre !== p.telefono ? `${p.nombre} (${p.telefono})` : (p.telefono || p.nombre)).join(', ')
+      : '';
+    const meta = [s.empresa && s.empresa !== s.nombre ? s.empresa : '', s.telefono, participantesTxt, s.resumen].filter(Boolean).join(' · ');
     const activa = s.sessionId === sesionActual ? 'on' : '';
     return `<div class="sess-item ${activa}" onclick="abrir('${s.sessionId.replace(/'/g,"\\'")}')">
       <div class="sess-top">
@@ -329,12 +334,15 @@ async function abrir(sessionId) {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     const info = TODAS.find(s => s.sessionId === sessionId) || {};
+    const participantesTxt = (!info.telefono && info.participantes && info.participantes.length)
+      ? info.participantes.map(p => p.nombre && p.nombre !== p.telefono ? `${p.nombre} (${p.telefono})` : (p.telefono || p.nombre)).join(', ')
+      : (info.telefono || '');
 
     main.innerHTML = `
       <div class="chat-header">
         <div>
           <div class="chat-title">${esc(info.nombre || info.empresa || sessionId)}</div>
-          <div class="chat-sub">${AGENTE_LABEL[data.agente] || data.agente} · ${data.historial.length} mensajes · ${esc(sessionId)}</div>
+          <div class="chat-sub">${AGENTE_LABEL[data.agente] || data.agente} · ${data.historial.length} mensajes${participantesTxt ? ' · ' + esc(participantesTxt) : ''}</div>
         </div>
       </div>
       <div id="msgs"></div>
