@@ -525,6 +525,26 @@ function detectarTriggerGrupo(texto, quotedMsgId) {
   return null;
 }
 
+// Dedup por contenido — respaldo del dedup por messageId. Cuando un grupo
+// tiene más de un canal nuestro como miembro (ej. NOA/SOFIA/SARA en el mismo
+// grupo), 2Chat entrega el mismo mensaje real una vez por cada canal, y cada
+// entrega puede traer un id/uuid DISTINTO (es un registro propio de 2Chat
+// por canal, no el id universal del mensaje de WhatsApp) — dedup por
+// messageId solo no alcanza. Como el remitente+texto sí es el mismo mensaje
+// real sin importar qué canal lo entregó, se usa eso como llave.
+const _dedupContenidoGrupo = new Map(); // "telefono|texto" → timestamp del último visto
+const DEDUP_CONTENIDO_MS = 15000;
+function esDuplicadoPorContenido(telefono, texto) {
+  const key = `${telefono}|${texto}`;
+  const ahora = Date.now();
+  const anterior = _dedupContenidoGrupo.get(key);
+  _dedupContenidoGrupo.set(key, ahora);
+  if (_dedupContenidoGrupo.size > 500) {
+    for (const [k, ts] of _dedupContenidoGrupo) if (ahora - ts > DEDUP_CONTENIDO_MS) _dedupContenidoGrupo.delete(k);
+  }
+  return !!anterior && (ahora - anterior) < DEDUP_CONTENIDO_MS;
+}
+
 app.post('/webhook/2chat', express.json(), (req, res) => {
   res.sendStatus(200);
   setImmediate(async () => {
@@ -551,6 +571,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       const esPropio = Object.values(TWOCHAT_NUMEROS).some(n => mismoNumero(n, remitentePhone));
 
       if (grupoWA.existeMensaje(messageId)) return; // dedup — 2Chat puede reintentar el mismo evento
+      if (esGrupo && texto && esDuplicadoPorContenido(remitentePhone, texto)) return; // mismo mensaje real, entregado por otro canal
 
       // canalUuid identifica la conversación para memoria de contexto — en
       // grupo se normaliza al wa_group_id real (universal, no scoped a un
