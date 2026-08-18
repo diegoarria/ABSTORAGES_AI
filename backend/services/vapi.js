@@ -186,6 +186,65 @@ async function llamarNormal(nombre, telefono) {
   return data;
 }
 
+// ── Llamada disparada desde el grupo de WhatsApp (2Chat) — SOFIA o NOA ───────
+// El agente decide sola, dentro de la conversación de grupo, que hace falta
+// una llamada real (token de control INICIAR_LLAMADA) — no es automático en
+// cada mensaje. Se le inyecta el resumen de lo que se habló en el grupo para
+// que no repita preguntas ya contestadas ahí.
+async function llamarDesdeGrupo({ agente, telefono, nombre, motivo, resumenContexto }) {
+  const raw = (telefono || '').replace(/\D/g, '');
+  if (raw.length < 10) {
+    console.log(`[Vapi] Teléfono inválido para llamada desde grupo: ${telefono}`);
+    return { status: 'telefono_invalido' };
+  }
+  const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
+  const esSofia = agente === 'sofia';
+  const promptBase = esSofia ? SOFIA_SYSTEM_PROMPT : NOA_SYSTEM_PROMPT;
+  const nombreAgente = esSofia ? 'SOFIA' : 'Noa';
+
+  const primerMensaje =
+    `${esSofia ? ESLOGAN + '. ' : ''}Hola ${nombre || ''}, soy ${nombreAgente} de ABSTORAGES. ` +
+    `Te marco porque ${motivo || 'necesito platicar algo contigo'}.`;
+
+  const systemPrompt =
+    promptBase + MODO_VOZ + (esSofia ? SOFIA_VOZ_EXTRA : '') + (esSofia ? CIERRE_ESLOGAN : '') +
+    `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
+    `Esta llamada la disparó una conversación en el grupo interno de WhatsApp de ABSTORAGES. Motivo: ${motivo || 'sin detalle'}.\n` +
+    (resumenContexto ? `Lo que se habló en el grupo relevante a esto:\n${resumenContexto}\n` : '') +
+    `Usa esta información para no volver a preguntar lo que ya está contestado ahí.`;
+
+  const phoneNumberId = esSofia ? PHONE_NUMBER_ID : PHONE_NUMBER_ID_NOA;
+  const assistantId = esSofia ? ASSISTANT_ID : ASSISTANT_ID_NOA;
+
+  if (!API_KEY || !phoneNumberId) {
+    console.log(`[Vapi STUB] Llamada desde grupo (${agente}) a ${nombre} (${numero}) — motivo: ${motivo}`);
+    return { status: 'stub' };
+  }
+
+  const payload = {
+    phoneNumberId,
+    customer: { number: numero, name: nombre || 'Contacto' },
+    assistantOverrides: {
+      firstMessage: primerMensaje,
+      model: { provider: 'anthropic', model: 'claude-haiku-4-5-20251001', messages: [{ role: 'system', content: systemPrompt }] },
+      ...VOZ_TUNING_RAPIDA,
+      ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
+    },
+    metadata: { agente, tipo: 'desde_grupo_wa', nombre, motivo },
+  };
+  if (assistantId) payload.assistantId = assistantId;
+
+  const res2 = await fetch(`${BASE_URL}/call/phone`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res2.ok) throw new Error(`Vapi error ${res2.status}: ${await res2.text()}`);
+  const data = await res2.json();
+  console.log(`[Vapi] Llamada desde grupo (${agente}) a ${nombre} iniciada — callId ${data.id}`);
+  return data;
+}
+
 // ── Filtrar proveedores compatibles con la orden ──────────────────────────────
 function filtrarProveedores(proveedores, orden) {
   const origenMatch = (p) => {
@@ -630,6 +689,7 @@ module.exports = {
   llamarProspecto,
   llamarProveedor,
   llamarNormal,
+  llamarDesdeGrupo,
   llamarStatusChofer,
   llamarStatusCliente,
   llamarAlertaStaff,

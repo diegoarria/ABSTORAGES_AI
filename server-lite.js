@@ -417,7 +417,10 @@ const MODO_GRUPO =
   `No te presentes ni expliques quién eres en cada mensaje, ya te conocen. ` +
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
   `No emitas ningún token de control de texto (NUEVA_ORDEN, LEAD_DATA, ALERTA_CRITICA, etc.) en este canal — no aplican aquí, es solo conversación. ` +
-  `WhatsApp no interpreta markdown — nunca uses [texto](link), **negritas**, encabezados con #, ni tablas. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.`;
+  `WhatsApp no interpreta markdown — nunca uses [texto](link), **negritas**, encabezados con #, ni tablas. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.\n\n` +
+  `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
+  `INICIAR_LLAMADA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre de a quién se llama]","motivo":"[motivo breve]"}\n` +
+  `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. No expliques el token en tu respuesta de texto, solo emítelo cuando aplique.`;
 
 const TWOCHAT_NUMEROS = {
   sofia: process.env.TWOCHAT_NUMBER_SOFIA,
@@ -492,7 +495,25 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       }));
 
       const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }]);
-      const respuestaLimpia = respuesta.trim();
+
+      // Token de control INICIAR_LLAMADA — el agente decide sola cuándo hace
+      // falta una llamada real, no en cada mensaje. Se limpia del texto antes
+      // de mandarlo al grupo, igual que los demás tokens de control del resto
+      // de la plataforma (NUEVA_ORDEN, ALERTA_CRITICA, etc.).
+      const llamadaMatch = respuesta.match(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/);
+      const respuestaLimpia = respuesta.replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/, '').trim();
+
+      if (llamadaMatch) {
+        try {
+          const datosLlamada = JSON.parse(llamadaMatch[1]);
+          const resumenContexto = historial.slice(-10).map(m => m.content).join('\n');
+          vapi.llamarDesdeGrupo({
+            agente, telefono: datosLlamada.telefono, nombre: datosLlamada.nombre,
+            motivo: datosLlamada.motivo, resumenContexto,
+          }).catch(e => console.error('[2Chat Webhook] Error disparando llamada:', e.message));
+        } catch (e) { console.error('[2Chat Webhook] INICIAR_LLAMADA inválido:', e.message); }
+      }
+
       // El prefijo 🟩/🟨 solo va en lo que se manda a WhatsApp — si se guarda
       // también en message_text, el agente lo ve en su propio historial de
       // contexto y empieza a imitarlo, duplicándolo en cada respuesta nueva.
