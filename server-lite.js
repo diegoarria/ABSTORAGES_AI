@@ -540,6 +540,17 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         const contactoConocido = await contactos.buscarPorTelefono(remitentePhone, agente);
         if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
       }
+      // Datos reales del TMS (folios, estatus, ubicación GPS en vivo) — sin
+      // esto NOA/SOFIA no tienen forma de contestar sobre folios reales por
+      // este canal, igual que ya se hace en el chat de la plataforma y en
+      // WhatsApp (Twilio).
+      if (agente === 'sofia') {
+        const tmsCtx = await tms.getContextoSOFIA(texto);
+        if (tmsCtx) systemPrompt += tmsCtx;
+      } else {
+        const tmsCtx = await tms.getContextoNOA(texto);
+        if (tmsCtx) systemPrompt += tmsCtx;
+      }
       const historial = grupoWA.contextoGrupo(canalUuid, 20).map(m => ({
         role: m.direction === 'outgoing' ? 'assistant' : 'user',
         content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,

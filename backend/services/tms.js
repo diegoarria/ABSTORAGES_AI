@@ -559,7 +559,7 @@ async function getContextoNOA(mensajeUsuario) {
   }
 
   // Detectar intención de entrega de turno o vista de todos los activos
-  const esTurno   = /turno|activos|briefing|todos los folios|folios activos|resumen|arranque/.test(msg);
+  const esTurno   = /turno|activos|briefing|todos los folios|folios activos|resumen|arranque|folios|recientes|estatus/.test(msg);
   if (esTurno) {
     const activos = await foliosActivosNOA();
     if (activos.length) return '\n\n---\n[DATOS TMS MONITOREO — uso interno NOA]\n' + formatearListaActivosNOA(activos) + '\n---\n';
