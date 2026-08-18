@@ -65,4 +65,57 @@ function limpiar(groupUuid) {
   return antes - cache.length;
 }
 
-module.exports = { registrar, existeMensaje, agentePorMessageId, contextoGrupo, limpiar };
+// Arma "conversaciones" agrupadas para el historial de la plataforma — un
+// hilo por group_uuid real (mismo agrupamiento que ya usa contextoGrupo()
+// para darle contexto al agente al responder, así el historial coincide
+// exactamente con lo que el bot ve). Un grupo de WhatsApp real mezcla
+// SOFIA/NOA/humanos en un solo hilo; un 1:1 es un hilo por número de
+// contacto (nota: si el mismo contacto le escribe a más de un bot 1:1,
+// hoy comparten canal — mismo comportamiento que ya tiene el webhook al
+// armar el contexto, no es algo nuevo de esta vista).
+function listarConversaciones() {
+  const porCanal = {};
+  for (const m of cache) {
+    if (!porCanal[m.group_uuid]) porCanal[m.group_uuid] = [];
+    porCanal[m.group_uuid].push(m);
+  }
+  return Object.entries(porCanal).map(([canalUuid, mensajes]) => {
+    const esGrupo = !canalUuid.startsWith('1a1:');
+    const ultimo = mensajes[mensajes.length - 1];
+    const primerEntrante = mensajes.find(m => m.direction === 'incoming');
+    // Último agente que respondió en el hilo — solo para la etiqueta visual
+    // en 1:1; en grupo se etiqueta genérico porque puede haber más de uno.
+    const ultimoAgente = [...mensajes].reverse().find(m => m.agent)?.agent;
+    return {
+      sessionId: `2chat:${canalUuid}`,
+      agente: esGrupo ? 'grupo' : (ultimoAgente || 'desconocido'),
+      msgs: mensajes.length,
+      updatedAt: new Date(ultimo.timestamp).getTime(),
+      nombre: esGrupo ? 'Grupo ABSTORAGES (WhatsApp)' : (primerEntrante?.sender_name || 'Contacto WhatsApp'),
+      empresa: null,
+      telefono: esGrupo ? null : (primerEntrante?.sender_phone || null),
+      resumen: null,
+    };
+  });
+}
+
+// Historial completo de un hilo (grupo o 1:1) a partir del sessionId
+// sintético que arma listarConversaciones() — usado por el detalle del
+// historial de la plataforma.
+function historialDeConversacion(sessionId) {
+  const canalUuid = sessionId.replace(/^2chat:/, '');
+  const mensajes = contextoGrupo(canalUuid, 500);
+  const esGrupo = !canalUuid.startsWith('1a1:');
+  const ultimoAgente = [...mensajes].reverse().find(m => m.agent)?.agent;
+  const historial = mensajes.map(m => ({
+    role: m.direction === 'outgoing' ? 'assistant' : 'user',
+    content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
+    ts: new Date(m.timestamp).getTime(),
+  }));
+  return { agente: esGrupo ? 'grupo' : (ultimoAgente || 'desconocido'), historial };
+}
+
+module.exports = {
+  registrar, existeMensaje, agentePorMessageId, contextoGrupo, limpiar,
+  listarConversaciones, historialDeConversacion,
+};

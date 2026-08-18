@@ -1394,10 +1394,10 @@ app.get('/api/sessions', (req, res) => res.json(memory.listSessions()));
 
 // ─── HISTORIAL DE CONVERSACIONES (todas las sesiones, sin límite de tiempo) ──
 function detectarAgente(id) {
-  if (/^widget_|^web_sara_/.test(id))  return 'sara';
-  if (/^sof_|^web_sofia_/.test(id))    return 'sofia';
-  if (/^noa_|^web_noa_/.test(id))      return 'noa';
-  if (/^hec_|^web_hector_/.test(id))   return 'hector';
+  if (/^widget_|^web_sara_|^wa_sara_/.test(id))   return 'sara';
+  if (/^sof_|^web_sofia_|^wa_sofia_/.test(id))    return 'sofia';
+  if (/^noa_|^web_noa_|^wa_/.test(id))            return 'noa'; // wa_<phone> sin sufijo de agente = NOA
+  if (/^hec_|^web_hector_/.test(id))              return 'hector';
   return 'desconocido';
 }
 
@@ -1424,6 +1424,11 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
       };
     });
 
+    // Conversaciones de WhatsApp vía 2Chat (grupo + 1:1) — viven en su propio
+    // store (no en `memory`), se fusionan aquí para que aparezcan en el mismo
+    // historial en vez de necesitar una pantalla aparte.
+    enriquecidas = enriquecidas.concat(grupoWA.listarConversaciones());
+
     if (q) {
       enriquecidas = enriquecidas.filter(s =>
         s.sessionId.toLowerCase().includes(q) ||
@@ -1442,6 +1447,11 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
 });
 
 app.get('/api/historial/sesiones/:id', adminUOps, (req, res) => {
+  if (req.params.id.startsWith('2chat:')) {
+    const { agente, historial } = grupoWA.historialDeConversacion(req.params.id);
+    if (!historial.length) return res.status(404).json({ error: 'Conversación no encontrada o sin mensajes' });
+    return res.json({ sessionId: req.params.id, agente, historial });
+  }
   const historial = memory.getFullHistory(req.params.id);
   if (!historial.length) return res.status(404).json({ error: 'Sesión no encontrada o sin mensajes' });
   res.json({ sessionId: req.params.id, agente: detectarAgente(req.params.id), historial });
