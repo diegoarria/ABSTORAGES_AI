@@ -557,21 +557,33 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // canal) para que la historia no se fragmente según qué número
       // "recibió" el webhook; en 1:1 es un id sintético por contacto.
       const canalUuidRecibido = esGrupo ? evento.group.uuid : null;
-      let waGroupId = null;
       let canalUuid = esGrupo ? canalUuidRecibido : `1a1:${(remitentePhone || '').replace(/\D/g, '').slice(-10)}`;
-      if (esGrupo) {
-        const cross = await resolverGruposWA();
-        waGroupId = cross.porUuidCanal[canalUuidRecibido] || null;
-        if (waGroupId) canalUuid = waGroupId;
-      }
 
-      grupoWA.registrar({
+      // Se registra YA, sin ningún await de por medio desde el chequeo de
+      // dedup — 2Chat entrega el mismo mensaje de grupo una vez por cada
+      // canal que es miembro (NOA/SOFIA/SARA pueden estar las 3 en el mismo
+      // grupo), casi en simultáneo. Si hubiera un await aquí, dos entregas
+      // del mismo mensaje podrían pasar ambas el chequeo de dedup antes de
+      // que ninguna alcance a registrarse, y el mensaje se procesaría (y se
+      // contestaría) dos veces.
+      const registro = grupoWA.registrar({
         message_id: messageId, group_uuid: canalUuid, sender_phone: remitentePhone || null,
         sender_name: remitente, agent: null, message_text: texto, direction: 'incoming',
         reply_to_message_id: quotedMsgId,
       });
 
       if (esPropio) return; // eco de un mensaje que mandamos nosotros mismos — nunca autorespondernos
+
+      // Recién aquí, ya cerrada la ventana de carrera, se resuelve el id
+      // real y universal del grupo (puede requerir una llamada async a la
+      // API de 2Chat si el caché está frío) y se actualiza el registro ya
+      // guardado para que quede unificado.
+      let waGroupId = null;
+      if (esGrupo) {
+        const cross = await resolverGruposWA();
+        waGroupId = cross.porUuidCanal[canalUuidRecibido] || null;
+        if (waGroupId) { canalUuid = waGroupId; registro.group_uuid = waGroupId; }
+      }
 
       let agente;
       if (esGrupo) {
