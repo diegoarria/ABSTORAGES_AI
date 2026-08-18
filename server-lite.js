@@ -12,7 +12,7 @@ const { saveMessage, getMessages } = require('./backend/services/db');
 const auth        = require('./backend/middleware/auth');
 const sessions    = require('./backend/services/sessions');
 const USERS       = require('./backend/data/users.json');
-const { chatStream } = require('./backend/services/claude');
+const { chatStream, chat } = require('./backend/services/claude');
 const memory      = require('./backend/services/memory');
 const tariff      = require('./backend/services/tariff');
 const SARA_PROMPT   = require('./backend/agents/sara-prompt');
@@ -36,6 +36,8 @@ const ordersStore = require('./backend/services/ordersStore');
 const contactos   = require('./backend/services/contactos');
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
+const twochat = require('./backend/services/twochat');
+const grupoWA = require('./backend/services/groupMessages');
 const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
@@ -403,6 +405,92 @@ app.get('/webhook/whatsapp', (req, res) => {
   } else {
     res.sendStatus(403);
   }
+});
+
+// ─── 2Chat — grupo de WhatsApp "ABSTORAGES IA - TEST" (MVP SOFIA/NOA) ───────
+// Sin auth — 2Chat llama esto externamente. Responde rápido y procesa aparte
+// para no bloquear el webhook (mismo patrón que /api/vapi/webhook).
+const MODO_GRUPO =
+  `\n\n---\n\n## 🟢 MODO GRUPO DE WHATSAPP\n` +
+  `Estás respondiendo dentro de un grupo de WhatsApp junto a humanos y otro agente AI, no en un chat 1:1. ` +
+  `Responde corto y natural — nada de párrafos largos, nada de listas eternas. ` +
+  `No te presentes ni expliques quién eres en cada mensaje, ya te conocen. ` +
+  `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
+  `No emitas ningún token de control de texto (NUEVA_ORDEN, LEAD_DATA, ALERTA_CRITICA, etc.) en este canal — no aplican aquí, es solo conversación.`;
+
+const TWOCHAT_NUMEROS = {
+  sofia: process.env.TWOCHAT_NUMBER_SOFIA,
+  noa:   process.env.TWOCHAT_NUMBER_NOA,
+};
+const TWOCHAT_PREFIJO = { sofia: '🟩 SOFIA:', noa: '🟨 NOA:' };
+
+function detectarTriggerGrupo(texto, quotedMsgId) {
+  const t = (texto || '').toLowerCase();
+  if (t.includes('@sofia')) return 'sofia';
+  if (t.includes('@noa')) return 'noa';
+  if (quotedMsgId) {
+    const agenteReply = grupoWA.agentePorMessageId(quotedMsgId);
+    if (agenteReply === 'sofia' || agenteReply === 'noa') return agenteReply;
+  }
+  return null;
+}
+
+app.post('/webhook/2chat', express.json(), (req, res) => {
+  res.sendStatus(200);
+  setImmediate(async () => {
+    try {
+      const evento = req.body;
+      // Log crudo mientras se confirma la forma real del payload de grupo —
+      // ver nota NEEDS VERIFICATION en la investigación previa de la API.
+      console.log('[2Chat Webhook] payload crudo:', JSON.stringify(evento).slice(0, 2000));
+
+      const msg = evento.message || evento;
+      const messageId = msg.id || msg.uuid || evento.id;
+      const groupUuid = evento.group_uuid || msg.group_uuid || evento.to_group_uuid
+        || (typeof evento.session_key === 'string' && evento.session_key.includes('@g.us') ? evento.session_key : null);
+      const texto = msg.message?.text || msg.text || evento.text || '';
+      const remitente = msg.contact?.first_name || msg.remote_phone_number || evento.remote_phone_number || 'alguien';
+      const canalNumero = msg.channel_phone_number || evento.channel_phone_number || null;
+      const quotedMsgId = msg.quoted_msg?.id || evento.quoted_msg?.id || null;
+      const esPropio = msg.sent_by === 'business' || msg.from_me === true || evento.from_me === true;
+
+      if (!groupUuid) { console.log('[2Chat Webhook] sin group_uuid, se ignora (¿es un mensaje 1:1?)'); return; }
+      if (grupoWA.existeMensaje(messageId)) return; // dedup — 2Chat puede mandar el mismo evento por cada número del grupo
+
+      grupoWA.registrar({
+        message_id: messageId, group_uuid: groupUuid, sender_phone: msg.remote_phone_number || null,
+        sender_name: remitente, agent: null, message_text: texto, direction: 'incoming',
+        reply_to_message_id: quotedMsgId,
+      });
+
+      if (esPropio) return; // eco de un mensaje que mandamos nosotros mismos — nunca autorespondernos
+
+      const agente = detectarTriggerGrupo(texto, quotedMsgId);
+      if (!agente) return; // Regla 3 — sin trigger, solo se guarda
+
+      const fromNumber = TWOCHAT_NUMEROS[agente];
+      if (!fromNumber) { console.log(`[2Chat Webhook] TWOCHAT_NUMBER_${agente.toUpperCase()} no configurado`); return; }
+
+      const promptBase = agente === 'sofia' ? SOFIA_PROMPT : NOA_PROMPT;
+      const systemPrompt = promptBase + MODO_GRUPO;
+      const historial = grupoWA.contextoGrupo(groupUuid, 20).map(m => ({
+        role: m.direction === 'outgoing' ? 'assistant' : 'user',
+        content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
+      }));
+
+      const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }]);
+      const textoFinal = `${TWOCHAT_PREFIJO[agente]}\n${respuesta.trim()}`;
+
+      const envio = await twochat.enviarMensajeGrupo(fromNumber, groupUuid, textoFinal);
+      grupoWA.registrar({
+        message_id: envio.message_uuid || `local-${Date.now()}`, group_uuid: groupUuid, sender_phone: fromNumber,
+        sender_name: agente.toUpperCase(), agent: agente, message_text: textoFinal, direction: 'outgoing',
+        reply_to_message_id: messageId,
+      });
+    } catch (e) {
+      console.error('[2Chat Webhook] Error:', e.message);
+    }
+  });
 });
 
 // Recursos públicos (logo, CSS del login) accesibles sin sesión
