@@ -56,4 +56,13 @@ function contextoGrupo(groupUuid, limit = 20) {
     .slice(-limit);
 }
 
-module.exports = { registrar, existeMensaje, agentePorMessageId, contextoGrupo };
+// Limpia mensajes de un grupo (o todos si no se pasa groupUuid) — para
+// descontaminar el historial cuando quedó guardado algo mal formado.
+function limpiar(groupUuid) {
+  const antes = cache.length;
+  cache = groupUuid ? cache.filter(m => m.group_uuid !== groupUuid) : [];
+  guardarDisco();
+  return antes - cache.length;
+}
+
+module.exports = { registrar, existeMensaje, agentePorMessageId, contextoGrupo, limpiar };

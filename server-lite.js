@@ -416,7 +416,8 @@ const MODO_GRUPO =
   `Responde corto y natural — nada de párrafos largos, nada de listas eternas. ` +
   `No te presentes ni expliques quién eres en cada mensaje, ya te conocen. ` +
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
-  `No emitas ningún token de control de texto (NUEVA_ORDEN, LEAD_DATA, ALERTA_CRITICA, etc.) en este canal — no aplican aquí, es solo conversación.`;
+  `No emitas ningún token de control de texto (NUEVA_ORDEN, LEAD_DATA, ALERTA_CRITICA, etc.) en este canal — no aplican aquí, es solo conversación. ` +
+  `WhatsApp no interpreta markdown — nunca uses [texto](link), **negritas**, encabezados con #, ni tablas. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.`;
 
 const TWOCHAT_NUMEROS = {
   sofia: process.env.TWOCHAT_NUMBER_SOFIA,
@@ -1021,6 +1022,13 @@ app.get('/api/vapi/llamadas', adminUOps, (req, res) => {
 });
 
 // Setup one-shot: aplica backend/db/schema.sql contra DATABASE_URL — idempotente
+// Limpia la memoria del grupo de WhatsApp (2Chat MVP) — útil mientras se
+// depura el detector de menciones/reply y queda contexto mal formado guardado.
+app.post('/api/admin/limpiar-grupo-wa', soloAdmin, (req, res) => {
+  const borrados = grupoWA.limpiar(req.body?.groupUuid);
+  res.json({ ok: true, borrados });
+});
+
 app.post('/api/admin/db-migrate', soloAdmin, async (req, res) => {
   try {
     await db.aplicarSchema();
