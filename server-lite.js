@@ -428,7 +428,8 @@ app.get('/webhook/whatsapp', (req, res) => {
 const MODO_2CHAT_COLA =
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
   `No emitas NUEVA_ORDEN ni LEAD_DATA en este canal — esos son del flujo de ventas de SARA, no aplican aquí. ` +
-  `WhatsApp no interpreta markdown — nunca uses [texto](link), **negritas**, encabezados con #, ni tablas. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.\n\n` +
+  `WhatsApp no interpreta markdown normal — nunca uses [texto](link), **negritas** (doble asterisco), encabezados con #, ni tablas con | y guiones. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.\n\n` +
+  `**Listas de varios registros (folios, proveedores, etc.):** cuando des 3 o más en una sola respuesta, mételos dentro de un bloque de texto monoespaciado (\`\`\` al inicio y \`\`\` al final, en su propia línea cada uno) — dentro de ese bloque WhatsApp respeta los espacios, así que alinea columnas cortas con espacios para que se lea como tabla real (ej. FOLIO | CLIENTE | RUTA | ESTATUS, una fila por línea, encabezado arriba). Fuera de listas largas no uses el bloque monoespaciado, solo para esto.\n\n` +
   `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
   `INICIAR_LLAMADA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre de a quién se llama]","motivo":"[motivo breve]"}\n` +
   `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. ` +
@@ -556,9 +557,9 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
       }));
 
-      // maxTokens bajo — las respuestas de grupo/1:1 deben ser cortas
-      // (MODO_2CHAT_COLA ya lo pide), y limitarlo acelera la respuesta real.
-      const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }], { maxTokens: 400 });
+      // Sin límite bajo de tokens — una respuesta cortada a medias (ej. una
+      // lista de folios truncada) es peor que tardar unos segundos más.
+      const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }]);
 
       // Tokens de control — igual que en los demás canales (chat/WhatsApp/
       // llamada), se detectan y se limpian del texto antes de mandarlo al
