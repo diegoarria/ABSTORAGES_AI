@@ -427,11 +427,12 @@ app.get('/webhook/whatsapp', (req, res) => {
 // llamada real, idéntico en ambos canales de 2Chat.
 const MODO_2CHAT_COLA =
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
-  `No emitas ningún token de control de texto (NUEVA_ORDEN, LEAD_DATA, ALERTA_CRITICA, etc.) en este canal — no aplican aquí, es solo conversación. ` +
+  `No emitas NUEVA_ORDEN ni LEAD_DATA en este canal — esos son del flujo de ventas de SARA, no aplican aquí. ` +
   `WhatsApp no interpreta markdown — nunca uses [texto](link), **negritas**, encabezados con #, ni tablas. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.\n\n` +
   `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
   `INICIAR_LLAMADA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre de a quién se llama]","motivo":"[motivo breve]"}\n` +
-  `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. No expliques el token en tu respuesta de texto, solo emítelo cuando aplique.`;
+  `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. ` +
+  `Para cualquier token de control (INICIAR_LLAMADA, ALERTA_CRITICA, ESTATUS_SEGUIMIENTO si tu rol los usa): el sistema los detecta y los quita automáticamente antes de que el grupo/contacto vea el mensaje — tú solo emítelos en su propia línea al final con el formato exacto, nunca los expliques, nunca agregues notas tipo "(esto no lo muestres)" ni nada parecido, y nunca cambies el nombre del token — eso rompe la detección y se filtra tal cual al chat.`;
 
 const MODO_GRUPO =
   `\n\n---\n\n## 🟢 MODO GRUPO DE WHATSAPP\n` +
@@ -548,12 +549,22 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // (MODO_2CHAT_COLA ya lo pide), y limitarlo acelera la respuesta real.
       const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }], { maxTokens: 400 });
 
-      // Token de control INICIAR_LLAMADA — el agente decide sola cuándo hace
-      // falta una llamada real, no en cada mensaje. Se limpia del texto antes
-      // de mandarlo al grupo, igual que los demás tokens de control del resto
-      // de la plataforma (NUEVA_ORDEN, ALERTA_CRITICA, etc.).
+      // Tokens de control — igual que en los demás canales (chat/WhatsApp/
+      // llamada), se detectan y se limpian del texto antes de mandarlo al
+      // grupo/contacto. El regex tolera que el modelo omita el guion bajo
+      // (ALERTACRITICA en vez de ALERTA_CRITICA) para no perder una alerta
+      // real por un desliz de formato.
       const llamadaMatch = respuesta.match(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/);
-      const respuestaLimpia = respuesta.replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/, '').trim();
+      const alertaMatch  = agente === 'noa' && respuesta.match(/ALERTA_?CRITICA:\s*(\{[^\n]+\})/i);
+      const estatusMatch = agente === 'noa' && !alertaMatch && respuesta.match(/ESTATUS_?SEGUIMIENTO:\s*(\{[^\n]+\})/i);
+
+      // Los tokens de alerta/estatus siempre van al final de la respuesta —
+      // se corta el texto ahí para también descartar cualquier cosa que el
+      // modelo haya escrito antes tratando de "explicarlo" (nunca debería,
+      // pero así no se filtra si pasa).
+      const corteIdx = alertaMatch ? alertaMatch.index : (estatusMatch ? estatusMatch.index : undefined);
+      const respuestaLimpia = (corteIdx !== undefined ? respuesta.slice(0, corteIdx) : respuesta)
+        .replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/, '').trim();
 
       if (llamadaMatch) {
         try {
@@ -564,6 +575,25 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
             motivo: datosLlamada.motivo, resumenContexto,
           }).catch(e => console.error('[2Chat Webhook] Error disparando llamada:', e.message));
         } catch (e) { console.error('[2Chat Webhook] INICIAR_LLAMADA inválido:', e.message); }
+      }
+
+      if (alertaMatch) {
+        try {
+          const datosAlerta = JSON.parse(alertaMatch[1]);
+          pushActividad({ agente: 'NOA', tipo: 'ALERTA_CRITICA', mensaje: `🚨 ${datosAlerta.motivo || 'Alerta crítica'} — folio ${datosAlerta.folio || '—'}`, metadata: datosAlerta });
+          sendPush({
+            title: '🚨 ALERTA CRÍTICA — NOA',
+            body: `${datosAlerta.motivo || 'Revisar de inmediato'} · Folio ${datosAlerta.folio || '—'}`,
+            tag: 'alerta-critica', url: '/ops-center.html#noa', tipo: 'ALERTA_CRITICA', urgente: true,
+          }).catch(() => {});
+          alertasStaff.alertarCriticoStaff({ ...datosAlerta, canal: 'whatsapp-grupo' }).catch(e => console.error('[alertasStaff]', e.message));
+        } catch (e) { console.error('[2Chat Webhook] ALERTA_CRITICA inválida:', e.message); }
+      } else if (estatusMatch) {
+        try {
+          const datosEstatus = JSON.parse(estatusMatch[1]);
+          pushActividad({ agente: 'NOA', tipo: 'ESTATUS_SEGUIMIENTO', mensaje: `📦 Estatus folio ${datosEstatus.folio || '—'} enviado al equipo`, metadata: datosEstatus });
+          alertasStaff.enviarEstatusSeguimiento(datosEstatus).catch(e => console.error('[alertasStaff]', e.message));
+        } catch (e) { console.error('[2Chat Webhook] ESTATUS_SEGUIMIENTO inválido:', e.message); }
       }
 
       // El prefijo 🟩/🟨 solo va en lo que se manda a WhatsApp — si se guarda
