@@ -472,6 +472,33 @@ async function obtenerNombresGruposWA() {
   return porUuid;
 }
 
+// 2Chat asigna un group.uuid DISTINTO por cada número/canal que es miembro
+// del mismo grupo real de WhatsApp — no es un id único global, es un id
+// scoped a cada canal. Sin resolver esto, un agente que no fue el que
+// "recibió" el webhook (ej. SOFIA cuando el mensaje llegó por el canal de
+// NOA) intenta mandar su respuesta a un uuid que no le pertenece a ella y
+// el envío falla en silencio — eso es lo que hacía que SOFIA se quedara
+// callada en un grupo con las 3 IAs mientras NOA/SARA sí contestaban.
+let _crossRefGruposCache = { ts: 0, porWaGroupId: {}, porUuidCanal: {} };
+async function resolverGruposWA() {
+  if (Date.now() - _crossRefGruposCache.ts < 5 * 60 * 1000) return _crossRefGruposCache;
+  const porWaGroupId = {}; // wa_group_id (real, universal) → { nombre, [agente]: uuid propio de ese agente }
+  const porUuidCanal = {}; // uuid scoped-a-un-canal (el que llega en cualquier webhook) → wa_group_id
+  for (const [agente, num] of Object.entries(TWOCHAT_NUMEROS).filter(([, n]) => n)) {
+    try {
+      const r = await twochat.listarGrupos(num);
+      for (const g of (r.data || [])) {
+        if (!g.wa_group_id) continue;
+        if (!porWaGroupId[g.wa_group_id]) porWaGroupId[g.wa_group_id] = { nombre: g.wa_group_name };
+        porWaGroupId[g.wa_group_id][agente] = g.uuid;
+        porUuidCanal[g.uuid] = g.wa_group_id;
+      }
+    } catch (e) { console.error('[2Chat] Error listando grupos de', agente, ':', e.message); }
+  }
+  _crossRefGruposCache = { ts: Date.now(), porWaGroupId, porUuidCanal };
+  return _crossRefGruposCache;
+}
+
 // Compara números por los últimos 10 dígitos — WhatsApp antepone un "1" extra
 // a los celulares mexicanos en el JID (52 1 XXXXXXXXXX) que no aparece en el
 // E.164 normal (+52XXXXXXXXXX), así que comparar el string completo no sirve.
@@ -525,9 +552,18 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
 
       if (grupoWA.existeMensaje(messageId)) return; // dedup — 2Chat puede reintentar el mismo evento
 
-      // canalUuid identifica la conversación para memoria de contexto — el
-      // group_uuid real en grupo, o un id sintético por contacto en 1:1.
-      const canalUuid = esGrupo ? evento.group.uuid : `1a1:${(remitentePhone || '').replace(/\D/g, '').slice(-10)}`;
+      // canalUuid identifica la conversación para memoria de contexto — en
+      // grupo se normaliza al wa_group_id real (universal, no scoped a un
+      // canal) para que la historia no se fragmente según qué número
+      // "recibió" el webhook; en 1:1 es un id sintético por contacto.
+      const canalUuidRecibido = esGrupo ? evento.group.uuid : null;
+      let waGroupId = null;
+      let canalUuid = esGrupo ? canalUuidRecibido : `1a1:${(remitentePhone || '').replace(/\D/g, '').slice(-10)}`;
+      if (esGrupo) {
+        const cross = await resolverGruposWA();
+        waGroupId = cross.porUuidCanal[canalUuidRecibido] || null;
+        if (waGroupId) canalUuid = waGroupId;
+      }
 
       grupoWA.registrar({
         message_id: messageId, group_uuid: canalUuid, sender_phone: remitentePhone || null,
@@ -636,8 +672,18 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // contexto y empieza a imitarlo, duplicándolo en cada respuesta nueva.
       const textoFinal = `${TWOCHAT_PREFIJO[agente]}\n${respuestaLimpia}`;
 
+      // Uuid con el que ESTE agente ve el grupo — puede no ser el mismo que
+      // llegó en el webhook (ese pertenece al canal que lo entregó, no
+      // necesariamente al agente que va a responder).
+      let uuidParaEnviar = canalUuidRecibido;
+      if (esGrupo && waGroupId) {
+        const cross = await resolverGruposWA();
+        const propio = cross.porWaGroupId[waGroupId]?.[agente];
+        if (propio) uuidParaEnviar = propio;
+        else console.error(`[2Chat Webhook] No se encontró el uuid propio de ${agente} para el grupo ${waGroupId} — el envío puede fallar`);
+      }
       const envio = esGrupo
-        ? await twochat.enviarMensajeGrupo(fromNumber, canalUuid, textoFinal)
+        ? await twochat.enviarMensajeGrupo(fromNumber, uuidParaEnviar, textoFinal)
         : await twochat.enviarMensaje(fromNumber, remitentePhone, textoFinal);
       grupoWA.registrar({
         message_id: envio.message_uuid || `local-${Date.now()}`, group_uuid: canalUuid, sender_phone: fromNumber,
