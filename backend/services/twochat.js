@@ -76,7 +76,20 @@ async function enviarMensajeGrupo(fromNumber, groupUuid, texto) {
   });
 }
 
+// Mensaje 1:1 — nunca junto con to_group_uuid en la misma llamada (la API
+// de 2Chat los trata como mutuamente excluyentes).
+async function enviarMensaje(fromNumber, toNumber, texto) {
+  if (!LIVE) {
+    console.log(`[2Chat STUB] → ${toNumber}: ${texto.slice(0, 80)}`);
+    return { success: true, stub: true };
+  }
+  return llamar('/send-message', {
+    method: 'POST',
+    body: { from_number: fromNumber, to_number: toNumber, text: texto },
+  });
+}
+
 module.exports = {
   listarNumeros, crearCanal, conectarCanal, desconectarCanal, obtenerQr,
-  suscribirWebhook, listarGrupos, enviarMensajeGrupo,
+  suscribirWebhook, listarGrupos, enviarMensajeGrupo, enviarMensaje,
 };

@@ -415,17 +415,27 @@ app.get('/webhook/whatsapp', (req, res) => {
 // ─── 2Chat — grupo de WhatsApp "ABSTORAGES IA - TEST" (MVP SOFIA/NOA) ───────
 // Sin auth — 2Chat llama esto externamente. Responde rápido y procesa aparte
 // para no bloquear el webhook (mismo patrón que /api/vapi/webhook).
-const MODO_GRUPO =
-  `\n\n---\n\n## 🟢 MODO GRUPO DE WHATSAPP\n` +
-  `Estás respondiendo dentro de un grupo de WhatsApp junto a humanos y otro agente AI, no en un chat 1:1. ` +
-  `Responde corto y natural — nada de párrafos largos, nada de listas eternas. ` +
-  `No te presentes ni expliques quién eres en cada mensaje, ya te conocen. ` +
+// Cola compartida entre grupo y 1:1 — formato para WhatsApp + trigger de
+// llamada real, idéntico en ambos canales de 2Chat.
+const MODO_2CHAT_COLA =
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
   `No emitas ningún token de control de texto (NUEVA_ORDEN, LEAD_DATA, ALERTA_CRITICA, etc.) en este canal — no aplican aquí, es solo conversación. ` +
   `WhatsApp no interpreta markdown — nunca uses [texto](link), **negritas**, encabezados con #, ni tablas. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.\n\n` +
   `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
   `INICIAR_LLAMADA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre de a quién se llama]","motivo":"[motivo breve]"}\n` +
   `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. No expliques el token en tu respuesta de texto, solo emítelo cuando aplique.`;
+
+const MODO_GRUPO =
+  `\n\n---\n\n## 🟢 MODO GRUPO DE WHATSAPP\n` +
+  `Estás respondiendo dentro de un grupo de WhatsApp junto a humanos y otro agente AI, no en un chat 1:1. ` +
+  `Responde corto y natural — nada de párrafos largos, nada de listas eternas. ` +
+  `No te presentes ni expliques quién eres en cada mensaje, ya te conocen. ` +
+  MODO_2CHAT_COLA;
+
+const MODO_2CHAT_1A1 =
+  `\n\n---\n\n## 🟢 MODO WHATSAPP 1:1 (número de prueba, vía 2Chat)\n` +
+  `Estás respondiendo un chat directo, no en el grupo. Responde corto y natural — nada de párrafos largos, nada de listas eternas. ` +
+  MODO_2CHAT_COLA;
 
 const TWOCHAT_NUMEROS = {
   sofia: process.env.TWOCHAT_NUMBER_SOFIA,
@@ -466,38 +476,54 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       console.log('[2Chat Webhook] payload crudo:', JSON.stringify(evento).slice(0, 2000));
 
       const messageId = evento.id || evento.uuid;
-      const groupUuid = evento.group?.uuid || null;
+      const esGrupo = !!evento.group?.uuid;
       const texto = evento.message?.text || '';
-      const participante = evento.participant || {};
-      const personaEquipoGrupo = staffDirectory.buscarPorTelefono(participante.phone_number);
-      const remitente = personaEquipoGrupo
-        ? `${personaEquipoGrupo.nombre} (${personaEquipoGrupo.puesto})`
-        : (participante.pushname || participante.phone_number || 'alguien');
       const quotedMsgId = evento.quoted_msg?.id || null;
+      const participante = evento.participant || {};
+
+      // Identidad del remitente — en grupo viene en `participant`, en 1:1 en
+      // remote_phone_number/contact (remote_phone_number sale null en grupo).
+      const remitentePhone = esGrupo ? participante.phone_number : evento.remote_phone_number;
+      const personaEquipo = staffDirectory.buscarPorTelefono(remitentePhone);
+      const nombreCrudo = esGrupo
+        ? (participante.pushname || participante.phone_number || 'alguien')
+        : (evento.contact?.first_name || evento.remote_phone_number || 'alguien');
+      const remitente = personaEquipo ? `${personaEquipo.nombre} (${personaEquipo.puesto})` : nombreCrudo;
       // Nunca autorespondernos: si quien mandó el mensaje es uno de nuestros
       // propios números de agente, es un eco de algo que nosotros mandamos.
-      const esPropio = Object.values(TWOCHAT_NUMEROS).some(n => mismoNumero(n, participante.phone_number));
+      const esPropio = Object.values(TWOCHAT_NUMEROS).some(n => mismoNumero(n, remitentePhone));
 
-      if (!groupUuid) { console.log('[2Chat Webhook] sin group_uuid, se ignora (¿es un mensaje 1:1?)'); return; }
-      if (grupoWA.existeMensaje(messageId)) return; // dedup — 2Chat puede mandar el mismo evento por cada número del grupo
+      if (grupoWA.existeMensaje(messageId)) return; // dedup — 2Chat puede reintentar el mismo evento
+
+      // canalUuid identifica la conversación para memoria de contexto — el
+      // group_uuid real en grupo, o un id sintético por contacto en 1:1.
+      const canalUuid = esGrupo ? evento.group.uuid : `1a1:${(remitentePhone || '').replace(/\D/g, '').slice(-10)}`;
 
       grupoWA.registrar({
-        message_id: messageId, group_uuid: groupUuid, sender_phone: participante.phone_number || null,
+        message_id: messageId, group_uuid: canalUuid, sender_phone: remitentePhone || null,
         sender_name: remitente, agent: null, message_text: texto, direction: 'incoming',
         reply_to_message_id: quotedMsgId,
       });
 
       if (esPropio) return; // eco de un mensaje que mandamos nosotros mismos — nunca autorespondernos
 
-      const agente = detectarTriggerGrupo(texto, quotedMsgId);
-      if (!agente) return; // Regla 3 — sin trigger, solo se guarda
+      let agente;
+      if (esGrupo) {
+        agente = detectarTriggerGrupo(texto, quotedMsgId);
+        if (!agente) return; // Regla 3 — sin trigger, solo se guarda
+      } else {
+        // 1:1 se contesta siempre (no hace falta @mención) — el agente lo
+        // decide el número al que le escribieron, no el contenido del texto.
+        agente = Object.entries(TWOCHAT_NUMEROS).find(([, n]) => mismoNumero(n, evento.channel_phone_number))?.[0];
+        if (!agente) { console.log('[2Chat Webhook] 1:1 a un número no reconocido:', evento.channel_phone_number); return; }
+      }
 
       const fromNumber = TWOCHAT_NUMEROS[agente];
       if (!fromNumber) { console.log(`[2Chat Webhook] TWOCHAT_NUMBER_${agente.toUpperCase()} no configurado`); return; }
 
       const promptBase = agente === 'sofia' ? SOFIA_PROMPT : NOA_PROMPT;
-      const systemPrompt = promptBase + MODO_GRUPO;
-      const historial = grupoWA.contextoGrupo(groupUuid, 20).map(m => ({
+      const systemPrompt = promptBase + (esGrupo ? MODO_GRUPO : MODO_2CHAT_1A1);
+      const historial = grupoWA.contextoGrupo(canalUuid, 20).map(m => ({
         role: m.direction === 'outgoing' ? 'assistant' : 'user',
         content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
       }));
@@ -527,9 +553,11 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // contexto y empieza a imitarlo, duplicándolo en cada respuesta nueva.
       const textoFinal = `${TWOCHAT_PREFIJO[agente]}\n${respuestaLimpia}`;
 
-      const envio = await twochat.enviarMensajeGrupo(fromNumber, groupUuid, textoFinal);
+      const envio = esGrupo
+        ? await twochat.enviarMensajeGrupo(fromNumber, canalUuid, textoFinal)
+        : await twochat.enviarMensaje(fromNumber, remitentePhone, textoFinal);
       grupoWA.registrar({
-        message_id: envio.message_uuid || `local-${Date.now()}`, group_uuid: groupUuid, sender_phone: fromNumber,
+        message_id: envio.message_uuid || `local-${Date.now()}`, group_uuid: canalUuid, sender_phone: fromNumber,
         sender_name: agente.toUpperCase(), agent: agente, message_text: respuestaLimpia, direction: 'outgoing',
         reply_to_message_id: messageId,
       });
