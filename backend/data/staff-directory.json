@@ -1,0 +1,20 @@
+[
+  { "telefono": "+528110049122", "nombre": "Alejandra", "puesto": "Ejecutiva de Administración" },
+  { "telefono": "+528118001081", "nombre": "Paola", "puesto": "Planner" },
+  { "telefono": "+528126212704", "nombre": "Rodrigo", "puesto": "Planner" },
+  { "telefono": "+528115160377", "nombre": "Abigail", "puesto": "Planner" },
+  { "telefono": "+528115385469", "nombre": "Susana", "puesto": "Tráfico y Monitoreo" },
+  { "telefono": "+528116111142", "nombre": "Amairani", "puesto": "Tráfico y Monitoreo" },
+  { "telefono": "+528116112136", "nombre": "Paty", "puesto": "Tráfico y Monitoreo" },
+  { "telefono": "+528117902939", "nombre": "Dante", "puesto": "Coordinador de Monitoreo" },
+  { "telefono": "+528117902942", "nombre": "Braian", "puesto": "Planner" },
+  { "telefono": "+528118212002", "nombre": "Estefania", "puesto": "Ejecutiva de Administración" },
+  { "telefono": "+528186842340", "nombre": "Pablo", "puesto": "Administración" },
+  { "telefono": "+528182746336", "nombre": "Gabriel", "puesto": "Gerente de Operaciones" },
+  { "telefono": "+528112441438", "nombre": "Lupita", "puesto": "Vendedora" },
+  { "telefono": "+528135511638", "nombre": "Fabiola", "puesto": "Vendedora" },
+  { "telefono": "+528180880715", "nombre": "Jazmín", "puesto": "Planner" },
+  { "telefono": "+528181391745", "nombre": "Rafael", "puesto": "Director General" },
+  { "telefono": "+528111810222", "nombre": "Manuel", "puesto": "Socio" },
+  { "telefono": "+528124376863", "nombre": "Diego", "puesto": "Desarrollador y Marketing" }
+]

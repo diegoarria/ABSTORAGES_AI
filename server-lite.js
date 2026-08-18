@@ -38,6 +38,7 @@ const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
 const grupoWA = require('./backend/services/groupMessages');
+const staffDirectory = require('./backend/services/staffDirectory');
 const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
@@ -265,6 +266,10 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const esPrimerMensaje = history.length === 0; // capturado antes de agregar el mensaje actual
     const tariffCtx = tariff.getContext();
     let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
+    // Reconocimiento del equipo interno por número — nunca tratarlos como
+    // cliente/proveedor/prospecto, sin importar el canal.
+    const personaEquipo = staffDirectory.buscarPorTelefono(phone);
+    if (personaEquipo) systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
     if (agente === 'sofia' && tms.ENABLED) {
       const tmsCtx = await tms.getContextoSOFIA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
@@ -464,7 +469,10 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       const groupUuid = evento.group?.uuid || null;
       const texto = evento.message?.text || '';
       const participante = evento.participant || {};
-      const remitente = participante.pushname || participante.phone_number || 'alguien';
+      const personaEquipoGrupo = staffDirectory.buscarPorTelefono(participante.phone_number);
+      const remitente = personaEquipoGrupo
+        ? `${personaEquipoGrupo.nombre} (${personaEquipoGrupo.puesto})`
+        : (participante.pushname || participante.phone_number || 'alguien');
       const quotedMsgId = evento.quoted_msg?.id || null;
       // Nunca autorespondernos: si quien mandó el mensaje es uno de nuestros
       // propios números de agente, es un eco de algo que nosotros mandamos.
