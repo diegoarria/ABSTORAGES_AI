@@ -199,15 +199,20 @@ async function getContextoSARA(mensajeUsuario) {
   const esContacto= /teléfono|telefono|contacto|contactos|correo|email|directorio|número/.test(msg);
   const esCliente = /cliente|clientes|empresa|empresas|historial|cartera/.test(msg);
 
-  // Buscar cliente mencionado por nombre
+  // Buscar cliente mencionado por nombre — solo si hay señal real de que se
+  // está preguntando algo del TMS. Sin este filtro, cualquier mensaje con
+  // una palabra larga (un saludo, small talk) dispara una consulta real al
+  // TMS por nada, metiendo latencia innecesaria a cada respuesta.
   let clienteEncontrado = null;
-  for (const palabra of palabrasClave) {
-    if (palabra.length < 4) continue;
-    const resultados = await buscarCliente(palabra);
-    if (resultados && resultados.length > 0) {
-      clienteEncontrado = resultados[0]['Razon Social'];
-      bloques.push(formatearCliente(resultados));
-      break;
+  if (esRutas || esTarifas || esContacto || esCliente) {
+    for (const palabra of palabrasClave) {
+      if (palabra.length < 4) continue;
+      const resultados = await buscarCliente(palabra);
+      if (resultados && resultados.length > 0) {
+        clienteEncontrado = resultados[0]['Razon Social'];
+        bloques.push(formatearCliente(resultados));
+        break;
+      }
     }
   }
 
@@ -394,14 +399,19 @@ async function getContextoSOFIA(mensajeUsuario) {
   const bloques = [];
   let proveedorEncontrado = null;
 
-  // Buscar proveedor mencionado por nombre
-  for (const palabra of palabrasClave) {
-    if (palabra.length < 4) continue;
-    const resultados = await buscarProveedor(palabra);
-    if (resultados.length > 0) {
-      proveedorEncontrado = resultados[0]['Razon Social'];
-      bloques.push(formatearProveedor(resultados));
-      break;
+  // Buscar proveedor mencionado por nombre — solo si hay señal real de que
+  // se está preguntando algo del TMS. Sin este filtro, cualquier mensaje con
+  // una palabra larga (un saludo, small talk) dispara una consulta real al
+  // TMS por nada, metiendo latencia innecesaria a cada respuesta.
+  if (esProveedor || esRuta || esContacto || esCosto) {
+    for (const palabra of palabrasClave) {
+      if (palabra.length < 4) continue;
+      const resultados = await buscarProveedor(palabra);
+      if (resultados.length > 0) {
+        proveedorEncontrado = resultados[0]['Razon Social'];
+        bloques.push(formatearProveedor(resultados));
+        break;
+      }
     }
   }
 
