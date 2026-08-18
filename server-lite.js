@@ -433,7 +433,10 @@ const MODO_2CHAT_COLA =
   `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
   `INICIAR_LLAMADA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre de a quién se llama]","motivo":"[motivo breve]"}\n` +
   `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. ` +
-  `Para cualquier token de control (INICIAR_LLAMADA, ALERTA_CRITICA, ESTATUS_SEGUIMIENTO si tu rol los usa): el sistema los detecta y los quita automáticamente antes de que el grupo/contacto vea el mensaje — tú solo emítelos en su propia línea al final con el formato exacto, nunca los expliques, nunca agregues notas tipo "(esto no lo muestres)" ni nada parecido, y nunca cambies el nombre del token — eso rompe la detección y se filtra tal cual al chat.`;
+  `**Mensajes de WhatsApp a un tercero:** si te piden explícitamente avisarle/escribirle algo a alguien que no está en esta conversación (ej. "avísale a Fulano que...", "mándale un WhatsApp a Fulano diciendo...") — emite en línea aparte:\n` +
+  `INICIAR_MENSAJE: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre del destinatario]","mensaje":"[el mensaje exacto a enviar, ya redactado, listo para mandar tal cual]"}\n` +
+  `Esto manda un WhatsApp real de inmediato a esa persona — solo cuando te lo pidan de verdad, con el teléfono correcto (si no lo tienes, pregúntalo antes de inventar uno). ` +
+  `Para cualquier token de control (INICIAR_LLAMADA, INICIAR_MENSAJE, ALERTA_CRITICA, ESTATUS_SEGUIMIENTO si tu rol los usa): el sistema los detecta y los quita automáticamente antes de que el grupo/contacto vea el mensaje — tú solo emítelos en su propia línea al final con el formato exacto, nunca los expliques, nunca agregues notas tipo "(esto no lo muestres)" ni nada parecido, y nunca cambies el nombre del token — eso rompe la detección y se filtra tal cual al chat.`;
 
 const MODO_GRUPO =
   `\n\n---\n\n## 🟢 MODO GRUPO DE WHATSAPP\n` +
@@ -659,6 +662,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // (ALERTACRITICA en vez de ALERTA_CRITICA) para no perder una alerta
       // real por un desliz de formato.
       const llamadaMatch = respuesta.match(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/);
+      const mensajeMatch = respuesta.match(/INICIAR_MENSAJE:\s*(\{[^\n]+\})/);
       const alertaMatch  = agente === 'noa' && respuesta.match(/ALERTA_?CRITICA:\s*(\{[^\n]+\})/i);
       const estatusMatch = agente === 'noa' && !alertaMatch && respuesta.match(/ESTATUS_?SEGUIMIENTO:\s*(\{[^\n]+\})/i);
 
@@ -668,7 +672,9 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // pero así no se filtra si pasa).
       const corteIdx = alertaMatch ? alertaMatch.index : (estatusMatch ? estatusMatch.index : undefined);
       const respuestaLimpia = (corteIdx !== undefined ? respuesta.slice(0, corteIdx) : respuesta)
-        .replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/, '').trim();
+        .replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/, '')
+        .replace(/INICIAR_MENSAJE:\s*\{[^\n]+\}/, '')
+        .trim();
 
       if (llamadaMatch) {
         try {
@@ -679,6 +685,19 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
             motivo: datosLlamada.motivo, resumenContexto,
           }).catch(e => console.error('[2Chat Webhook] Error disparando llamada:', e.message));
         } catch (e) { console.error('[2Chat Webhook] INICIAR_LLAMADA inválido:', e.message); }
+      }
+
+      if (mensajeMatch) {
+        try {
+          const datosMensaje = JSON.parse(mensajeMatch[1]);
+          if (datosMensaje.telefono && datosMensaje.mensaje) {
+            twochat.enviarMensaje(fromNumber, datosMensaje.telefono, datosMensaje.mensaje)
+              .then(() => console.log(`[2Chat Webhook] Mensaje proactivo de ${agente} → ${datosMensaje.nombre || datosMensaje.telefono}`))
+              .catch(e => console.error('[2Chat Webhook] Error mandando mensaje proactivo:', e.message));
+          } else {
+            console.error('[2Chat Webhook] INICIAR_MENSAJE sin teléfono o mensaje:', datosMensaje);
+          }
+        } catch (e) { console.error('[2Chat Webhook] INICIAR_MENSAJE inválido:', e.message); }
       }
 
       if (alertaMatch) {
