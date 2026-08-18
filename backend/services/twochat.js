@@ -49,6 +49,16 @@ function obtenerQr(uuid) {
   return llamar(`/channel/${uuid}/qr-code`);
 }
 
+// url debe ser una imagen accesible públicamente (2Chat la descarga desde
+// ahí) — usamos /img/*.png de la plataforma, servido antes del middleware
+// de auth. url: null quita la foto de perfil.
+function setFotoPerfil(fromNumber, url) {
+  return llamar(`/set-profile-picture/${encodeURIComponent(fromNumber)}`, {
+    method: 'POST',
+    body: { url },
+  });
+}
+
 // ── Webhooks ───────────────────────────────────────────────────────────────────
 // evento ej. 'whatsapp.group.message.received'; groupUuid opcional filtra solo
 // ese grupo (si no, "any").
@@ -90,6 +100,6 @@ async function enviarMensaje(fromNumber, toNumber, texto) {
 }
 
 module.exports = {
-  listarNumeros, crearCanal, conectarCanal, desconectarCanal, obtenerQr,
+  listarNumeros, crearCanal, conectarCanal, desconectarCanal, obtenerQr, setFotoPerfil,
   suscribirWebhook, listarGrupos, enviarMensajeGrupo, enviarMensaje,
 };
