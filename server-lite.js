@@ -445,9 +445,10 @@ const MODO_2CHAT_COLA =
 
 const MODO_GRUPO =
   `\n\n---\n\n## 🟢 MODO GRUPO DE WHATSAPP\n` +
-  `Estás respondiendo dentro de un grupo de WhatsApp junto a humanos y otro agente AI, no en un chat 1:1. ` +
+  `Estás respondiendo dentro de un grupo de WhatsApp junto a humanos y otros agentes AI, no en un chat 1:1. ` +
   `Responde corto y natural — nada de párrafos largos, nada de listas eternas. ` +
   `No te presentes ni expliques quién eres en cada mensaje, ya te conocen. ` +
+  `**Si alguien te habla a ti (por nombre o mencionándote), SIEMPRE respondes — sin excepción.** Nunca te quedes callada ni ignores la pregunta. Si te piden un favor dentro de tu dominio (mandar un mensaje, hacer una llamada, disponibilidad de unidades, información de folios/clientes/proveedores, lo que sea que ya sabes hacer) — hazlo, no des largas ni digas que no puedes si sí puedes. Solo si genuinamente no tienes el dato o la acción está fuera de tu alcance, dilo claro y directo — pero nunca por default, siempre intenta ayudar primero. ` +
   MODO_2CHAT_COLA;
 
 const MODO_2CHAT_1A1 =
@@ -519,13 +520,19 @@ function mismoNumero(a, b) {
 // Las menciones @agente en WhatsApp se mandan como @<número>, no como texto
 // "@SOFIA" — solo se ve el nombre en la UI del cliente. Se detecta buscando
 // cualquier "@<dígitos>" en el texto y comparando contra el número del agente.
-// También se acepta "@sofia"/"@noa" literal por si alguien lo escribe a mano.
+// Además de "@sofia"/"@noa"/"@sara" literal, también se dispara con el
+// nombre suelto en el texto ("Sofia, tienes...", "oye Sara me ayudas") —
+// quien le habla a una de las 3 en el grupo SIEMPRE debe recibir respuesta,
+// no solo cuando usa la @ literal.
+function nombraAgente(texto, ...nombres) {
+  return nombres.some(n => new RegExp(`(^|[^a-záéíóúñ])${n}([^a-záéíóúñ]|$)`, 'i').test(texto));
+}
 function detectarTriggerGrupo(texto, quotedMsgId) {
-  const t = (texto || '').toLowerCase();
-  const menciones = (texto.match(/@(\d+)/g) || []).map(m => m.slice(1));
-  if (t.includes('@sofia') || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sofia))) return 'sofia';
-  if (t.includes('@noa')   || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.noa)))   return 'noa';
-  if (t.includes('@sara')  || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sara)))  return 'sara';
+  const t = texto || '';
+  const menciones = (t.match(/@(\d+)/g) || []).map(m => m.slice(1));
+  if (nombraAgente(t, 'sofia', 'sofía') || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sofia))) return 'sofia';
+  if (nombraAgente(t, 'noa')            || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.noa)))   return 'noa';
+  if (nombraAgente(t, 'sara')           || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sara)))  return 'sara';
   if (quotedMsgId) {
     const agenteReply = grupoWA.agentePorMessageId(quotedMsgId);
     if (agenteReply === 'sofia' || agenteReply === 'noa' || agenteReply === 'sara') return agenteReply;
