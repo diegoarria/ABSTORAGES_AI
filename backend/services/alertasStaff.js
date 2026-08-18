@@ -17,6 +17,7 @@ require('dotenv').config();
 const STAFF = require('../data/staff-contacts.json');
 const vapi  = require('./vapi');
 const incidentesNOA = require('./incidentesNOA');
+const twochat = require('./twochat');
 
 const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
@@ -81,6 +82,71 @@ async function llamarATodos(nombresClave, folio, motivo) {
   return resultados;
 }
 
+// NOA/SOFIA en 2Chat — números propios de cada una (WhatsApp Web, distinto
+// de los números de Twilio de arriba). Se usan para que, ante una alerta
+// crítica, AMBAS levanten la voz en el/los grupo(s) de WhatsApp donde
+// participan, sin importar cuál de las 2 fue quien detectó el problema.
+const TWOCHAT_PREFIJO_ALERTA = { noa: '🟨 NOA:', sofia: '🟩 SOFIA:' };
+function numerosAgentesWA() {
+  return Object.entries({ noa: process.env.TWOCHAT_NUMBER_NOA, sofia: process.env.TWOCHAT_NUMBER_SOFIA })
+    .filter(([, n]) => n);
+}
+
+// Publica la alerta en todos los grupos de WhatsApp donde NOA o SOFIA
+// participan, una vez por cada una — así ambas quedan "enteradas" y lo
+// dejan ver en el grupo, sin necesidad de un canal de mensajería interno
+// entre agentes (el resultado observable es el mismo: las dos avisan).
+async function alertarGrupoWA({ folio, motivo }) {
+  const numeros = numerosAgentesWA();
+  if (!numeros.length) return { ok: false, razon: 'sin números de 2Chat configurados' };
+
+  let gruposUuid = [];
+  try {
+    const listas = await Promise.all(numeros.map(([, num]) => twochat.listarGrupos(num)));
+    const vistos = new Set();
+    for (const r of listas) {
+      for (const g of (r.data || [])) {
+        if (!vistos.has(g.uuid)) { vistos.add(g.uuid); gruposUuid.push(g.uuid); }
+      }
+    }
+  } catch (e) {
+    console.error('[alertasStaff] Error listando grupos de WhatsApp:', e.message);
+  }
+  if (!gruposUuid.length) return { ok: false, razon: 'sin grupos de WhatsApp detectados' };
+
+  const mensaje = `🚨 ALERTA CRÍTICA${folio ? ` — Folio ${folio}` : ''}\n${motivo || 'Revisar de inmediato'}`;
+  const envios = [];
+  for (const grupoUuid of gruposUuid) {
+    for (const [agente, numero] of numeros) {
+      envios.push(
+        twochat.enviarMensajeGrupo(numero, grupoUuid, `${TWOCHAT_PREFIJO_ALERTA[agente]}\n${mensaje}`)
+          .then(() => true)
+          .catch(e => { console.error(`[alertasStaff] Error avisando en grupo WA como ${agente}:`, e.message); return false; })
+      );
+    }
+  }
+  const resultados = await Promise.all(envios);
+  const ok = resultados.some(Boolean);
+  console.log(`[alertasStaff] Alerta en grupo(s) de WhatsApp: ${ok ? 'enviada' : 'falló'} (${gruposUuid.length} grupo(s))`);
+  return { ok };
+}
+
+// Fallback si no se pudo avisar en ningún grupo — mensaje 1:1 por WhatsApp
+// (2Chat, texto libre) directo a cada uno de los 5, además de la plantilla
+// de Twilio y la llamada que ya se disparan siempre.
+async function alertarIndividualWA({ folio, motivo }) {
+  const [, fromNumber] = numerosAgentesWA()[0] || [];
+  if (!fromNumber) return;
+  const mensaje = `🚨 ALERTA CRÍTICA${folio ? ` — Folio ${folio}` : ''}\n${motivo || 'Revisar de inmediato'}`;
+  const destinatarios = EQUIPO_ALERTA_CRITICA.map(k => STAFF[k]).filter(Boolean);
+  const resultados = await Promise.allSettled(
+    destinatarios.map(d => twochat.enviarMensaje(fromNumber, d.telefono, mensaje))
+  );
+  resultados.forEach((r, i) => {
+    if (r.status === 'rejected') console.error(`[alertasStaff] Error en WA individual a ${destinatarios[i].nombre}:`, r.reason?.message);
+  });
+}
+
 async function alertarCriticoStaff({ folio, motivo, canal }) {
   console.log(`[alertasStaff] Alerta crítica folio ${folio || '—'} → equipo (WhatsApp + llamada)`);
   try { incidentesNOA.registrar({ folio, motivo, canal }); } catch (e) { console.error('[alertasStaff] Error registrando incidente:', e.message); }
@@ -89,7 +155,11 @@ async function alertarCriticoStaff({ folio, motivo, canal }) {
     '2': motivo || 'Sin detalle',
   });
   const llamadas = llamarATodos(EQUIPO_ALERTA_CRITICA, folio, motivo);
-  return Promise.all([whatsapp, llamadas]);
+  const grupoWA = alertarGrupoWA({ folio, motivo }).then(async (r) => {
+    if (!r.ok) await alertarIndividualWA({ folio, motivo }).catch(e => console.error('[alertasStaff] Error en fallback individual WA:', e.message));
+    return r;
+  }).catch(e => console.error('[alertasStaff] Error en alertarGrupoWA:', e.message));
+  return Promise.all([whatsapp, llamadas, grupoWA]);
 }
 
 async function enviarEstatusSeguimiento({ folio, resumen }) {
