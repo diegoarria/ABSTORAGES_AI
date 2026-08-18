@@ -491,12 +491,16 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       }));
 
       const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }]);
-      const textoFinal = `${TWOCHAT_PREFIJO[agente]}\n${respuesta.trim()}`;
+      const respuestaLimpia = respuesta.trim();
+      // El prefijo 🟩/🟨 solo va en lo que se manda a WhatsApp — si se guarda
+      // también en message_text, el agente lo ve en su propio historial de
+      // contexto y empieza a imitarlo, duplicándolo en cada respuesta nueva.
+      const textoFinal = `${TWOCHAT_PREFIJO[agente]}\n${respuestaLimpia}`;
 
       const envio = await twochat.enviarMensajeGrupo(fromNumber, groupUuid, textoFinal);
       grupoWA.registrar({
         message_id: envio.message_uuid || `local-${Date.now()}`, group_uuid: groupUuid, sender_phone: fromNumber,
-        sender_name: agente.toUpperCase(), agent: agente, message_text: textoFinal, direction: 'outgoing',
+        sender_name: agente.toUpperCase(), agent: agente, message_text: respuestaLimpia, direction: 'outgoing',
         reply_to_message_id: messageId,
       });
     } catch (e) {
