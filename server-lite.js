@@ -424,10 +424,24 @@ const TWOCHAT_NUMEROS = {
 };
 const TWOCHAT_PREFIJO = { sofia: '🟩 SOFIA:', noa: '🟨 NOA:' };
 
+// Compara números por los últimos 10 dígitos — WhatsApp antepone un "1" extra
+// a los celulares mexicanos en el JID (52 1 XXXXXXXXXX) que no aparece en el
+// E.164 normal (+52XXXXXXXXXX), así que comparar el string completo no sirve.
+function mismoNumero(a, b) {
+  const da = (a || '').replace(/\D/g, '').slice(-10);
+  const db = (b || '').replace(/\D/g, '').slice(-10);
+  return !!da && da === db;
+}
+
+// Las menciones @agente en WhatsApp se mandan como @<número>, no como texto
+// "@SOFIA" — solo se ve el nombre en la UI del cliente. Se detecta buscando
+// cualquier "@<dígitos>" en el texto y comparando contra el número del agente.
+// También se acepta "@sofia"/"@noa" literal por si alguien lo escribe a mano.
 function detectarTriggerGrupo(texto, quotedMsgId) {
   const t = (texto || '').toLowerCase();
-  if (t.includes('@sofia')) return 'sofia';
-  if (t.includes('@noa')) return 'noa';
+  const menciones = (texto.match(/@(\d+)/g) || []).map(m => m.slice(1));
+  if (t.includes('@sofia') || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sofia))) return 'sofia';
+  if (t.includes('@noa')   || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.noa)))   return 'noa';
   if (quotedMsgId) {
     const agenteReply = grupoWA.agentePorMessageId(quotedMsgId);
     if (agenteReply === 'sofia' || agenteReply === 'noa') return agenteReply;
@@ -440,25 +454,23 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
   setImmediate(async () => {
     try {
       const evento = req.body;
-      // Log crudo mientras se confirma la forma real del payload de grupo —
-      // ver nota NEEDS VERIFICATION en la investigación previa de la API.
       console.log('[2Chat Webhook] payload crudo:', JSON.stringify(evento).slice(0, 2000));
 
-      const msg = evento.message || evento;
-      const messageId = msg.id || msg.uuid || evento.id;
-      const groupUuid = evento.group_uuid || msg.group_uuid || evento.to_group_uuid
-        || (typeof evento.session_key === 'string' && evento.session_key.includes('@g.us') ? evento.session_key : null);
-      const texto = msg.message?.text || msg.text || evento.text || '';
-      const remitente = msg.contact?.first_name || msg.remote_phone_number || evento.remote_phone_number || 'alguien';
-      const canalNumero = msg.channel_phone_number || evento.channel_phone_number || null;
-      const quotedMsgId = msg.quoted_msg?.id || evento.quoted_msg?.id || null;
-      const esPropio = msg.sent_by === 'business' || msg.from_me === true || evento.from_me === true;
+      const messageId = evento.id || evento.uuid;
+      const groupUuid = evento.group?.uuid || null;
+      const texto = evento.message?.text || '';
+      const participante = evento.participant || {};
+      const remitente = participante.pushname || participante.phone_number || 'alguien';
+      const quotedMsgId = evento.quoted_msg?.id || null;
+      // Nunca autorespondernos: si quien mandó el mensaje es uno de nuestros
+      // propios números de agente, es un eco de algo que nosotros mandamos.
+      const esPropio = Object.values(TWOCHAT_NUMEROS).some(n => mismoNumero(n, participante.phone_number));
 
       if (!groupUuid) { console.log('[2Chat Webhook] sin group_uuid, se ignora (¿es un mensaje 1:1?)'); return; }
       if (grupoWA.existeMensaje(messageId)) return; // dedup — 2Chat puede mandar el mismo evento por cada número del grupo
 
       grupoWA.registrar({
-        message_id: messageId, group_uuid: groupUuid, sender_phone: msg.remote_phone_number || null,
+        message_id: messageId, group_uuid: groupUuid, sender_phone: participante.phone_number || null,
         sender_name: remitente, agent: null, message_text: texto, direction: 'incoming',
         reply_to_message_id: quotedMsgId,
       });
