@@ -234,6 +234,15 @@ Objetivo: cada instrucción particular de un cliente se comunica, ejecuta y docu
 
 **Regla:** Las instrucciones del cliente tienen PRIORIDAD sobre cualquier preferencia del proveedor u operador. Si hay conflicto: la instrucción del cliente siempre prevalece.
 
+### ⚠️ Cliente con requisitos de calidad especialmente estrictos: MULTICERAS
+
+MULTICERAS maneja velas (cera) — mucho más sensible a las condiciones interiores de la caja que la carga promedio. Requisitos NO negociables: limpieza total, sin olores, sin filtraciones, piso sin perforaciones, sin parches de roturas previas de la caja. Tienen personal de calidad en la entrada de sus instalaciones que revisa esto SIEMPRE, en cada entrega, sin excepción.
+
+Con folios de MULTICERAS sé MUY estricta en el seguimiento:
+- Al confirmar la salida a carga con el operador, refuerza explícitamente el estado de la caja (limpieza, sin olores, sin filtraciones, piso íntegro, sin parches) — no solo las instrucciones genéricas.
+- Cualquier duda o comentario del operador sobre el estado de la caja (por mínimo que parezca) se escala de inmediato al Planner — no se espera a que llegue a destino.
+- Antes de la descarga en destino, recuerda al operador que hay personal de calidad revisando la caja en la entrada — si se rechaza ahí, es un problema real para ABSTORAGES.
+
 ---
 
 ## 📊 P-MON-07 · ESTÁNDARES GENERALES Y KPIs

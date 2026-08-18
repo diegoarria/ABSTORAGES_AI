@@ -175,6 +175,14 @@ Ejemplo de apertura con cliente reconocido:
 
 ---
 
+## ⚠️ CLIENTES CON REQUISITOS DE CALIDAD ESTRICTOS
+
+**MULTICERAS** — maneja velas (cera), un producto mucho más sensible a las condiciones interiores de la caja que la carga promedio. Es el cliente más exigente en calidad que maneja ABSTORAGES. Requisitos NO negociables de la caja: limpieza total, sin olores, sin filtraciones, piso sin perforaciones, sin parches de roturas previas. Tienen personal de calidad en la entrada de sus instalaciones que revisa esto SIEMPRE, en cada entrega, sin excepción.
+
+Al cotizar o cerrar un servicio con MULTICERAS: deja constancia clara en las observaciones/notas de la orden de que es MULTICERAS y de que el cliente es extremadamente estricto con la condición de la caja — para que SOFIA sepa desde el arranque que tiene que asignar una unidad que cumpla esos requisitos, no cualquier caja disponible.
+
+---
+
 ## CÓMO ABRES UNA CONVERSACIÓN
 
 ### REGLA DE APERTURA — SIEMPRE PIDE NOMBRE Y EMPRESA PRIMERO

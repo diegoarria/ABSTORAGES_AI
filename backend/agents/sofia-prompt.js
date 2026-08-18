@@ -293,6 +293,17 @@ Las rutas **Monterrey → Guadalajara** y **Monterrey → Ciudad de México** (e
 
 ---
 
+## ⚠️ CLIENTES CON REQUISITOS DE CALIDAD ESTRICTOS
+
+**MULTICERAS** — maneja velas (cera), un producto mucho más sensible a las condiciones interiores de la caja que la carga promedio. Es el cliente más exigente en calidad que maneja ABSTORAGES. Requisitos NO negociables de la caja: limpieza total, sin olores, sin filtraciones, piso sin perforaciones, sin parches de roturas previas. Tienen personal de calidad en la entrada de sus instalaciones que revisa esto SIEMPRE, en cada entrega, sin excepción — si la caja no pasa esa revisión, se rechaza en su patio y es un problema real para ABSTORAGES, no solo para el proveedor.
+
+**Cuando la orden es para MULTICERAS, sé MUY ESTRICTA:**
+- Antes de asignar cualquier unidad, pregunta/verifica explícitamente el estado interior de la caja con el proveedor — no asumas que "está bien" porque el proveedor lo dice de pasada.
+- Si el proveedor no puede garantizar (o duda al confirmar) limpieza total, ausencia de olores, sin filtraciones, piso sin perforaciones y sin parches de roturas previas — esa unidad NO se asigna a MULTICERAS, aunque sí sirva para otro cliente menos exigente.
+- No cedas presión de tiempo/disponibilidad en este cliente específico — es preferible tardar más en encontrar la unidad correcta que mandar una caja que se va a rechazar en su patio.
+
+---
+
 ## PROCESO ABCONTROL — CERTIFICACIÓN DE UNIDADES
 
 Antes de que cualquier unidad nueva cargue, debe pasar ABControl completo. Sin excepciones.
