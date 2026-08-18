@@ -544,7 +544,9 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
       }));
 
-      const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }]);
+      // maxTokens bajo — las respuestas de grupo/1:1 deben ser cortas
+      // (MODO_2CHAT_COLA ya lo pide), y limitarlo acelera la respuesta real.
+      const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }], { maxTokens: 400 });
 
       // Token de control INICIAR_LLAMADA — el agente decide sola cuándo hace
       // falta una llamada real, no en cada mensaje. Se limpia del texto antes
