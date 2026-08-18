@@ -427,7 +427,7 @@ app.get('/webhook/whatsapp', (req, res) => {
 // llamada real, idéntico en ambos canales de 2Chat.
 const MODO_2CHAT_COLA =
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
-  `No emitas NUEVA_ORDEN ni LEAD_DATA en este canal — esos son del flujo de ventas de SARA, no aplican aquí. ` +
+  `No emitas NUEVA_ORDEN ni LEAD_DATA en este canal — esto es conversación interna del equipo, no un cierre de venta real con un cliente, así que ese flujo no aplica aquí. ` +
   `WhatsApp no interpreta markdown normal — nunca uses [texto](link), **negritas** (doble asterisco), encabezados con #, ni tablas con | y guiones. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.\n\n` +
   `**Listas de varios registros (folios, proveedores, etc.):** cuando des 3 o más en una sola respuesta, mételos dentro de un bloque de texto monoespaciado (\`\`\` al inicio y \`\`\` al final, en su propia línea cada uno) — dentro de ese bloque WhatsApp respeta los espacios, así que alinea columnas cortas con espacios para que se lea como tabla real (ej. FOLIO | CLIENTE | RUTA | ESTATUS, una fila por línea, encabezado arriba). Fuera de listas largas no uses el bloque monoespaciado, solo para esto.\n\n` +
   `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
@@ -450,8 +450,10 @@ const MODO_2CHAT_1A1 =
 const TWOCHAT_NUMEROS = {
   sofia: process.env.TWOCHAT_NUMBER_SOFIA,
   noa:   process.env.TWOCHAT_NUMBER_NOA,
+  sara:  process.env.TWOCHAT_NUMBER_SARA,
 };
-const TWOCHAT_PREFIJO = { sofia: '🟩 SOFIA:', noa: '🟨 NOA:' };
+const TWOCHAT_PREFIJO = { sofia: '🟩 SOFIA:', noa: '🟨 NOA:', sara: '🟦 SARA:' };
+const TWOCHAT_PROMPT_BASE = { sofia: SOFIA_PROMPT, noa: NOA_PROMPT, sara: SARA_PROMPT };
 
 // Nombre real de cada grupo de WhatsApp (wa_group_name) — no viaja en los
 // mensajes guardados, se resuelve vía API de 2Chat con caché de 10 min para
@@ -488,9 +490,10 @@ function detectarTriggerGrupo(texto, quotedMsgId) {
   const menciones = (texto.match(/@(\d+)/g) || []).map(m => m.slice(1));
   if (t.includes('@sofia') || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sofia))) return 'sofia';
   if (t.includes('@noa')   || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.noa)))   return 'noa';
+  if (t.includes('@sara')  || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sara)))  return 'sara';
   if (quotedMsgId) {
     const agenteReply = grupoWA.agentePorMessageId(quotedMsgId);
-    if (agenteReply === 'sofia' || agenteReply === 'noa') return agenteReply;
+    if (agenteReply === 'sofia' || agenteReply === 'noa' || agenteReply === 'sara') return agenteReply;
   }
   return null;
 }
@@ -548,7 +551,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       const fromNumber = TWOCHAT_NUMEROS[agente];
       if (!fromNumber) { console.log(`[2Chat Webhook] TWOCHAT_NUMBER_${agente.toUpperCase()} no configurado`); return; }
 
-      const promptBase = agente === 'sofia' ? SOFIA_PROMPT : NOA_PROMPT;
+      const promptBase = TWOCHAT_PROMPT_BASE[agente];
       const aprendizajeBlock = agente === 'noa' ? incidentesNOA.bloqueAprendizaje() : '';
       let systemPrompt = promptBase + aprendizajeBlock + (esGrupo ? MODO_GRUPO : MODO_2CHAT_1A1);
       // 1:1 fuera del grupo interno — si no es equipo, ¿ya es un contacto
@@ -565,8 +568,11 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       if (agente === 'sofia') {
         const tmsCtx = await tms.getContextoSOFIA(texto);
         if (tmsCtx) systemPrompt += tmsCtx;
-      } else {
+      } else if (agente === 'noa') {
         const tmsCtx = await tms.getContextoNOA(texto);
+        if (tmsCtx) systemPrompt += tmsCtx;
+      } else if (agente === 'sara') {
+        const tmsCtx = await tms.getContextoSARA(texto);
         if (tmsCtx) systemPrompt += tmsCtx;
       }
       const historial = grupoWA.contextoGrupo(canalUuid, 20).map(m => ({
