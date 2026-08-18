@@ -39,6 +39,7 @@ const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
 const grupoWA = require('./backend/services/groupMessages');
 const staffDirectory = require('./backend/services/staffDirectory');
+const incidentesNOA = require('./backend/services/incidentesNOA');
 const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
@@ -269,7 +270,14 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Reconocimiento del equipo interno por número — nunca tratarlos como
     // cliente/proveedor/prospecto, sin importar el canal.
     const personaEquipo = staffDirectory.buscarPorTelefono(phone);
-    if (personaEquipo) systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
+    if (personaEquipo) {
+      systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
+    } else {
+      // No es equipo interno — ¿ya es un contacto conocido (proveedor/cliente
+      // con quien ya se cerró algo antes)? Si sí, se le da continuidad real.
+      const contactoConocido = await contactos.buscarPorTelefono(phone, agente);
+      if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+    }
     if (agente === 'sofia' && tms.ENABLED) {
       const tmsCtx = await tms.getContextoSOFIA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
@@ -362,7 +370,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
             tag: 'alerta-critica', url: '/ops-center.html#noa', tipo: 'ALERTA_CRITICA', urgente: true,
           }).catch(() => {});
           // Mensaje directo por WhatsApp al equipo — automático, nadie tiene que ordenarlo.
-          alertasStaff.alertarCriticoStaff(datos).catch(e => console.error('[alertasStaff]', e.message));
+          alertasStaff.alertarCriticoStaff({ ...datos, canal: 'whatsapp' }).catch(e => console.error('[alertasStaff]', e.message));
         } catch (e) { console.error('[WA] ALERTA_CRITICA inválida:', e.message); }
       }
 
@@ -522,7 +530,15 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       if (!fromNumber) { console.log(`[2Chat Webhook] TWOCHAT_NUMBER_${agente.toUpperCase()} no configurado`); return; }
 
       const promptBase = agente === 'sofia' ? SOFIA_PROMPT : NOA_PROMPT;
-      const systemPrompt = promptBase + (esGrupo ? MODO_GRUPO : MODO_2CHAT_1A1);
+      const aprendizajeBlock = agente === 'noa' ? incidentesNOA.bloqueAprendizaje() : '';
+      let systemPrompt = promptBase + aprendizajeBlock + (esGrupo ? MODO_GRUPO : MODO_2CHAT_1A1);
+      // 1:1 fuera del grupo interno — si no es equipo, ¿ya es un contacto
+      // conocido (proveedor/cliente con historial real)? El grupo se salta
+      // esto porque ahí todos son equipo interno por definición.
+      if (!esGrupo && !personaEquipo) {
+        const contactoConocido = await contactos.buscarPorTelefono(remitentePhone, agente);
+        if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+      }
       const historial = grupoWA.contextoGrupo(canalUuid, 20).map(m => ({
         role: m.direction === 'outgoing' ? 'assistant' : 'user',
         content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
@@ -837,7 +853,7 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
               title: '🚨 ALERTA CRÍTICA — NOA', body: `${datosAlerta.motivo} · Folio ${datosAlerta.folio || '—'}`,
               tag: 'alerta-critica', url: '/ops-center.html#noa', tipo: 'ALERTA_CRITICA', urgente: true,
             }).catch(() => {});
-            alertasStaff.alertarCriticoStaff(datosAlerta).catch(e => console.error('[alertasStaff]', e.message));
+            alertasStaff.alertarCriticoStaff({ ...datosAlerta, canal: 'llamada' }).catch(e => console.error('[alertasStaff]', e.message));
           } else if (structuredData.estatus_relevante && structuredData.estatus_resumen) {
             const datosEstatus = { folio: structuredData.folio || metadata.folio || null, resumen: structuredData.estatus_resumen };
             pushActividad({ agente: 'NOA', tipo: 'ESTATUS_SEGUIMIENTO', mensaje: `📦 Estatus folio ${datosEstatus.folio || '—'} enviado al equipo`, metadata: datosEstatus });
@@ -1084,6 +1100,22 @@ app.get('/api/vapi/llamadas', adminUOps, (req, res) => {
 app.post('/api/admin/limpiar-grupo-wa', soloAdmin, (req, res) => {
   const borrados = grupoWA.limpiar(req.body?.groupUuid);
   res.json({ ok: true, borrados });
+});
+
+// Incidentes críticos de NOA — historial + marcar resultado, para que su
+// criterio se calibre con lo que de verdad pasó y no solo siga el protocolo.
+app.get('/api/admin/incidentes', soloAdmin, (req, res) => {
+  res.json(incidentesNOA.listar({ limit: req.query.limit ? Number(req.query.limit) : undefined }));
+});
+
+app.post('/api/admin/incidentes/:id/resolver', soloAdmin, (req, res) => {
+  const { resultado, notas } = req.body || {};
+  if (!['bien', 'mal', 'falsa_alarma'].includes(resultado)) {
+    return res.status(400).json({ error: "resultado debe ser 'bien', 'mal' o 'falsa_alarma'" });
+  }
+  const incidente = incidentesNOA.marcarResultado(req.params.id, resultado, notas);
+  if (!incidente) return res.status(404).json({ error: 'Incidente no encontrado' });
+  res.json({ ok: true, incidente });
 });
 
 app.post('/api/admin/db-migrate', soloAdmin, async (req, res) => {
@@ -1501,9 +1533,12 @@ function buildPrompt(agente, contextBlock, tariffCtx) {
   const tariffBlock = agente === 'sofia'
     ? `\n\n## MERCADO ACTUAL (actualizado en tiempo real)\n${tariffCtx.prompt}`
     : '';
+  // Aprendizaje de incidentes pasados solo para NOA — le da continuidad de
+  // criterio entre alertas críticas, sin importar por qué canal entre.
+  const aprendizajeBlock = agente === 'noa' ? incidentesNOA.bloqueAprendizaje() : '';
   return contextBlock
-    ? `${base}${tariffBlock}\n\n${contextBlock}`
-    : `${base}${tariffBlock}`;
+    ? `${base}${tariffBlock}${aprendizajeBlock}\n\n${contextBlock}`
+    : `${base}${tariffBlock}${aprendizajeBlock}`;
 }
 
 // ─── CHAT (SSE streaming con memoria + tarifa dinámica) ───────────────────
@@ -1756,7 +1791,7 @@ async function handleChat(agente, req, res) {
           const datos = JSON.parse(m[1]);
           res.write(`data: ${JSON.stringify({ type: 'alerta_critica', datos })}\n\n`);
           // Mensaje directo por WhatsApp al equipo — automático, nadie tiene que ordenarlo.
-          alertasStaff.alertarCriticoStaff(datos).catch(e => console.error('[alertasStaff]', e.message));
+          alertasStaff.alertarCriticoStaff({ ...datos, canal: 'chat' }).catch(e => console.error('[alertasStaff]', e.message));
         }
       } catch {}
     }

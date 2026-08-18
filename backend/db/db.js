@@ -216,6 +216,16 @@ async function obtenerContactoDetalle(id) {
   return { ...contactoRows[0], interacciones };
 }
 
+async function buscarContactoPorTelefono(telefono, agente) {
+  const { rows } = await query('SELECT * FROM contactos WHERE telefono LIKE $1 LIMIT 1', [`%${telefono}`]);
+  if (!rows[0]) return null;
+  const { rows: interacciones } = await query(
+    'SELECT * FROM interacciones WHERE contacto_id = $1 ORDER BY fecha DESC LIMIT 10',
+    [rows[0].id]
+  );
+  return { ...rows[0], interacciones };
+}
+
 // ─── PROVEEDORES ─────────────────────────────────────────────────────────────
 
 async function obtenerProveedoresPorRuta(origen, destino) {
@@ -351,6 +361,7 @@ module.exports = {
   upsertContacto,
   listarContactosPorAgente,
   obtenerContactoDetalle,
+  buscarContactoPorTelefono,
   obtenerProveedoresPorRuta,
   obtenerProveedoresRecurrentes,
   actualizarClasificacionProveedor,

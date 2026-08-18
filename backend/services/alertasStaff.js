@@ -16,6 +16,7 @@
 require('dotenv').config();
 const STAFF = require('../data/staff-contacts.json');
 const vapi  = require('./vapi');
+const incidentesNOA = require('./incidentesNOA');
 
 const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
@@ -80,8 +81,9 @@ async function llamarATodos(nombresClave, folio, motivo) {
   return resultados;
 }
 
-async function alertarCriticoStaff({ folio, motivo }) {
+async function alertarCriticoStaff({ folio, motivo, canal }) {
   console.log(`[alertasStaff] Alerta crítica folio ${folio || '—'} → equipo (WhatsApp + llamada)`);
+  try { incidentesNOA.registrar({ folio, motivo, canal }); } catch (e) { console.error('[alertasStaff] Error registrando incidente:', e.message); }
   const whatsapp = enviarATodos(EQUIPO_ALERTA_CRITICA, CONTENT_SID_ALERTA_CRITICA, {
     '1': folio || '—',
     '2': motivo || 'Sin detalle',

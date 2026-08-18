@@ -5,6 +5,7 @@ require('dotenv').config();
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 const SARA_SYSTEM_PROMPT  = require('../agents/sara-prompt');
 const NOA_SYSTEM_PROMPT   = require('../agents/noa-prompt');
+const contactos           = require('./contactos');
 
 const API_KEY               = process.env.VAPI_API_KEY;
 const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;             // SOFIA
@@ -72,7 +73,7 @@ async function llamarProveedor(proveedor, orden) {
 
   // Mismo prompt completo que usa SOFIA en el chat de texto, + modo voz +
   // el contexto específico de este folio (ruta, unidad, fecha, margen).
-  const systemPrompt =
+  let systemPrompt =
     SOFIA_SYSTEM_PROMPT +
     MODO_VOZ +
     SOFIA_VOZ_EXTRA +
@@ -83,6 +84,12 @@ async function llamarProveedor(proveedor, orden) {
     `Carga: ${orden.tipo_carga || 'mercancía general'}, ${orden.peso_toneladas || ''} toneladas. ` +
     `Objetivo: confirmar disponibilidad y obtener el mejor precio. El margen mínimo de ABSTORAGES es 20%. ` +
     `Si acepta, dile que le confirmamos en los próximos minutos.`;
+
+  // ¿Ya es un proveedor conocido, con historial de negociaciones previas?
+  try {
+    const contactoConocido = await contactos.buscarPorTelefono(proveedor.telefono, 'sofia');
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+  } catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
 
   const payload = {
     phoneNumberId: PHONE_NUMBER_ID,
@@ -432,7 +439,7 @@ async function llamarLead(lead) {
 
   // Mismo prompt completo que usa SARA en el chat de texto, + modo voz +
   // el contexto específico de este lead (ruta, unidad, precio cotizado).
-  const systemPrompt =
+  let systemPrompt =
     SARA_SYSTEM_PROMPT +
     MODO_VOZ +
     CIERRE_ESLOGAN +
@@ -440,6 +447,12 @@ async function llamarLead(lead) {
     `Estás llamando a ${lead.nombre || 'el cliente'} de ${lead.empresa || ''} para dar seguimiento a su solicitud. ` +
     `Ruta: ${lead.origen} → ${lead.destino} | Unidad: ${lead.tipo_unidad} | Precio cotizado: ${lead.precio_cotizado}. ` +
     `Objetivo: confirmar datos, resolver dudas y cerrar el acuerdo.`;
+
+  // ¿Es un cliente recurrente, con historial de servicios previos?
+  try {
+    const contactoConocido = await contactos.buscarPorTelefono(lead.telefono, 'sara');
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+  } catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
 
   return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `lead ${lead.id}`, tipo: 'seguimiento' });
 }
@@ -517,7 +530,7 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
     ? `Hola ${nombre}, soy Noa de ABSTORAGES Logistics Solutions, llamando por el folio ${folio}. ¿Cómo va todo con el viaje?`
     : `Hola ${nombre}, soy Noa de ABSTORAGES Logistics Solutions, te llamo para darte un estatus de tu envío, folio ${folio}.`;
 
-  const systemPrompt =
+  let systemPrompt =
     NOA_SYSTEM_PROMPT +
     MODO_VOZ +
     `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
@@ -526,6 +539,13 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
         `dónde va, si tiene algún incidente o retraso, y hora estimada de llegada. Es una llamada de seguimiento breve, no de negociación.`
       : `Estás llamando al cliente del folio ${folio} (ruta: ${ruta}) para darle un estatus breve y tranquilizador de su envío. ` +
         `No reveles información interna (proveedor, costos). Si el cliente tiene una duda que no puedes resolver, dile que el equipo lo contacta.`);
+
+  // ¿Ya has hablado antes con este transportista/cliente? (proveedores se
+  // guardan como 'sofia' al cerrar el trato — NOA consulta el mismo registro).
+  try {
+    const contactoConocido = await contactos.buscarPorTelefono(telefono, esChofer ? 'sofia' : 'sara');
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+  } catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
 
   if (!API_KEY || !PHONE_NUMBER_ID_NOA) {
     console.log(`[Vapi STUB] NOA — llamada de estatus a ${rol} ${nombre} (${telefono}) — folio ${folio}`);
