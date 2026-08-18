@@ -441,6 +441,7 @@ const MODO_2CHAT_COLA =
   `**Mensajes de WhatsApp a un tercero:** si te piden explícitamente avisarle/escribirle algo a alguien que no está en esta conversación (ej. "avísale a Fulano que...", "mándale un WhatsApp a Fulano diciendo...") — emite en línea aparte:\n` +
   `INICIAR_MENSAJE: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre del destinatario]","mensaje":"[el mensaje exacto a enviar, ya redactado, listo para mandar tal cual]"}\n` +
   `Esto manda un WhatsApp real de inmediato a esa persona. Nunca inventes un número. Si el destinatario es alguien del equipo interno de ABSTORAGES (los que reconoces en la sección de equipo), puedes dejar "telefono" vacío ("") — el sistema resuelve su número real automáticamente por su nombre, tú no lo necesitas saber. Si es alguien externo cuyo teléfono no tienes en esta conversación, pregúntalo antes de emitir el token — nunca digas "listo, enviado" sin haber emitido primero el token real; si no tienes el dato, dilo y pide el teléfono, no finjas que ya se mandó. ` +
+  `**Si te piden avisar/llamar a VARIAS personas en un solo pedido** (ej. "avísale a Gabriel, Diego y Rafael que...") — emite un token INICIAR_MENSAJE (o INICIAR_LLAMADA) POR CADA PERSONA, cada uno en su propia línea, con los datos de esa persona. Un solo pedido con 3 destinatarios son 3 tokens, no uno. Nunca digas que le avisaste a alguien sin haber emitido su token individual. ` +
   `Para cualquier token de control (INICIAR_LLAMADA, INICIAR_MENSAJE, ALERTA_CRITICA, ESTATUS_SEGUIMIENTO si tu rol los usa): el sistema los detecta y los quita automáticamente antes de que el grupo/contacto vea el mensaje — tú solo emítelos en su propia línea al final con el formato exacto, nunca los expliques, nunca agregues notas tipo "(esto no lo muestres)" ni nada parecido, y nunca cambies el nombre del token — eso rompe la detección y se filtra tal cual al chat.`;
 
 const MODO_GRUPO =
@@ -673,8 +674,13 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // grupo/contacto. El regex tolera que el modelo omita el guion bajo
       // (ALERTACRITICA en vez de ALERTA_CRITICA) para no perder una alerta
       // real por un desliz de formato.
-      const llamadaMatch = respuesta.match(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/);
-      const mensajeMatch = respuesta.match(/INICIAR_MENSAJE:\s*(\{[^\n]+\})/);
+      // /g — un mismo pedido puede incluir varios destinatarios ("avísale a
+      // Gabriel, Diego y Rafael"), y cada uno se emite como su propio token
+      // en su propia línea. Con match simple (sin /g) solo se procesaba el
+      // primero y se le decía "enviado" a todos los demás sin haber hecho
+      // nada — esto lo corrige.
+      const llamadaMatches = [...respuesta.matchAll(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/g)];
+      const mensajeMatches = [...respuesta.matchAll(/INICIAR_MENSAJE:\s*(\{[^\n]+\})/g)];
       const alertaMatch  = agente === 'noa' && respuesta.match(/ALERTA_?CRITICA:\s*(\{[^\n]+\})/i);
       const estatusMatch = agente === 'noa' && !alertaMatch && respuesta.match(/ESTATUS_?SEGUIMIENTO:\s*(\{[^\n]+\})/i);
 
@@ -684,13 +690,13 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // pero así no se filtra si pasa).
       const corteIdx = alertaMatch ? alertaMatch.index : (estatusMatch ? estatusMatch.index : undefined);
       const respuestaLimpia = (corteIdx !== undefined ? respuesta.slice(0, corteIdx) : respuesta)
-        .replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/, '')
-        .replace(/INICIAR_MENSAJE:\s*\{[^\n]+\}/, '')
+        .replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/g, '')
+        .replace(/INICIAR_MENSAJE:\s*\{[^\n]+\}/g, '')
         .trim();
 
-      if (llamadaMatch) {
+      for (const m of llamadaMatches) {
         try {
-          const datosLlamada = JSON.parse(llamadaMatch[1]);
+          const datosLlamada = JSON.parse(m[1]);
           // El prompt nunca expone teléfonos del equipo — si el modelo no
           // trae uno (o dejó el campo vacío) pero el nombre sí matchea a
           // alguien del directorio interno, se resuelve el número real
@@ -700,7 +706,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
             if (staffMatch) datosLlamada.telefono = staffMatch.telefono;
           }
           if (datosLlamada.telefono) {
-            const resumenContexto = historial.slice(-10).map(m => m.content).join('\n');
+            const resumenContexto = historial.slice(-10).map(h => h.content).join('\n');
             vapi.llamarDesdeGrupo({
               agente, telefono: datosLlamada.telefono, nombre: datosLlamada.nombre,
               motivo: datosLlamada.motivo, resumenContexto,
@@ -711,9 +717,9 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         } catch (e) { console.error('[2Chat Webhook] INICIAR_LLAMADA inválido:', e.message); }
       }
 
-      if (mensajeMatch) {
+      for (const m of mensajeMatches) {
         try {
-          const datosMensaje = JSON.parse(mensajeMatch[1]);
+          const datosMensaje = JSON.parse(m[1]);
           if (!datosMensaje.telefono && datosMensaje.nombre) {
             const staffMatch = staffDirectory.buscarPorNombre(datosMensaje.nombre);
             if (staffMatch) datosMensaje.telefono = staffMatch.telefono;
