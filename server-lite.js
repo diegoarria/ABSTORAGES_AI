@@ -286,6 +286,10 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       const tmsCtx = await tms.getContextoNOA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
+    if (agente === 'sara' && tms.ENABLED) {
+      const tmsCtx = await tms.getContextoSARA(texto);
+      if (tmsCtx) systemPrompt += tmsCtx;
+    }
     memory.addMessage(session, 'user', texto);
     saveMessage(session, agente, 'user', texto);
     let respuesta = '';
@@ -1780,6 +1784,12 @@ async function handleChat(agente, req, res) {
     if (tmsCtx) systemPrompt += tmsCtx;
   }
 
+  // Inyectar contexto TMS para SARA (clientes, rutas principales, tarifas históricas, directorio)
+  if (agente === 'sara' && tms.ENABLED) {
+    const tmsCtx = await tms.getContextoSARA(message);
+    if (tmsCtx) systemPrompt += tmsCtx;
+  }
+
   const messages = [...history, { role: 'user', content: message }];
 
   memory.addMessage(sid, 'user', message);
@@ -2023,6 +2033,10 @@ app.post('/api/interno/consultar', adminUOps, async (req, res) => {
     }
     if (agente === 'noa' && tms.ENABLED) {
       const tmsCtx = await tms.getContextoNOA(pregunta);
+      if (tmsCtx) systemPrompt += tmsCtx;
+    }
+    if (agente === 'sara' && tms.ENABLED) {
+      const tmsCtx = await tms.getContextoSARA(pregunta);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
     systemPrompt += `
