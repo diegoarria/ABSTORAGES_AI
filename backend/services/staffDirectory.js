@@ -16,6 +16,16 @@ function buscarPorTelefono(telefono) {
   return DIRECTORIO.find(p => normalizarDigitos(p.telefono) === digitos) || null;
 }
 
+// Resuelve el teléfono real de alguien del equipo por su nombre — para
+// cuando un agente quiere mandarle un mensaje/llamada a "Diego" o "Rafael"
+// sin tener (ni deber inventar) su número; el prompt nunca expone los
+// teléfonos del equipo, así que esto es la única fuente confiable.
+function buscarPorNombre(nombre) {
+  const n = (nombre || '').trim().toLowerCase();
+  if (!n) return null;
+  return DIRECTORIO.find(p => p.nombre.toLowerCase() === n || p.nombre.toLowerCase().startsWith(n) || n.startsWith(p.nombre.toLowerCase())) || null;
+}
+
 // Bloque de contexto a inyectar en el system prompt cuando quien escribe/llama
 // es alguien del equipo — anula cualquier flujo de calificación de cliente o
 // proveedor para ese mensaje/llamada específica.
@@ -28,4 +38,4 @@ function bloqueEquipoInterno(persona) {
   );
 }
 
-module.exports = { buscarPorTelefono, bloqueEquipoInterno, normalizarDigitos };
+module.exports = { buscarPorTelefono, buscarPorNombre, bloqueEquipoInterno, normalizarDigitos };

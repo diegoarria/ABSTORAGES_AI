@@ -437,10 +437,10 @@ const MODO_2CHAT_COLA =
   `**Listas de varios registros (folios, proveedores, etc.):** cuando des 3 o más en una sola respuesta, mételos dentro de un bloque de texto monoespaciado (\`\`\` al inicio y \`\`\` al final, en su propia línea cada uno) — dentro de ese bloque WhatsApp respeta los espacios, así que alinea columnas cortas con espacios para que se lea como tabla real (ej. FOLIO | CLIENTE | RUTA | ESTATUS, una fila por línea, encabezado arriba). Fuera de listas largas no uses el bloque monoespaciado, solo para esto.\n\n` +
   `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
   `INICIAR_LLAMADA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre de a quién se llama]","motivo":"[motivo breve]"}\n` +
-  `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. ` +
+  `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. Si es alguien del equipo interno de ABSTORAGES puedes dejar "telefono" vacío ("") — el sistema resuelve su número real por su nombre. ` +
   `**Mensajes de WhatsApp a un tercero:** si te piden explícitamente avisarle/escribirle algo a alguien que no está en esta conversación (ej. "avísale a Fulano que...", "mándale un WhatsApp a Fulano diciendo...") — emite en línea aparte:\n` +
   `INICIAR_MENSAJE: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre del destinatario]","mensaje":"[el mensaje exacto a enviar, ya redactado, listo para mandar tal cual]"}\n` +
-  `Esto manda un WhatsApp real de inmediato a esa persona — solo cuando te lo pidan de verdad, con el teléfono correcto (si no lo tienes, pregúntalo antes de inventar uno). ` +
+  `Esto manda un WhatsApp real de inmediato a esa persona. Nunca inventes un número. Si el destinatario es alguien del equipo interno de ABSTORAGES (los que reconoces en la sección de equipo), puedes dejar "telefono" vacío ("") — el sistema resuelve su número real automáticamente por su nombre, tú no lo necesitas saber. Si es alguien externo cuyo teléfono no tienes en esta conversación, pregúntalo antes de emitir el token — nunca digas "listo, enviado" sin haber emitido primero el token real; si no tienes el dato, dilo y pide el teléfono, no finjas que ya se mandó. ` +
   `Para cualquier token de control (INICIAR_LLAMADA, INICIAR_MENSAJE, ALERTA_CRITICA, ESTATUS_SEGUIMIENTO si tu rol los usa): el sistema los detecta y los quita automáticamente antes de que el grupo/contacto vea el mensaje — tú solo emítelos en su propia línea al final con el formato exacto, nunca los expliques, nunca agregues notas tipo "(esto no lo muestres)" ni nada parecido, y nunca cambies el nombre del token — eso rompe la detección y se filtra tal cual al chat.`;
 
 const MODO_GRUPO =
@@ -684,23 +684,39 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       if (llamadaMatch) {
         try {
           const datosLlamada = JSON.parse(llamadaMatch[1]);
-          const resumenContexto = historial.slice(-10).map(m => m.content).join('\n');
-          vapi.llamarDesdeGrupo({
-            agente, telefono: datosLlamada.telefono, nombre: datosLlamada.nombre,
-            motivo: datosLlamada.motivo, resumenContexto,
-          }).catch(e => console.error('[2Chat Webhook] Error disparando llamada:', e.message));
+          // El prompt nunca expone teléfonos del equipo — si el modelo no
+          // trae uno (o dejó el campo vacío) pero el nombre sí matchea a
+          // alguien del directorio interno, se resuelve el número real
+          // aquí, del lado del servidor.
+          if (!datosLlamada.telefono && datosLlamada.nombre) {
+            const staffMatch = staffDirectory.buscarPorNombre(datosLlamada.nombre);
+            if (staffMatch) datosLlamada.telefono = staffMatch.telefono;
+          }
+          if (datosLlamada.telefono) {
+            const resumenContexto = historial.slice(-10).map(m => m.content).join('\n');
+            vapi.llamarDesdeGrupo({
+              agente, telefono: datosLlamada.telefono, nombre: datosLlamada.nombre,
+              motivo: datosLlamada.motivo, resumenContexto,
+            }).catch(e => console.error('[2Chat Webhook] Error disparando llamada:', e.message));
+          } else {
+            console.error('[2Chat Webhook] INICIAR_LLAMADA sin teléfono resoluble:', datosLlamada);
+          }
         } catch (e) { console.error('[2Chat Webhook] INICIAR_LLAMADA inválido:', e.message); }
       }
 
       if (mensajeMatch) {
         try {
           const datosMensaje = JSON.parse(mensajeMatch[1]);
+          if (!datosMensaje.telefono && datosMensaje.nombre) {
+            const staffMatch = staffDirectory.buscarPorNombre(datosMensaje.nombre);
+            if (staffMatch) datosMensaje.telefono = staffMatch.telefono;
+          }
           if (datosMensaje.telefono && datosMensaje.mensaje) {
             twochat.enviarMensaje(fromNumber, datosMensaje.telefono, datosMensaje.mensaje)
               .then(() => console.log(`[2Chat Webhook] Mensaje proactivo de ${agente} → ${datosMensaje.nombre || datosMensaje.telefono}`))
               .catch(e => console.error('[2Chat Webhook] Error mandando mensaje proactivo:', e.message));
           } else {
-            console.error('[2Chat Webhook] INICIAR_MENSAJE sin teléfono o mensaje:', datosMensaje);
+            console.error('[2Chat Webhook] INICIAR_MENSAJE sin teléfono resoluble o sin mensaje:', datosMensaje);
           }
         } catch (e) { console.error('[2Chat Webhook] INICIAR_MENSAJE inválido:', e.message); }
       }
