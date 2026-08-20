@@ -74,16 +74,33 @@ function listarGrupos(phoneNumber) {
   return llamar(`/groups/${encodeURIComponent(phoneNumber)}`);
 }
 
+// ── Límite de velocidad de envío, por número ──────────────────────────────────
+// 2Chat es automatización de WhatsApp Web (no la API oficial de Business) —
+// mandar varios mensajes en ráfaga desde el mismo número es justo el patrón
+// que dispara restricciones/desconexiones de WhatsApp (le pasó a SARA y
+// SOFIA). Se serializan TODOS los envíos por número aquí, en un solo lugar,
+// para que cualquier función nueva quede protegida automáticamente sin tener
+// que acordarse de espaciar cada una por su cuenta.
+const MIN_INTERVALO_ENVIO_MS = 3000;
+const colaPorNumero = new Map(); // from_number → promesa de la última tanda encolada
+
+function encolarEnvio(fromNumber, ejecutar) {
+  const anterior = (colaPorNumero.get(fromNumber) || Promise.resolve()).catch(() => {});
+  const resultado = anterior.then(ejecutar);
+  colaPorNumero.set(fromNumber, resultado.catch(() => {}).then(() => new Promise(r => setTimeout(r, MIN_INTERVALO_ENVIO_MS))));
+  return resultado;
+}
+
 // ── Mensajes ───────────────────────────────────────────────────────────────────
 async function enviarMensajeGrupo(fromNumber, groupUuid, texto) {
   if (!LIVE) {
     console.log(`[2Chat STUB] → grupo ${groupUuid}: ${texto.slice(0, 80)}`);
     return { success: true, stub: true };
   }
-  return llamar('/send-message', {
+  return encolarEnvio(fromNumber, () => llamar('/send-message', {
     method: 'POST',
     body: { from_number: fromNumber, to_group_uuid: groupUuid, text: texto },
-  });
+  }));
 }
 
 // Mensaje 1:1 — nunca junto con to_group_uuid en la misma llamada (la API
@@ -93,10 +110,10 @@ async function enviarMensaje(fromNumber, toNumber, texto) {
     console.log(`[2Chat STUB] → ${toNumber}: ${texto.slice(0, 80)}`);
     return { success: true, stub: true };
   }
-  return llamar('/send-message', {
+  return encolarEnvio(fromNumber, () => llamar('/send-message', {
     method: 'POST',
     body: { from_number: fromNumber, to_number: toNumber, text: texto },
-  });
+  }));
 }
 
 module.exports = {

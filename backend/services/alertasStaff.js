@@ -92,8 +92,6 @@ function numerosAgentesWA() {
     .filter(([, n]) => n);
 }
 
-function esperar(ms) { return new Promise(r => setTimeout(r, ms)); }
-
 // Whitelist explícita de grupos reales de ABSTORAGES (wa_group_id, el id
 // universal — no el uuid, que es distinto por cada canal) — SIN esto, se
 // publicaría en CUALQUIER grupo donde el número de 2Chat esté metido,
@@ -145,7 +143,6 @@ async function alertarGrupoWA({ folio, motivo }) {
       } catch (e) {
         console.error(`[alertasStaff] Error avisando en grupo WA como ${agente}:`, e.message);
       }
-      await esperar(1500);
     }
   }
   console.log(`[alertasStaff] Alerta en grupo(s) de WhatsApp: ${algunoOk ? 'enviada' : 'falló'} (${waGroupIds.length} grupo(s) permitidos)`);
@@ -167,7 +164,6 @@ async function alertarIndividualWA({ folio, motivo }) {
     } catch (e) {
       console.error(`[alertasStaff] Error en WA individual a ${d.nombre}:`, e.message);
     }
-    await esperar(1500);
   }
 }
 
