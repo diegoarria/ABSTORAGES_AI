@@ -37,6 +37,7 @@ const contactos   = require('./backend/services/contactos');
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
+const vision  = require('./backend/services/vision');
 const grupoWA = require('./backend/services/groupMessages');
 const staffDirectory = require('./backend/services/staffDirectory');
 const incidentesNOA = require('./backend/services/incidentesNOA');
@@ -252,10 +253,19 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
   console.log('[WA-IN] body:', JSON.stringify(req.body).slice(0, 600));
   try {
     // Twilio manda form-urlencoded: From="whatsapp:+52...", To="whatsapp:+52...", Body="texto", NumMedia="0"
-    if (!req.body?.From || !req.body?.Body) { console.log('[WA-IN] sin From/Body, ignorando'); return; }
-    if (Number(req.body.NumMedia || 0) > 0 && !req.body.Body.trim()) { console.log('[WA-IN] solo media, sin texto, ignorando'); return; }
+    const numMedia = Number(req.body?.NumMedia || 0);
+    // Antes se ignoraba cualquier mensaje sin texto (línea que exigía Body) —
+    // eso descartaba por completo evidencias reales (foto de caja seca, carta
+    // porte) mandadas sin caption, que es como la mayoría de choferes las
+    // mandan. Ahora solo se requiere From, y al menos texto o algún adjunto.
+    if (!req.body?.From || (!req.body?.Body?.trim() && numMedia === 0)) { console.log('[WA-IN] sin From ni contenido, ignorando'); return; }
     const phone  = req.body.From.replace(/^whatsapp:/, '');
-    const texto  = req.body.Body.trim();
+    const texto  = (req.body.Body || '').trim();
+    const mediaUrls = [];
+    for (let i = 0; i < numMedia; i++) {
+      const url = req.body[`MediaUrl${i}`];
+      if (url) mediaUrls.push(url);
+    }
     // El agente que contesta depende del número al que le escribieron — cada
     // agente tiene su propio número de WhatsApp, igual que su número de Vapi.
     const agente  = agenteParaNumeroWA(req.body.To);
@@ -290,10 +300,26 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       const tmsCtx = await tms.getContextoSARA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
-    memory.addMessage(session, 'user', texto);
-    saveMessage(session, agente, 'user', texto);
+    // Si trae imagen(es)/PDF, se descargan (Twilio exige auth básica para
+    // sus media URLs) y se arma un mensaje multimodal para Claude — el
+    // historial guardado solo lleva un texto liviano describiendo que hubo
+    // un adjunto, nunca la imagen completa (evita inflar la memoria/contexto
+    // en cada turno futuro con datos que ya no hacen falta).
+    let contenidoParaClaude = texto;
+    let textoParaHistorial = texto;
+    if (mediaUrls.length) {
+      const { content, adjuntos } = await vision.construirContenidoConArchivos(mediaUrls, texto, {
+        basicAuth: `${TWILIO_SID}:${TWILIO_TOKEN}`,
+      });
+      if (adjuntos > 0) {
+        contenidoParaClaude = content;
+        textoParaHistorial = `${texto ? texto + ' ' : ''}[${adjuntos} archivo(s) adjunto(s) enviado(s)]`.trim();
+      }
+    }
+    memory.addMessage(session, 'user', textoParaHistorial);
+    saveMessage(session, agente, 'user', textoParaHistorial);
     let respuesta = '';
-    await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
+    await chatStream(systemPrompt, [...history, { role: 'user', content: contenidoParaClaude }], (c) => { respuesta += c; }, () => {});
     memory.addMessage(session, 'assistant', respuesta);
     saveMessage(session, agente, 'assistant', respuesta);
     const bloques = splitForWhatsApp(limpiarControlParaCliente(respuesta));
@@ -561,6 +587,15 @@ function esDuplicadoPorContenido(telefono, texto) {
   return !!anterior && (ahora - anterior) < DEDUP_CONTENIDO_MS;
 }
 
+// Campos de media en el payload de 2Chat aún no confirmados con un evento
+// real (la doc no cargó al pedirla) — se revisan varios nombres plausibles
+// a la vez; si algún día llega un mensaje con adjunto y esto no lo agarra,
+// el payload crudo ya se loguea completo arriba, así se ajusta rápido.
+function extraerMediaUrls2Chat(evento) {
+  const m = evento.message || {};
+  return [...new Set([m.media?.url, m.media_url, m.attachment?.url, m.url].filter(Boolean))];
+}
+
 app.post('/webhook/2chat', express.json(), (req, res) => {
   res.sendStatus(200);
   setImmediate(async () => {
@@ -571,6 +606,10 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       const messageId = evento.id || evento.uuid;
       const esGrupo = !!evento.group?.uuid;
       const texto = evento.message?.text || '';
+      const mediaUrls2Chat = extraerMediaUrls2Chat(evento);
+      if (evento.message?.type && evento.message.type !== 'text' && !mediaUrls2Chat.length) {
+        console.warn('[2Chat Webhook] Mensaje de tipo', evento.message.type, 'sin URL de media detectada — revisar payload crudo de arriba y ajustar extraerMediaUrls2Chat().');
+      }
       const quotedMsgId = evento.quoted_msg?.id || null;
       const participante = evento.participant || {};
 
@@ -587,7 +626,8 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       const esPropio = Object.values(TWOCHAT_NUMEROS).some(n => mismoNumero(n, remitentePhone));
 
       if (grupoWA.existeMensaje(messageId)) return; // dedup — 2Chat puede reintentar el mismo evento
-      if (esGrupo && texto && esDuplicadoPorContenido(remitentePhone, texto)) return; // mismo mensaje real, entregado por otro canal
+      const claveDedupContenido = texto || mediaUrls2Chat[0] || '';
+      if (esGrupo && claveDedupContenido && esDuplicadoPorContenido(remitentePhone, claveDedupContenido)) return; // mismo mensaje real, entregado por otro canal
 
       // canalUuid identifica la conversación para memoria de contexto — en
       // grupo se normaliza al wa_group_id real (universal, no scoped a un
@@ -605,8 +645,9 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // contestaría) dos veces.
       const registro = grupoWA.registrar({
         message_id: messageId, group_uuid: canalUuid, sender_phone: remitentePhone || null,
-        sender_name: remitente, agent: null, message_text: texto, direction: 'incoming',
-        reply_to_message_id: quotedMsgId,
+        sender_name: remitente, agent: null,
+        message_text: texto || (mediaUrls2Chat.length ? '[archivo adjunto]' : ''),
+        direction: 'incoming', reply_to_message_id: quotedMsgId,
       });
 
       if (esPropio) return; // eco de un mensaje que mandamos nosotros mismos — nunca autorespondernos
@@ -665,9 +706,18 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
       }));
 
+      // Imagen/PDF adjunto (evidencia de caja, carta porte, etc.) — se
+      // descarga y se manda como bloque multimodal; 2Chat sirve sus media
+      // URLs públicas, sin necesidad de auth.
+      let contenidoParaClaude = `${remitente}: ${texto}`;
+      if (mediaUrls2Chat.length) {
+        const { content, adjuntos } = await vision.construirContenidoConArchivos(mediaUrls2Chat, `${remitente}: ${texto}`);
+        if (adjuntos > 0) contenidoParaClaude = content;
+      }
+
       // Sin límite bajo de tokens — una respuesta cortada a medias (ej. una
       // lista de folios truncada) es peor que tardar unos segundos más.
-      const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: `${remitente}: ${texto}` }]);
+      const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: contenidoParaClaude }]);
 
       // Tokens de control — igual que en los demás canales (chat/WhatsApp/
       // llamada), se detectan y se limpian del texto antes de mandarlo al
