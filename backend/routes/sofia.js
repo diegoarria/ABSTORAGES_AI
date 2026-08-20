@@ -224,7 +224,7 @@ Registrada por SARA el ${ts}
 }
 
 function detectarActualizacionFolio(respuesta) {
-  const folioMatch = respuesta.match(/ABST-\d{6}/i);
+  const folioMatch = respuesta.match(/OP-ABS-\d{2}-\d{3,4}/i) || respuesta.match(/ABST-\d{6}/i);
   if (!folioMatch) return null;
 
   const estatusMap = {

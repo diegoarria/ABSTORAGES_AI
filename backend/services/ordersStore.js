@@ -10,32 +10,32 @@
 const db = require('../db/db');
 const USA_DB = !!process.env.DATABASE_URL;
 
-const store = new Map(); // fallback en memoria — ABST-XXXXXX → datos completos
+const store = new Map(); // fallback en memoria — OP-ABS-YY-XXXX → datos completos
 
-// Busca un folio en cualquier texto — soporta múltiples formatos:
-//   ABST-123456  |  ABST 123456  |  abst123456  |  folio 123456  |  #123456
+// Busca un folio en cualquier texto — formato real de ABSTORAGES (el mismo
+// que usa el TMS): OP-ABS-YY-XXXX, ej. OP-ABS-26-4821. Se mantiene
+// compatibilidad con el esquema interno viejo (ABST-XXXXXX) por si queda
+// algún folio ya creado con ese formato antes del cambio.
 function extraerFolio(texto) {
   if (!texto) return null;
   const t = String(texto);
 
-  const m1 = t.match(/ABST[-\s]?(\d{6})/i);
-  if (m1) return `ABST-${m1[1]}`;
+  const m1 = t.match(/OP-ABS-(\d{2})[-\s]?(\d{3,4})/i);
+  if (m1) return `OP-ABS-${m1[1]}-${m1[2].padStart(4, '0')}`;
 
-  const m2 = t.match(/(?:folio|#|número|n[uú]mero)[:\s]*(\d{6})/i);
-  if (m2) return `ABST-${m2[1]}`;
-
-  const m3 = t.match(/\b(\d{6})\b/);
-  if (m3) {
-    const candidato = `ABST-${m3[1]}`;
-    if (store.has(candidato)) return candidato;
-  }
+  const legacy = t.match(/ABST[-\s]?(\d{6})/i);
+  if (legacy) return `ABST-${legacy[1]}`;
 
   return null;
 }
 
 function normalizarFolio(folio) {
-  const digits = String(folio).match(/\d{6}/);
-  return digits ? `ABST-${digits[0]}` : String(folio).toUpperCase().trim();
+  const f = String(folio).trim();
+  const m = f.match(/OP-ABS-(\d{2})[-\s]?(\d{3,4})/i);
+  if (m) return `OP-ABS-${m[1]}-${m[2].padStart(4, '0')}`;
+  const legacy = f.match(/\d{6}/);
+  if (legacy) return `ABST-${legacy[0]}`; // compat con folios viejos ya guardados
+  return f.toUpperCase();
 }
 
 // Mapea el shape de leads.js (nombre, empresa, rfc, telefono, email, origen,

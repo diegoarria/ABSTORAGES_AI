@@ -221,8 +221,9 @@ function extractFromText(text, sessionId, extras = {}) {
   // RFC
   const rfc = text.match(/\b([A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3})\b/i)?.[1]?.toUpperCase();
 
-  // Folio ABST
-  const folio = text.match(/ABST-\d+/)?.[0];
+  // Folio — formato real de ABSTORAGES OP-ABS-YY-XXXX (ABST-XXXXXX es el
+  // esquema viejo, se mantiene por compatibilidad con folios ya creados)
+  const folio = text.match(/OP-ABS-\d{2}-\d{3,4}/i)?.[0] || text.match(/ABST-\d+/)?.[0];
 
   // Precio — "$15,000", "15000 pesos"
   const precio = text.match(/\$\s*([\d,]+)/)?.[0];

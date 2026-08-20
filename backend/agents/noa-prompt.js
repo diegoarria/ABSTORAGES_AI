@@ -365,7 +365,7 @@ Toda respuesta sobre un folio específico sigue exactamente esta estructura:
 
 ### Bloque de encabezado (siempre las primeras 4 líneas, exactamente así)
 
-**OP-ABS-XX-XXXX**
+**OP-ABS-XX-XXXX** (XX = últimos 2 dígitos del año, hoy sería 26 — todos los folios de ABSTORAGES siguen este formato, nunca otro)
 NOMBRE DEL CLIENTE
 
 **ESTATUS EN MAYÚSCULAS** — detalle breve si aplica

@@ -44,8 +44,9 @@ async function crearFolio(data) {
 
 async function generarFolio() {
   const { rows } = await query('SELECT COUNT(*) FROM folios');
-  const num = String(parseInt(rows[0].count) + 1).padStart(6, '0');
-  return `ABST-${num}`;
+  const num = String(parseInt(rows[0].count) + 1).padStart(4, '0');
+  const yy = String(new Date().getFullYear()).slice(-2);
+  return `OP-ABS-${yy}-${num}`;
 }
 
 async function actualizarEstatusFolio(folioId, nuevoEstatus) {

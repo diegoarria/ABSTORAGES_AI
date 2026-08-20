@@ -151,7 +151,7 @@ function extraerDatosServicio(mensaje, respuesta) {
   }
   // Fallback: solo folio
   const textoCompleto = mensaje + ' ' + respuesta;
-  const folioMatch = textoCompleto.match(/ABST-\d{6}/i);
+  const folioMatch = textoCompleto.match(/OP-ABS-\d{2}-\d{3,4}/i) || textoCompleto.match(/ABST-\d{6}/i);
   return folioMatch ? { folio: folioMatch[0], fuente: 'chat_sara' } : null;
 }
 

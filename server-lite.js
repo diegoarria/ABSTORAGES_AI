@@ -1393,7 +1393,7 @@ app.post('/api/admin/db-migrate', soloAdmin, async (req, res) => {
 // que la persistencia en Postgres funciona de punta a punta.
 app.post('/api/admin/test-orden', soloAdmin, async (req, res) => {
   try {
-    const folio = 'ABST-' + String(Math.floor(Math.random() * 900000) + 100000);
+    const folio = `OP-ABS-${String(new Date().getFullYear()).slice(-2)}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     const resultado = await ordersStore.guardarOrden({
       folio, nombre: 'Test Diagnóstico', empresa: 'TEST DIAGNOSTICO SA',
       telefono: '8100000000', email: 'test@diagnostico.com', rfc: 'TES010101AAA',
