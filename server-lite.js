@@ -731,14 +731,15 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // nada — esto lo corrige.
       let llamadaMatches = [...respuesta.matchAll(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/g)];
       let mensajeMatches = [...respuesta.matchAll(/INICIAR_MENSAJE:\s*(\{[^\n]+\})/g)];
-      // Pedido explícito (20-ago-2026): NOA no manda mensajes/llamadas
-      // masivas por ahora — se cae al primer destinatario nada más, el
-      // resto se descarta con log, para que un "avísale a Gabriel, Diego y
-      // Rafael" no dispare 3 envíos aunque sea vía 2Chat (no solo el fan-out
-      // de alertasStaff.js). Reactivar con NOA_MASIVOS=true.
-      if (agente === 'noa' && process.env.NOA_MASIVOS !== 'true') {
-        if (llamadaMatches.length > 1) { console.warn(`[2Chat Webhook] NOA_MASIVOS apagado — se descartan ${llamadaMatches.length - 1} llamada(s) extra de NOA, solo se procesa la primera`); llamadaMatches = llamadaMatches.slice(0, 1); }
-        if (mensajeMatches.length > 1) { console.warn(`[2Chat Webhook] NOA_MASIVOS apagado — se descartan ${mensajeMatches.length - 1} mensaje(s) extra de NOA, solo se procesa el primero`); mensajeMatches = mensajeMatches.slice(0, 1); }
+      // Pedido explícito (20-ago-2026): NI NOA, NI SARA, NI SOFIA mandan
+      // mensajes/llamadas masivas por ahora — se cae al primer destinatario
+      // nada más, el resto se descarta con log, para que un "avísale a
+      // Gabriel, Diego y Rafael" no dispare varios envíos aunque sea vía
+      // 2Chat (no solo el fan-out de alertasStaff.js, que es solo NOA).
+      // Reactivar con MENSAJES_MASIVOS=true.
+      if (process.env.MENSAJES_MASIVOS !== 'true') {
+        if (llamadaMatches.length > 1) { console.warn(`[2Chat Webhook] MENSAJES_MASIVOS apagado — se descartan ${llamadaMatches.length - 1} llamada(s) extra de ${agente}, solo se procesa la primera`); llamadaMatches = llamadaMatches.slice(0, 1); }
+        if (mensajeMatches.length > 1) { console.warn(`[2Chat Webhook] MENSAJES_MASIVOS apagado — se descartan ${mensajeMatches.length - 1} mensaje(s) extra de ${agente}, solo se procesa el primero`); mensajeMatches = mensajeMatches.slice(0, 1); }
       }
       const alertaMatch  = agente === 'noa' && respuesta.match(/ALERTA_?CRITICA:\s*(\{[^\n]+\})/i);
       const estatusMatch = agente === 'noa' && !alertaMatch && respuesta.match(/ESTATUS_?SEGUIMIENTO:\s*(\{[^\n]+\})/i);
@@ -2317,8 +2318,16 @@ app.get('/api/prospector/creditos', soloAdmin, async (req, res) => {
   res.json(c || { error: 'No disponible' });
 });
 
-// Runner automático cada 15 minutos
+// Runner automático cada 15 minutos — mismo interruptor que el resto
+// (20-ago-2026): contacta a varios prospectos sin que nadie lo pida en el
+// momento, justo lo que se quiere pausar. El endpoint manual
+// (POST /api/prospector/run) sigue libre — ese sí es una acción humana
+// explícita, no un barrido automático.
 setInterval(() => {
+  if (process.env.MENSAJES_MASIVOS !== 'true') {
+    console.warn('[OutreachRunner] 🔇 Corrida automática suprimida — MENSAJES_MASIVOS no está en "true".');
+    return;
+  }
   outreachRunner.run(pushActividad).catch(e => console.error('[OutreachRunner]', e.message));
 }, 15 * 60 * 1000);
 app.get('/api/leads/export.csv', async (req, res) => {
@@ -2452,6 +2461,14 @@ function splitForWhatsApp(text, maxLen = 1500) {
 const SEGUIMIENTO_MIN_HORAS = 2;
 const SEGUIMIENTO_MAX_HORAS = 7 * 24; // no perseguir leads de hace semanas
 async function revisarLeadsSinRespuesta() {
+  // Mismo interruptor que el resto — pedido explícito (20-ago-2026): ni
+  // NOA, ni SARA, ni SOFIA mandan nada masivo/automático hasta reactivarlo.
+  // Este barrido corre solo cada 30 min sobre TODOS los leads pendientes,
+  // sin que nadie lo pida en el momento — justo lo que se quiere pausar.
+  if (process.env.MENSAJES_MASIVOS !== 'true') {
+    console.warn('[SARA seguimiento] 🔇 Barrido de seguimiento automático suprimido — MENSAJES_MASIVOS no está en "true".');
+    return;
+  }
   try {
     const rows = await leads.list({ limit: 500 });
     const ahora = Date.now();

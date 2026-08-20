@@ -31,13 +31,13 @@ const EQUIPO_ALERTA_CRITICA = ['dante', 'rafael', 'manuel', 'gabriel', 'diego'];
 const EQUIPO_ESTATUS        = ['dante', 'rafael', 'diego'];
 
 // Interruptor general — apagado por default. Pedido explícito del usuario
-// (20-ago-2026) tras la restricción de WhatsApp en SARA/SOFIA: NOA no manda
-// NADA masivo (ni la alerta crítica al staff) hasta que se reactive a mano
-// con NOA_MASIVOS=true en el entorno. El incidente se sigue registrando
-// igual (incidentesNOA) y la actividad se sigue viendo en el ops-center —
-// lo que se apaga es el envío real de WhatsApp/llamadas a varias personas,
-// no la visibilidad del evento.
-const MASIVOS_HABILITADO = process.env.NOA_MASIVOS === 'true';
+// (20-ago-2026) tras la restricción de WhatsApp en SARA/SOFIA: NINGUNA de
+// las 3 IA manda nada masivo (ni la alerta crítica al staff) hasta que se
+// reactive a mano con MENSAJES_MASIVOS=true en el entorno. El incidente se
+// sigue registrando igual (incidentesNOA) y la actividad se sigue viendo en
+// el ops-center — lo que se apaga es el envío real de WhatsApp/llamadas a
+// varias personas, no la visibilidad del evento.
+const MASIVOS_HABILITADO = process.env.MENSAJES_MASIVOS === 'true';
 
 async function enviarPlantilla(to, contentSid, variables) {
   if (!WA_LIVE) {
@@ -179,8 +179,8 @@ async function alertarIndividualWA({ folio, motivo }) {
 async function alertarCriticoStaff({ folio, motivo, canal }) {
   try { incidentesNOA.registrar({ folio, motivo, canal }); } catch (e) { console.error('[alertasStaff] Error registrando incidente:', e.message); }
   if (!MASIVOS_HABILITADO) {
-    console.warn(`[alertasStaff] 🔇 SUPRIMIDA — alerta crítica folio ${folio || '—'} (${motivo || 'sin motivo'}) — NOA_MASIVOS no está en "true". Nadie del staff fue notificado por WhatsApp/llamada. El evento sí quedó registrado (incidentesNOA) y visible en el ops-center.`);
-    return { ok: false, razon: 'NOA_MASIVOS deshabilitado' };
+    console.warn(`[alertasStaff] 🔇 SUPRIMIDA — alerta crítica folio ${folio || '—'} (${motivo || 'sin motivo'}) — MENSAJES_MASIVOS no está en "true". Nadie del staff fue notificado por WhatsApp/llamada. El evento sí quedó registrado (incidentesNOA) y visible en el ops-center.`);
+    return { ok: false, razon: 'MENSAJES_MASIVOS deshabilitado' };
   }
   console.log(`[alertasStaff] Alerta crítica folio ${folio || '—'} → equipo (WhatsApp + llamada)`);
   const whatsapp = enviarATodos(EQUIPO_ALERTA_CRITICA, CONTENT_SID_ALERTA_CRITICA, {
@@ -197,8 +197,8 @@ async function alertarCriticoStaff({ folio, motivo, canal }) {
 
 async function enviarEstatusSeguimiento({ folio, resumen }) {
   if (!MASIVOS_HABILITADO) {
-    console.warn(`[alertasStaff] 🔇 SUPRIMIDO — estatus de seguimiento folio ${folio || '—'} — NOA_MASIVOS no está en "true".`);
-    return { ok: false, razon: 'NOA_MASIVOS deshabilitado' };
+    console.warn(`[alertasStaff] 🔇 SUPRIMIDO — estatus de seguimiento folio ${folio || '—'} — MENSAJES_MASIVOS no está en "true".`);
+    return { ok: false, razon: 'MENSAJES_MASIVOS deshabilitado' };
   }
   console.log(`[alertasStaff] Estatus de seguimiento folio ${folio || '—'} → equipo`);
   return enviarATodos(EQUIPO_ESTATUS, CONTENT_SID_ESTATUS, {
