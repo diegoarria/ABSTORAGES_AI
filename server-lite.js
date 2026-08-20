@@ -1382,6 +1382,22 @@ app.post('/api/admin/test-contacto', soloAdmin, async (req, res) => {
   }
 });
 
+// Diagnóstico: manda un WhatsApp de texto libre real vía Twilio (no
+// plantilla) — solo funciona si el destinatario ya escribió primero al
+// número de ese agente en las últimas 24h (regla de Meta/WhatsApp), si no
+// Twilio lo rechaza. Útil para probar que un número de Twilio sí manda
+// texto libre dentro de la ventana de servicio al cliente.
+app.post('/api/admin/test-whatsapp-libre', soloAdmin, async (req, res) => {
+  try {
+    const { to, texto, agente } = req.body || {};
+    if (!to || !texto) return res.status(400).json({ error: 'to y texto son requeridos' });
+    await sendWhatsApp(to, texto, (agente || 'sofia').toLowerCase());
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
