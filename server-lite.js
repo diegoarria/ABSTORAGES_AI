@@ -276,7 +276,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const { contextBlock, history } = memory.buildContext(session);
     const esPrimerMensaje = history.length === 0; // capturado antes de agregar el mensaje actual
     const tariffCtx = tariff.getContext();
-    let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
+    let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
     // Reconocimiento del equipo interno por número — nunca tratarlos como
     // cliente/proveedor/prospecto, sin importar el canal.
     const personaEquipo = staffDirectory.buscarPorTelefono(phone);
@@ -455,12 +455,22 @@ app.get('/webhook/whatsapp', (req, res) => {
 // para no bloquear el webhook (mismo patrón que /api/vapi/webhook).
 // Cola compartida entre grupo y 1:1 — formato para WhatsApp + trigger de
 // llamada real, idéntico en ambos canales de 2Chat.
+// Reglas de formato para WhatsApp — compartidas entre TODOS los canales de
+// WhatsApp (2Chat grupo/1:1 Y Twilio de producción). Antes solo vivían aquí,
+// dentro de MODO_2CHAT_COLA — el webhook de Twilio (el WhatsApp real de
+// producción, con clientes/proveedores) no las tenía, así que las IA podían
+// mandar **negritas**, ##, ---, tablas con | e incluso bloques de JSON
+// crudos ahí, que WhatsApp no renderiza y quedan ilegibles.
+const FORMATO_WHATSAPP =
+  `WhatsApp no interpreta markdown normal — nunca uses [texto](link), **negritas** (doble asterisco), encabezados con #, líneas separadoras con ---, ni tablas con | y guiones. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link. ` +
+  `Nunca mandes bloques de código, JSON, esquemas técnicos ni propuestas de arquitectura tal cual — eso no se lee en un teléfono y se ve como basura de símbolos. Si te piden algo así de técnico, explícalo en 2-3 oraciones simples con lo esencial, y ofrece seguir el detalle técnico por otro medio (el chat de la plataforma, o que alguien del equipo lo revise ahí) en vez de volcarlo completo en el mensaje.\n\n` +
+  `**Listas de varios registros (folios, proveedores, etc.):** cuando des 3 o más en una sola respuesta, mételos dentro de un bloque de texto monoespaciado (\`\`\` al inicio y \`\`\` al final, en su propia línea cada uno) — dentro de ese bloque WhatsApp respeta los espacios, así que alinea columnas cortas con espacios para que se lea como tabla real (ej. FOLIO | CLIENTE | RUTA | ESTATUS, una fila por línea, encabezado arriba). Fuera de listas largas no uses el bloque monoespaciado, solo para esto.`;
+
 const MODO_2CHAT_COLA =
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
   `Habla natural, como una persona real escribiendo WhatsApp — nunca uses jerga de radio/militar tipo "Roger", "Copy", "10-4", "Enterado", "Afirmativo" (los operadores no entienden esas palabras). Para confirmar algo usa palabras comunes: "Ok", "Correcto", "Perfecto", "Va", "Listo". ` +
   `No emitas NUEVA_ORDEN ni LEAD_DATA en este canal — esto es conversación interna del equipo, no un cierre de venta real con un cliente, así que ese flujo no aplica aquí. ` +
-  `WhatsApp no interpreta markdown normal — nunca uses [texto](link), **negritas** (doble asterisco), encabezados con #, ni tablas con | y guiones. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link.\n\n` +
-  `**Listas de varios registros (folios, proveedores, etc.):** cuando des 3 o más en una sola respuesta, mételos dentro de un bloque de texto monoespaciado (\`\`\` al inicio y \`\`\` al final, en su propia línea cada uno) — dentro de ese bloque WhatsApp respeta los espacios, así que alinea columnas cortas con espacios para que se lea como tabla real (ej. FOLIO | CLIENTE | RUTA | ESTATUS, una fila por línea, encabezado arriba). Fuera de listas largas no uses el bloque monoespaciado, solo para esto.\n\n` +
+  FORMATO_WHATSAPP + `\n\n` +
   `**Llamadas reales:** si de la conversación se desprende que genuinamente hace falta una llamada de voz real (alguien lo pide explícitamente, o hay que coordinar/confirmar algo que no se resuelve bien por texto) — emite al final de tu respuesta, en línea aparte:\n` +
   `INICIAR_LLAMADA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre de a quién se llama]","motivo":"[motivo breve]"}\n` +
   `Esto dispara una llamada real de Vapi de inmediato — no lo emitas por rutina ni "por si acaso", solo cuando de verdad se necesite. Si es alguien del equipo interno de ABSTORAGES puedes dejar "telefono" vacío ("") — el sistema resuelve su número real por su nombre. ` +
