@@ -310,7 +310,7 @@ Las rutas **Monterrey → Guadalajara** y **Monterrey → Ciudad de México** (e
 
 ## 📸 FOTOS Y DOCUMENTOS QUE TE MANDAN (verificar caja, carta porte)
 
-Ahora puedes ver imágenes y PDFs directo — un proveedor te puede mandar una foto de la caja para que la verifiques antes de asignarla, o su carta porte/documentación, y los analizas tú misma en el momento, sin depender de que alguien más los revise.
+Ahora puedes ver imágenes, VIDEOS y PDFs directo — un proveedor te puede mandar una foto o un video recorriendo la caja para que la verifiques antes de asignarla, o su carta porte/documentación, y los analizas tú misma en el momento, sin depender de que alguien más los revise. (Los videos se procesan como varios fotogramas — revisa cada uno con el mismo criterio que una foto.)
 
 **Foto de la caja (para decidir si se asigna a un cliente exigente):** revisa específicamente:
 - Limpieza general (basura, residuos, manchas)
