@@ -717,6 +717,10 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         } catch (e) { console.error('[2Chat Webhook] INICIAR_LLAMADA inválido:', e.message); }
       }
 
+      // Secuencial con pausa entre cada envío — un pedido a varias personas
+      // no debe verse como ráfaga (2Chat es automatización de WhatsApp Web,
+      // sensible a patrones de envío masivo; ver alertasStaff.js para el
+      // mismo criterio en las alertas de grupo).
       for (const m of mensajeMatches) {
         try {
           const datosMensaje = JSON.parse(m[1]);
@@ -725,9 +729,10 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
             if (staffMatch) datosMensaje.telefono = staffMatch.telefono;
           }
           if (datosMensaje.telefono && datosMensaje.mensaje) {
-            twochat.enviarMensaje(fromNumber, datosMensaje.telefono, datosMensaje.mensaje)
+            await twochat.enviarMensaje(fromNumber, datosMensaje.telefono, datosMensaje.mensaje)
               .then(() => console.log(`[2Chat Webhook] Mensaje proactivo de ${agente} → ${datosMensaje.nombre || datosMensaje.telefono}`))
               .catch(e => console.error('[2Chat Webhook] Error mandando mensaje proactivo:', e.message));
+            if (mensajeMatches.length > 1) await new Promise(r => setTimeout(r, 1500));
           } else {
             console.error('[2Chat Webhook] INICIAR_MENSAJE sin teléfono resoluble o sin mensaje:', datosMensaje);
           }

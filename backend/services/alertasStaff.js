@@ -92,59 +92,83 @@ function numerosAgentesWA() {
     .filter(([, n]) => n);
 }
 
-// Publica la alerta en todos los grupos de WhatsApp donde NOA o SOFIA
-// participan, una vez por cada una — así ambas quedan "enteradas" y lo
-// dejan ver en el grupo, sin necesidad de un canal de mensajería interno
-// entre agentes (el resultado observable es el mismo: las dos avisan).
+function esperar(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Whitelist explícita de grupos reales de ABSTORAGES (wa_group_id, el id
+// universal — no el uuid, que es distinto por cada canal) — SIN esto, se
+// publicaría en CUALQUIER grupo donde el número de 2Chat esté metido,
+// incluyendo grupos ajenos a ABSTORAGES si el número ya tenía WhatsApp
+// activo antes (pasó con SARA: su número ya estaba en ~12 grupos de otro
+// tipo). Eso además de ser una fuga de datos es justo el patrón de "ráfaga
+// a muchos grupos distintos" que dispara restricciones de WhatsApp.
+const GRUPOS_ALERTA_WHITELIST = (process.env.TWOCHAT_GRUPOS_ALERTA || '').split(',').map(s => s.trim()).filter(Boolean);
+
+// Publica la alerta en los grupos de WhatsApp reales de ABSTORAGES (solo
+// los de la whitelist) donde NOA o SOFIA participan, una vez por cada una
+// — así ambas quedan "enteradas" y lo dejan ver en el grupo. Envíos
+// SECUENCIALES con pausa entre cada uno — nunca en ráfaga, porque 2Chat es
+// automatización de WhatsApp Web (no la API oficial de Business) y es
+// sensible a patrones de envío masivo.
 async function alertarGrupoWA({ folio, motivo }) {
   const numeros = numerosAgentesWA();
   if (!numeros.length) return { ok: false, razon: 'sin números de 2Chat configurados' };
+  if (!GRUPOS_ALERTA_WHITELIST.length) {
+    console.error('[alertasStaff] TWOCHAT_GRUPOS_ALERTA no configurado — no se publica en ningún grupo (evita spamear grupos ajenos al número)');
+    return { ok: false, razon: 'sin whitelist de grupos configurada' };
+  }
 
-  let gruposUuid = [];
+  const porWaGroupId = {}; // wa_group_id (whitelisteado) → { [agente]: uuid propio de ese agente en ese grupo }
   try {
-    const listas = await Promise.all(numeros.map(([, num]) => twochat.listarGrupos(num)));
-    const vistos = new Set();
-    for (const r of listas) {
+    const listas = await Promise.all(numeros.map(([agente, num]) => twochat.listarGrupos(num).then(r => [agente, r])));
+    for (const [agente, r] of listas) {
       for (const g of (r.data || [])) {
-        if (!vistos.has(g.uuid)) { vistos.add(g.uuid); gruposUuid.push(g.uuid); }
+        if (!g.wa_group_id || !GRUPOS_ALERTA_WHITELIST.includes(g.wa_group_id)) continue;
+        if (!porWaGroupId[g.wa_group_id]) porWaGroupId[g.wa_group_id] = {};
+        porWaGroupId[g.wa_group_id][agente] = g.uuid;
       }
     }
   } catch (e) {
     console.error('[alertasStaff] Error listando grupos de WhatsApp:', e.message);
   }
-  if (!gruposUuid.length) return { ok: false, razon: 'sin grupos de WhatsApp detectados' };
+  const waGroupIds = Object.keys(porWaGroupId);
+  if (!waGroupIds.length) return { ok: false, razon: 'ninguno de los grupos de TWOCHAT_GRUPOS_ALERTA fue encontrado' };
 
   const mensaje = `🚨 ALERTA CRÍTICA${folio ? ` — Folio ${folio}` : ''}\n${motivo || 'Revisar de inmediato'}`;
-  const envios = [];
-  for (const grupoUuid of gruposUuid) {
+  let algunoOk = false;
+  for (const waGroupId of waGroupIds) {
     for (const [agente, numero] of numeros) {
-      envios.push(
-        twochat.enviarMensajeGrupo(numero, grupoUuid, `${TWOCHAT_PREFIJO_ALERTA[agente]}\n${mensaje}`)
-          .then(() => true)
-          .catch(e => { console.error(`[alertasStaff] Error avisando en grupo WA como ${agente}:`, e.message); return false; })
-      );
+      const uuidPropio = porWaGroupId[waGroupId][agente];
+      if (!uuidPropio) continue; // ese agente no es miembro de este grupo específico
+      try {
+        await twochat.enviarMensajeGrupo(numero, uuidPropio, `${TWOCHAT_PREFIJO_ALERTA[agente]}\n${mensaje}`);
+        algunoOk = true;
+      } catch (e) {
+        console.error(`[alertasStaff] Error avisando en grupo WA como ${agente}:`, e.message);
+      }
+      await esperar(1500);
     }
   }
-  const resultados = await Promise.all(envios);
-  const ok = resultados.some(Boolean);
-  console.log(`[alertasStaff] Alerta en grupo(s) de WhatsApp: ${ok ? 'enviada' : 'falló'} (${gruposUuid.length} grupo(s))`);
-  return { ok };
+  console.log(`[alertasStaff] Alerta en grupo(s) de WhatsApp: ${algunoOk ? 'enviada' : 'falló'} (${waGroupIds.length} grupo(s) permitidos)`);
+  return { ok: algunoOk };
 }
 
 // Fallback si no se pudo avisar en ningún grupo — mensaje 1:1 por WhatsApp
 // (2Chat, texto libre) directo a cada uno de los 5, además de la plantilla
-// de Twilio y la llamada que ya se disparan siempre.
+// de Twilio y la llamada que ya se disparan siempre. Secuencial con pausa,
+// mismo motivo que arriba.
 async function alertarIndividualWA({ folio, motivo }) {
   const [, fromNumber] = numerosAgentesWA()[0] || [];
   if (!fromNumber) return;
   const mensaje = `🚨 ALERTA CRÍTICA${folio ? ` — Folio ${folio}` : ''}\n${motivo || 'Revisar de inmediato'}`;
   const destinatarios = EQUIPO_ALERTA_CRITICA.map(k => STAFF[k]).filter(Boolean);
-  const resultados = await Promise.allSettled(
-    destinatarios.map(d => twochat.enviarMensaje(fromNumber, d.telefono, mensaje))
-  );
-  resultados.forEach((r, i) => {
-    if (r.status === 'rejected') console.error(`[alertasStaff] Error en WA individual a ${destinatarios[i].nombre}:`, r.reason?.message);
-  });
+  for (const d of destinatarios) {
+    try {
+      await twochat.enviarMensaje(fromNumber, d.telefono, mensaje);
+    } catch (e) {
+      console.error(`[alertasStaff] Error en WA individual a ${d.nombre}:`, e.message);
+    }
+    await esperar(1500);
+  }
 }
 
 async function alertarCriticoStaff({ folio, motivo, canal }) {
