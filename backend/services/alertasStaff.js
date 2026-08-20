@@ -177,6 +177,18 @@ async function alertarIndividualWA({ folio, motivo }) {
 }
 
 async function alertarCriticoStaff({ folio, motivo, canal }) {
+  // ¿Ya se reportó algo igual/muy parecido en la última hora? — evita
+  // re-mandar una alerta masiva sobre algo que el equipo ya está
+  // atendiendo (caso real: "lo de Peñafiel", donde la alerta llegó cuando
+  // el equipo ya lo tenía controlado desde antes).
+  let incidenteReciente = null;
+  try { incidenteReciente = incidentesNOA.buscarRecienteSimilar({ folio, motivo }); } catch (e) { console.error('[alertasStaff] Error buscando incidente reciente:', e.message); }
+  if (incidenteReciente) {
+    const minAtras = Math.round((Date.now() - new Date(incidenteReciente.timestamp).getTime()) / 60000);
+    console.warn(`[alertasStaff] 🔁 Alerta folio ${folio || '—'} parece la misma que ${incidenteReciente.id} (hace ${minAtras} min) — se registra como duplicado, NO se re-manda al staff.`);
+    try { incidentesNOA.registrar({ folio, motivo, canal, duplicado_de: incidenteReciente.id }); } catch (e) { console.error('[alertasStaff] Error registrando incidente:', e.message); }
+    return { ok: false, razon: `duplicado de ${incidenteReciente.id}` };
+  }
   try { incidentesNOA.registrar({ folio, motivo, canal }); } catch (e) { console.error('[alertasStaff] Error registrando incidente:', e.message); }
   if (!MASIVOS_HABILITADO) {
     console.warn(`[alertasStaff] 🔇 SUPRIMIDA — alerta crítica folio ${folio || '—'} (${motivo || 'sin motivo'}) — MENSAJES_MASIVOS no está en "true". Nadie del staff fue notificado por WhatsApp/llamada. El evento sí quedó registrado (incidentesNOA) y visible en el ops-center.`);

@@ -25,17 +25,56 @@ function guardarDisco() {
   }, 500);
 }
 
-function registrar({ folio, motivo, canal }) {
+function registrar({ folio, motivo, canal, duplicado_de }) {
   const registro = {
     id: `INC-${Date.now().toString(36).toUpperCase()}`,
     folio: folio || null, motivo: motivo || null, canal: canal || null,
     timestamp: new Date().toISOString(),
     resultado: null, notas: null, resuelto_en: null,
+    duplicado_de: duplicado_de || null,
   };
   cache.push(registro);
   if (cache.length > MAX_REGISTROS) cache = cache.slice(-MAX_REGISTROS);
   guardarDisco();
   return registro;
+}
+
+// ¿Ya se reportó algo igual/muy parecido hace poco? — evita que NOA dispare
+// una alerta masiva nueva sobre algo que el equipo ya está atendiendo (caso
+// real: "lo de Peñafiel", donde la alerta llegó cuando el equipo ya lo tenía
+// controlado). Match por folio exacto, o por overlap de palabras clave del
+// motivo si no hay folio — no es perfecto, pero corta el caso obvio de
+// "mismo evento, mismo minuto/hora, distinto disparador".
+const VENTANA_DEDUP_MIN = 60;
+// Vocabulario genérico de incidentes — se excluye del match por palabra
+// clave para no confundir dos eventos DISTINTOS que solo comparten el tipo
+// de incidente (ej. dos robos reales en rutas distintas el mismo día no
+// deben deduplicarse solo por decir "robo" los dos).
+const PALABRAS_GENERICAS_INCIDENTE = new Set([
+  'robo', 'robos', 'accidente', 'accidentes', 'tránsito', 'transito',
+  'situación', 'situacion', 'control', 'alerta', 'crítica', 'critica',
+  'reporta', 'reportó', 'reporto', 'operador', 'unidad', 'ruta',
+  'confirmado', 'inmediato', 'revisar', 'sobre', 'está', 'esta',
+]);
+function buscarRecienteSimilar({ folio, motivo }) {
+  const limiteMs = VENTANA_DEDUP_MIN * 60 * 1000;
+  const ahora = Date.now();
+  return cache.find(i => {
+    if (i.duplicado_de) return false; // no encadenar duplicados de duplicados
+    if (ahora - new Date(i.timestamp).getTime() > limiteMs) return false;
+    if (folio && i.folio && folio === i.folio) return true;
+    if (motivo && i.motivo) {
+      // Basta con 1 palabra DISTINTIVA en común (ej. nombre de cliente/lugar
+      // como "Peñafiel") — se excluye el vocabulario genérico de incidentes
+      // para no fusionar dos eventos reales distintos solo porque ambos
+      // dicen "robo" o "accidente".
+      const esDistintiva = w => w.length > 3 && !PALABRAS_GENERICAS_INCIDENTE.has(w);
+      const palabrasNuevas = new Set(motivo.toLowerCase().split(/\s+/).filter(esDistintiva));
+      const comunes = i.motivo.toLowerCase().split(/\s+/).filter(w => esDistintiva(w) && palabrasNuevas.has(w));
+      if (comunes.length >= 1) return true;
+    }
+    return false;
+  }) || null;
 }
 
 // resultado: 'bien' | 'mal' | 'falsa_alarma'
@@ -72,4 +111,4 @@ function bloqueAprendizaje(limit = 8) {
   );
 }
 
-module.exports = { registrar, marcarResultado, listar, bloqueAprendizaje };
+module.exports = { registrar, marcarResultado, listar, bloqueAprendizaje, buscarRecienteSimilar };
