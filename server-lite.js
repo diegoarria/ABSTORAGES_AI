@@ -729,8 +729,17 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // en su propia línea. Con match simple (sin /g) solo se procesaba el
       // primero y se le decía "enviado" a todos los demás sin haber hecho
       // nada — esto lo corrige.
-      const llamadaMatches = [...respuesta.matchAll(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/g)];
-      const mensajeMatches = [...respuesta.matchAll(/INICIAR_MENSAJE:\s*(\{[^\n]+\})/g)];
+      let llamadaMatches = [...respuesta.matchAll(/INICIAR_LLAMADA:\s*(\{[^\n]+\})/g)];
+      let mensajeMatches = [...respuesta.matchAll(/INICIAR_MENSAJE:\s*(\{[^\n]+\})/g)];
+      // Pedido explícito (20-ago-2026): NOA no manda mensajes/llamadas
+      // masivas por ahora — se cae al primer destinatario nada más, el
+      // resto se descarta con log, para que un "avísale a Gabriel, Diego y
+      // Rafael" no dispare 3 envíos aunque sea vía 2Chat (no solo el fan-out
+      // de alertasStaff.js). Reactivar con NOA_MASIVOS=true.
+      if (agente === 'noa' && process.env.NOA_MASIVOS !== 'true') {
+        if (llamadaMatches.length > 1) { console.warn(`[2Chat Webhook] NOA_MASIVOS apagado — se descartan ${llamadaMatches.length - 1} llamada(s) extra de NOA, solo se procesa la primera`); llamadaMatches = llamadaMatches.slice(0, 1); }
+        if (mensajeMatches.length > 1) { console.warn(`[2Chat Webhook] NOA_MASIVOS apagado — se descartan ${mensajeMatches.length - 1} mensaje(s) extra de NOA, solo se procesa el primero`); mensajeMatches = mensajeMatches.slice(0, 1); }
+      }
       const alertaMatch  = agente === 'noa' && respuesta.match(/ALERTA_?CRITICA:\s*(\{[^\n]+\})/i);
       const estatusMatch = agente === 'noa' && !alertaMatch && respuesta.match(/ESTATUS_?SEGUIMIENTO:\s*(\{[^\n]+\})/i);
 
