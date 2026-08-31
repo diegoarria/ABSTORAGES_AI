@@ -23,6 +23,28 @@
 //      "Hola {{1}}, este es un estatus de tu envío. Folio {{2}}: {{3}}."
 require('dotenv').config();
 const STAFF = require('../data/staff-contacts.json');
+const memory = require('./memory');
+
+// Normaliza a E.164 (+52XXXXXXXXXX) — tiene que coincidir EXACTO con el
+// `phone` que arma el webhook de WhatsApp (server-lite.js, From de Twilio)
+// para que la sesión de memoria sea la misma cuando la persona responda.
+function normalizarE164(telefono) {
+  const raw = String(telefono || '').replace(/\D/g, '');
+  if (!raw) return null;
+  return raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
+}
+
+// Registra el mensaje saliente en la MISMA memoria de sesión que usa el
+// webhook de WhatsApp (server-lite.js: session = wa_<agente>_<phone>) — sin
+// esto, cuando la persona responde al mensaje proactivo, la IA no tiene
+// ningún registro de qué le preguntó/avisó, y contesta a ciegas.
+function registrarEnMemoria(agente, telefono, texto) {
+  const tel = normalizarE164(telefono);
+  if (!tel) return;
+  const session = `wa_${agente}_${tel}`;
+  try { memory.addMessage(session, 'assistant', texto); }
+  catch (e) { console.error('[whatsappProactivo] Error registrando en memoria:', e.message); }
+}
 
 const TWILIO_SID   = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN;
@@ -69,13 +91,16 @@ async function preguntarDisponibilidad(proveedor, orden) {
   if (!CONTENT_SID_DISPONIBILIDAD) { console.warn('[whatsappProactivo] Plantilla de disponibilidad aún no aprobada — se omite'); return null; }
   if (!telefonoValido(proveedor?.telefono)) return null;
   const [origen, destino] = (orden.ruta || '').split('→').map(s => (s || '').trim());
-  return enviarPlantilla('sofia', proveedor.telefono, CONTENT_SID_DISPONIBILIDAD, {
-    '1': proveedor.nombre || 'ahí',
-    '2': orden.tipo_unidad || 'caja seca',
-    '3': origen || orden.origen || '—',
-    '4': destino || orden.destino || '—',
-    '5': orden.fecha_carga || 'por confirmar',
+  const tipoUnidad = orden.tipo_unidad || 'caja seca';
+  const org = origen || orden.origen || '—';
+  const dst = destino || orden.destino || '—';
+  const fecha = orden.fecha_carga || 'por confirmar';
+  const resultado = await enviarPlantilla('sofia', proveedor.telefono, CONTENT_SID_DISPONIBILIDAD, {
+    '1': proveedor.nombre || 'ahí', '2': tipoUnidad, '3': org, '4': dst, '5': fecha,
   });
+  registrarEnMemoria('sofia', proveedor.telefono,
+    `Hola ${proveedor.nombre || ''}, soy SOFIA de ABSTORAGES. Buscamos unidad ${tipoUnidad} para la ruta ${org} → ${dst}, salida ${fecha}. ¿Tienes disponibilidad? Contáctanos por este medio.`);
+  return resultado;
 }
 
 // Misma lista de proveedores compatibles que ya usan las llamadas — se le
@@ -95,14 +120,15 @@ async function avisarEquipo(agente, remitenteLabel, mensaje, destinatariosClaves
   if (!CONTENT_SID_AVISO_EQUIPO) { console.warn('[whatsappProactivo] Plantilla de aviso al equipo aún no aprobada — se omite'); return null; }
   const destinatarios = (destinatariosClaves || []).map(k => STAFF[k]).filter(Boolean);
   if (!destinatarios.length) return null;
+  const remitente = remitenteLabel || agente.toUpperCase();
   const resultados = await Promise.allSettled(
     destinatarios.map(d => enviarPlantilla(agente, d.telefono, CONTENT_SID_AVISO_EQUIPO, {
-      '1': remitenteLabel || agente.toUpperCase(),
-      '2': mensaje,
+      '1': remitente, '2': mensaje,
     }))
   );
   resultados.forEach((r, i) => {
     if (r.status === 'rejected') console.error(`[whatsappProactivo] Error avisando a ${destinatarios[i]?.nombre}:`, r.reason?.message);
+    else registrarEnMemoria(agente, destinatarios[i].telefono, `Aviso de ${remitente}: ${mensaje} — ABSTORAGES Logistics Solutions`);
   });
   return resultados;
 }
@@ -111,11 +137,13 @@ async function avisarEquipo(agente, remitenteLabel, mensaje, destinatariosClaves
 async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   if (!CONTENT_SID_ESTATUS_FOLIO) { console.warn('[whatsappProactivo] Plantilla de estatus de folio aún no aprobada — se omite'); return null; }
   if (!telefonoValido(telefono)) return null;
-  return enviarPlantilla(agente, telefono, CONTENT_SID_ESTATUS_FOLIO, {
-    '1': nombre || 'ahí',
-    '2': folio || '—',
-    '3': resumen || 'sin novedades',
+  const f = folio || '—';
+  const r = resumen || 'sin novedades';
+  const resultado = await enviarPlantilla(agente, telefono, CONTENT_SID_ESTATUS_FOLIO, {
+    '1': nombre || 'ahí', '2': f, '3': r,
   });
+  registrarEnMemoria(agente, telefono, `Hola ${nombre || ''}, este es un estatus de tu envío. Folio ${f}: ${r} — ABSTORAGES Logistics Solutions`);
+  return resultado;
 }
 
 module.exports = { preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
