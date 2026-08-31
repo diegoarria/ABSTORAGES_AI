@@ -95,7 +95,7 @@ async function query(recurso, opts = {}) {
 async function buscarCliente(texto) {
   const r = await query('clientes', {
     pagina: 1, limite: 5,
-    filtros: { 'Razon Social': { contiene: texto } },
+    filtros: { 'Razon Social': { contiene: texto.toUpperCase() } },
     campos: ['RFC','Razon Social','Ejecutivo Comercial','Estatus','Dias de crédito',
              'Comentario','Bloqueo de Cliente','Tipo de Servicio',
              'Usuario Principal','Correo principal','Telefono principal','Móvil principal'],
@@ -119,7 +119,7 @@ async function buscarCliente(texto) {
 async function historialCliente(nombreCliente) {
   const r = await query('servicios', {
     pagina: 1, limite: 20,
-    filtros: { 'Cliente': { contiene: nombreCliente } },
+    filtros: { 'Cliente': { contiene: nombreCliente.toUpperCase() } },
     campos: ['Folio de servicio','Fecha','Cliente','Cuidad Origen','Estado Origen',
              'Cuidad Destino','Estado Destino','Estatus Operativo','Estatus Administrativo',
              'Costo','Venta total','Margen $','Margen %','Pagada'],
@@ -189,7 +189,7 @@ async function tarifasCliente(nombreCliente) {
 async function directorio(texto) {
   const r = await query('clientes', {
     pagina: 1, limite: 10,
-    filtros: { 'Razon Social': { contiene: texto } },
+    filtros: { 'Razon Social': { contiene: texto.toUpperCase() } },
     campos: ['Razon Social','RFC','Estatus','Usuario Principal',
              'Correo principal','Telefono principal','Móvil principal',
              'Recepción de Facturas','Correo RF','Telefono RF',
@@ -313,7 +313,7 @@ async function listarProveedores(limite = 50) {
 async function buscarProveedor(texto) {
   const por_nombre = await query('proveedores', {
     pagina: 1, limite: 5,
-    filtros: { 'Razon Social': { contiene: texto } },
+    filtros: { 'Razon Social': { contiene: texto.toUpperCase() } },
     campos: ['Folio','RFC','Razon Social','Contacto','Correo','Telefono','Movil','Estatus','Comentarios','Emergencia'],
   });
   if (por_nombre?.datos?.length) return por_nombre.datos;
@@ -335,7 +335,7 @@ async function rutasProveedor(nombreProveedor) {
   const r = await query('detalle_servicios', {
     pagina: 1, limite: 200,
     desde: haceDias(180),
-    filtros: { 'Proveedor': { contiene: nombreProveedor } },
+    filtros: { 'Proveedor': { contiene: nombreProveedor.toUpperCase() } },
     campos: ['Folio de servicio','Fecha de Servicio','Proveedor','Cliente',
              'Cuidad Origen','Estado Origen','Cuidad destino','Estado destino',
              'Costo','Estatus Operaciones'],
@@ -370,8 +370,8 @@ async function rutasProveedor(nombreProveedor) {
 // Proveedores que han manejado una ruta específica (por ciudad origen → destino)
 async function proveedoresPorRuta(origen, destino) {
   const filtros = {};
-  if (origen)  filtros['Cuidad Origen']  = { contiene: origen };
-  if (destino) filtros['Cuidad destino'] = { contiene: destino };
+  if (origen)  filtros['Cuidad Origen']  = { contiene: origen.toUpperCase() };
+  if (destino) filtros['Cuidad destino'] = { contiene: destino.toUpperCase() };
 
   const r = await query('detalle_servicios', {
     pagina: 1, limite: 200,
@@ -431,7 +431,7 @@ async function getContextoSOFIA(mensajeUsuarioOriginal) {
     .slice(0, 3);
 
   const esProveedor  = /proveedor|transportista|flete|camión|unidad|operador|carrier/.test(msg);
-  const esRuta       = /ruta|rutas|origen|destino|maneja|cubre|atiende/.test(msg);
+  const esRuta       = /ruta|rutas|origen|destino|maneja|cubre|atiende|viaj|recorrid|desde .+ (a|hasta)\b/.test(msg);
   const esContacto   = /teléfono|telefono|contacto|correo|email|número|llamar/.test(msg);
   const esCosto      = /costo|costos|precio|precios|tarifa|tarifas|cuánto|cobra/.test(msg);
 
