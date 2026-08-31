@@ -1557,6 +1557,29 @@ app.get('/api/admin/estatus-mensaje/:sid', soloAdmin, async (req, res) => {
   }
 });
 
+// Diagnóstico: lista los últimos mensajes de Twilio hacia un número — para
+// encontrar el SID de un mensaje mandado por una vía que no lo devuelve
+// (ej. sendWhatsApp/texto libre) y así poder consultar su estatus real.
+app.get('/api/admin/mensajes-recientes/:to', soloAdmin, async (req, res) => {
+  try {
+    if (!TWILIO_SID || !TWILIO_TOKEN) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const to = `whatsapp:${req.params.to.replace(/^whatsapp:/, '')}`;
+    const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json?To=${encodeURIComponent(to)}&PageSize=5`, {
+      headers: { 'Authorization': `Basic ${auth}` },
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 400)}` });
+    const data = JSON.parse(resp);
+    res.json((data.messages || []).map(m => ({
+      sid: m.sid, status: m.status, error_code: m.error_code, from: m.from,
+      body: (m.body || '').slice(0, 60), date_created: m.date_created,
+    })));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
