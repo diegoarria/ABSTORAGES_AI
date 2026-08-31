@@ -55,10 +55,42 @@ const SOFIA_VOZ_EXTRA =
   `Si fue solo un cruce breve sin que te haya dicho nada claro, retoma tu idea exactamente donde ibas — ` +
   `no te detengas a mitad de frase y no te quedes en silencio esperando; sigue la conversación.`;
 
+// Resumen + datos estructurados al terminar la llamada — Vapi los genera
+// solo si se los pides explícitamente aquí. server-lite.js ya sabía leer
+// `analysis.summary` y `analysis.structuredData` (código escrito para esto
+// hace tiempo), pero nunca se había pedido este análisis en la llamada en
+// sí — por eso nunca llegaba resumen, y NOA jamás detectaba ALERTA_CRITICA/
+// ESTATUS_SEGUIMIENTO por llamada (no puede decir esos tokens en voz, solo
+// por aquí). Va en VOZ_TUNING_RAPIDA para aplicar a toda llamada de
+// cualquiera de las 3, sin tener que tocar cada payload por separado.
+const ANALYSIS_PLAN = {
+  summaryPlan: {
+    enabled: true,
+    messages: [
+      { role: 'system', content: 'Eres un experto tomando notas de llamadas reales de logística (ABSTORAGES). Vas a recibir la transcripción de una llamada. Resúmela en 2-4 oraciones, en español, mencionando de qué se trató, qué se acordó o resolvió, y cuál es el siguiente paso si aplica. No regreses nada más que el resumen.' },
+      { role: 'user', content: 'Transcripción:\n\n{{transcript}}\n\nMotivo de fin de llamada:\n\n{{endedReason}}' },
+    ],
+  },
+  structuredDataPlan: {
+    enabled: true,
+    schema: {
+      type: 'object',
+      properties: {
+        alerta_critica:    { type: 'boolean', description: 'true SOLO si durante la llamada se reportó un robo, accidente o emergencia real que requiere atención inmediata del equipo — no marcar true por rutina.' },
+        motivo:            { type: 'string',  description: 'Descripción breve del motivo de la alerta crítica, si alerta_critica es true.' },
+        folio:             { type: 'string',  description: 'Folio del servicio mencionado en la llamada, si se dijo alguno (formato OP-ABS-YY-XXXX).' },
+        estatus_relevante: { type: 'boolean', description: 'true si se obtuvo información nueva y sustancial sobre el estatus de un folio que vale la pena reportar al equipo — no marcar true por rutina ni si no hubo nada nuevo.' },
+        estatus_resumen:   { type: 'string',  description: 'Resumen breve del estatus nuevo, si estatus_relevante es true.' },
+      },
+    },
+  },
+};
+
 const VOZ_TUNING_RAPIDA = {
   startSpeakingPlan: { waitSeconds: 0.4, smartEndpointingPlan: { provider: 'vapi' } },
   stopSpeakingPlan: { numWords: 3, voiceSeconds: 0.2, backoffSeconds: 0.5 },
   serverMessages: ['status-update', 'transcript', 'speech-update', 'end-of-call-report', 'hang'],
+  analysisPlan: ANALYSIS_PLAN,
 };
 
 // ── Lanzar una llamada a un proveedor ─────────────────────────────────────────
