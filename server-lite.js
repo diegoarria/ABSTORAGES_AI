@@ -2631,5 +2631,6 @@ app.listen(PORT, () => {
   console.log(`  TTS Voz:   ${EL_LIVE ? '🟢 LIVE' : '🟡 stub (agrega ELEVENLABS_API_KEY)'}`);
   console.log(`  Tarifas:   🟢 dinámicas\n`);
   noaScheduler.iniciar(pushActividad);
+  tms.iniciarPrewarmNOA();
   setInterval(revisarLeadsSinRespuesta, 30 * 60 * 1000);
 });

@@ -63,6 +63,24 @@ const CACHE_TTL_MS = 3 * 60 * 1000;
 const cacheTMS = new Map(); // "recurso|opts" → { ts, data }
 
 // ── Core query ───────────────────────────────────────────────────────────────
+// El Google Sheet trae basura de captura manual pegada a los valores —
+// comillas literales envolviendo el texto ("METAPEL" en vez de METAPEL),
+// espacios repetidos. Sin esto, ese ruido llega tal cual a un mensaje real
+// de cara al cliente y se ve poco profesional.
+function limpiarTexto(v) {
+  if (typeof v !== 'string') return v;
+  return v.trim().replace(/^"+|"+$/g, '').trim().replace(/\s{2,}/g, ' ');
+}
+function limpiarDatos(datos) {
+  if (!Array.isArray(datos)) return datos;
+  return datos.map(fila => {
+    if (!fila || typeof fila !== 'object') return fila;
+    const limpia = {};
+    for (const [k, v] of Object.entries(fila)) limpia[k] = limpiarTexto(v);
+    return limpia;
+  });
+}
+
 async function query(recurso, opts = {}) {
   if (!ENABLED) return null;
   const key = `${recurso}|${JSON.stringify(opts)}`;
@@ -73,6 +91,7 @@ async function query(recurso, opts = {}) {
     const raw = r1.redirect ? await httpGet(r1.redirect) : r1.data;
     const parsed = JSON.parse(raw);
     if (!parsed.ok) throw new Error(parsed.error || 'TMS error');
+    if (parsed.datos) parsed.datos = limpiarDatos(parsed.datos);
     cacheTMS.set(key, { ts: Date.now(), data: parsed });
     if (cacheTMS.size > 300) {
       for (const [k, v] of cacheTMS) if (Date.now() - v.ts > CACHE_TTL_MS) cacheTMS.delete(k);
@@ -227,8 +246,13 @@ async function getContextoSARA(mensajeUsuario) {
   // está preguntando algo del TMS. Sin este filtro, cualquier mensaje con
   // una palabra larga (un saludo, small talk) dispara una consulta real al
   // TMS por nada, metiendo latencia innecesaria a cada respuesta.
+  // OJO: esTarifas/esRutas por sí solos NO son señal de que hay un cliente
+  // que buscar — "cuánto cuesta" es literalmente la pregunta más común de
+  // un lead nuevo cotizando por primera vez (la cotiza el motor de tarifas
+  // local, no el TMS), y disparaba una búsqueda TMS de 1-3 consultas
+  // secuenciales en CADA cotización nueva sin necesidad real.
   let clienteEncontrado = null;
-  if (esRutas || esTarifas || esContacto || esCliente) {
+  if (esCliente || esContacto) {
     for (const palabra of palabrasClave) {
       if (palabra.length < 4) continue;
       const resultados = await buscarCliente(palabra);
@@ -707,6 +731,20 @@ function formatearListaActivosNOA(activos) {
   return lineas.join('\n');
 }
 
+// ── Pre-calentado de caché ──────────────────────────────────────────────────
+// foliosActivosNOA() es la consulta más pesada (detalle_servicios, 15-45s en
+// frío) y la más repetida — es literalmente lo primero que pregunta cualquier
+// persona en un chat con NOA. Refrescarla en segundo plano cada 2 minutos
+// (dentro del TTL de caché de 3 min) hace que, en la práctica, un cliente o
+// miembro del equipo casi nunca pague el costo de la consulta en frío.
+const PREWARM_MS = 2 * 60 * 1000;
+function iniciarPrewarmNOA() {
+  if (!ENABLED) return;
+  const refrescar = () => foliosActivosNOA().catch(e => console.error('[TMS prewarm] Error refrescando folios activos:', e.message));
+  refrescar();
+  setInterval(refrescar, PREWARM_MS);
+}
+
 module.exports = {
   // SARA
   buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
@@ -715,5 +753,5 @@ module.exports = {
   // NOA
   buscarFolioNOA, foliosActivosNOA, getContextoNOA,
   // Core
-  query, ENABLED,
+  query, ENABLED, iniciarPrewarmNOA,
 };
