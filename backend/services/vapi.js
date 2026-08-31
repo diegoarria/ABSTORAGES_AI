@@ -731,6 +731,7 @@ async function asignarAssistantANumero(numeroId, assistantId) {
 }
 
 module.exports = {
+  filtrarProveedores,
   lanzarLlamadasProveedores,
   procesarResultadoLlamada,
   obtenerEstadoLlamadas,

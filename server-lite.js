@@ -38,6 +38,7 @@ const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
 const vision  = require('./backend/services/vision');
+const whatsappProactivo = require('./backend/services/whatsappProactivo');
 const grupoWA = require('./backend/services/groupMessages');
 const staffDirectory = require('./backend/services/staffDirectory');
 const incidentesNOA = require('./backend/services/incidentesNOA');
@@ -360,6 +361,11 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
         vapi.lanzarLlamadasProveedores(lead, PROVEEDORES)
           .then(r => pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: `Folio ${lead.folio} — ${r.llamadas} llamadas a carriers iniciadas`, metadata: { folio: lead.folio, ...r } }))
           .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
+        // Además de llamar, se les pregunta disponibilidad por WhatsApp
+        // (plantilla Twilio) — mismo filtro de compatibilidad que las
+        // llamadas, así SOFIA cubre los dos canales para conseguir unidad.
+        whatsappProactivo.preguntarDisponibilidadATodos(vapi.filtrarProveedores(PROVEEDORES, lead), lead)
+          .catch(e => console.error('[whatsappProactivo] Error preguntando disponibilidad:', e.message));
       }
 
       if (esPrimerMensaje) {
@@ -478,7 +484,12 @@ const MODO_2CHAT_COLA =
   `INICIAR_MENSAJE: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre del destinatario]","mensaje":"[el mensaje exacto a enviar, ya redactado, listo para mandar tal cual]"}\n` +
   `Esto manda un WhatsApp real de inmediato a esa persona. Nunca inventes un número. Si el destinatario es alguien del equipo interno de ABSTORAGES (los que reconoces en la sección de equipo), puedes dejar "telefono" vacío ("") — el sistema resuelve su número real automáticamente por su nombre, tú no lo necesitas saber. Si es alguien externo cuyo teléfono no tienes en esta conversación, pregúntalo antes de emitir el token — nunca digas "listo, enviado" sin haber emitido primero el token real; si no tienes el dato, dilo y pide el teléfono, no finjas que ya se mandó. ` +
   `**Si te piden avisar/llamar a VARIAS personas en un solo pedido** (ej. "avísale a Gabriel, Diego y Rafael que...") — emite un token INICIAR_MENSAJE (o INICIAR_LLAMADA) POR CADA PERSONA, cada uno en su propia línea, con los datos de esa persona. Un solo pedido con 3 destinatarios son 3 tokens, no uno. Nunca digas que le avisaste a alguien sin haber emitido su token individual. ` +
-  `Para cualquier token de control (INICIAR_LLAMADA, INICIAR_MENSAJE, ALERTA_CRITICA, ESTATUS_SEGUIMIENTO si tu rol los usa): el sistema los detecta y los quita automáticamente antes de que el grupo/contacto vea el mensaje — tú solo emítelos en su propia línea al final con el formato exacto, nunca los expliques, nunca agregues notas tipo "(esto no lo muestres)" ni nada parecido, y nunca cambies el nombre del token — eso rompe la detección y se filtra tal cual al chat.`;
+  `**Solo si eres SARA o SOFIA** (NOA no tiene WhatsApp propio de Twilio — si eres NOA y necesitas avisar/dar estatus, usa INICIAR_LLAMADA en vez de esto): para avisos a VARIAS personas del equipo o estatus proactivo a un cliente/proveedor, usa las plantillas seguras de Twilio en vez de INICIAR_MENSAJE — son el canal correcto para esto (no arriesgan que se restrinja el número):\n` +
+  `AVISO_EQUIPO_WA: {"remitente":"[SARA o SOFIA]","mensaje":"[el aviso, corto y claro]","destinatarios":["gabriel","diego","rafael"]}\n` +
+  `(claves válidas de destinatarios: dante, rafael, manuel, gabriel, diego — pon las que apliquen, 1 o varias)\n` +
+  `ESTATUS_FOLIO_WA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre]","folio":"OP-ABS-YY-XXXX","resumen":"[estatus breve]"}\n` +
+  `(para avisarle a un cliente o proveedor el estatus de su folio sin que te lo hayan preguntado en este momento)\n` +
+  `Para cualquier token de control (INICIAR_LLAMADA, INICIAR_MENSAJE, AVISO_EQUIPO_WA, ESTATUS_FOLIO_WA, ALERTA_CRITICA, ESTATUS_SEGUIMIENTO si tu rol los usa): el sistema los detecta y los quita automáticamente antes de que el grupo/contacto vea el mensaje — tú solo emítelos en su propia línea al final con el formato exacto, nunca los expliques, nunca agregues notas tipo "(esto no lo muestres)" ni nada parecido, y nunca cambies el nombre del token — eso rompe la detección y se filtra tal cual al chat.`;
 
 const MODO_GRUPO =
   `\n\n---\n\n## 🟢 MODO GRUPO DE WHATSAPP\n` +
@@ -753,6 +764,12 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       }
       const alertaMatch  = agente === 'noa' && respuesta.match(/ALERTA_?CRITICA:\s*(\{[^\n]+\})/i);
       const estatusMatch = agente === 'noa' && !alertaMatch && respuesta.match(/ESTATUS_?SEGUIMIENTO:\s*(\{[^\n]+\})/i);
+      // AVISO_EQUIPO_WA / ESTATUS_FOLIO_WA — solo SARA/SOFIA (tienen número
+      // de Twilio propio) y NUNCA limitados por MENSAJES_MASIVOS: van por
+      // plantilla aprobada de Meta, que es justo el canal seguro que
+      // reemplaza el envío masivo por 2Chat, no el que se quiso pausar.
+      const avisoEquipoMatches  = (agente === 'sara' || agente === 'sofia') ? [...respuesta.matchAll(/AVISO_EQUIPO_WA:\s*(\{[^\n]+\})/g)] : [];
+      const estatusFolioMatches = (agente === 'sara' || agente === 'sofia') ? [...respuesta.matchAll(/ESTATUS_FOLIO_WA:\s*(\{[^\n]+\})/g)] : [];
 
       // Los tokens de alerta/estatus siempre van al final de la respuesta —
       // se corta el texto ahí para también descartar cualquier cosa que el
@@ -762,7 +779,29 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       const respuestaLimpia = (corteIdx !== undefined ? respuesta.slice(0, corteIdx) : respuesta)
         .replace(/INICIAR_LLAMADA:\s*\{[^\n]+\}/g, '')
         .replace(/INICIAR_MENSAJE:\s*\{[^\n]+\}/g, '')
+        .replace(/AVISO_EQUIPO_WA:\s*\{[^\n]+\}/g, '')
+        .replace(/ESTATUS_FOLIO_WA:\s*\{[^\n]+\}/g, '')
         .trim();
+
+      for (const m of avisoEquipoMatches) {
+        try {
+          const datos = JSON.parse(m[1]);
+          if (Array.isArray(datos.destinatarios) && datos.destinatarios.length && datos.mensaje) {
+            whatsappProactivo.avisarEquipo(agente, datos.remitente, datos.mensaje, datos.destinatarios)
+              .catch(e => console.error('[2Chat Webhook] Error en AVISO_EQUIPO_WA:', e.message));
+          } else {
+            console.error('[2Chat Webhook] AVISO_EQUIPO_WA inválido (faltan destinatarios o mensaje):', datos);
+          }
+        } catch (e) { console.error('[2Chat Webhook] AVISO_EQUIPO_WA malformado:', e.message); }
+      }
+
+      for (const m of estatusFolioMatches) {
+        try {
+          const datos = JSON.parse(m[1]);
+          whatsappProactivo.enviarEstatusFolio(agente, datos.telefono, datos.nombre, datos.folio, datos.resumen)
+            .catch(e => console.error('[2Chat Webhook] Error en ESTATUS_FOLIO_WA:', e.message));
+        } catch (e) { console.error('[2Chat Webhook] ESTATUS_FOLIO_WA malformado:', e.message); }
+      }
 
       for (const m of llamadaMatches) {
         try {
@@ -2016,6 +2055,11 @@ async function handleChat(agente, req, res) {
             console.log(`[Vapi] ${msg}`);
           })
           .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
+        // Además de llamar, se les pregunta disponibilidad por WhatsApp
+        // (plantilla Twilio) — mismo filtro de compatibilidad que las
+        // llamadas, así SOFIA cubre los dos canales para conseguir unidad.
+        whatsappProactivo.preguntarDisponibilidadATodos(vapi.filtrarProveedores(PROVEEDORES, lead), lead)
+          .catch(e => console.error('[whatsappProactivo] Error preguntando disponibilidad:', e.message));
 
         // Confirmación proactiva por WhatsApp — folio ya cerrado, aunque el
         // lead venga del chat web y no de WhatsApp. Fuera de la ventana de
