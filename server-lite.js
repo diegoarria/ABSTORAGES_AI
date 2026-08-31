@@ -1507,6 +1507,36 @@ app.post('/api/admin/test-whatsapp-libre', soloAdmin, async (req, res) => {
   }
 });
 
+// Diagnóstico: dispara una plantilla real de Twilio Content API a UN
+// destinatario específico — para confirmar en vivo que una plantilla ya
+// aprobada por Meta de verdad manda el mensaje, sin tener que esperar a
+// que el flujo real (leads/incidentes/folios) la dispare sola.
+app.post('/api/admin/test-plantilla', soloAdmin, async (req, res) => {
+  try {
+    const { to, contentSid, variables, agente } = req.body || {};
+    if (!to || !contentSid) return res.status(400).json({ error: 'to y contentSid son requeridos' });
+    const from = WA_NUMBERS[(agente || 'noa').toLowerCase()] || TWILIO_WA_FROM;
+    if (!TWILIO_SID || !TWILIO_TOKEN || !from) return res.status(400).json({ error: 'Faltan credenciales de Twilio o número del agente' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const body = new URLSearchParams({
+      From: `whatsapp:${from}`,
+      To:   `whatsapp:${to.replace(/^whatsapp:/, '')}`,
+      ContentSid: contentSid,
+      ContentVariables: JSON.stringify(variables || {}),
+    });
+    const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${auth}` },
+      body,
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 400)}` });
+    res.json({ ok: true, twilio: JSON.parse(resp) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
