@@ -1537,6 +1537,26 @@ app.post('/api/admin/test-plantilla', soloAdmin, async (req, res) => {
   }
 });
 
+// Diagnóstico: consulta el estatus real de un mensaje ya mandado por SID —
+// "queued" en la respuesta inmediata no garantiza que se haya entregado,
+// esto sí dice si falló y por qué (delivered/failed/undelivered + código
+// de error real de Twilio/Meta).
+app.get('/api/admin/estatus-mensaje/:sid', soloAdmin, async (req, res) => {
+  try {
+    if (!TWILIO_SID || !TWILIO_TOKEN) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages/${req.params.sid}.json`, {
+      headers: { 'Authorization': `Basic ${auth}` },
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 400)}` });
+    const m = JSON.parse(resp);
+    res.json({ status: m.status, error_code: m.error_code, error_message: m.error_message, from: m.from, to: m.to, date_updated: m.date_updated });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
