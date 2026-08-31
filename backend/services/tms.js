@@ -50,17 +50,41 @@ function httpPost(url, body) {
   }), TMS_TIMEOUT_MS);
 }
 
+// ── Caché corta ────────────────────────────────────────────────────────────
+// El TMS (Google Apps Script sobre Sheets) puede tardar 30-45s o directo
+// hacer timeout en consultas pesadas (detalle_servicios sobre todo) —
+// encontrado en vivo: NOA tardó 33s en traer los folios de hoy, y una
+// búsqueda de proveedores por ruta hizo timeout completo incluso con los
+// nombres de ciudad correctos. Cachear por (recurso + parámetros exactos)
+// evita repetir la misma consulta lenta si preguntan algo parecido en los
+// siguientes minutos — no arregla la primera consulta en frío, pero sí
+// evita que CADA pregunta pague el costo completo.
+const CACHE_TTL_MS = 3 * 60 * 1000;
+const cacheTMS = new Map(); // "recurso|opts" → { ts, data }
+
 // ── Core query ───────────────────────────────────────────────────────────────
 async function query(recurso, opts = {}) {
   if (!ENABLED) return null;
+  const key = `${recurso}|${JSON.stringify(opts)}`;
+  const cacheado = cacheTMS.get(key);
+  if (cacheado && Date.now() - cacheado.ts < CACHE_TTL_MS) return cacheado.data;
   try {
     const r1 = await httpPost(TMS_URL, { token: TMS_TOKEN, recurso, ...opts });
     const raw = r1.redirect ? await httpGet(r1.redirect) : r1.data;
     const parsed = JSON.parse(raw);
     if (!parsed.ok) throw new Error(parsed.error || 'TMS error');
+    cacheTMS.set(key, { ts: Date.now(), data: parsed });
+    if (cacheTMS.size > 300) {
+      for (const [k, v] of cacheTMS) if (Date.now() - v.ts > CACHE_TTL_MS) cacheTMS.delete(k);
+    }
     return parsed;
   } catch (e) {
     console.error('[TMS]', recurso, e.message);
+    // Si falla (típicamente timeout) pero hay algo en caché aunque ya esté
+    // vencido, mejor un dato un poco viejo que un "no encontré nada" — eso
+    // es justo lo que pasó con SOFIA y las rutas: cero resultado, no un
+    // error visible, así que parecía que el dato no existía.
+    if (cacheado) { console.warn('[TMS] Usando caché vencido por fallo de consulta:', recurso); return cacheado.data; }
     return null;
   }
 }
@@ -378,10 +402,25 @@ async function proveedoresPorRuta(origen, destino) {
     }));
 }
 
+// Abreviaciones comunes de ciudad (código de aeropuerto/uso coloquial) — sin
+// esto, "proveedores de MTY a GDL" nunca encontraba nada: el detector de
+// ciudades solo reconoce palabras tipo "Monterrey" (mayúscula+minúsculas),
+// así que "MTY"/"GDL" en mayúsculas quedaban invisibles para la búsqueda.
+const ABREVIACIONES_CIUDAD = {
+  MTY: 'Monterrey', GDL: 'Guadalajara', CDMX: 'Ciudad de México', MEX: 'Ciudad de México',
+  TIJ: 'Tijuana', QRO: 'Querétaro', SLP: 'San Luis Potosí', CHH: 'Chihuahua',
+  HMO: 'Hermosillo', MZT: 'Mazatlán', BJX: 'León', PBC: 'Puebla', MID: 'Mérida',
+  CUN: 'Cancún', VER: 'Veracruz', SLW: 'Saltillo',
+};
+function expandirAbreviacionesCiudad(texto) {
+  return texto.replace(/\b([A-ZÁÉÍÓÚ]{3,4})\b/g, m => ABREVIACIONES_CIUDAD[m] || m);
+}
+
 // Context builder para SOFIA
-async function getContextoSOFIA(mensajeUsuario) {
+async function getContextoSOFIA(mensajeUsuarioOriginal) {
   if (!ENABLED) return '';
 
+  const mensajeUsuario = expandirAbreviacionesCiudad(mensajeUsuarioOriginal);
   const msg = mensajeUsuario.toLowerCase();
   const stopwords = new Set(['para','como','que','con','cuando','donde','cuanto','cuantos',
     'tiene','tienen','tengo','quiero','busco','necesito','dame','dime','cual','cuales',
