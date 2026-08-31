@@ -4,6 +4,7 @@
 // a grupos. Se usa solo para el MVP de "ABSTORAGES IA - TEST", números aparte
 // de los de producción (Twilio) para no arriesgarlos.
 require('dotenv').config();
+const { limpiarFormatoWhatsApp } = require('./formatoWA');
 
 const API_KEY  = process.env.TWOCHAT_API_KEY;
 const BASE_URL = 'https://api.p.2chat.io/open/whatsapp';
@@ -93,6 +94,7 @@ function encolarEnvio(fromNumber, ejecutar) {
 
 // ── Mensajes ───────────────────────────────────────────────────────────────────
 async function enviarMensajeGrupo(fromNumber, groupUuid, texto) {
+  texto = limpiarFormatoWhatsApp(texto);
   if (!LIVE) {
     console.log(`[2Chat STUB] → grupo ${groupUuid}: ${texto.slice(0, 80)}`);
     return { success: true, stub: true };
@@ -106,6 +108,7 @@ async function enviarMensajeGrupo(fromNumber, groupUuid, texto) {
 // Mensaje 1:1 — nunca junto con to_group_uuid en la misma llamada (la API
 // de 2Chat los trata como mutuamente excluyentes).
 async function enviarMensaje(fromNumber, toNumber, texto) {
+  texto = limpiarFormatoWhatsApp(texto);
   if (!LIVE) {
     console.log(`[2Chat STUB] → ${toNumber}: ${texto.slice(0, 80)}`);
     return { success: true, stub: true };

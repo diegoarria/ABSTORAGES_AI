@@ -31,6 +31,7 @@ const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
 const db          = require('./backend/db/db');
 const tms         = require('./backend/services/tms');
+const { limpiarFormatoWhatsApp } = require('./backend/services/formatoWA');
 const gpsProviders = require('./backend/services/gpsProviders');
 const ordersStore = require('./backend/services/ordersStore');
 const contactos   = require('./backend/services/contactos');
@@ -143,6 +144,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
   if (text !== antes.trim()) {
     console.warn(`[WA] ⚠️ Se bloqueó un token de control que iba a salir hacia ${to}`);
   }
+  text = limpiarFormatoWhatsApp(text);
   if (!text) { console.log(`[WA] Mensaje vacío tras filtrar control, no se envía a ${to}`); return; }
 
   if (!WA_LIVE) {
@@ -468,9 +470,10 @@ app.get('/webhook/whatsapp', (req, res) => {
 // mandar **negritas**, ##, ---, tablas con | e incluso bloques de JSON
 // crudos ahí, que WhatsApp no renderiza y quedan ilegibles.
 const FORMATO_WHATSAPP =
-  `WhatsApp no interpreta markdown normal — nunca uses [texto](link), **negritas** (doble asterisco), encabezados con #, líneas separadoras con ---, ni tablas con | y guiones. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link. ` +
+  `WhatsApp no interpreta markdown — NUNCA uses [texto](link), **negritas** (doble asterisco), encabezados con #, líneas separadoras con ---, tablas con |, bloques de código con \`\`\`, ni llaves {}. Si necesitas resaltar algo usa mayúsculas o *un solo asterisco* (así sí se ve en negritas en WhatsApp). Escribe correos y teléfonos como texto plano, nunca como link. ` +
   `Nunca mandes bloques de código, JSON, esquemas técnicos ni propuestas de arquitectura tal cual — eso no se lee en un teléfono y se ve como basura de símbolos. Si te piden algo así de técnico, explícalo en 2-3 oraciones simples con lo esencial, y ofrece seguir el detalle técnico por otro medio (el chat de la plataforma, o que alguien del equipo lo revise ahí) en vez de volcarlo completo en el mensaje.\n\n` +
-  `**Listas de varios registros (folios, proveedores, etc.):** cuando des 3 o más en una sola respuesta, mételos dentro de un bloque de texto monoespaciado (\`\`\` al inicio y \`\`\` al final, en su propia línea cada uno) — dentro de ese bloque WhatsApp respeta los espacios, así que alinea columnas cortas con espacios para que se lea como tabla real (ej. FOLIO | CLIENTE | RUTA | ESTATUS, una fila por línea, encabezado arriba). Fuera de listas largas no uses el bloque monoespaciado, solo para esto.`;
+  `Listas de varios registros (folios, proveedores, etc.): cuando des 3 o más en una sola respuesta, NUNCA uses tablas ni pipes | ni bloques de código — un registro por línea, en una sola oración corta de texto plano, algo como "Folio OP-ABS-26-XXXX, cliente X, ruta Y, estatus Z." Un salto de línea entre cada registro, sin encabezados de columna ni separadores. Si son muchos (más de 6-8), no los vuelques todos — da los más urgentes o relevantes primero y ofrece mandar el resto si hace falta.\n\n` +
+  `Emojis: úsalos con moderación, casi nunca — como mucho uno por mensaje completo, y solo si de verdad aporta (🚨 para una alerta crítica real). Nunca decores encabezados, listas ni cada línea con emojis — eso es justo lo que hace un mensaje difícil de leer.`;
 
 const MODO_2CHAT_COLA =
   `No inventes información — si no la tienes, dilo directo y pide lo que falta. ` +
