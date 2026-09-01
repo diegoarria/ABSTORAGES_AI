@@ -6,6 +6,14 @@
 //   abstorages_sara_seguimiento_lead → HX74e936db4d3c50c0acc37a95e66f16e3
 //   abstorages_sara_cotizacion       → HXdfa3e32db45810b122cd6e285e6c8ae5
 //   abstorages_sara_venta_cerrada    → HX8e4037d3e3ee6464d663c3994a765e07
+// Las 3 quedaron APROBADAS pero HUÉRFANAS — el WABA se volvió a armar
+// después y Twilio siguió mostrando "Approved" aunque Meta ya no las
+// reconociera (error real en vivo: 63027 "Template does not exist for a
+// language and locale"). Recreadas y resometidas el 01-sep-2026, mismo
+// texto, pendientes de aprobación bajo el WABA actual:
+//   abstorages_sara_seguimiento_lead_2 → HXd4594e8561e81c02c8d8f59a635ffdf8
+//   abstorages_sara_cotizacion_2       → HXffc1ba05d5857ff12a3cf56aa9730adf (Marketing)
+//   abstorages_sara_venta_cerrada_2    → HXf43876d80588e3323741f01ec3f90f61
 require('dotenv').config();
 const memory = require('./memory');
 
@@ -32,9 +40,9 @@ const TWILIO_TOKEN   = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_WA_FROM = (process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, '');
 const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 
-const CONTENT_SID_SEGUIMIENTO_LEAD = 'HX74e936db4d3c50c0acc37a95e66f16e3';
-const CONTENT_SID_COTIZACION       = 'HXdfa3e32db45810b122cd6e285e6c8ae5';
-const CONTENT_SID_VENTA_CERRADA    = 'HX8e4037d3e3ee6464d663c3994a765e07';
+const CONTENT_SID_SEGUIMIENTO_LEAD = 'HXd4594e8561e81c02c8d8f59a635ffdf8';
+const CONTENT_SID_COTIZACION       = 'HXffc1ba05d5857ff12a3cf56aa9730adf';
+const CONTENT_SID_VENTA_CERRADA    = 'HXf43876d80588e3323741f01ec3f90f61';
 
 async function enviarPlantilla(to, contentSid, variables) {
   if (!WA_LIVE) {

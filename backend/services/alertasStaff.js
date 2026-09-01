@@ -7,12 +7,18 @@
 // WhatsApp Business exige plantilla aprobada por Meta para mensajes que el
 // negocio inicia sin que el destinatario haya escrito antes en las últimas 24h
 // (nuestro caso: NADIE le escribe primero a NOA, la alerta sale sola). Por eso
-// NO se manda texto libre — se manda vía Content API de Twilio con los SIDs de
-// las plantillas ya creadas y enviadas a aprobación de WhatsApp (04-ago-2026):
-//   abstorages_alerta_critica          → HX78a10be1500919f208490671ce141b33
-//   abstorages_estatus_seguimiento_v2  → HX9dc6738a6e114cfb9287bccf9b3d106d
+// NO se manda texto libre — se manda vía Content API de Twilio.
+//   abstorages_alerta_critica          → HX78a10be1500919f208490671ce141b33 (04-ago-2026)
+//   abstorages_estatus_seguimiento_v2  → HX9dc6738a6e114cfb9287bccf9b3d106d (04-ago-2026)
 //   (la v1 de estatus, HX03e437c037c1a85f60d5826b88da5fbd, fue RECHAZADA por
 //   Meta — terminaba en variable, "no puede empezar/terminar en variable")
+// Las 2 de arriba quedaron APROBADAS pero HUÉRFANAS — el WABA se volvió a
+// armar después y Twilio siguió mostrando "Approved" aunque Meta ya no las
+// reconociera (error real en vivo: 63027 "Template does not exist for a
+// language and locale"). Recreadas y resometidas el 01-sep-2026, mismo texto,
+// pendientes de aprobación bajo el WABA actual:
+//   abstorages_alerta_critica_2         → HX7ab1abf9fcdf735c3bdeea00b13a4955
+//   abstorages_estatus_seguimiento_v3   → HXfdaff679cd6a4222201401f616bd7a05
 require('dotenv').config();
 const STAFF = require('../data/staff-contacts.json');
 const vapi  = require('./vapi');
@@ -21,11 +27,11 @@ const twochat = require('./twochat');
 
 const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, ''); // número de NOA
+const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, ''); // número real de SARA — NOA no tiene número propio de Twilio, solo llamadas
 const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 
-const CONTENT_SID_ALERTA_CRITICA = 'HX78a10be1500919f208490671ce141b33';
-const CONTENT_SID_ESTATUS        = 'HX9dc6738a6e114cfb9287bccf9b3d106d';
+const CONTENT_SID_ALERTA_CRITICA = 'HX7ab1abf9fcdf735c3bdeea00b13a4955';
+const CONTENT_SID_ESTATUS        = 'HXfdaff679cd6a4222201401f616bd7a05';
 
 const EQUIPO_ALERTA_CRITICA = ['dante', 'rafael', 'manuel', 'gabriel', 'diego'];
 const EQUIPO_ESTATUS        = ['dante', 'rafael', 'diego'];
