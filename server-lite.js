@@ -1596,6 +1596,79 @@ app.get('/api/admin/mensajes-recientes/:to', soloAdmin, async (req, res) => {
   }
 });
 
+// ── Plantillas WhatsApp (Twilio Content API) — recuperar/recrear las que
+// quedaron huérfanas del WABA (error 63027, "Template does not exist for a
+// language and locale"). El recurso Content en sí sigue vivo en la cuenta de
+// Twilio aunque la aprobación de WhatsApp haya quedado huérfana — se puede
+// leer su texto exacto para no tener que re-teclearlo de memoria.
+const TWILIO_CONTENT_BASE = 'https://content.twilio.com/v1/Content';
+
+app.get('/api/admin/plantilla/:contentSid', soloAdmin, async (req, res) => {
+  try {
+    if (!TWILIO_SID || !TWILIO_TOKEN) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const r = await fetch(`${TWILIO_CONTENT_BASE}/${req.params.contentSid}`, {
+      headers: { 'Authorization': `Basic ${auth}` },
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 500)}` });
+    res.json(JSON.parse(resp));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Crea un nuevo Content resource (plantilla) desde cero — no reutiliza el
+// Content viejo/huérfano porque su historial de aprobación quedó ligado al
+// WABA anterior; hay que someter uno nuevo. friendlyName debe ser único por
+// cuenta de Twilio.
+app.post('/api/admin/plantilla-crear', soloAdmin, async (req, res) => {
+  try {
+    const { friendlyName, language, body, variables } = req.body || {};
+    if (!friendlyName || !body) return res.status(400).json({ error: 'friendlyName y body son requeridos' });
+    if (!TWILIO_SID || !TWILIO_TOKEN) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const payload = {
+      friendly_name: friendlyName,
+      language: language || 'es_MX',
+      variables: variables || {},
+      types: { 'twilio/text': { body } },
+    };
+    const r = await fetch(TWILIO_CONTENT_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${auth}` },
+      body: JSON.stringify(payload),
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 500)}` });
+    res.json(JSON.parse(resp));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Somete un Content resource a aprobación de WhatsApp/Meta — a partir de
+// aquí ya no es reversible sin gastar otro ciclo de revisión, por eso es un
+// paso aparte y explícito, nunca automático dentro de plantilla-crear.
+app.post('/api/admin/plantilla-someter', soloAdmin, async (req, res) => {
+  try {
+    const { contentSid, name, category } = req.body || {};
+    if (!contentSid || !name) return res.status(400).json({ error: 'contentSid y name son requeridos' });
+    if (!TWILIO_SID || !TWILIO_TOKEN) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const r = await fetch(`${TWILIO_CONTENT_BASE}/${contentSid}/ApprovalRequests/whatsapp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${auth}` },
+      body: JSON.stringify({ name, category: category || 'UTILITY' }),
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 500)}` });
+    res.json(JSON.parse(resp));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SOFIA: proveedores desde TMS ────────────────────────────────────────────
 app.get('/api/sofia/proveedores', adminUOps, async (req, res) => {
   const local = () => require('./backend/data/proveedores.json').map(p => ({
