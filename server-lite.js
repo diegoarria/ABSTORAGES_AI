@@ -43,7 +43,6 @@ const whatsappProactivo = require('./backend/services/whatsappProactivo');
 const grupoWA = require('./backend/services/groupMessages');
 const staffDirectory = require('./backend/services/staffDirectory');
 const incidentesNOA = require('./backend/services/incidentesNOA');
-const PROVEEDORES = require('./backend/data/proveedores.json');
 const eta         = require('./backend/services/eta');
 const webpush     = require('web-push');
 
@@ -186,6 +185,40 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     else        console.log(`[WA] OK → ${to}`);
   } catch (e) {
     console.error('[WA] Error enviando:', e.message);
+  }
+}
+
+// Busca unidad real para un folio recién cerrado — llamadas Vapi +
+// disponibilidad por WhatsApp a proveedores REALES del TMS (antes usaba
+// data/proveedores.json, un archivo de prueba con nombres y teléfonos
+// inventados que nunca se sincronizó con el TMS — encontrado en auditoría
+// del 01-sep-2026). Si de verdad no hay ningún proveedor compatible, avisa
+// al equipo en vez de quedarse callado — antes esto solo quedaba en un log.
+async function buscarUnidadParaOrden(lead) {
+  try {
+    const proveedoresReales = await tms.proveedoresParaVapi();
+    const compatibles = vapi.filtrarProveedores(proveedoresReales, lead);
+    if (!compatibles.length) {
+      console.warn(`[SOFIA] Sin proveedores reales compatibles para folio ${lead.folio}`);
+      pushActividad({
+        agente: 'SOFIA', tipo: 'SIN_UNIDAD',
+        mensaje: `Folio ${lead.folio || ''} — no se encontró ningún proveedor real compatible, nadie fue contactado`,
+        metadata: { folio: lead.folio },
+      });
+      sendPush({
+        title: '⚠️ Sin unidad disponible — SOFIA',
+        body: `Folio ${lead.folio || ''} (${lead.empresa || lead.nombre || 'cliente'}) — ningún proveedor real compatible, revisar manualmente`,
+        tag: 'sin-unidad', url: '/', tipo: 'SIN_UNIDAD', urgente: true,
+      }).catch(() => {});
+      return;
+    }
+    vapi.lanzarLlamadasProveedores(lead, proveedoresReales)
+      .then(r => pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: `Folio ${lead.folio || ''} — ${r.llamadas} llamadas a carriers iniciadas`, metadata: { folio: lead.folio, ...r } }))
+      .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
+    whatsappProactivo.preguntarDisponibilidadATodos(compatibles, lead)
+      .catch(e => console.error('[whatsappProactivo] Error preguntando disponibilidad:', e.message));
+  } catch (e) {
+    console.error('[SOFIA] Error buscando unidad real para folio', lead.folio, ':', e.message);
   }
 }
 
@@ -373,14 +406,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
           resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
           canal: 'whatsapp',
         }).catch(e => console.error('[contactos]', e.message));
-        vapi.lanzarLlamadasProveedores(lead, PROVEEDORES)
-          .then(r => pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: `Folio ${lead.folio} — ${r.llamadas} llamadas a carriers iniciadas`, metadata: { folio: lead.folio, ...r } }))
-          .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
-        // Además de llamar, se les pregunta disponibilidad por WhatsApp
-        // (plantilla Twilio) — mismo filtro de compatibilidad que las
-        // llamadas, así SOFIA cubre los dos canales para conseguir unidad.
-        whatsappProactivo.preguntarDisponibilidadATodos(vapi.filtrarProveedores(PROVEEDORES, lead), lead)
-          .catch(e => console.error('[whatsappProactivo] Error preguntando disponibilidad:', e.message));
+        buscarUnidadParaOrden(lead);
       }
 
       if (esPrimerMensaje) {
@@ -1152,7 +1178,8 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
               .catch(e => console.error('[notifier asignacion]', e.message));
 
             // Memoria compartida cross-agente — solo por acuerdo real confirmado (ganador).
-            const proveedorInfo = PROVEEDORES.find(p => p.id === resultado.proveedorId);
+            const proveedoresReales = await tms.proveedoresParaVapi().catch(() => []);
+            const proveedorInfo = proveedoresReales.find(p => p.id === resultado.proveedorId);
             contactos.upsertContacto({
               agente: 'sofia', tipo: 'proveedor',
               nombre_completo: proveedorInfo?.nombre || resultado.proveedorId,
@@ -2227,21 +2254,9 @@ async function handleChat(agente, req, res) {
           canal: 'chat',
         }).catch(e => console.error('[contactos]', e.message));
 
-        // Lanzar llamadas a carriers en paralelo (stub si VAPI_API_KEY no está)
-        vapi.lanzarLlamadasProveedores(lead, PROVEEDORES)
-          .then(r => {
-            const msg = r.llamadas > 0
-              ? `Folio ${lead.folio} — ${r.llamadas} llamadas a carriers iniciadas`
-              : `Folio ${lead.folio} — sin carriers compatibles para esta ruta`;
-            pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: msg, metadata: { folio: lead.folio, ...r } });
-            console.log(`[Vapi] ${msg}`);
-          })
-          .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
-        // Además de llamar, se les pregunta disponibilidad por WhatsApp
-        // (plantilla Twilio) — mismo filtro de compatibilidad que las
-        // llamadas, así SOFIA cubre los dos canales para conseguir unidad.
-        whatsappProactivo.preguntarDisponibilidadATodos(vapi.filtrarProveedores(PROVEEDORES, lead), lead)
-          .catch(e => console.error('[whatsappProactivo] Error preguntando disponibilidad:', e.message));
+        // Lanzar llamadas + disponibilidad por WhatsApp a proveedores reales
+        // del TMS (stub si VAPI_API_KEY no está) — ver buscarUnidadParaOrden.
+        buscarUnidadParaOrden(lead);
 
         // Confirmación proactiva por WhatsApp — folio ya cerrado, aunque el
         // lead venga del chat web y no de WhatsApp. Fuera de la ventana de

@@ -333,6 +333,30 @@ async function listarProveedores(limite = 50) {
   return r?.datos || [];
 }
 
+// Proveedores reales del TMS, en el formato que espera vapi.js
+// (filtrarProveedores/lanzarLlamadasProveedores) — reemplaza el archivo
+// local data/proveedores.json, que tenía datos de prueba inventados
+// ("Transportes García", teléfonos ficticios) y nunca se sincronizaba con
+// el TMS real. El recurso 'proveedores' del TMS no trae columnas de
+// ruta/tipo de unidad — se dejan vacías, que es justo la condición con la
+// que filtrarProveedores() ya trata a un proveedor como compatible con
+// cualquier ruta/unidad (la compatibilidad real se confirma en la llamada
+// misma, preguntando los requisitos, como ya indica el prompt de SOFIA).
+async function proveedoresParaVapi(limite = 300) {
+  const datos = await listarProveedores(limite);
+  return datos
+    .filter(p => (p['Estatus'] || '').toLowerCase() !== 'inactivo')
+    .map(p => ({
+      id: p['Folio'],
+      nombre: p['Razon Social'],
+      telefono: p['Telefono_limpio']?.[0] || p['Movil_limpio']?.[0] || null,
+      rutas: [],
+      tipos_unidad: [],
+      activo: true,
+    }))
+    .filter(p => p.telefono); // sin teléfono no se puede llamar ni mandar WhatsApp
+}
+
 // Buscar proveedor/transportista por nombre o RFC
 async function buscarProveedor(texto) {
   const por_nombre = await query('proveedores', {
@@ -749,7 +773,7 @@ module.exports = {
   // SARA
   buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
   // SOFIA
-  listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA,
+  listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA, proveedoresParaVapi,
   // NOA
   buscarFolioNOA, foliosActivosNOA, getContextoNOA,
   // Core
