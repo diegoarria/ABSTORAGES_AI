@@ -51,19 +51,20 @@ async function enviarEmail(p) {
   });
 }
 
+// DESHABILITADO A PROPÓSITO — este paso mandaba texto libre (sin plantilla
+// aprobada por Meta) a un prospecto en frío que nunca le escribió primero a
+// ABSTORAGES. Es exactamente el patrón que restringe/bloquea un número de
+// WhatsApp Business (encontrado en auditoría del 01-sep-2026, nunca llegó a
+// dispararse en producción porque MENSAJES_MASIVOS sigue apagado — pero de
+// activarse tal como estaba, este paso sí habría arriesgado el número).
+// Para reactivar este canal hace falta una plantilla de prospección en frío
+// diseñada y aprobada por Meta primero (como se hizo con las de seguimiento/
+// cotización/venta), no basta con volver a habilitar esta función tal cual.
+// No lanza error a propósito: si lanzara, la secuencia se quedaría
+// atorada para siempre en este paso y el prospecto nunca llegaría al paso
+// de llamada — mejor omitir y dejar que la secuencia avance.
 async function enviarWhatsApp(p) {
-  if (!WA_KEY || !p.telefono) throw new Error('Sin WhatsApp o teléfono');
-  const r = await fetch(`${WA_URL}/messages`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'D360-API-KEY': WA_KEY },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to: p.telefono.replace(/\D/g, ''),
-      type: 'text',
-      text: { body: templateWhatsApp(p) },
-    }),
-  });
-  if (!r.ok) throw new Error(`WA error ${r.status}`);
+  console.warn(`[Outreach] 🔇 Paso de WhatsApp OMITIDO (no enviado) para ${p.nombre} — canal deshabilitado hasta tener una plantilla de prospección en frío aprobada por Meta.`);
 }
 
 async function enviarLinkedIn(p) {
