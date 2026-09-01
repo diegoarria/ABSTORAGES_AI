@@ -107,14 +107,19 @@ const EL_LIVE = EL_KEY && !EL_KEY.startsWith('xxxx');
 // ─── WHATSAPP (Twilio) ───────────────────────────────────────────────────────
 const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, ''); // ej. +19383884379 (NOA — histórico/default)
+// TWILIO_WHATSAPP_NUMBER es el número real de SARA (+1 806 375 4780, confirmado
+// en vivo) — es el número original de antes de separar por agente, NUNCA de
+// NOA. NOA no tiene número de WhatsApp de Twilio propio (solo llamadas) — el
+// código antes lo mapeaba a "noa" por default histórico y eso hacía que
+// cualquier mensaje real al número de SARA lo contestara la persona de NOA.
+const TWILIO_WA_FROM  = (process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, ''); // número real de SARA
 const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 
 // Un número de WhatsApp por agente — cada uno contesta con su propia identidad,
-// igual que sus números de llamada en Vapi (nunca mezclar personas).
+// igual que sus números de llamada en Vapi (nunca mezclar personas). NOA no
+// aparece aquí — no tiene número de WhatsApp de Twilio.
 const WA_NUMBERS = {
-  noa:   TWILIO_WA_FROM,
-  sara:  (process.env.TWILIO_WHATSAPP_NUMBER_SARA  || '').replace(/^whatsapp:/, ''),
+  sara:  (process.env.TWILIO_WHATSAPP_NUMBER_SARA  || '').replace(/^whatsapp:/, '') || TWILIO_WA_FROM,
   sofia: (process.env.TWILIO_WHATSAPP_NUMBER_SOFIA || '').replace(/^whatsapp:/, ''),
 };
 
@@ -124,7 +129,7 @@ function agenteParaNumeroWA(numero) {
   for (const [agente, num] of Object.entries(WA_NUMBERS)) {
     if (num && num === limpio) return agente;
   }
-  return 'noa'; // fallback histórico — número original antes de separar por agente
+  return 'sara'; // fallback histórico — TWILIO_WHATSAPP_NUMBER es el número original de SARA antes de separar por agente
 }
 
 async function sendWhatsApp(to, text, agente = 'noa') {
@@ -149,6 +154,14 @@ async function sendWhatsApp(to, text, agente = 'noa') {
 
   if (!WA_LIVE) {
     console.log(`[WA-STUB] → ${to}: ${text.slice(0, 80)}`);
+    return;
+  }
+  // NOA no tiene número de WhatsApp de Twilio propio — sin esta guarda, un
+  // mensaje mandado con agente="noa" caía en el fallback `|| TWILIO_WA_FROM`
+  // y salía en realidad desde el número de SARA, impersonándola sin que se
+  // notara en el log ni en el WhatsApp del destinatario.
+  if (agente === 'noa') {
+    console.error(`[WA] ⚠️ Se intentó mandar un WhatsApp real como NOA hacia ${to} — NOA no tiene número de Twilio, no se envía.`);
     return;
   }
   console.log(`[WA] Enviando a ${to}: ${text.slice(0, 60)}...`);
@@ -1518,7 +1531,7 @@ app.post('/api/admin/test-plantilla', soloAdmin, async (req, res) => {
   try {
     const { to, contentSid, variables, agente } = req.body || {};
     if (!to || !contentSid) return res.status(400).json({ error: 'to y contentSid son requeridos' });
-    const from = WA_NUMBERS[(agente || 'noa').toLowerCase()] || TWILIO_WA_FROM;
+    const from = WA_NUMBERS[(agente || 'sara').toLowerCase()] || TWILIO_WA_FROM;
     if (!TWILIO_SID || !TWILIO_TOKEN || !from) return res.status(400).json({ error: 'Faltan credenciales de Twilio o número del agente' });
     const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
     const body = new URLSearchParams({
