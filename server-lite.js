@@ -1618,6 +1618,26 @@ app.get('/api/admin/plantilla/:contentSid', soloAdmin, async (req, res) => {
   }
 });
 
+// Categoría (Marketing/Utility/Authentication) con la que Meta aprobó una
+// plantilla — vive en el sub-recurso de ApprovalRequests, no en el Content
+// principal. Hace falta saberla antes de recrear una plantilla: si se
+// resomete con una categoría distinta a la que ya había pasado revisión, se
+// arriesga un rechazo o una re-clasificación no deseada.
+app.get('/api/admin/plantilla-aprobacion/:contentSid', soloAdmin, async (req, res) => {
+  try {
+    if (!TWILIO_SID || !TWILIO_TOKEN) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const r = await fetch(`${TWILIO_CONTENT_BASE}/${req.params.contentSid}/ApprovalRequests`, {
+      headers: { 'Authorization': `Basic ${auth}` },
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 500)}` });
+    res.json(JSON.parse(resp));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Crea un nuevo Content resource (plantilla) desde cero — no reutiliza el
 // Content viejo/huérfano porque su historial de aprobación quedó ligado al
 // WABA anterior; hay que someter uno nuevo. friendlyName debe ser único por
