@@ -28,7 +28,7 @@
   const style = document.createElement('style');
   style.textContent = `
     #_sara_btn {
-      position: fixed; bottom: 24px; left: 24px; z-index: 2147483646;
+      position: fixed; bottom: 24px; right: 24px; z-index: 2147483646;
       background: ${COLOR}; color: #fff;
       border: none; border-radius: 50px;
       padding: 13px 20px; font-size: 14px; font-weight: 600;
@@ -40,7 +40,7 @@
     }
     #_sara_btn:hover { transform: translateY(-2px); box-shadow: 0 7px 28px rgba(0,0,0,.45); }
     #_sara_wrap {
-      position: fixed; bottom: 8px; left: 24px; z-index: 2147483645;
+      position: fixed; bottom: 8px; right: 24px; z-index: 2147483645;
       width: 320px; height: 480px;
       border-radius: 16px; overflow: hidden;
       box-shadow: 0 12px 48px rgba(0,0,0,.5);
@@ -53,9 +53,9 @@
     }
     #_sara_wrap iframe { width: 100%; height: 100%; border: none; display: block; }
     @media (max-width: 500px) {
-      #_sara_wrap { width: calc(100vw - 16px); height: 68vh; bottom: 0; left: 0;
+      #_sara_wrap { width: calc(100vw - 16px); height: 68vh; bottom: 0; right: 0;
         border-radius: 16px 16px 0 0; }
-      #_sara_btn  { bottom: 16px; left: 16px; }
+      #_sara_btn  { bottom: 16px; right: 16px; }
     }
   `;
   document.head.appendChild(style);
