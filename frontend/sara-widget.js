@@ -40,7 +40,7 @@
     }
     #_sara_btn:hover { transform: translateY(-2px); box-shadow: 0 7px 28px rgba(0,0,0,.45); }
     #_sara_wrap {
-      position: fixed; bottom: 24px; right: 24px; z-index: 2147483645;
+      position: fixed; bottom: 8px; right: 24px; z-index: 2147483645;
       width: 320px; height: 480px;
       border-radius: 16px; overflow: hidden;
       box-shadow: 0 12px 48px rgba(0,0,0,.5);
