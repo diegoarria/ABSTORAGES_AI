@@ -41,7 +41,7 @@
     #_sara_btn:hover { transform: translateY(-2px); box-shadow: 0 7px 28px rgba(0,0,0,.45); }
     #_sara_wrap {
       position: fixed; bottom: 88px; right: 24px; z-index: 2147483645;
-      width: 360px; height: 540px;
+      width: 320px; height: 480px;
       border-radius: 16px; overflow: hidden;
       box-shadow: 0 12px 48px rgba(0,0,0,.5);
       display: none; border: 1px solid rgba(255,255,255,.08);
