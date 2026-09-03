@@ -23,6 +23,7 @@ const cors        = require('cors');
 const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
 const leads          = require('./backend/services/leads');
+const sessionIp      = require('./backend/services/sessionIp');
 const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
 const callLog        = require('./backend/services/callLog');
@@ -1944,7 +1945,7 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
   }
 });
 
-app.get('/api/historial/sesiones/:id', adminUOps, (req, res) => {
+app.get('/api/historial/sesiones/:id', adminUOps, async (req, res) => {
   if (req.params.id.startsWith('2chat:')) {
     const { agente, historial } = grupoWA.historialDeConversacion(req.params.id);
     if (!historial.length) return res.status(404).json({ error: 'Conversación no encontrada o sin mensajes' });
@@ -1952,7 +1953,14 @@ app.get('/api/historial/sesiones/:id', adminUOps, (req, res) => {
   }
   const historial = memory.getFullHistory(req.params.id);
   if (!historial.length) return res.status(404).json({ error: 'Sesión no encontrada o sin mensajes' });
-  res.json({ sessionId: req.params.id, agente: detectarAgente(req.params.id), historial });
+  const ipInfo = await sessionIp.obtener(req.params.id).catch(() => null);
+  res.json({
+    sessionId: req.params.id,
+    agente: detectarAgente(req.params.id),
+    historial,
+    ip: ipInfo?.ip || null,
+    ipPrimerMensaje: ipInfo?.first_seen || ipInfo?.firstSeen || null,
+  });
 });
 
 // ─── TARIFA DINÁMICA ──────────────────────────────────────────────────────
@@ -2100,6 +2108,11 @@ async function handleChat(agente, req, res) {
 
   const sid = sessionId || `web_${agente}_${Date.now()}`;
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || null;
+
+  // Se guarda SIEMPRE, desde el primer mensaje — independiente de si la sesión
+  // llega a ser lead, orden o alerta de abuso (a diferencia de leads.add, que
+  // solo captura ip cuando ya se extrajeron datos de contacto).
+  sessionIp.registrar(sid, agente, ip).catch(() => {});
 
   // Moderación — corte determinístico ante insultos/amenazas, sin llamar a Claude
   if (moderacion.detectarAbuso(message)) {

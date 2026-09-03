@@ -342,7 +342,7 @@ async function abrir(sessionId) {
       <div class="chat-header">
         <div>
           <div class="chat-title">${esc(info.nombre || info.empresa || sessionId)}</div>
-          <div class="chat-sub">${AGENTE_LABEL[data.agente] || data.agente} · ${data.historial.length} mensajes${participantesTxt ? ' · ' + esc(participantesTxt) : ''}</div>
+          <div class="chat-sub">${AGENTE_LABEL[data.agente] || data.agente} · ${data.historial.length} mensajes${participantesTxt ? ' · ' + esc(participantesTxt) : ''}${data.ip ? ' · IP ' + esc(data.ip) : ''}</div>
         </div>
       </div>
       <div id="msgs"></div>

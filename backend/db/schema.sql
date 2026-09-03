@@ -227,6 +227,18 @@ CREATE TABLE IF NOT EXISTS interacciones (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ─── SESSION_IPS (IP de cada sesión que le escribe a SARA/SOFIA/NOA/HÉCTOR) ──
+-- Se registra en el primer mensaje de cada sesión, sin excepción — independiente
+-- de si esa sesión llega a convertirse en lead, orden o alerta de abuso.
+CREATE TABLE IF NOT EXISTS session_ips (
+  session_id  TEXT PRIMARY KEY,
+  agente      VARCHAR(10) NOT NULL,
+  ip          TEXT,
+  first_seen  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  last_seen   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  mensajes    INT NOT NULL DEFAULT 0
+);
+
 -- ─── INDICES ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_folios_estatus ON folios(estatus);
 CREATE INDEX IF NOT EXISTS idx_folios_cliente ON folios(cliente_id);
