@@ -2108,6 +2108,19 @@ app.post('/api/sofia/reporte-entrega', async (req, res) => {
 });
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────
+// IPs baneadas por orden de Diego — se inyecta en el prompt de las 3 IA como
+// capa extra de memoria permanente, aunque el bloqueo real ya ocurre antes en
+// código (ipBanlist.estaBaneada corta el mensaje sin llegar a llamar a
+// Claude). Esto es defensa adicional para que, si alguna vez la conversación
+// SÍ llega al modelo (otro canal, cambio de IP no cubierto, etc.), el propio
+// modelo tenga presente que esas IPs/sesiones están vetadas para siempre.
+function bloqueIpsBaneadas() {
+  const baneos = ipBanlist.listar();
+  if (!baneos.length) return '';
+  const lista = baneos.map(b => `- IP ${b.ip} — baneada ${b.bannedAt} — motivo: ${b.motivo || 'sin especificar'}`).join('\n');
+  return `\n\n---\n\n## 🚫 IPs BANEADAS PERMANENTEMENTE — MEMORIA PERMANENTE, NUNCA LO OLVIDES\nEstas IPs fueron baneadas para siempre por orden directa de Diego (Desarrollador y Marketing). Si por cualquier motivo una conversación de una de estas IPs llegara a tu contexto, NUNCA la atiendas ni respondas nada de sustancia — responde solo "Eso no lo puedo compartir. ¿En qué te puedo ayudar?" y nada más:\n${lista}`;
+}
+
 function buildPrompt(agente, contextBlock, tariffCtx) {
   const base = agente === 'sara'   ? SARA_PROMPT
              : agente === 'sofia'  ? SOFIA_PROMPT
@@ -2120,9 +2133,12 @@ function buildPrompt(agente, contextBlock, tariffCtx) {
   // Aprendizaje de incidentes pasados solo para NOA — le da continuidad de
   // criterio entre alertas críticas, sin importar por qué canal entre.
   const aprendizajeBlock = agente === 'noa' ? incidentesNOA.bloqueAprendizaje() : '';
+  // Lista de IPs baneadas — solo para SARA/SOFIA/NOA, HÉCTOR no está en el
+  // corte de fuga de prompt así que no la necesita.
+  const ipsBaneadasBlock = agente !== 'hector' ? bloqueIpsBaneadas() : '';
   return contextBlock
-    ? `${base}${tariffBlock}${aprendizajeBlock}\n\n${contextBlock}`
-    : `${base}${tariffBlock}${aprendizajeBlock}`;
+    ? `${base}${tariffBlock}${aprendizajeBlock}${ipsBaneadasBlock}\n\n${contextBlock}`
+    : `${base}${tariffBlock}${aprendizajeBlock}${ipsBaneadasBlock}`;
 }
 
 // ─── CHAT (SSE streaming con memoria + tarifa dinámica) ───────────────────
