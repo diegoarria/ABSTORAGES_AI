@@ -25,6 +25,7 @@ const gpsLive     = require('./backend/services/gps-live');
 const leads          = require('./backend/services/leads');
 const sessionIp      = require('./backend/services/sessionIp');
 const promptLeakGuard = require('./backend/services/promptLeakGuard');
+const ipBanlist       = require('./backend/services/ipBanlist');
 const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
 const callLog        = require('./backend/services/callLog');
@@ -2137,6 +2138,19 @@ async function handleChat(agente, req, res) {
   // solo captura ip cuando ya se extrajeron datos de contacto).
   sessionIp.registrar(sid, agente, ip).catch(() => {});
 
+  // IP baneada permanentemente (por un intento previo de sacar el proceso/
+  // reglas internas) — se corta de inmediato, ni siquiera se guarda el mensaje
+  // en el historial. Por orden de Diego: nunca más se le vuelve a abrir el chat.
+  if (['sara', 'sofia', 'noa'].includes(agente) && ipBanlist.estaBaneada(ip)) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+    res.write(`data: ${JSON.stringify({ type: 'cerrar_chat' })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    return res.end();
+  }
+
   // Mantenimiento forzado por orden de Diego — SARA, SOFIA y NOA no responden
   // a nadie hasta la fecha/hora indicada. HÉCTOR no está incluido en el corte.
   const MANTENIMIENTO_HASTA = new Date('2026-09-03T15:30:00Z'); // 3 sep 2026, 9:30 am hora MTY (UTC-6)
@@ -2167,11 +2181,21 @@ async function handleChat(agente, req, res) {
     saveMessage(sid, agente, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
     pushActividad({ agente, tipo: 'ALERTA_FUGA_PROMPT', mensaje: message.slice(0, 200), sessionId: sid, metadata: { sessionId: sid, ip } });
 
+    // Cierre inmediato del chat + baneo permanente de la IP — por orden de
+    // Diego: quien intente esto no vuelve a poder abrir el chat nunca más.
+    ipBanlist.banear({ ip, motivo: `Intento de fuga de proceso/reglas: "${message.slice(0, 200)}"`, agente, sessionId: sid }).catch(() => {});
+    sendPush({
+      title: '🚫 IP baneada — intento de fuga de prompt',
+      body: `${agente.toUpperCase()} · IP ${ip || 'desconocida'} · "${message.slice(0, 80)}"`,
+      tag: 'ip-baneada', url: '/', tipo: 'ALERTA_FUGA_PROMPT', urgente: true,
+    }).catch(() => {});
+
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
     res.write(`data: ${JSON.stringify({ type: 'chunk', text: promptLeakGuard.MENSAJE_BLOQUEO })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'cerrar_chat' })}\n\n`);
     res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
     return res.end();
   }

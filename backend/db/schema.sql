@@ -239,6 +239,15 @@ CREATE TABLE IF NOT EXISTS session_ips (
   mensajes    INT NOT NULL DEFAULT 0
 );
 
+-- ─── IP_BANLIST (bloqueo permanente por intento de fuga de proceso/reglas) ──
+CREATE TABLE IF NOT EXISTS ip_banlist (
+  ip         TEXT PRIMARY KEY,
+  motivo     TEXT,
+  agente     VARCHAR(10),
+  session_id TEXT,
+  banned_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- ─── INDICES ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_folios_estatus ON folios(estatus);
 CREATE INDEX IF NOT EXISTS idx_folios_cliente ON folios(cliente_id);

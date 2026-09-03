@@ -4,3 +4,4 @@ node_modules/
 .DS_Store
 data/sessions/*.json
 data/session-ips.json
+data/ip-banlist.json
