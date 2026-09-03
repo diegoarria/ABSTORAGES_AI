@@ -24,6 +24,7 @@ const broadcast   = require('./backend/services/broadcast');
 const gpsLive     = require('./backend/services/gps-live');
 const leads          = require('./backend/services/leads');
 const sessionIp      = require('./backend/services/sessionIp');
+const promptLeakGuard = require('./backend/services/promptLeakGuard');
 const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
 const callLog        = require('./backend/services/callLog');
@@ -346,6 +347,20 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       const contactoConocido = await contactos.buscarPorTelefono(phone, agente);
       if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
     }
+
+    // Fuga de proceso/metodología/reglas internas — corte determinístico,
+    // igual que en el chat web. Por orden de Diego: nadie más que él (verificado
+    // por su número real en el directorio) puede pedir esto, en ningún canal.
+    if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
+      memory.addMessage(session, 'user', texto);
+      memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+      saveMessage(session, agente, 'user', texto);
+      saveMessage(session, agente, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+      pushActividad({ agente: agenteU, tipo: 'ALERTA_FUGA_PROMPT', mensaje: texto.slice(0, 200), sessionId: session });
+      await sendWhatsApp(phone, promptLeakGuard.MENSAJE_BLOQUEO, agente);
+      return;
+    }
+
     if (agente === 'sofia' && tms.ENABLED) {
       const tmsCtx = await tms.getContextoSOFIA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
@@ -2137,6 +2152,26 @@ async function handleChat(agente, req, res) {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
     res.write(`data: ${JSON.stringify({ type: 'chunk', text: MENSAJE_MANTENIMIENTO })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    return res.end();
+  }
+
+  // Fuga de proceso/metodología/reglas internas — corte determinístico, no
+  // depende de que el modelo "recuerde" bloquearlo. Por orden de Diego: nadie
+  // más que él puede pedir esto. En el widget público (sin sesión de staff)
+  // esto bloquea a absolutamente todos, sin excepción.
+  if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(message) && !req.user) {
+    memory.addMessage(sid, 'user', message);
+    memory.addMessage(sid, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    saveMessage(sid, agente, 'user', message);
+    saveMessage(sid, agente, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    pushActividad({ agente, tipo: 'ALERTA_FUGA_PROMPT', mensaje: message.slice(0, 200), sessionId: sid, metadata: { sessionId: sid, ip } });
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+    res.write(`data: ${JSON.stringify({ type: 'chunk', text: promptLeakGuard.MENSAJE_BLOQUEO })}\n\n`);
     res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
     return res.end();
   }
