@@ -19,6 +19,11 @@ const PATRONES = [
   /(reveal|show|output|print)\s+(your\s+)?(system\s+)?prompt/i,
   /ignore\s+(all\s+)?previous\s+instructions/i,
   /system\s+prompt/i,
+  /(comparte|muestra|dame|ens[eé]ñame)\s+.*(tu\s+)?c[oó]digo/i,
+  /(en\s+qu[eé]|con\s+qu[eé])\s+(lenguaje|stack|framework|tecnolog[ií]a)\s+(est[aá]s|te)\s+(programad[ao]|hech[ao]|construid[ao])/i,
+  /qu[eé]\s+(base\s+de\s+datos|servidor|api|librer[ií]as?)\s+usas/i,
+  /c[oó]mo\s+est[aá]s?\s+(programad[ao]|construid[ao]|hech[ao])/i,
+  /arquitectura\s+(del\s+sistema|interna|del\s+backend)/i,
 ];
 
 function detectar(texto) {
