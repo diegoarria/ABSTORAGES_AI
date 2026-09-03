@@ -84,7 +84,15 @@ async function sendPush(payload) {
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-app.set('trust proxy', true); // Railway corre detrás de un proxy; necesario para obtener la IP real del visitante
+// `true` confía en TODOS los saltos del header X-Forwarded-For, incluido
+// cualquier valor que el propio atacante mande como primer salto — eso hacía
+// que la IP de banlist.js/sessionIp.js fuera trivialmente falsificable (le
+// bastaba a cualquiera mandar su propio header X-Forwarded-For para aparentar
+// otra IP y saltarse el baneo, o peor, hacer que banéemos la IP de alguien
+// inocente). Railway mete exactamente 1 salto de proxy antes de llegar aquí,
+// así que `1` hace que Express confíe solo en ESE salto y calcule la IP real
+// del visitante ignorando cualquier prefijo que el cliente haya inventado.
+app.set('trust proxy', 1);
 
 // ─── ACTIVIDAD EN TIEMPO REAL (SSE) ───────────────────────────────────────
 const actividadClients = new Set();
@@ -2147,7 +2155,10 @@ async function handleChat(agente, req, res) {
   if (!message) return res.status(400).json({ error: 'message requerido' });
 
   const sid = sessionId || `web_${agente}_${Date.now()}`;
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || null;
+  // req.ip ya resuelve correctamente la IP real usando `trust proxy: 1` —
+  // NUNCA tomar el header x-forwarded-for a mano, su primer valor lo puede
+  // inventar el propio cliente y falsificar cualquier IP.
+  const ip = req.ip || null;
 
   // Se guarda SIEMPRE, desde el primer mensaje — independiente de si la sesión
   // llega a ser lead, orden o alerta de abuso (a diferencia de leads.add, que
