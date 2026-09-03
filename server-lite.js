@@ -320,6 +320,14 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // agente tiene su propio número de WhatsApp, igual que su número de Vapi.
     const agente  = agenteParaNumeroWA(req.body.To);
     const agenteU = agente.toUpperCase();
+
+    // Mantenimiento forzado por orden de Diego — mismo corte que en el chat web,
+    // aplicado también a WhatsApp. Se ignora el mensaje en silencio, sin
+    // responder nada (ni siquiera un aviso de mantenimiento) mientras dure.
+    if (['sara', 'sofia', 'noa'].includes(agente) && Date.now() < new Date('2026-09-03T15:30:00Z').getTime()) {
+      console.log(`[WA-IN] ${agenteU} en mantenimiento forzado, ignorando mensaje de ${phone}`);
+      return;
+    }
     // NOA conserva su clave de sesión histórica (wa_${phone}) para no romper
     // continuidad de conversaciones ya guardadas; SARA/SOFIA son números nuevos.
     const session = agente === 'noa' ? `wa_${phone}` : `wa_${agente}_${phone}`;
@@ -2113,6 +2121,25 @@ async function handleChat(agente, req, res) {
   // llega a ser lead, orden o alerta de abuso (a diferencia de leads.add, que
   // solo captura ip cuando ya se extrajeron datos de contacto).
   sessionIp.registrar(sid, agente, ip).catch(() => {});
+
+  // Mantenimiento forzado por orden de Diego — SARA, SOFIA y NOA no responden
+  // a nadie hasta la fecha/hora indicada. HÉCTOR no está incluido en el corte.
+  const MANTENIMIENTO_HASTA = new Date('2026-09-03T15:30:00Z'); // 3 sep 2026, 9:30 am hora MTY (UTC-6)
+  if (['sara', 'sofia', 'noa'].includes(agente) && Date.now() < MANTENIMIENTO_HASTA.getTime()) {
+    const MENSAJE_MANTENIMIENTO = 'En este momento no estoy disponible. Vuelvo a estar activa pronto — gracias por tu paciencia.';
+    memory.addMessage(sid, 'user', message);
+    memory.addMessage(sid, 'assistant', MENSAJE_MANTENIMIENTO);
+    saveMessage(sid, agente, 'user', message);
+    saveMessage(sid, agente, 'assistant', MENSAJE_MANTENIMIENTO);
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+    res.write(`data: ${JSON.stringify({ type: 'chunk', text: MENSAJE_MANTENIMIENTO })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    return res.end();
+  }
 
   // Moderación — corte determinístico ante insultos/amenazas, sin llamar a Claude
   if (moderacion.detectarAbuso(message)) {
