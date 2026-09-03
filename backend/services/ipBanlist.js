@@ -21,6 +21,15 @@ function loadFromDisk() {
 // nunca debe frenar el chat esperando una consulta a la DB.
 const cache = loadFromDisk(); // { [ip]: { motivo, agente, sessionId, bannedAt } }
 
+// Baneos manuales ordenados directamente por Diego — se aplican siempre al
+// arrancar, sin importar qué tan seguido se resetee el disco/redeploy.
+const BANEOS_MANUALES = {
+  '187.161.8.111': { motivo: 'Baneo manual directo por orden de Diego', agente: null, sessionId: null },
+};
+Object.entries(BANEOS_MANUALES).forEach(([ip, datos]) => {
+  if (!cache[ip]) cache[ip] = { ...datos, bannedAt: new Date().toISOString() };
+});
+
 let saveTimer = null;
 function scheduleSave() {
   clearTimeout(saveTimer);
@@ -61,6 +70,15 @@ async function ensureTable() {
       cache[r.ip] = { motivo: r.motivo, agente: r.agente, sessionId: r.session_id, bannedAt: r.banned_at };
     });
     if (rows.length) scheduleSave();
+
+    // Asegura que los baneos manuales queden también en Postgres, aunque ya
+    // estuvieran en el archivo de disco (que no sobrevive redeploys sin volumen).
+    for (const [ip, datos] of Object.entries(BANEOS_MANUALES)) {
+      await pool.query(
+        `INSERT INTO ip_banlist (ip, motivo, agente, session_id) VALUES ($1,$2,$3,$4) ON CONFLICT (ip) DO NOTHING`,
+        [ip, datos.motivo, datos.agente, datos.sessionId]
+      );
+    }
   } catch (e) {
     console.error('[ipBanlist] Error precargando desde DB:', e.message);
   }
