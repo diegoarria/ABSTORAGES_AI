@@ -8,6 +8,11 @@ const https   = require('https');
 const fs      = require('fs');
 const crypto  = require('crypto');
 
+// Mantenimiento forzado de SARA, SOFIA y NOA — por orden directa de Diego.
+// HÉCTOR no está incluido. Un solo lugar para la fecha de corte, usado tanto
+// en el chat web (handleChat) como en el webhook de WhatsApp.
+const MANTENIMIENTO_HASTA = new Date('2026-09-04T15:30:00Z'); // 4 sep 2026, 9:30 am hora MTY (UTC-6)
+
 const { saveMessage, getMessages } = require('./backend/services/db');
 const auth        = require('./backend/middleware/auth');
 const sessions    = require('./backend/services/sessions');
@@ -362,7 +367,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Mantenimiento forzado por orden de Diego — mismo corte que en el chat web,
     // aplicado también a WhatsApp. Se ignora el mensaje en silencio, sin
     // responder nada (ni siquiera un aviso de mantenimiento) mientras dure.
-    if (['sara', 'sofia', 'noa'].includes(agente) && Date.now() < new Date('2026-09-03T15:30:00Z').getTime()) {
+    if (['sara', 'sofia', 'noa'].includes(agente) && Date.now() < MANTENIMIENTO_HASTA.getTime()) {
       console.log(`[WA-IN] ${agenteU} en mantenimiento forzado, ignorando mensaje de ${phone}`);
       return;
     }
@@ -2207,8 +2212,8 @@ async function handleChat(agente, req, res) {
   }
 
   // Mantenimiento forzado por orden de Diego — SARA, SOFIA y NOA no responden
-  // a nadie hasta la fecha/hora indicada. HÉCTOR no está incluido en el corte.
-  const MANTENIMIENTO_HASTA = new Date('2026-09-03T15:30:00Z'); // 3 sep 2026, 9:30 am hora MTY (UTC-6)
+  // a nadie hasta la fecha/hora indicada (constante MANTENIMIENTO_HASTA arriba
+  // del archivo). HÉCTOR no está incluido en el corte.
   if (['sara', 'sofia', 'noa'].includes(agente) && Date.now() < MANTENIMIENTO_HASTA.getTime()) {
     const MENSAJE_MANTENIMIENTO = 'En este momento no estoy disponible. Vuelvo a estar activa pronto — gracias por tu paciencia.';
     memory.addMessage(sid, 'user', message);
