@@ -304,12 +304,40 @@ app.post('/api/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-// WhatsApp webhook — sin auth (viene de Twilio)
+// Verifica que el POST realmente venga de Twilio (firma HMAC-SHA1 con el auth
+// token, documentado en twilio.com/docs/usage/security) — sin esto, cualquiera
+// en internet puede mandar un POST a esta URL con un From= falso y hacerse
+// pasar por un número del equipo interno (saltándose staffDirectory por
+// completo, incluido el bypass de "Diego" del bloqueo de fuga de prompt).
+function validarFirmaTwilio(req) {
+  if (!TWILIO_TOKEN) return true; // sin token configurado (dev local) — no se puede validar, no bloquear
+  const firma = req.headers['x-twilio-signature'];
+  if (!firma) return false;
+  const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+  const params = req.body || {};
+  const data = Object.keys(params).sort().reduce((acc, key) => acc + key + params[key], url);
+  const esperada = crypto.createHmac('sha1', TWILIO_TOKEN).update(Buffer.from(data, 'utf-8')).digest('base64');
+  try {
+    const a = Buffer.from(esperada), b = Buffer.from(firma);
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  } catch { return false; }
+}
+
+// WhatsApp webhook — sin auth de sesión (viene de Twilio), pero SÍ con
+// verificación de firma — ver validarFirmaTwilio arriba.
 app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (req, res) => {
   // TwiML vacío — un body como "OK" (res.sendStatus por default) se reenvía
-  // como mensaje real al usuario si no es XML válido.
+  // como mensaje real al usuario si no es XML válido. Se manda igual sin
+  // importar si la firma es válida, para no delatarle a un atacante que su
+  // request fue detectado.
   res.set('Content-Type', 'text/xml');
   res.send('<?xml version="1.0" encoding="UTF-8"?><Response></Response>');
+
+  if (!validarFirmaTwilio(req)) {
+    console.warn('[WA-IN] Firma de Twilio inválida — request descartado, posible spoofing. From:', req.body?.From);
+    return;
+  }
+
   console.log('[WA-IN] body:', JSON.stringify(req.body).slice(0, 600));
   try {
     // Twilio manda form-urlencoded: From="whatsapp:+52...", To="whatsapp:+52...", Body="texto", NumMedia="0"
