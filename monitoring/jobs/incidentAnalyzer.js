@@ -50,26 +50,35 @@ Clasifica la severidad GLOBAL de este conjunto (low, medium, high o critical) y 
 Responde ÚNICAMENTE con este JSON, sin texto adicional ni bloque de código:
 {"severity": "...", "summary": "..."}`;
 
-  const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 500,
-    messages: [{ role: 'user', content: prompt }],
-  });
-
-  const texto = msg.content?.[0]?.text?.trim() || '{}';
+  // Un sistema de monitoreo no se puede caer solo porque Claude (uno de los
+  // servicios que él mismo vigila) esté caído, sin cuota, o tarde en
+  // responder — por eso TODO lo que dependa de la API, no solo el parseo del
+  // JSON, cae al mismo respaldo determinístico si algo sale mal.
   try {
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const texto = msg.content?.[0]?.text?.trim() || '{}';
     const parsed = JSON.parse(texto);
     if (!['low', 'medium', 'high', 'critical'].includes(parsed.severity)) throw new Error('severity inválida');
     return parsed;
   } catch (e) {
-    console.error('[incident-analyzer] Claude no regresó JSON válido, degradando a clasificación local:', e.message, texto);
-    // Fallback determinístico si Claude falla en formatear — nunca se debe
-    // perder un incidente por un problema de parseo.
-    const peorEvento = eventos.reduce((max, e) => Math.max(max, severidadNumerica(e.severity)), 0);
-    const hayDown = checks.some(c => c.status === 'down');
-    const severity = hayDown || peorEvento >= 4 ? 'critical' : peorEvento === 3 ? 'high' : checks.length || eventos.length ? 'medium' : 'low';
-    return { severity, summary: `Análisis automático de respaldo (Claude no respondió en formato esperado). ${checks.length} chequeo(s) con problemas, ${eventos.length} evento(s) de seguridad. Revisar incidents/security_events directamente.` };
+    console.error('[incident-analyzer] Claude no disponible o no regresó JSON válido, degradando a clasificación local:', e.message);
+    return clasificacionDeRespaldo(checks, eventos, e.message);
   }
+}
+
+function clasificacionDeRespaldo(checks, eventos, motivoFalla) {
+  const peorEvento = eventos.reduce((max, e) => Math.max(max, severidadNumerica(e.severity)), 0);
+  const hayDown = checks.some(c => c.status === 'down');
+  const severity = hayDown || peorEvento >= 4 ? 'critical' : peorEvento === 3 ? 'high' : checks.length || eventos.length ? 'medium' : 'low';
+  return {
+    severity,
+    summary: `Análisis automático de respaldo — Claude no estuvo disponible para redactar el resumen (${motivoFalla}). ${checks.length} chequeo(s) con problemas, ${eventos.length} evento(s) de seguridad en esta ventana. Revisar incidents/security_events directamente.`,
+  };
 }
 
 async function analizar() {

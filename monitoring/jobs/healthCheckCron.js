@@ -110,9 +110,17 @@ async function checarServicio(nombre, checker) {
 }
 
 async function correrHealthChecks() {
-  await Promise.allSettled(
+  const resultados = await Promise.allSettled(
     Object.entries(CHECKERS).map(([nombre, checker]) => checarServicio(nombre, checker))
   );
+  // allSettled traga los errores por diseño — sin esto, un fallo real (ej. de
+  // permisos en la base) se pierde en silencio y parece que "no pasó nada".
+  resultados.forEach((r, i) => {
+    if (r.status === 'rejected') {
+      const nombre = Object.keys(CHECKERS)[i];
+      console.error(`[health-check] ${nombre} falló por completo (no se guardó ningún check):`, r.reason?.message || r.reason);
+    }
+  });
 }
 
 module.exports = { correrHealthChecks };

@@ -64,6 +64,12 @@ ALTER TABLE security_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE incidents       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE alert_log       ENABLE ROW LEVEL SECURITY;
 
+-- Sin esto, ningún GRANT sobre las tablas sirve de nada — un rol necesita
+-- USAGE sobre el esquema mismo para poder siquiera "ver" que las tablas
+-- existen (roles.sql hace REVOKE ALL ON SCHEMA public FROM PUBLIC, así que
+-- hay que devolvérselo explícitamente a los 2 roles que sí deben entrar).
+GRANT USAGE ON SCHEMA public TO monitoring_service, monitoring_admin;
+
 -- monitoring_service: acceso total a las 4 tablas (así opera el cron/analyzer).
 GRANT SELECT, INSERT, UPDATE ON service_checks, security_events, incidents, alert_log TO monitoring_service;
 DROP POLICY IF EXISTS service_full_access ON service_checks;
