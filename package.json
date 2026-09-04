@@ -7,7 +7,9 @@
     "start": "node server-lite.js",
     "dev": "nodemon server-lite.js",
     "monitoring": "node monitoring/index.js",
-    "monitoring:migrate": "node monitoring/db/migrate.js"
+    "monitoring:migrate": "node monitoring/db/migrate.js",
+    "monitoring:panel": "node monitoring/admin-server.js",
+    "monitoring:create-admin": "node monitoring/scripts/createAdminUser.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.0",

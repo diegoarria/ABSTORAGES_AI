@@ -74,6 +74,147 @@ Este proceso **nunca se importa desde `server-lite.js` ni `backend/server.js`**
 — en producción va como un servicio de Railway aparte (o cualquier proceso
 independiente), con su propio `.env`.
 
-## Siguiente paso
+## Fase 3 — panel de administración técnico
 
-Fase 3 (panel de administración técnico) queda pendiente de tu confirmación.
+App separada, Vite + React + TypeScript (`monitoring/admin-panel/`), con su
+**propio `package.json`** (no comparte dependencias con el resto del repo) y
+su **propio login** (`monitoring/lib/adminAuth.js` — usuario/contraseña con
+hash real vía `scrypt`, sesión propia por cookie `monitoring_session`; cero
+relación con `backend/middleware/auth.js` ni `data/sessions.json` del negocio).
+
+Adaptación respecto al plan original: pedías Supabase Auth restringido a un
+rol `monitoring_admin` — como no hay Supabase, el equivalente real aquí es
+que **la propia base de datos** solo le permite a la contraseña de Postgres
+del rol `monitoring_admin` leer/escribir lo que le corresponde (RLS de la
+Fase 1), y el panel además tiene su login independiente encima.
+
+### Vistas
+- **Dashboard** — estado actual de cada servicio + latencia promedio 24h.
+- **Eventos de seguridad** — filtrable por severidad y tipo, con detalle JSON expandible.
+- **Incidentes** — lista + botón para marcar como resuelto.
+- **Historial de alertas** — qué se envió, cuándo, estado de entrega.
+
+### Cómo correrlo en desarrollo
+
+```bash
+# 1. Crea tu usuario del panel (una sola vez)
+npm run monitoring:create-admin -- diego "una-contraseña-fuerte-de-verdad"
+
+# 2. Arranca el servidor del panel (API + auth)
+npm run monitoring:panel        # puerto 4001 por defecto
+
+# 3. En otra terminal, arranca el frontend con hot-reload
+cd monitoring/admin-panel && npm install && npm run dev   # puerto 5175, proxya /api al 4001
+```
+
+### Despliegue
+
+**Opción simple (recomendada, usa la infra que ya tienes en Railway):**
+1. `cd monitoring/admin-panel && npm install && npm run build` — genera `dist/`.
+2. Sube `monitoring/admin-server.js` como un servicio nuevo de Railway (o el
+   mismo droplet, otro proceso) con su propio `monitoring/.env` — sirve el
+   `dist/` ya compilado directo, sin necesitar Vercel/Netlify.
+3. `npm run monitoring:panel` (o el equivalente `node monitoring/admin-server.js`
+   como start command de ese servicio).
+
+**Opción Vercel/Netlify (como pediste originalmente) — con un matiz:**
+Vercel/Netlify sirven sitios estáticos; la API (`admin-server.js`) necesita un
+proceso Node corriendo, así que en ese caso el frontend y la API quedan en
+sitios distintos:
+1. Despliega `admin-server.js` en Railway (o cualquier host con proceso
+   persistente) — apunta `MONITORING_ADMIN_PORT` y el resto de variables ahí.
+2. En Vercel: importa `monitoring/admin-panel/` como proyecto, con **Root
+   Directory** = `monitoring/admin-panel`, build command `npm run build`,
+   output directory `dist`.
+3. Define `VITE_API_TARGET` en Vercel apuntando a la URL pública de tu
+   `admin-server.js`, y ajusta `vite.config.ts`/`api.ts` para usar esa URL
+   absoluta en producción (ahora mismo `api.ts` asume mismo origen — con
+   dominios separados hay que resolver CORS en `admin-server.js` con
+   `cors({ origin: TU_DOMINIO_VERCEL, credentials: true })`).
+
+Dado que ya tienes todo en Railway, la opción simple es la que te ahorra
+ese trabajo extra de CORS entre dominios.
+
+## Fase 4 — verificación
+
+Estos son los comandos para probar las 3 cosas que pediste, una vez que
+tengas la base de monitoring levantada (Fase 1) — no los pude correr yo
+mismo porque esa base todavía no existe en tu Railway, pero están listos
+para copiar/pegar tal cual.
+
+### 1. RLS realmente bloquea lo que no debe
+
+```bash
+# Como monitoring_admin: SELECT funciona
+psql "$MONITORING_ADMIN_DATABASE_URL" -c "SELECT count(*) FROM incidents;"
+
+# Como monitoring_admin: INSERT debe FALLAR (solo tiene SELECT + UPDATE acotado)
+psql "$MONITORING_ADMIN_DATABASE_URL" -c "INSERT INTO service_checks (service_name, status) VALUES ('test','ok');"
+# Esperado: ERROR: permission denied for table service_checks
+
+# Como monitoring_admin: UPDATE de una columna NO concedida debe FALLAR
+psql "$MONITORING_ADMIN_DATABASE_URL" -c "UPDATE incidents SET summary_text = 'hackeado' WHERE true;"
+# Esperado: ERROR: permission denied for table incidents (o "column summary_text")
+
+# Como monitoring_admin: UPDATE de resolved SÍ debe funcionar
+psql "$MONITORING_ADMIN_DATABASE_URL" -c "UPDATE incidents SET resolved = true WHERE false;" # WHERE false = no toca filas reales, solo prueba el permiso
+
+# Rol sin ningún grant — ni siquiera debe poder ver que las tablas existen
+psql "$MONITORING_OWNER_DATABASE_URL" -c "
+  CREATE ROLE rando_test WITH LOGIN PASSWORD 'temporal123';
+"
+psql "postgresql://rando_test:temporal123@<host>:5432/<db>" -c "SELECT * FROM incidents;"
+# Esperado: ERROR: permission denied for table incidents
+psql "$MONITORING_OWNER_DATABASE_URL" -c "DROP ROLE rando_test;" # limpiar
+```
+
+### 2. Los jobs corren sin errores antes de apuntar a APIs reales
+
+Con `.env` configurado pero **sin** las API keys de los servicios (o con
+keys inválidas a propósito), los checkers deben degradar a `status='down'`
+o `'degraded'` sin tronar el proceso — nunca deben lanzar una excepción sin
+capturar:
+
+```bash
+# Corre un solo ciclo de cada job y confirma que no hay errores no capturados
+node -e "require('./monitoring/jobs/healthCheckCron').correrHealthChecks().then(() => console.log('health-check OK')).catch(e => { console.error('FALLÓ:', e); process.exit(1); })"
+
+node -e "require('./monitoring/jobs/securityLogScanner').correrSecurityScan().then(() => console.log('security-scan OK')).catch(e => { console.error('FALLÓ:', e); process.exit(1); })"
+
+node -e "require('./monitoring/jobs/incidentAnalyzer').analizar().then(() => console.log('analyzer OK')).catch(e => { console.error('FALLÓ:', e); process.exit(1); })"
+
+# Confirma que sí quedaron filas, aunque los checks hayan sido 'down'
+psql "$MONITORING_SERVICE_DATABASE_URL" -c "SELECT service_name, status, checked_at FROM service_checks ORDER BY checked_at DESC LIMIT 10;"
+```
+
+Una vez confirmado esto, pon las API keys reales en `monitoring/.env` y
+corre `npm run monitoring` para el proceso completo y persistente.
+
+### 3. El panel rechaza logins sin el rol correcto
+
+```bash
+# Arranca el panel (necesitas haber creado un usuario con monitoring:create-admin)
+npm run monitoring:panel &
+
+# Sin sesión — debe regresar 401
+curl -i http://localhost:4001/api/dashboard
+# Esperado: HTTP/1.1 401 Unauthorized
+
+# Login con contraseña incorrecta — debe regresar 401
+curl -i -X POST http://localhost:4001/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"diego","password":"contraseña-incorrecta"}'
+# Esperado: HTTP/1.1 401 Unauthorized
+
+# Login correcto — debe regresar 200 + set-cookie, y CON esa cookie /api/dashboard sí responde
+curl -i -c cookies.txt -X POST http://localhost:4001/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"diego","password":"tu-contraseña-real"}'
+curl -i -b cookies.txt http://localhost:4001/api/dashboard
+# Esperado: HTTP/1.1 200 OK en ambos
+```
+
+### Lo que sí verifiqué yo mismo, sin necesitar la base todavía
+- `npm install && npm run build` en `monitoring/admin-panel/` — compila
+  TypeScript sin errores y genera `dist/` correctamente.
+- Todos los archivos `.js` nuevos pasan `node -c` (sintaxis válida).
