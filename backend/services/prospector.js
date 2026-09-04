@@ -23,7 +23,7 @@ async function apolloBuscarPersonas(filtros = {}) {
 
   const body = {
     page: filtros.pagina || 1,
-    per_page: filtros.limite || 25,
+    per_page: Math.min(filtros.limite || 25, 100), // Apollo tope real por página
     person_titles: filtros.cargos || ['Director de Logística', 'Gerente de Operaciones', 'Director de Supply Chain', 'VP Logistics', 'Gerente de Compras', 'Director Comercial'],
     organization_industry_tag_ids: [],
     organization_locations: filtros.ubicaciones || ['Mexico'],
@@ -69,18 +69,30 @@ async function apolloEnriquecer(nombre, empresa, dominio) {
   } catch { return null; }
 }
 
-// ── Lusha: buscar personas (fallback cuando Apollo no está disponible) ───────
-async function lushaBuscarPersonas(filtros = {}) {
-  if (!LUSHA_KEY) throw new Error('LUSHA_API_KEY no configurada');
+// Lusha exige size <= 40 por página (excederlo tira error de validación) —
+// para pedir más resultados hay que paginar, ver lushaBuscarPersonas abajo.
+const LUSHA_PAGE_SIZE = 40;
 
-  const size = Math.max(filtros.limite || 25, 10); // Lusha exige size >= 10
+// ── Lusha: una sola página de búsqueda ───────────────────────────────────────
+async function lushaBuscarPagina(filtros, page) {
   const body = {
-    pages: { page: 0, size },
+    pages: { page, size: LUSHA_PAGE_SIZE },
     filters: {
       contacts: {
         include: {
           jobTitles: filtros.cargos || ['Director de Logística', 'Gerente de Operaciones', 'Director de Supply Chain', 'VP Logistics', 'Gerente de Compras', 'Director Comercial'],
           locations: (filtros.ubicaciones || ['Mexico']).map(country => ({ country })),
+        },
+      },
+      // Filtro a nivel empresa — restringe por industria y país de la propia
+      // empresa (no solo la ubicación del contacto). Nombres de industria
+      // best-effort sobre la taxonomía de Lusha — si el nombre exacto no
+      // calza, Lusha regresa 0 resultados en vez de ignorar el filtro, así
+      // que esto debe probarse con una búsqueda real después de desplegar.
+      companies: {
+        include: {
+          industries: filtros.industriasEmpresa || ['Food & Beverages', 'Food Production', 'Beverages'],
+          countries:  filtros.ubicaciones || ['Mexico'],
         },
       },
     },
@@ -97,11 +109,27 @@ async function lushaBuscarPersonas(filtros = {}) {
     throw new Error(`Lusha error ${r.status}: ${err.slice(0, 200)}`);
   }
 
-  const data = await r.json();
-  return {
-    requestId: data.requestId,
-    personas: (data.data || []).map(normalizarPersonaLusha),
-  };
+  return r.json();
+}
+
+// ── Lusha: buscar personas, paginando hasta juntar el total pedido ───────────
+// (fallback cuando Apollo no está disponible)
+async function lushaBuscarPersonas(filtros = {}) {
+  if (!LUSHA_KEY) throw new Error('LUSHA_API_KEY no configurada');
+
+  const objetivo = Math.min(filtros.limite || 25, 2000); // tope de seguridad
+  let personas = [], requestId = null, page = 0;
+
+  while (personas.length < objetivo) {
+    const data = await lushaBuscarPagina(filtros, page);
+    requestId = data.requestId || requestId;
+    const lote = (data.data || []).map(normalizarPersonaLusha);
+    personas = personas.concat(lote);
+    if (lote.length < LUSHA_PAGE_SIZE) break; // última página, no hay más
+    page++;
+  }
+
+  return { requestId, personas: personas.slice(0, objetivo) };
 }
 
 // ── Lusha: revelar email/teléfono de contactos ya encontrados (gasta créditos) ─
@@ -212,7 +240,18 @@ function puntuarProspecto(p) {
 }
 
 // ── Buscar + enriquecer pipeline completo ────────────────────────────────────
-async function buscar(filtros = {}) {
+// Por orden de Diego: la pantalla de Prospector de SARA SOLO busca empresas
+// mexicanas de alimentos y bebidas — se fuerza aquí, en el backend, sin
+// importar qué mande el frontend, para que no dependa de que nadie deje los
+// selects del formulario en la opción correcta.
+async function buscar(filtrosEntrada = {}) {
+  const filtros = {
+    ...filtrosEntrada,
+    ubicaciones: ['Mexico'],
+    industrias: ['food_and_beverages'],
+    industriasEmpresa: ['Food & Beverages', 'Food Production', 'Beverages'],
+  };
+
   let personas, requestId = null, fuentePrimaria = 'apollo';
 
   try {

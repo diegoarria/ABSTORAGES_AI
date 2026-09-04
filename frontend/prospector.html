@@ -175,27 +175,18 @@ body { background: var(--pr-bg); color: var(--pr-t1); font-family: var(--font-sa
 
       <div class="field">
         <label>Industria</label>
-        <select id="f-industria">
-          <option value="">Todas</option>
-          <option value="logistics_and_supply_chain" selected>Logística & Supply Chain</option>
-          <option value="manufacturing">Manufactura</option>
-          <option value="retail">Retail & Comercio</option>
-          <option value="food_and_beverages">Alimentos & Bebidas</option>
-          <option value="automotive">Automotriz</option>
-          <option value="construction">Construcción</option>
-          <option value="pharmaceuticals">Farmacéutica</option>
-          <option value="electronics">Electrónica</option>
+        <select id="f-industria" disabled>
+          <option value="food_and_beverages" selected>Alimentos & Bebidas</option>
         </select>
+        <div style="font-size:11px;color:var(--pr-t3);margin-top:4px">Bloqueado — SARA solo prospecta Alimentos & Bebidas</div>
       </div>
 
       <div class="field">
         <label>País / Región</label>
-        <select id="f-pais">
+        <select id="f-pais" disabled>
           <option value="Mexico" selected>México</option>
-          <option value="United States">Estados Unidos</option>
-          <option value="Colombia">Colombia</option>
-          <option value="Argentina">Argentina</option>
         </select>
+        <div style="font-size:11px;color:var(--pr-t3);margin-top:4px">Bloqueado — SARA solo prospecta empresas mexicanas</div>
       </div>
 
       <div class="field">
@@ -227,6 +218,10 @@ Director de Supply Chain</textarea>
           <option value="10">10 prospectos</option>
           <option value="25" selected>25 prospectos</option>
           <option value="50">50 prospectos</option>
+          <option value="100">100 prospectos</option>
+          <option value="250">250 prospectos</option>
+          <option value="500">500 prospectos</option>
+          <option value="1000">1,000 prospectos</option>
         </select>
       </div>
 
