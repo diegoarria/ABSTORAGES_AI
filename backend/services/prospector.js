@@ -84,17 +84,6 @@ async function lushaBuscarPagina(filtros, page) {
           locations: (filtros.ubicaciones || ['Mexico']).map(country => ({ country })),
         },
       },
-      // Filtro a nivel empresa — restringe por industria y país de la propia
-      // empresa (no solo la ubicación del contacto). Nombres de industria
-      // best-effort sobre la taxonomía de Lusha — si el nombre exacto no
-      // calza, Lusha regresa 0 resultados en vez de ignorar el filtro, así
-      // que esto debe probarse con una búsqueda real después de desplegar.
-      companies: {
-        include: {
-          industries: filtros.industriasEmpresa || ['Food & Beverages', 'Food Production', 'Beverages'],
-          countries:  filtros.ubicaciones || ['Mexico'],
-        },
-      },
     },
   };
 
