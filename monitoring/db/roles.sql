@@ -28,6 +28,12 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- pg_monitor: rol nativo de Postgres (desde v10), de solo lectura de
+-- estadísticas del propio servidor — permite que security-log-scanner vea
+-- pg_stat_activity (conexiones activas a la base de monitoring) sin darle
+-- ningún acceso a datos de tablas más allá de las que ya se le otorgaron.
+GRANT pg_monitor TO monitoring_service;
+
 -- Nadie más (ni el rol por default `PUBLIC`) puede conectarse y ver nada,
 -- ni siquiera con las tablas ya creadas — se refuerza otra vez en schema.sql
 -- con RLS, esto es la primera capa (privilegios de esquema/tabla).

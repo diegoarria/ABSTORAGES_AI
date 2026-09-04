@@ -5,7 +5,9 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node server-lite.js",
-    "dev": "nodemon server-lite.js"
+    "dev": "nodemon server-lite.js",
+    "monitoring": "node monitoring/index.js",
+    "monitoring:migrate": "node monitoring/db/migrate.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.109.0",
