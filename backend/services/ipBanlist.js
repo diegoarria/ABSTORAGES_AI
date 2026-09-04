@@ -25,6 +25,8 @@ const cache = loadFromDisk(); // { [ip]: { motivo, agente, sessionId, bannedAt }
 // arrancar, sin importar qué tan seguido se resetee el disco/redeploy.
 const BANEOS_MANUALES = {
   '187.161.8.111': { motivo: 'Baneo manual directo por orden de Diego', agente: null, sessionId: null },
+  '79.127.217.65': { motivo: 'Baneo manual directo por orden de Diego', agente: null, sessionId: null },
+  '152.233.76.9':  { motivo: 'Baneo manual directo por orden de Diego', agente: null, sessionId: null },
 };
 Object.entries(BANEOS_MANUALES).forEach(([ip, datos]) => {
   if (!cache[ip]) cache[ip] = { ...datos, bannedAt: new Date().toISOString() };
