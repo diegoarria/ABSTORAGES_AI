@@ -29,7 +29,18 @@ async function juntarSenales(ventanaDesde) {
       [ventanaDesde]
     ),
   ]);
-  return { checks: checks.rows, eventos: eventos.rows };
+
+  // Un solo check 'down' aislado suele ser un timeout de red pasajero, no una
+  // caída real — mismo criterio que healthCheckCron (2 fallas antes de
+  // considerarlo grave). Sin esto, un blip cualquiera generaba un incidente
+  // 'critical' y una alerta de WhatsApp de la nada.
+  const porServicio = {};
+  checks.rows.forEach(c => { (porServicio[c.service_name] ||= []).push(c); });
+  const checksFiltrados = Object.values(porServicio)
+    .filter(rows => rows.length >= 2)
+    .flat();
+
+  return { checks: checksFiltrados, eventos: eventos.rows };
 }
 
 function severidadNumerica(s) {
@@ -93,6 +104,19 @@ function clasificacionDeRespaldo(checks, eventos, motivoFalla) {
   };
 }
 
+// Mientras ya haya un incidente sin resolver de severidad alta/crítica, no
+// tiene caso volver a mandar WhatsApp cada 15 min por el mismo problema
+// que sigue activo — spamea sin aportar nada nuevo. En cuanto alguien lo
+// marca "resuelto" en el panel, la siguiente vez que se repita sí alerta
+// de nuevo (eso es justo lo que "resuelto" significa: ya me enteré, avísame
+// otra vez si vuelve a pasar).
+async function hayIncidenteAbiertoSinResolver() {
+  const { rows } = await pool.query(
+    `SELECT id FROM incidents WHERE resolved = false AND severity IN ('high', 'critical') LIMIT 1`
+  );
+  return rows.length > 0;
+}
+
 async function analizar() {
   const ventanaDesde = desde;
   desde = new Date(); // siguiente corrida solo ve lo nuevo desde ahora
@@ -103,6 +127,10 @@ async function analizar() {
   const { severity, summary } = await clasificarConClaude(checks, eventos);
   const relatedIds = eventos.map(e => e.id);
 
+  const yaHayAbierto = (severity === 'high' || severity === 'critical')
+    ? await hayIncidenteAbiertoSinResolver()
+    : false;
+
   const { rows } = await pool.query(
     `INSERT INTO incidents (severity, summary_text, related_event_ids)
      VALUES ($1, $2, $3) RETURNING id`,
@@ -112,6 +140,14 @@ async function analizar() {
   console.log(`[incident-analyzer] Incidente ${incidentId} creado — severidad ${severity}`);
 
   if (severity === 'high' || severity === 'critical') {
+    if (yaHayAbierto) {
+      console.log(`[incident-analyzer] Ya hay un incidente sin resolver de severidad alta/crítica — se omite la alerta de WhatsApp para no repetir spam. Márcalo resuelto en el panel para volver a recibir alertas.`);
+      await pool.query(
+        `INSERT INTO alert_log (incident_id, channel, delivery_status) VALUES ($1, 'whatsapp', 'suppressed_dedup')`,
+        [incidentId]
+      );
+      return;
+    }
     const textoAlerta = `🚨 ABSTORAGES Monitoring [${severity.toUpperCase()}]\n\n${summary}`;
     const resultado = await enviarAlertaWhatsApp(textoAlerta);
     await pool.query(
