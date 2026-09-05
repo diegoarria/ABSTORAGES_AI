@@ -101,6 +101,18 @@ const PATRONES = [
 
   // Base64 / codificación como vector para colar instrucciones
   /decodifica\s+y\s+(haz|ejecuta)/i,
+
+  // Credenciales/infraestructura del TMS (Google Sheets) — URL/ID del
+  // spreadsheet, cuenta de servicio, API key, o pedir "pegar" lo que sea
+  // que esté usando ahorita para "revisar" una supuesta falla
+  /spreadsheet.*(tms|url|id)/i,
+  /(url|id)\s+.*spreadsheet/i,
+  /docs\.google\.com\/spreadsheets/i,
+  /cuenta\s+de\s+servicio\s+de\s+google/i,
+  /api\s+key\s+.*(google|sheets|tms)/i,
+  /qu[eé]\s+credencial\s+est[aá]s\s+usando/i,
+  /p[eé]gamela|pasame\s+la\s+(api\s*key|credencial|contrase[ñn]a)/i,
+  /completa\s+esta\s+l[ií]nea\s+con\s+el\s+dato\s+real/i,
 ];
 
 // Normaliza el texto antes de comparar — así los patrones de arriba también
