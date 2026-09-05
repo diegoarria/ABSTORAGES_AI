@@ -5,6 +5,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const path = require('path');
 const { pool } = require('./lib/adminDb');
+const { pool: poolEscritura } = require('./lib/db'); // rol monitoring_service — sí puede INSERT
 const auth = require('./lib/adminAuth');
 
 const app = express();
@@ -50,6 +51,32 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/me', auth.requiereSesion, (req, res) => res.json({ username: req.monitoringUser }));
+
+// ── Intake de eventos reportados por el backend de negocio ──────────────────
+// El negocio (server-lite.js) NUNCA tiene credenciales de esta base — le
+// avisa a monitoring por HTTP, con un secreto compartido, y monitoring hace
+// el INSERT usando sus propias credenciales (monitoring_service). Así se
+// mantiene el aislamiento real: negocio no toca la base de monitoring, y
+// monitoring no toca la de negocio — solo se pasan un mensaje.
+app.post('/internal/report-event', express.json(), async (req, res) => {
+  const secreto = req.headers['x-intake-secret'];
+  if (!process.env.MONITORING_INTAKE_SECRET || secreto !== process.env.MONITORING_INTAKE_SECRET) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
+  const { event_type, severity, source_ip, details } = req.body || {};
+  if (!event_type || !severity) return res.status(400).json({ error: 'event_type y severity requeridos' });
+
+  try {
+    await poolEscritura.query(
+      `INSERT INTO security_events (event_type, severity, source_ip, details) VALUES ($1, $2, $3, $4)`,
+      [event_type, severity, source_ip || null, JSON.stringify(details || {})]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[admin-server] Error insertando evento reportado:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // Todo lo demás bajo /api requiere sesión — el rol de Postgres (monitoring_admin)
 // ya limita qué puede leer/escribir, esto es la capa de "quién puede entrar

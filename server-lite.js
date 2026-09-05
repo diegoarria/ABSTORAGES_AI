@@ -33,6 +33,7 @@ const promptLeakGuard = require('./backend/services/promptLeakGuard');
 const ipBanlist       = require('./backend/services/ipBanlist');
 const phoneBanlist    = require('./backend/services/phoneBanlist');
 const emergencyShutdown = require('./backend/services/emergencyShutdown');
+const ipIntel         = require('./backend/services/ipIntel');
 
 // ── Detector de ataque en curso — activa el apagado de emergencia solo,
 // sin que nadie tenga que darse cuenta y apretar el switch a mano ──────────
@@ -467,6 +468,10 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       // segundas oportunidades, por orden explícita de Diego.
       phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente }).catch(() => {});
       registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone}`);
+      // Sin `req` aquí a propósito: es el webhook de Twilio, no el navegador
+      // del atacante — su User-Agent/IP no están disponibles por este canal,
+      // nunca inventar esos campos, solo reportar lo que sí es real (teléfono).
+      ipIntel.reportarIntento({ telefono: phone, agente, motivo: texto.slice(0, 300), severity: 'critical' });
       await sendWhatsApp(phone, promptLeakGuard.MENSAJE_BLOQUEO, agente);
       return;
     }
@@ -2347,6 +2352,9 @@ async function handleChat(agente, req, res) {
     // Diego: quien intente esto no vuelve a poder abrir el chat nunca más.
     ipBanlist.banear({ ip, motivo: `Intento de fuga de proceso/reglas: "${message.slice(0, 200)}"`, agente, sessionId: sid }).catch(() => {});
     registrarBaneoParaDeteccionDeAtaque(`IP ${ip}`);
+    // Geo/ISP/VPN real de la IP + lo que mandó el navegador (User-Agent,
+    // referrer) — se reporta a monitoring sin darle acceso a esta base.
+    ipIntel.reportarIntento({ ip, agente, motivo: message.slice(0, 300), req, severity: 'high' });
     sendPush({
       title: '🚫 IP baneada — intento de fuga de prompt',
       body: `${agente.toUpperCase()} · IP ${ip || 'desconocida'} · "${message.slice(0, 80)}"`,
