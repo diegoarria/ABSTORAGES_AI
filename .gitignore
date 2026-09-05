@@ -5,6 +5,8 @@ node_modules/
 data/sessions/*.json
 data/session-ips.json
 data/ip-banlist.json
+data/phone-banlist.json
+data/emergency-shutdown.json
 monitoring/data/*.json
 monitoring/admin-panel/dist/
 dist/

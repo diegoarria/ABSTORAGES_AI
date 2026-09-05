@@ -32,6 +32,42 @@ const sessionIp      = require('./backend/services/sessionIp');
 const promptLeakGuard = require('./backend/services/promptLeakGuard');
 const ipBanlist       = require('./backend/services/ipBanlist');
 const phoneBanlist    = require('./backend/services/phoneBanlist');
+const emergencyShutdown = require('./backend/services/emergencyShutdown');
+
+// ── Detector de ataque en curso — activa el apagado de emergencia solo,
+// sin que nadie tenga que darse cuenta y apretar el switch a mano ──────────
+// Si se banean varias IPs/teléfonos distintos en poco tiempo, es señal de un
+// ataque coordinado o automatizado (no un usuario aislado) — se apaga todo
+// de inmediato y se avisa a Diego, quien decide cuándo reactivar a mano.
+const ATAQUE_VENTANA_MS = 10 * 60 * 1000; // 10 minutos
+const ATAQUE_UMBRAL = 5; // baneos distintos dentro de la ventana
+let baneosRecientes = [];
+
+function registrarBaneoParaDeteccionDeAtaque(detalle) {
+  if (emergencyShutdown.estaActivo()) return; // ya está apagado, nada que hacer
+  const ahora = Date.now();
+  baneosRecientes.push(ahora);
+  baneosRecientes = baneosRecientes.filter(t => ahora - t < ATAQUE_VENTANA_MS);
+  if (baneosRecientes.length < ATAQUE_UMBRAL) return;
+
+  const cantidad = baneosRecientes.length;
+  baneosRecientes = []; // reset — no seguir disparando en cada baneo subsecuente
+  const motivo = `Auto-detectado: ${cantidad} baneos (IP/teléfono) en los últimos ${ATAQUE_VENTANA_MS / 60000} minutos — posible ataque coordinado. Último: ${detalle}`;
+
+  emergencyShutdown.activar({ motivo, activadoPor: 'sistema-automático' }).catch(() => {});
+  console.error(`[ataque] 🔴 EMERGENCIA AUTO-ACTIVADA — ${motivo}`);
+
+  sendPush({
+    title: '🔴 EMERGENCIA: SARA/SOFIA/NOA apagadas automáticamente',
+    body: `${cantidad} baneos en ${ATAQUE_VENTANA_MS / 60000} min — posible ataque. Revisa y reactiva manualmente cuando esté resuelto.`,
+    tag: 'emergencia-ataque', url: '/', tipo: 'EMERGENCIA_AUTO', urgente: true,
+  }).catch(() => {});
+
+  const diego = staffDirectory.buscarPorNombre('Diego');
+  if (diego?.telefono) {
+    sendWhatsApp(diego.telefono, `🔴 EMERGENCIA — SARA, SOFIA y NOA se apagaron automáticamente.\n\n${motivo}\n\nRevisa el panel y reactívalas manualmente cuando confirmes que ya no hay riesgo.`, 'noa').catch(() => {});
+  }
+}
 const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
 const callLog        = require('./backend/services/callLog');
@@ -365,6 +401,12 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const agente  = agenteParaNumeroWA(req.body.To);
     const agenteU = agente.toUpperCase();
 
+    // Apagado de emergencia — máxima prioridad, igual que en el chat web.
+    if (['sara', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
+      console.log(`[WA-IN] ${agenteU} — apagado de emergencia activo, ignorando mensaje de ${phone}`);
+      return;
+    }
+
     // Teléfono baneado permanentemente — se ignora en silencio, ni siquiera
     // se guarda el mensaje. Por orden de Diego: una sola vez que mande
     // cualquiera de las frases bloqueadas, nunca más se le vuelve a responder.
@@ -424,6 +466,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       // Un solo intento y el número queda baneado para siempre — sin
       // segundas oportunidades, por orden explícita de Diego.
       phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente }).catch(() => {});
+      registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone}`);
       await sendWhatsApp(phone, promptLeakGuard.MENSAJE_BLOQUEO, agente);
       return;
     }
@@ -2221,6 +2264,20 @@ async function handleChat(agente, req, res) {
   // inventar el propio cliente y falsificar cualquier IP.
   const ip = req.ip || null;
 
+  // Apagado de emergencia — máxima prioridad, por encima de todo lo demás
+  // (mantenimiento, baneos, lo que sea). Se activa a mano desde el panel o
+  // solo si el sistema detecta un ataque en curso (ver registrarBaneoPara-
+  // DeteccionDeAtaque). Ni siquiera se registra la IP de la sesión.
+  if (['sara', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+    res.write(`data: ${JSON.stringify({ type: 'cerrar_chat' })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    return res.end();
+  }
+
   // Se guarda SIEMPRE, desde el primer mensaje — independiente de si la sesión
   // llega a ser lead, orden o alerta de abuso (a diferencia de leads.add, que
   // solo captura ip cuando ya se extrajeron datos de contacto).
@@ -2289,6 +2346,7 @@ async function handleChat(agente, req, res) {
     // Cierre inmediato del chat + baneo permanente de la IP — por orden de
     // Diego: quien intente esto no vuelve a poder abrir el chat nunca más.
     ipBanlist.banear({ ip, motivo: `Intento de fuga de proceso/reglas: "${message.slice(0, 200)}"`, agente, sessionId: sid }).catch(() => {});
+    registrarBaneoParaDeteccionDeAtaque(`IP ${ip}`);
     sendPush({
       title: '🚫 IP baneada — intento de fuga de prompt',
       body: `${agente.toUpperCase()} · IP ${ip || 'desconocida'} · "${message.slice(0, 80)}"`,
@@ -2646,6 +2704,19 @@ function adminUOps(req, res, next) {
   if (req.user?.role === 'admin' || req.user?.role === 'operaciones') return next();
   res.status(403).json({ error: 'Acceso restringido' });
 }
+// ─── APAGADO DE EMERGENCIA — switch manual, sin necesitar redeploy ──────────
+app.get('/api/admin/emergencia', soloAdmin, (req, res) => {
+  res.json(emergencyShutdown.obtenerEstado());
+});
+app.post('/api/admin/emergencia/activar', soloAdmin, async (req, res) => {
+  await emergencyShutdown.activar({ motivo: req.body?.motivo || 'Activado manualmente desde el panel', activadoPor: req.user?.nombre || req.user?.email || 'admin' });
+  res.json(emergencyShutdown.obtenerEstado());
+});
+app.post('/api/admin/emergencia/desactivar', soloAdmin, async (req, res) => {
+  await emergencyShutdown.desactivar({ desactivadoPor: req.user?.nombre || req.user?.email || 'admin' });
+  res.json(emergencyShutdown.obtenerEstado());
+});
+
 app.get('/api/metricas', soloAdmin, async (req, res) => {
   const all = await leads.list({ limit: 5000 });
   const now = Date.now();

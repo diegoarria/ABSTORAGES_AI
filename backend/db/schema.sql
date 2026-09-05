@@ -256,6 +256,18 @@ CREATE TABLE IF NOT EXISTS phone_banlist (
   banned_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ─── EMERGENCY_SHUTDOWN (switch manual/automático para apagar SARA/SOFIA/NOA) ─
+-- Una sola fila (id=1) — ver backend/services/emergencyShutdown.js.
+CREATE TABLE IF NOT EXISTS emergency_shutdown (
+  id           INT PRIMARY KEY DEFAULT 1,
+  activo       BOOLEAN NOT NULL DEFAULT FALSE,
+  motivo       TEXT,
+  activado_por TEXT,
+  activado_en  TIMESTAMPTZ,
+  CHECK (id = 1)
+);
+INSERT INTO emergency_shutdown (id, activo) VALUES (1, false) ON CONFLICT (id) DO NOTHING;
+
 -- ─── INDICES ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_folios_estatus ON folios(estatus);
 CREATE INDEX IF NOT EXISTS idx_folios_cliente ON folios(cliente_id);
