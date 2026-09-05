@@ -65,7 +65,12 @@ export const api = {
   me: () => req<{ username: string }>('/me'),
   dashboard: () => req<ServiceStatus[]>('/dashboard'),
   securityEvents: (params: { severity?: string; type?: string } = {}) => {
-    const qs = new URLSearchParams(params as Record<string, string>).toString();
+    // OJO: new URLSearchParams({x: undefined}) convierte el valor a la
+    // cadena literal "undefined" (no lo omite) — sin este filtro, un filtro
+    // "vacío" terminaba mandando ?severity=undefined y el backend filtraba
+    // por eso, que no existe, regresando siempre 0 resultados.
+    const limpio = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined)) as Record<string, string>;
+    const qs = new URLSearchParams(limpio).toString();
     return req<SecurityEvent[]>(`/security-events${qs ? `?${qs}` : ''}`);
   },
   incidents: () => req<Incident[]>('/incidents'),
