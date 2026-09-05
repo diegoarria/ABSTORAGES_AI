@@ -67,8 +67,20 @@ Responde ÚNICAMENTE con este JSON, sin texto adicional ni bloque de código:
     return parsed;
   } catch (e) {
     console.error('[incident-analyzer] Claude no disponible o no regresó JSON válido, degradando a clasificación local:', e.message);
-    return clasificacionDeRespaldo(checks, eventos, e.message);
+    return clasificacionDeRespaldo(checks, eventos, resumirMotivoFalla(e));
   }
+}
+
+// El mensaje crudo de la API (JSON con comillas, dos puntos, guiones bajos)
+// se ve feo en WhatsApp y algunos caracteres pueden confundir el renderizado
+// de formato de WhatsApp (_texto_ = itálicas) — mejor una razón corta y humana.
+function resumirMotivoFalla(e) {
+  const msg = e?.message || '';
+  if (e?.status === 429 || /usage limits|rate limit/i.test(msg)) return 'límite de uso de la API alcanzado';
+  if (e?.status === 401 || /authentication|invalid.*api.?key/i.test(msg)) return 'error de autenticación con la API';
+  if (e?.status >= 500) return 'la API de Claude está caída';
+  if (/severity inválida/i.test(msg)) return 'respuesta en formato inesperado';
+  return 'no disponible';
 }
 
 function clasificacionDeRespaldo(checks, eventos, motivoFalla) {
