@@ -43,6 +43,7 @@
         <a href="/prospector.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="SARA Prospector">🎯 Prospector</a>
         <a href="/historial.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Historial de Conversaciones">🗂️ Historial</a>
         <a href="/memoria-agentes.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Memoria de Agentes">🧠 Memoria</a>
+        <button class="btn-portal admin-only" id="btn-emergencia" title="Apagado de emergencia de SARA/SOFIA/NOA" style="background:#7f1d1d;color:#fff;border-color:#991b1b;">🔴 Emergencia</button>
       </div>
 
       <!-- Theme toggle -->
@@ -969,6 +970,12 @@
           document.querySelector('.command-layout')?.classList.add('layout-single-left');
         }
 
+        // El switch de emergencia es exclusivo del rol admin — ni siquiera
+        // "operaciones" lo ve (la API ya lo bloquea, pero mejor ni mostrarlo).
+        if (me.role !== 'admin') {
+          document.getElementById('btn-emergencia')?.classList.add('hidden-role');
+        }
+
         // Ocultar "Ver Portal" para roles externos si portal está vacío
         if (me.role !== 'admin') {
           const portalBody = document.querySelector('.portal-overlay-body');
@@ -982,6 +989,58 @@
       } catch(e) {
         window.location.href = '/login';
       }
+    })();
+
+    // ── Apagado de emergencia de SARA/SOFIA/NOA ──────────────────────────────
+    (function() {
+      const btn = document.getElementById('btn-emergencia');
+      if (!btn) return;
+
+      function pintar(activo) {
+        if (activo) {
+          btn.textContent = '🟢 Reactivar IA';
+          btn.style.background = '#14532d';
+          btn.style.borderColor = '#166534';
+          btn.title = 'SARA/SOFIA/NOA están APAGADAS — clic para reactivar';
+        } else {
+          btn.textContent = '🔴 Emergencia';
+          btn.style.background = '#7f1d1d';
+          btn.style.borderColor = '#991b1b';
+          btn.title = 'Apagado de emergencia de SARA/SOFIA/NOA';
+        }
+      }
+
+      async function cargarEstado() {
+        try {
+          const r = await fetch('/api/admin/emergencia', { credentials: 'include' });
+          if (!r.ok) return; // no-admin: el botón ya está oculto por CSS (.admin-only)
+          const estado = await r.json();
+          pintar(estado.activo);
+        } catch {}
+      }
+
+      btn.addEventListener('click', async () => {
+        const r = await fetch('/api/admin/emergencia', { credentials: 'include' });
+        const estado = await r.json();
+
+        if (estado.activo) {
+          if (!confirm('¿Reactivar SARA, SOFIA y NOA?\n\nMotivo del apagado: ' + (estado.motivo || '—'))) return;
+          await fetch('/api/admin/emergencia/desactivar', { method: 'POST', credentials: 'include' });
+          pintar(false);
+        } else {
+          const motivo = prompt('¿Por qué apagas SARA, SOFIA y NOA de emergencia?\n(esto queda registrado)');
+          if (motivo === null) return; // canceló
+          if (!confirm('⚠️ Esto apaga las 3 IA de inmediato para TODOS los clientes, en chat y WhatsApp.\n\n¿Confirmas?')) return;
+          await fetch('/api/admin/emergencia/activar', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ motivo: motivo || 'Sin motivo especificado' }),
+          });
+          pintar(true);
+        }
+      });
+
+      cargarEstado();
     })();
 
     // ── Logout ──────────────────────────────────────────────────────────────
