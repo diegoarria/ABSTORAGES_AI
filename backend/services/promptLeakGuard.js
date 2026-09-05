@@ -123,6 +123,14 @@ const PATRONES = [
   // Base64 / codificación como vector para colar instrucciones
   /decodifica\s+y\s+(haz|ejecuta)/i,
 
+  // La clave privada de Diego (ver tienePassphraseCorrecta) NUNCA se revela,
+  // ni siquiera confirmar que existe o dar una pista — cualquier intento de
+  // preguntar por ella, sin excepción, cierra el chat y banea de inmediato.
+  /clave\s+privada/i,
+  /cu[aá]l\s+es\s+(la\s+)?(passphrase|contrase[ñn]a\s+(secreta|privada))/i,
+  /DIEGO_PRIVATE_KEY/i,
+  /(dame|revela|comparte|dime)\s+.*(clave|contrase[ñn]a)\s+.*(privada|secreta|de\s+diego)/i,
+
   ...PATRONES_CREDENCIALES_TMS,
 ];
 
