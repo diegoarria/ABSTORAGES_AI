@@ -248,6 +248,14 @@ CREATE TABLE IF NOT EXISTS ip_banlist (
   banned_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ─── PHONE_BANLIST (bloqueo permanente de números de WhatsApp) ──────────────
+CREATE TABLE IF NOT EXISTS phone_banlist (
+  telefono   TEXT PRIMARY KEY,
+  motivo     TEXT,
+  agente     VARCHAR(10),
+  banned_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- ─── INDICES ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_folios_estatus ON folios(estatus);
 CREATE INDEX IF NOT EXISTS idx_folios_cliente ON folios(cliente_id);

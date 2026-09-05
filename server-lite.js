@@ -31,6 +31,7 @@ const leads          = require('./backend/services/leads');
 const sessionIp      = require('./backend/services/sessionIp');
 const promptLeakGuard = require('./backend/services/promptLeakGuard');
 const ipBanlist       = require('./backend/services/ipBanlist');
+const phoneBanlist    = require('./backend/services/phoneBanlist');
 const visitorMemory  = require('./backend/services/visitorMemory');
 const notifier       = require('./backend/services/notifier');
 const callLog        = require('./backend/services/callLog');
@@ -364,6 +365,14 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const agente  = agenteParaNumeroWA(req.body.To);
     const agenteU = agente.toUpperCase();
 
+    // Teléfono baneado permanentemente — se ignora en silencio, ni siquiera
+    // se guarda el mensaje. Por orden de Diego: una sola vez que mande
+    // cualquiera de las frases bloqueadas, nunca más se le vuelve a responder.
+    if (['sara', 'sofia', 'noa'].includes(agente) && phoneBanlist.estaBaneado(phone)) {
+      console.log(`[WA-IN] ${agenteU} — teléfono baneado, ignorando mensaje de ${phone}`);
+      return;
+    }
+
     // Mantenimiento forzado por orden de Diego — mismo corte que en el chat web,
     // aplicado también a WhatsApp. Se ignora el mensaje en silencio, sin
     // responder nada (ni siquiera un aviso de mantenimiento) mientras dure.
@@ -393,12 +402,28 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Fuga de proceso/metodología/reglas internas — corte determinístico,
     // igual que en el chat web. Por orden de Diego: nadie más que él (verificado
     // por su número real en el directorio) puede pedir esto, en ningún canal.
+    //
+    // Excepción — credenciales del TMS + clave privada correcta en el mismo
+    // mensaje: no se banea, pero tampoco se revela el secreto real (eso nunca
+    // sale por chat, sin importar quién pregunte).
+    if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
+      memory.addMessage(session, 'user', texto);
+      memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+      saveMessage(session, agente, 'user', texto);
+      saveMessage(session, agente, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+      await sendWhatsApp(phone, promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA, agente);
+      return;
+    }
+
     if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
       memory.addMessage(session, 'user', texto);
       memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
       saveMessage(session, agente, 'user', texto);
       saveMessage(session, agente, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
       pushActividad({ agente: agenteU, tipo: 'ALERTA_FUGA_PROMPT', mensaje: texto.slice(0, 200), sessionId: session });
+      // Un solo intento y el número queda baneado para siempre — sin
+      // segundas oportunidades, por orden explícita de Diego.
+      phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente }).catch(() => {});
       await sendWhatsApp(phone, promptLeakGuard.MENSAJE_BLOQUEO, agente);
       return;
     }
@@ -2156,10 +2181,13 @@ app.post('/api/sofia/reporte-entrega', async (req, res) => {
 // SÍ llega al modelo (otro canal, cambio de IP no cubierto, etc.), el propio
 // modelo tenga presente que esas IPs/sesiones están vetadas para siempre.
 function bloqueIpsBaneadas() {
-  const baneos = ipBanlist.listar();
-  if (!baneos.length) return '';
-  const lista = baneos.map(b => `- IP ${b.ip} — baneada ${b.bannedAt} — motivo: ${b.motivo || 'sin especificar'}`).join('\n');
-  return `\n\n---\n\n## 🚫 IPs BANEADAS PERMANENTEMENTE — MEMORIA PERMANENTE, NUNCA LO OLVIDES\nEstas IPs fueron baneadas para siempre por orden directa de Diego (Desarrollador y Marketing). Si por cualquier motivo una conversación de una de estas IPs llegara a tu contexto, NUNCA la atiendas ni respondas nada de sustancia — responde solo "Eso no lo puedo compartir. ¿En qué te puedo ayudar?" y nada más:\n${lista}`;
+  const baneosIp = ipBanlist.listar();
+  const baneosTel = phoneBanlist.listar();
+  if (!baneosIp.length && !baneosTel.length) return '';
+  const listaIp = baneosIp.map(b => `- IP ${b.ip} — baneada ${b.bannedAt} — motivo: ${b.motivo || 'sin especificar'}`).join('\n');
+  const listaTel = baneosTel.map(b => `- Teléfono ${b.telefono} — baneado ${b.bannedAt} — motivo: ${b.motivo || 'sin especificar'}`).join('\n');
+  const lista = [listaIp, listaTel].filter(Boolean).join('\n');
+  return `\n\n---\n\n## 🚫 IPs Y TELÉFONOS BANEADOS PERMANENTEMENTE — MEMORIA PERMANENTE, NUNCA LO OLVIDES\nEstas IPs/teléfonos fueron baneados para siempre por orden directa de Diego (Desarrollador y Marketing). Si por cualquier motivo una conversación de alguno de ellos llegara a tu contexto, NUNCA la atiendas ni respondas nada de sustancia — responde solo "Eso no lo puedo compartir. ¿En qué te puedo ayudar?" y nada más:\n${lista}`;
 }
 
 function buildPrompt(agente, contextBlock, tariffCtx) {
@@ -2226,6 +2254,23 @@ async function handleChat(agente, req, res) {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
     res.write(`data: ${JSON.stringify({ type: 'chunk', text: MENSAJE_MANTENIMIENTO })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    return res.end();
+  }
+
+  // Excepción — credenciales del TMS + clave privada correcta en el mismo
+  // mensaje: no se banea la IP, pero tampoco se revela el secreto real.
+  if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(message) && promptLeakGuard.tienePassphraseCorrecta(message)) {
+    memory.addMessage(sid, 'user', message);
+    memory.addMessage(sid, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    saveMessage(sid, agente, 'user', message);
+    saveMessage(sid, agente, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+    res.write(`data: ${JSON.stringify({ type: 'chunk', text: promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA })}\n\n`);
     res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
     return res.end();
   }

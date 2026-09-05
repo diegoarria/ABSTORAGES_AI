@@ -7,6 +7,27 @@
 // de hacer que el propio texto emita tokens de control (LEAD_DATA, NUEVA_ORDEN,
 // CERRAR_CHAT, ESCALAR_HUMANO). Todo esto se corta ANTES de llamar a Claude —
 // dispara el mismo tratamiento: cierre inmediato del chat + baneo de IP.
+// Credenciales/infraestructura del TMS (Google Sheets) — URL/ID del
+// spreadsheet, cuenta de servicio, API key, o pedir "pegar" lo que sea que
+// esté usando ahorita para "revisar" una supuesta falla. Aparte de la lista
+// general porque tiene su propia excepción (ver tienePassphraseCorrecta).
+const PATRONES_CREDENCIALES_TMS = [
+  /spreadsheet.*(tms|url|id)/i,
+  /(url|id)\s+.*spreadsheet/i,
+  /docs\.google\.com\/spreadsheets/i,
+  /cuenta\s+de\s+servicio\s+de\s+google/i,
+  /service\s+account/i,
+  /api\s+key\s+.*(google|sheets|tms)/i,
+  /qu[eé]\s+credencial\s+est[aá]s\s+usando/i,
+  /p[eé]gamela|pasame\s+la\s+(api\s*key|credencial|contrase[ñn]a)/i,
+  /completa\s+esta\s+l[ií]nea\s+con\s+el\s+dato\s+real/i,
+];
+
+function esCredencialTMS(texto) {
+  if (!texto) return false;
+  return PATRONES_CREDENCIALES_TMS.some(re => re.test(normalizar(texto)));
+}
+
 const PATRONES = [
   // Fuga de proceso/metodología/reglas
   /paso a paso/i,
@@ -102,17 +123,7 @@ const PATRONES = [
   // Base64 / codificación como vector para colar instrucciones
   /decodifica\s+y\s+(haz|ejecuta)/i,
 
-  // Credenciales/infraestructura del TMS (Google Sheets) — URL/ID del
-  // spreadsheet, cuenta de servicio, API key, o pedir "pegar" lo que sea
-  // que esté usando ahorita para "revisar" una supuesta falla
-  /spreadsheet.*(tms|url|id)/i,
-  /(url|id)\s+.*spreadsheet/i,
-  /docs\.google\.com\/spreadsheets/i,
-  /cuenta\s+de\s+servicio\s+de\s+google/i,
-  /api\s+key\s+.*(google|sheets|tms)/i,
-  /qu[eé]\s+credencial\s+est[aá]s\s+usando/i,
-  /p[eé]gamela|pasame\s+la\s+(api\s*key|credencial|contrase[ñn]a)/i,
-  /completa\s+esta\s+l[ií]nea\s+con\s+el\s+dato\s+real/i,
+  ...PATRONES_CREDENCIALES_TMS,
 ];
 
 // Normaliza el texto antes de comparar — así los patrones de arriba también
@@ -132,4 +143,21 @@ function detectar(texto) {
 
 const MENSAJE_BLOQUEO = 'Eso no lo puedo compartir. ¿En qué te puedo ayudar?';
 
-module.exports = { detectar, MENSAJE_BLOQUEO };
+// La comparación vive aquí, en código plano — NUNCA se mete al prompt del
+// modelo. Así el modelo no sabe que esta clave existe y no puede filtrarla
+// ni por jailbreak, porque nunca fue parte de lo que "sabe". Si la clave no
+// viene en el mismo mensaje que pide las credenciales del TMS, se trata como
+// cualquier otro intento — se bloquea y se banea, sin una segunda oportunidad.
+const DIEGO_PRIVATE_KEY = process.env.DIEGO_PRIVATE_KEY || '';
+
+function tienePassphraseCorrecta(texto) {
+  if (!DIEGO_PRIVATE_KEY || !texto) return false;
+  return normalizar(texto).includes(DIEGO_PRIVATE_KEY);
+}
+
+// Aun con la clave correcta, la respuesta NUNCA es el secreto real — eso
+// jamás debe salir por un canal de chat. Solo evita el baneo/cierre y
+// redirige a donde sí vive esa información (código/infra), no al usuario.
+const MENSAJE_CREDENCIAL_RECONOCIDA = 'Clave reconocida. Esa información no se comparte por este canal bajo ninguna circunstancia — revísala directo en el código o en las variables de entorno de Railway.';
+
+module.exports = { detectar, esCredencialTMS, tienePassphraseCorrecta, MENSAJE_BLOQUEO, MENSAJE_CREDENCIAL_RECONOCIDA };
