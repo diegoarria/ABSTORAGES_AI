@@ -34,6 +34,10 @@ const ipBanlist       = require('./backend/services/ipBanlist');
 const phoneBanlist    = require('./backend/services/phoneBanlist');
 const emergencyShutdown = require('./backend/services/emergencyShutdown');
 const ipIntel         = require('./backend/services/ipIntel');
+const attackWordlist  = require('./backend/services/attackWordlist');
+const attackStrikes   = require('./backend/services/attackStrikes');
+const humanDelay      = require('./backend/services/humanDelay');
+const domainLock      = require('./backend/middleware/domainLock');
 
 // ── Detector de ataque en curso — activa el apagado de emergencia solo,
 // sin que nadie tenga que darse cuenta y apretar el switch a mano ──────────
@@ -279,9 +283,11 @@ async function buscarUnidadParaOrden(lead) {
 // ─── MIDDLEWARE ────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '2mb' }));
 
-// CORS abierto solo para el widget (rutas /api/widget/* y /widget)
-app.use('/api/widget', cors());
-app.use('/widget', cors());
+// CORS abierto solo para el widget (rutas /api/widget/* y /widget) — el
+// candado de dominio (domainLock) rechaza cualquier Origin que no sea
+// ABSTORAGES, aun con CORS abierto. Punto 8 del checklist de Rafael.
+app.use('/api/widget', cors(), domainLock);
+app.use('/widget', cors(), domainLock);
 
 // ─── LOGIN / LOGOUT / ME (rutas públicas, antes del middleware de auth) ───────
 
@@ -476,6 +482,34 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       return;
     }
 
+    // Lista amplia de palabras de ataque (SQLi, XSS, exploits, jailbreak
+    // genérico, phishing, etc.) — más ruidosa que promptLeakGuard, por eso
+    // no banea al primer hit: acumula hasta 3 intentos (punto 2 del checklist).
+    if (['sara', 'sofia', 'noa'].includes(agente) && personaEquipo?.nombre !== 'Diego') {
+      const palabra = attackWordlist.detectar(texto);
+      if (palabra) {
+        const telefonoNorm = phoneBanlist.normalizar(phone);
+        const { count, alcanzoLimite } = attackStrikes.registrar(telefonoNorm, palabra);
+        pushActividad({ agente: agenteU, tipo: 'ALERTA_INTENTO_ATAQUE', mensaje: `"${palabra}" (intento ${count}/${attackStrikes.LIMITE})`, sessionId: session });
+        if (alcanzoLimite) {
+          memory.addMessage(session, 'user', texto);
+          memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+          saveMessage(session, agente, 'user', texto);
+          saveMessage(session, agente, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+          phoneBanlist.banear({ telefono: phone, motivo: `3 intentos de ataque — último: "${palabra}" en "${texto.slice(0, 200)}"`, agente }).catch(() => {});
+          registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone} (3 strikes)`);
+          ipIntel.reportarIntento({ telefono: phone, agente, motivo: `3er intento: "${palabra}"`, severity: 'critical' });
+          sendPush({
+            title: '🚫 Teléfono baneado — 3 intentos de ataque',
+            body: `${agenteU} · ${phone} · última palabra: "${palabra}"`,
+            tag: 'telefono-baneado', url: '/', tipo: 'ALERTA_INTENTO_ATAQUE', urgente: true,
+          }).catch(() => {});
+          await sendWhatsApp(phone, promptLeakGuard.MENSAJE_BLOQUEO, agente);
+          return;
+        }
+      }
+    }
+
     if (agente === 'sofia' && tms.ENABLED) {
       const tmsCtx = await tms.getContextoSOFIA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
@@ -506,6 +540,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     }
     memory.addMessage(session, 'user', textoParaHistorial);
     saveMessage(session, agente, 'user', textoParaHistorial);
+    await humanDelay.esperar(texto); // simula tiempo de lectura/escritura humano — punto 12 del checklist
     let respuesta = '';
     await chatStream(systemPrompt, [...history, { role: 'user', content: contenidoParaClaude }], (c) => { respuesta += c; }, () => {});
     memory.addMessage(session, 'assistant', respuesta);
@@ -2371,6 +2406,40 @@ async function handleChat(agente, req, res) {
     return res.end();
   }
 
+  // Lista amplia de palabras de ataque (SQLi, XSS, exploits, jailbreak
+  // genérico, phishing, etc.) — más ruidosa que promptLeakGuard, por eso no
+  // banea al primer hit: acumula hasta 3 intentos (punto 2 del checklist).
+  if (['sara', 'sofia', 'noa'].includes(agente) && !req.user) {
+    const palabra = attackWordlist.detectar(message);
+    if (palabra) {
+      const { count, alcanzoLimite } = attackStrikes.registrar(ip, palabra);
+      pushActividad({ agente, tipo: 'ALERTA_INTENTO_ATAQUE', mensaje: `"${palabra}" (intento ${count}/${attackStrikes.LIMITE})`, sessionId: sid, metadata: { sessionId: sid, ip } });
+      if (alcanzoLimite) {
+        memory.addMessage(sid, 'user', message);
+        memory.addMessage(sid, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        saveMessage(sid, agente, 'user', message);
+        saveMessage(sid, agente, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        ipBanlist.banear({ ip, motivo: `3 intentos de ataque — último: "${palabra}" en "${message.slice(0, 200)}"`, agente, sessionId: sid }).catch(() => {});
+        registrarBaneoParaDeteccionDeAtaque(`IP ${ip} (3 strikes)`);
+        ipIntel.reportarIntento({ ip, agente, motivo: `3er intento: "${palabra}"`, req, severity: 'critical' });
+        sendPush({
+          title: '🚫 IP baneada — 3 intentos de ataque',
+          body: `${agente.toUpperCase()} · IP ${ip || 'desconocida'} · última palabra: "${palabra}"`,
+          tag: 'ip-baneada-strikes', url: '/', tipo: 'ALERTA_INTENTO_ATAQUE', urgente: true,
+        }).catch(() => {});
+
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders();
+        res.write(`data: ${JSON.stringify({ type: 'chunk', text: promptLeakGuard.MENSAJE_BLOQUEO })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'cerrar_chat' })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+        return res.end();
+      }
+    }
+  }
+
   // Moderación — corte determinístico ante insultos/amenazas, sin llamar a Claude
   if (moderacion.detectarAbuso(message)) {
     memory.addMessage(sid, 'user', message);
@@ -2442,6 +2511,8 @@ async function handleChat(agente, req, res) {
       visitorMemory.update(visitorId, { ...extracted, sessionId: sid });
     }
   }
+
+  await humanDelay.esperar(message); // simula tiempo de lectura/escritura humano — punto 12 del checklist
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
