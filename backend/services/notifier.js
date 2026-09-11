@@ -335,6 +335,39 @@ async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
   }
 }
 
+// ── Alertas urgentes (bans, apagado de emergencia, alertas críticas) por
+// email — mismo criterio "urgente" que ya usa sendPush() en server-lite.js
+// para las notificaciones push, así no hay que duplicar la lista de eventos
+// en dos lugares. Va a Diego + Rafael, no a la lista general de NOTIF_EMAIL
+// (esa es solo para leads comerciales).
+const RAFAEL_EMAIL = 'rafael.arria@abstorages.com';
+const ALERT_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL];
+
+async function notificarAlerta({ title, body, tipo }) {
+  const asunto = title || 'Alerta ABSTORAGES AI';
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#7a1f1f;padding:20px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">${asunto}</div>
+      <div style="color:#fca5a5;font-size:12px;margin-top:2px;">${new Date().toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Monterrey'})}${tipo ? ` · ${tipo}` : ''}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0;font-size:14px;color:#111;white-space:pre-wrap;">${body || 'Sin detalle adicional.'}</p>
+    </div>
+  </div>`;
+
+  if (!gmailTransport) {
+    console.log(`[Notifier STUB] Alerta: ${asunto} — ${body || ''}`);
+    return;
+  }
+  try {
+    await gmailTransport.sendMail({ from: `ABSTORAGES AI <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Alerta enviada a ${ALERT_EMAILS.join(', ')} — "${asunto}"`);
+  } catch (e) {
+    console.error('[Gmail] ❌ Error enviando alerta:', e.message);
+  }
+}
+
 async function notificarLlamada({ agente, nombre, telefono, resumen, transcript, duracionSeg, folio }) {
   const label = AGENTE_LABEL[agente] || agente?.toUpperCase() || 'Agente';
   const asunto = `📞 Llamada terminada — ${label}${folio ? ` · Folio ${folio}` : ''}`;
@@ -356,4 +389,4 @@ async function notificarLlamada({ agente, nombre, telefono, resumen, transcript,
   if (!enviado) console.log(`[Notifier STUB] Llamada terminada — ${label} con ${nombre}`);
 }
 
-module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada };
+module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta };

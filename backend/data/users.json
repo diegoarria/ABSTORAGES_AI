@@ -8,6 +8,14 @@
     "role": "admin"
   },
   {
+    "id": "admin-002",
+    "nombre": "Rafael Arria",
+    "email": "rafael.arria@abstorages.com",
+    "password": "venezuela2011",
+    "pin": "1368",
+    "role": "admin"
+  },
+  {
     "id": "ops-001",
     "nombre": "Gabriel Díaz",
     "email": "gabriel.diaz@abstorages.com",

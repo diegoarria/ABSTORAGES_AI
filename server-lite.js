@@ -114,6 +114,13 @@ function savePushSubs() {
 }
 
 async function sendPush(payload) {
+  // Toda alerta marcada "urgente" (bans, apagado de emergencia, alertas
+  // críticas de NOA, nuevas órdenes) también va por email a Diego + Rafael —
+  // mismo criterio que ya se usa para decidir qué sí interrumpe con push,
+  // sin mantener una segunda lista de eventos por separado.
+  if (payload.urgente) {
+    notifier.notificarAlerta({ title: payload.title, body: payload.body, tipo: payload.tipo }).catch(() => {});
+  }
   if (!VAPID_PUB || !VAPID_PRIV || pushSubs.length === 0) return;
   const dead = [];
   await Promise.allSettled(pushSubs.map(async (sub, i) => {
