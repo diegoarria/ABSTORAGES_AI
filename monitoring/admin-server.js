@@ -14,6 +14,23 @@ const PORT = process.env.MONITORING_ADMIN_PORT || 4001;
 app.set('trust proxy', 1);
 app.use(express.json());
 
+// Bootstrap del primer usuario del panel — monitoring/data/admin-users.json
+// vive en el disco efímero del contenedor (nunca se commitea, está en
+// .gitignore), así que en un despliegue nuevo no hay forma de correr
+// `createAdminUser.js` a mano sin acceso SSH. Si no hay ningún usuario
+// todavía y vienen estas 2 variables, se crea una sola vez al arrancar —
+// no pisa un usuario que ya exista con ese mismo nombre.
+if (process.env.MONITORING_BOOTSTRAP_USER && process.env.MONITORING_BOOTSTRAP_PASS) {
+  try {
+    if (!auth.verificarLogin(process.env.MONITORING_BOOTSTRAP_USER, process.env.MONITORING_BOOTSTRAP_PASS)) {
+      auth.upsertUser(process.env.MONITORING_BOOTSTRAP_USER, process.env.MONITORING_BOOTSTRAP_PASS);
+      console.log(`[monitoring/admin-server] Usuario bootstrap "${process.env.MONITORING_BOOTSTRAP_USER}" creado/actualizado.`);
+    }
+  } catch (e) {
+    console.error('[monitoring/admin-server] Error en bootstrap de usuario:', e.message);
+  }
+}
+
 // CORS manual (sin depender del paquete `cors` del repo raíz, para que
 // monitoring/ pueda vivir como servicio 100% independiente) — solo necesario
 // si despliegas el panel en un dominio distinto al de admin-server.js (ej.
