@@ -79,6 +79,7 @@ const callLog        = require('./backend/services/callLog');
 const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
+const sofiaScheduler = require('./backend/services/sofiaScheduler');
 const db          = require('./backend/db/db');
 const tms         = require('./backend/services/tms');
 const { limpiarFormatoWhatsApp } = require('./backend/services/formatoWA');
@@ -3116,6 +3117,7 @@ app.listen(PORT, () => {
   console.log(`  TTS Voz:   ${EL_LIVE ? '🟢 LIVE' : '🟡 stub (agrega ELEVENLABS_API_KEY)'}`);
   console.log(`  Tarifas:   🟢 dinámicas\n`);
   noaScheduler.iniciar(pushActividad);
+  sofiaScheduler.iniciar(pushActividad);
   tms.iniciarPrewarmNOA();
   setInterval(revisarLeadsSinRespuesta, 30 * 60 * 1000);
 });

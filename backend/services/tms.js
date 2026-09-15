@@ -593,6 +593,47 @@ async function buscarFolioNOA(folio) {
   return r?.datos || [];
 }
 
+// ── Folios sin proveedor asignado, próximos a cargar — para la ronda diaria
+// de disponibilidad de SOFIA (sofiaScheduler.js). Reutiliza el mismo filtro
+// de "Estatus Operaciones contiene Proceso" que foliosActivosNOA porque es
+// el único indicador de "folio vivo" que expone el TMS — la falta de
+// proveedor asignado se detecta en JS, no hay un estatus explícito para eso.
+async function foliosPorAsignar(horasVentana = 72) {
+  const campos = [
+    'Folio de servicio', 'Cliente',
+    'Cuidad Origen', 'Estado Origen', 'Cuidad destino', 'Estado destino',
+    'Cita de carga', 'Proveedor', 'Tipo remolque', 'Mercancias', 'Presentacion',
+  ];
+  const r = await query('detalle_servicios', {
+    pagina: 1, limite: 200,
+    filtros: { 'Estatus Operaciones': { contiene: 'Proceso' } },
+    campos,
+  });
+  const todos = r?.datos || [];
+  const limite = Date.now() + horasVentana * 60 * 60 * 1000;
+
+  const filtrados = todos.filter(s => {
+    const sinProveedor = !s['Proveedor'] || !String(s['Proveedor']).trim();
+    if (!sinProveedor) return false;
+    const cita = s['Cita de carga'] ? new Date(s['Cita de carga']).getTime() : null;
+    // Sin fecha de cita definida todavía: más vale preguntar disponibilidad
+    // de más que dejar pasar una carga real sin cubrir por falta de dato.
+    if (!cita || isNaN(cita)) return true;
+    return cita <= limite;
+  });
+
+  // El TMS trae filas duplicadas del mismo folio en detalle_servicios (mismo
+  // patrón ya visto en foliosActivosNOA) — sin esto, SOFIA le preguntaría
+  // disponibilidad al mismo proveedor 2-3 veces por el mismo folio en una
+  // sola ronda.
+  const unicos = new Map();
+  for (const f of filtrados) {
+    const folio = f['Folio de servicio'];
+    if (folio && !unicos.has(folio)) unicos.set(folio, f);
+  }
+  return [...unicos.values()];
+}
+
 // Folios activos para el dashboard de NOA
 // Valores reales de EstatusMonitoreoDetalle: "En tránsito", "En origen",
 // "Unidad detenida", "Unidad en resguardo", "En destino", "Sin Información", "Servicio concluido"
@@ -773,7 +814,7 @@ module.exports = {
   // SARA
   buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
   // SOFIA
-  listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA, proveedoresParaVapi,
+  listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA, proveedoresParaVapi, foliosPorAsignar,
   // NOA
   buscarFolioNOA, foliosActivosNOA, getContextoNOA,
   // Core
