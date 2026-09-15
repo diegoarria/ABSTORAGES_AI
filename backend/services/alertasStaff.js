@@ -24,6 +24,7 @@ const STAFF = require('../data/staff-contacts.json');
 const vapi  = require('./vapi');
 const incidentesNOA = require('./incidentesNOA');
 const twochat = require('./twochat');
+const agentPause = require('./agentPause');
 
 const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
@@ -46,6 +47,10 @@ const EQUIPO_ESTATUS        = ['dante', 'rafael', 'diego'];
 const MASIVOS_HABILITADO = process.env.MENSAJES_MASIVOS === 'true';
 
 async function enviarPlantilla(to, contentSid, variables) {
+  if (agentPause.estaPausado('noa')) {
+    console.warn(`[alertasStaff] NOA pausada — se omite plantilla a ${to}`);
+    return { status: 'paused', to };
+  }
   if (!WA_LIVE) {
     console.log(`[alertasStaff STUB] → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
     return { status: 'stub', to };
@@ -196,6 +201,10 @@ async function alertarCriticoStaff({ folio, motivo, canal }) {
     return { ok: false, razon: `duplicado de ${incidenteReciente.id}` };
   }
   try { incidentesNOA.registrar({ folio, motivo, canal }); } catch (e) { console.error('[alertasStaff] Error registrando incidente:', e.message); }
+  if (agentPause.estaPausado('noa')) {
+    console.warn(`[alertasStaff] 🔇 NOA pausada — alerta crítica folio ${folio || '—'} NO se manda a nadie (WhatsApp/llamada/grupo). Sí quedó registrada.`);
+    return { ok: false, razon: 'NOA pausada' };
+  }
   if (!MASIVOS_HABILITADO) {
     console.warn(`[alertasStaff] 🔇 SUPRIMIDA — alerta crítica folio ${folio || '—'} (${motivo || 'sin motivo'}) — MENSAJES_MASIVOS no está en "true". Nadie del staff fue notificado por WhatsApp/llamada. El evento sí quedó registrado (incidentesNOA) y visible en el ops-center.`);
     return { ok: false, razon: 'MENSAJES_MASIVOS deshabilitado' };
@@ -214,6 +223,10 @@ async function alertarCriticoStaff({ folio, motivo, canal }) {
 }
 
 async function enviarEstatusSeguimiento({ folio, resumen }) {
+  if (agentPause.estaPausado('noa')) {
+    console.warn(`[alertasStaff] 🔇 NOA pausada — estatus de seguimiento folio ${folio || '—'} NO se manda a nadie.`);
+    return { ok: false, razon: 'NOA pausada' };
+  }
   if (!MASIVOS_HABILITADO) {
     console.warn(`[alertasStaff] 🔇 SUPRIMIDO — estatus de seguimiento folio ${folio || '—'} — MENSAJES_MASIVOS no está en "true".`);
     return { ok: false, razon: 'MENSAJES_MASIVOS deshabilitado' };

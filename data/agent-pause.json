@@ -2,5 +2,13 @@
   "sofia": {
     "motivo": "Pedido directo del usuario (Diego) — pausar contacto proactivo de SOFIA hasta nuevo aviso, 15-sep-2026",
     "desde": "2026-09-15T00:00:00.000Z"
+  },
+  "sara": {
+    "motivo": "Pedido directo del usuario (Diego) — pausar contacto proactivo de SARA hasta nuevo aviso, 15-sep-2026",
+    "desde": "2026-09-15T00:00:00.000Z"
+  },
+  "noa": {
+    "motivo": "Pedido directo del usuario (Diego) — pausar contacto proactivo de NOA hasta nuevo aviso, 15-sep-2026",
+    "desde": "2026-09-15T00:00:00.000Z"
   }
 }

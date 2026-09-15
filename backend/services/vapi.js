@@ -462,6 +462,10 @@ async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPro
 
 // ── Llamada de seguimiento al lead capturado por SARA (ya cotizó/en proceso) ──
 async function llamarLead(lead) {
+  if (agentPause.estaPausado('sara')) {
+    console.warn(`[Vapi] SARA pausada — se omite llamada de seguimiento a ${lead?.nombre || lead?.telefono}`);
+    return { status: 'paused' };
+  }
   const raw = (lead.telefono || '').replace(/\D/g, '');
   if (raw.length < 10) {
     console.log(`[Vapi] Teléfono inválido para llamada de seguimiento: ${lead.telefono}`);
@@ -496,6 +500,10 @@ async function llamarLead(lead) {
 
 // ── Llamada de confirmación — SARA acaba de cerrar la venta (NUEVA_ORDEN) ────
 async function llamarConfirmacionVenta(lead) {
+  if (agentPause.estaPausado('sara')) {
+    console.warn(`[Vapi] SARA pausada — se omite llamada de confirmación a ${lead?.nombre || lead?.telefono}`);
+    return { status: 'paused' };
+  }
   const raw = (lead.telefono || '').replace(/\D/g, '');
   if (raw.length < 10) {
     console.log(`[Vapi] Teléfono inválido para llamada de confirmación de venta: ${lead.telefono}`);
@@ -557,6 +565,10 @@ async function llamarProspecto(prospecto) {
 
 // ── Llamada genérica de estatus (NOA) — usada para chofer/proveedor y cliente ─
 async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
+  if (agentPause.estaPausado('noa')) {
+    console.warn(`[Vapi] NOA pausada — se omite llamada de estatus (${rol}) a ${nombre || telefono}`);
+    return { status: 'paused' };
+  }
   if (!telefono) {
     console.log(`[Vapi] NOA — sin teléfono para ${rol} del folio ${folio}, se omite llamada`);
     return { status: 'sin_telefono' };
@@ -632,6 +644,10 @@ async function llamarStatusCliente({ telefono, nombre, folio, ruta }) {
 // situación de viva voz y responde preguntas del equipo sobre lo que sabe.
 async function llamarAlertaStaff({ telefono, nombreStaff, folio, motivo }) {
   if (!telefono) return { status: 'sin_telefono' };
+  if (agentPause.estaPausado('noa')) {
+    console.warn(`[Vapi] NOA pausada — se omite llamada de alerta crítica a ${nombreStaff || telefono}`);
+    return { status: 'paused' };
+  }
 
   const primerMensaje =
     `Hola ${nombreStaff || ''}, soy Noa, de monitoreo ABSTORAGES. Te marco por una alerta crítica ` +

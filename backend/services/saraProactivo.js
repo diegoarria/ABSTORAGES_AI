@@ -16,6 +16,7 @@
 //   abstorages_sara_venta_cerrada_2    → HXf43876d80588e3323741f01ec3f90f61
 require('dotenv').config();
 const memory = require('./memory');
+const agentPause = require('./agentPause');
 
 // Tiene que coincidir EXACTO con el `phone` que arma el webhook de WhatsApp
 // (server-lite.js, From de Twilio) para que sea la misma sesión cuando la
@@ -45,6 +46,10 @@ const CONTENT_SID_COTIZACION       = 'HXffc1ba05d5857ff12a3cf56aa9730adf';
 const CONTENT_SID_VENTA_CERRADA    = 'HXf43876d80588e3323741f01ec3f90f61';
 
 async function enviarPlantilla(to, contentSid, variables) {
+  if (agentPause.estaPausado('sara')) {
+    console.warn(`[saraProactivo] SARA pausada — se omite plantilla a ${to}`);
+    return { status: 'paused', to };
+  }
   if (!WA_LIVE) {
     console.log(`[saraProactivo STUB] → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
     return { status: 'stub', to };

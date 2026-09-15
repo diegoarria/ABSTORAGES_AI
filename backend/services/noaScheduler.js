@@ -8,6 +8,7 @@
 
 const tms  = require('./tms');
 const vapi = require('./vapi');
+const agentPause = require('./agentPause');
 
 const HABILITADO   = process.env.NOA_AUTOLLAMADAS === 'true';
 const INTERVALO_MS = 90 * 60 * 1000; // 1.5 horas entre llamadas por folio
@@ -35,6 +36,10 @@ async function telefonoCliente(nombreCliente) {
 
 async function revisarFolios(pushActividad) {
   if (!HABILITADO) return;
+  if (agentPause.estaPausado('noa')) {
+    console.log('[NOA scheduler] NOA pausada — se omite este ciclo de llamadas de estatus');
+    return;
+  }
   if (!tms.ENABLED) return;
 
   let folios;
