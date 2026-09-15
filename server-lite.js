@@ -39,6 +39,7 @@ const attackStrikes   = require('./backend/services/attackStrikes');
 const humanDelay      = require('./backend/services/humanDelay');
 const domainLock      = require('./backend/middleware/domainLock');
 const plantillasAprobadas = require('./backend/services/plantillasAprobadas');
+const agentPause      = require('./backend/services/agentPause');
 
 // ── Detector de ataque en curso — activa el apagado de emergencia solo,
 // sin que nadie tenga que darse cuenta y apretar el switch a mano ──────────
@@ -1744,6 +1745,9 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
     if (!contacto.telefono) return res.status(400).json({ error: 'Este contacto no tiene teléfono guardado' });
 
     const agente = (contacto.agente_asignado || '').toLowerCase();
+    if (agentPause.estaPausado(agente)) {
+      return res.status(423).json({ error: `${agente.toUpperCase()} está pausada — no puede contactar a nadie por ahora.` });
+    }
     const plantilla = plantillasAprobadas.buscarPlantilla(agente, contentSid);
     if (!plantilla) {
       return res.status(403).json({ error: 'Esa plantilla no está aprobada para este agente — no se puede enviar.' });
@@ -1784,6 +1788,11 @@ app.post('/api/contactos/:id/llamar', soloAdmin, async (req, res) => {
     const contacto = await contactos.obtenerDetalle(req.params.id);
     if (!contacto) return res.status(404).json({ error: 'Contacto no encontrado' });
     if (!contacto.telefono) return res.status(400).json({ error: 'Este contacto no tiene teléfono guardado' });
+
+    const agenteContacto = (contacto.agente_asignado || '').toLowerCase();
+    if (agentPause.estaPausado(agenteContacto)) {
+      return res.status(423).json({ error: `${agenteContacto.toUpperCase()} está pausada — no puede contactar a nadie por ahora.` });
+    }
 
     const resultado = await vapi.llamarProspecto({
       nombre: contacto.nombre_completo, telefono: contacto.telefono,
@@ -2906,6 +2915,22 @@ app.post('/api/admin/emergencia/activar', soloAdmin, async (req, res) => {
 app.post('/api/admin/emergencia/desactivar', soloAdmin, async (req, res) => {
   await emergencyShutdown.desactivar({ desactivadoPor: req.user?.nombre || req.user?.email || 'admin' });
   res.json(emergencyShutdown.obtenerEstado());
+});
+
+// Pausa de contacto proactivo por agente — a diferencia de la emergencia
+// (apaga las 3 IA por completo), esto solo bloquea que UN agente inicie
+// contacto (llamadas, plantillas de WhatsApp); sigue contestando si alguien
+// le escribe primero.
+app.get('/api/admin/agentes/pausados', soloAdmin, (req, res) => {
+  res.json(agentPause.listar());
+});
+app.post('/api/admin/agentes/:agente/pausar', soloAdmin, (req, res) => {
+  agentPause.pausar(req.params.agente, req.body?.motivo || `Pausado manualmente por ${req.user?.nombre || req.user?.email || 'admin'}`);
+  res.json(agentPause.listar());
+});
+app.post('/api/admin/agentes/:agente/reanudar', soloAdmin, (req, res) => {
+  agentPause.reanudar(req.params.agente);
+  res.json(agentPause.listar());
 });
 
 app.get('/api/metricas', soloAdmin, async (req, res) => {

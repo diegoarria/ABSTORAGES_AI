@@ -12,6 +12,7 @@
 const tms             = require('./tms');
 const vapi             = require('./vapi');
 const whatsappProactivo = require('./whatsappProactivo');
+const agentPause        = require('./agentPause');
 
 const HABILITADO     = process.env.SOFIA_DISPONIBILIDAD_DIARIA === 'true';
 const HORA_ENVIO      = Number(process.env.SOFIA_DISPONIBILIDAD_HORA || 8); // 8am hora Monterrey
@@ -30,6 +31,10 @@ function horaYFechaMTY() {
 
 async function correrSiToca(pushActividad) {
   if (!HABILITADO) return;
+  if (agentPause.estaPausado('sofia')) {
+    console.log('[SOFIA scheduler] SOFIA pausada — se omite la ronda diaria de hoy');
+    return;
+  }
   if (!tms.ENABLED) return;
 
   const { fecha, hora } = horaYFechaMTY();

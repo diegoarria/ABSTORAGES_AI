@@ -6,6 +6,7 @@ const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
 const SARA_SYSTEM_PROMPT  = require('../agents/sara-prompt');
 const NOA_SYSTEM_PROMPT   = require('../agents/noa-prompt');
 const contactos           = require('./contactos');
+const agentPause          = require('./agentPause');
 
 const API_KEY               = process.env.VAPI_API_KEY;
 const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;             // SOFIA
@@ -95,6 +96,10 @@ const VOZ_TUNING_RAPIDA = {
 
 // ── Lanzar una llamada a un proveedor ─────────────────────────────────────────
 async function llamarProveedor(proveedor, orden) {
+  if (agentPause.estaPausado('sofia')) {
+    console.warn(`[Vapi] SOFIA pausada — se omite llamada a ${proveedor?.nombre} (folio ${orden?.folio})`);
+    return { status: 'paused', proveedor: proveedor?.id };
+  }
   const primerMensaje =
     `${ESLOGAN}. Hola ${proveedor.nombre}, soy SOFIA. ` +
     `Tenemos un servicio urgente — folio ${orden.folio}. ` +

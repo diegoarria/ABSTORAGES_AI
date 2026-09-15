@@ -24,6 +24,7 @@
 require('dotenv').config();
 const STAFF = require('../data/staff-contacts.json');
 const memory = require('./memory');
+const agentPause = require('./agentPause');
 
 // Normaliza a E.164 (+52XXXXXXXXXX) — tiene que coincidir EXACTO con el
 // `phone` que arma el webhook de WhatsApp (server-lite.js, From de Twilio)
@@ -63,6 +64,10 @@ function telefonoValido(t) {
 }
 
 async function enviarPlantilla(agente, to, contentSid, variables) {
+  if (agentPause.estaPausado(agente)) {
+    console.warn(`[whatsappProactivo] ${agente?.toUpperCase()} pausado — se omite plantilla a ${to}`);
+    return { status: 'paused', to };
+  }
   const from = TWILIO_WA_FROM[agente];
   const live = !!(TWILIO_SID && TWILIO_TOKEN && from);
   if (!live) {
