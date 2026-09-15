@@ -36,7 +36,7 @@ function normalizarTelefono(t) {
   return (t || '').replace(/\D/g, '').slice(-10);
 }
 
-function upsertEnMemoria({ agente, tipo, nombre_completo, telefono, email, empresa, tipo_carga, resumen_interaccion, canal }) {
+function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas }) {
   const AGENTE = (agente || '').toUpperCase();
   const tel = normalizarTelefono(telefono);
   let existente = null;
@@ -47,19 +47,22 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, telefono, email, empre
   let contacto;
   if (existente) {
     existente.nombre_completo = nombre_completo || existente.nombre_completo;
+    existente.puesto          = puesto || existente.puesto;
     existente.telefono        = telefono || existente.telefono;
     existente.email           = email || existente.email;
     existente.empresa         = empresa || existente.empresa;
     existente.tipo_carga      = tipo_carga || existente.tipo_carga;
+    existente.tipo            = tipo || existente.tipo;
+    existente.notas           = notas || existente.notas;
     existente.fecha_ultimo_contacto = ahora;
     contacto = existente;
   } else {
     contacto = {
       id: `CT-${Date.now().toString(36).toUpperCase()}`,
       agente_asignado: AGENTE, tipo: tipo || null,
-      nombre_completo: nombre_completo || 'Sin nombre', telefono: telefono || null,
-      email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null,
-      fecha_ultimo_contacto: ahora, created_at: ahora,
+      nombre_completo: nombre_completo || 'Sin nombre', puesto: puesto || null, telefono: telefono || null,
+      email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null,
+      fecha_primer_contacto: ahora, fecha_ultimo_contacto: ahora, created_at: ahora,
     };
     cache.push(contacto);
     if (cache.length > MAX_REGISTROS) cache = cache.slice(-MAX_REGISTROS);

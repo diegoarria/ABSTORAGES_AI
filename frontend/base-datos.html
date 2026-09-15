@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Memoria de Agentes — ABSTORAGES</title>
+<title>Base de Datos — ABSTORAGES</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#04080f">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -13,7 +13,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/design-system.css">
 <style>
-/* Alias hacia los tokens corporativos de design-system.css */
 :root {
   --m-bg:   var(--ink-950);
   --m-s1:   var(--ink-900);
@@ -31,7 +30,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--m-bg); color: var(--m-t1); font-family: var(--font-sans); min-height: 100vh; }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
 .hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--m-s1); border-bottom:1px solid var(--m-b1); position:sticky; top:0; z-index:50; }
 .hdr-logo { font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--m-t1); display:flex; align-items:center; gap:8px; }
 .hdr-logo span { color:var(--m-acc); }
@@ -39,14 +37,12 @@ body { background: var(--m-bg); color: var(--m-t1); font-family: var(--font-sans
 .hn { background:none; border:none; color:var(--m-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
 .hn:hover, .hn.on { background:rgba(47,111,237,.12); color:var(--m-acc); }
 
-/* ── Layout ─────────────────────────────────────────────────────────────── */
 .wrap { max-width:1280px; margin:0 auto; padding:24px 24px 60px; }
 .top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
 .eyebrow { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--m-t3); margin-bottom:4px; }
 h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
 .updated { font-size:11px; color:var(--m-t3); }
 
-/* ── Tabs por agente ────────────────────────────────────────────────────── */
 .tabs { display:flex; gap:10px; margin-bottom:18px; }
 .tab { flex:1; position:relative; cursor:pointer; padding:14px 16px 12px; background:var(--m-s1); border:1px solid var(--m-b1); border-bottom:3px solid var(--m-b1); border-radius:10px 10px 0 0; transition:.15s; }
 .tab:hover { border-color:rgba(255,255,255,.14); }
@@ -61,14 +57,24 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
 .tab[data-agent="SOFIA"] .count { background:rgba(47,111,237,.15); color:var(--m-acc); }
 .tab[data-agent="NOA"]   .count { background:rgba(240,169,59,.15); color:var(--m-amb); }
 
-/* ── Controles ──────────────────────────────────────────────────────────── */
+/* ── Panel de "lo que tengo permitido hacer" ───────────────────────────── */
+.permitido { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:10px; padding:14px 18px; margin-bottom:16px; }
+.permitido .cab { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.permitido .cab .ico { font-size:14px; }
+.permitido .cab .txt { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--m-t2); }
+.permitido .chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.pchip { font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:6px; background:var(--m-s2); border:1px solid var(--m-b1); color:var(--m-t1); }
+.permitido .regla { font-size:11.5px; color:var(--m-t3); line-height:1.5; border-top:1px solid var(--m-b1); padding-top:9px; }
+.permitido .regla b { color:var(--m-red); }
+
 .controls { display:flex; gap:8px; margin-bottom:14px; }
 .search { flex:1; background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:9px 12px; color:var(--m-t1); font-size:13px; outline:none; transition:border-color .15s; }
 .search:focus { border-color:rgba(47,111,237,.5); }
-.filter { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:9px 13px; color:var(--m-t3); font-size:12px; cursor:pointer; font-weight:600; transition:all .15s; }
+.filter { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:9px 13px; color:var(--m-t3); font-size:12px; cursor:pointer; font-weight:600; transition:all .15s; white-space:nowrap; }
 .filter.on { color:var(--m-t1); border-color:rgba(255,255,255,.18); background:var(--m-s3); }
+.btn-add { background:var(--m-acc); border:none; border-radius:8px; padding:9px 16px; color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.btn-add:hover { filter:brightness(1.08); }
 
-/* ── Board: lista + detalle ─────────────────────────────────────────────── */
 .board { display:grid; grid-template-columns: 340px 1fr; gap:16px; align-items:start; }
 
 .list { display:flex; flex-direction:column; gap:6px; max-height:72vh; overflow-y:auto; }
@@ -77,6 +83,7 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
 .card.sel { background:var(--m-s2); }
 .card .row1 { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
 .card .nombre { font-size:13.5px; font-weight:600; }
+.card .puesto { font-size:11px; color:var(--m-t3); }
 .card .empresa { font-size:11.5px; color:var(--m-t3); margin:2px 0 7px; }
 .tipo-tag { font-size:11px; font-weight:800; letter-spacing:.05em; padding:2px 7px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
 .tipo-cliente   { background:rgba(14,169,104,.15);  color:var(--m-grn); }
@@ -87,11 +94,30 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
 .detail { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:10px; padding:20px 24px; min-height:480px; }
 .d-head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--m-b1); padding-bottom:14px; margin-bottom:14px; }
 .d-head .nombre { font-size:17px; font-weight:800; margin-bottom:2px; }
+.d-head .puesto { font-size:12.5px; color:var(--m-acc); font-weight:600; margin-bottom:2px; }
 .d-head .empresa { font-size:12.5px; color:var(--m-t3); }
 .agent-badge { font-size:11px; font-weight:800; letter-spacing:.06em; padding:3px 10px; border-radius:5px; text-transform:uppercase; height:fit-content; }
 .fields { display:grid; grid-template-columns:1fr 1fr; gap:10px 22px; margin-bottom:18px; }
 .field label { display:block; font-size:11px; color:var(--m-t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; font-weight:700; }
 .field .val { font-size:13px; }
+
+.actions { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+.act-btn { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:8px 14px; color:var(--m-t1); font-size:12.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; }
+.act-btn:hover { border-color:rgba(255,255,255,.2); }
+.act-btn:disabled { opacity:.4; cursor:not-allowed; }
+.act-btn.call:hover { border-color:var(--m-grn); color:var(--m-grn); }
+.act-btn.tpl:hover { border-color:var(--m-acc); color:var(--m-acc); }
+
+.tpl-panel { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:10px; padding:14px 16px; margin-bottom:18px; display:none; }
+.tpl-panel.open { display:block; }
+.tpl-panel select { width:100%; background:var(--m-s3); border:1px solid var(--m-b1); border-radius:7px; padding:8px 10px; color:var(--m-t1); font-size:12.5px; margin-bottom:10px; }
+.tpl-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.tpl-fields input { background:var(--m-s3); border:1px solid var(--m-b1); border-radius:7px; padding:7px 9px; color:var(--m-t1); font-size:12px; }
+.tpl-fields label { display:block; font-size:10.5px; color:var(--m-t3); margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
+.tpl-send { background:var(--m-acc); border:none; border-radius:7px; padding:8px 16px; color:#fff; font-size:12px; font-weight:700; cursor:pointer; }
+.tpl-msg { font-size:11.5px; margin-top:8px; }
+.tpl-msg.ok  { color:var(--m-grn); }
+.tpl-msg.err { color:var(--m-red); }
 
 .sec-title { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--m-t3); font-weight:700; margin:0 0 10px; padding-top:12px; border-top:1px solid var(--m-b1); }
 .bitacora { display:flex; flex-direction:column; }
@@ -101,18 +127,31 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
 .evento .canal { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--m-t3); display:block; margin-bottom:2px; font-weight:700; }
 .evento .resumen { font-size:12.5px; line-height:1.55; }
 .empty-msg { padding:22px 12px; text-align:center; color:var(--m-t3); font-size:12px; border:1px dashed var(--m-b1); border-radius:10px; }
+
+/* ── Modal nuevo contacto ─────────────────────────────────────────────── */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; align-items:center; justify-content:center; padding:20px; }
+.overlay.open { display:flex; }
+.modal { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:12px; padding:22px 24px; width:100%; max-width:440px; }
+.modal h2 { font-size:15px; font-weight:800; margin-bottom:16px; }
+.modal .frow { margin-bottom:12px; }
+.modal label { display:block; font-size:11px; color:var(--m-t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; font-weight:700; }
+.modal input, .modal select, .modal textarea { width:100%; background:var(--m-s2); border:1px solid var(--m-b1); border-radius:7px; padding:9px 11px; color:var(--m-t1); font-size:13px; font-family:inherit; }
+.modal textarea { resize:vertical; min-height:56px; }
+.modal .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+.btn-cancel { background:none; border:1px solid var(--m-b1); border-radius:8px; padding:9px 16px; color:var(--m-t2); font-size:12.5px; font-weight:600; cursor:pointer; }
+.btn-save { background:var(--m-grn); border:none; border-radius:8px; padding:9px 16px; color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <div class="hdr-logo">🧠 <span>Memoria</span> de Agentes</div>
+  <div class="hdr-logo">🗂️ <span>Base de</span> Datos</div>
   <nav class="hdr-nav">
     <button class="hn" onclick="location.href='/'">Portal</button>
-    <button class="hn" onclick="location.href='/base-datos.html'">Base de Datos</button>
+    <button class="hn" onclick="location.href='/memoria-agentes.html'">Memoria</button>
+    <button class="hn on">Base de Datos</button>
     <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
-    <button class="hn" onclick="location.href='/prospector.html'">Prospector</button>
-    <button class="hn" onclick="location.href='/historial.html'">Historial</button>
   </nav>
 </header>
 
@@ -120,20 +159,23 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
 
   <div class="top">
     <div>
-      <div class="eyebrow">ABSTORAGES · Sistema multiagente</div>
-      <h1>Memoria de agentes</h1>
+      <div class="eyebrow">ABSTORAGES · Directorio para llamadas y plantillas</div>
+      <h1>Base de datos</h1>
     </div>
     <div class="updated" id="updated"></div>
   </div>
 
   <div class="tabs" id="tabs"></div>
 
+  <div class="permitido" id="permitido"></div>
+
   <div class="controls">
-    <input class="search" id="searchInput" placeholder="Buscar por nombre, empresa o tipo de carga…">
+    <input class="search" id="searchInput" placeholder="Buscar por nombre, empresa o puesto…">
     <div class="filter" data-tipo="todos" id="f-todos">Todos</div>
     <div class="filter" data-tipo="cliente" id="f-cliente">Clientes</div>
     <div class="filter" data-tipo="proveedor" id="f-proveedor">Proveedores</div>
     <div class="filter" data-tipo="operador" id="f-operador">Operadores</div>
+    <button class="btn-add" onclick="abrirModal()">➕ Nuevo contacto</button>
   </div>
 
   <div class="board">
@@ -141,6 +183,53 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
     <div class="detail" id="detail"></div>
   </div>
 
+</div>
+
+<!-- ── Modal nuevo contacto ─────────────────────────────────────────────── -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>Nuevo contacto — <span id="modalAgente"></span></h2>
+    <div class="frow">
+      <label>Nombre completo</label>
+      <input id="f-nombre" placeholder="Ej. Carlos Ramírez">
+    </div>
+    <div class="frow frow2">
+      <div>
+        <label>Puesto</label>
+        <input id="f-puesto" placeholder="Ej. Gerente de Compras">
+      </div>
+      <div>
+        <label>Tipo</label>
+        <select id="f-tipo">
+          <option value="cliente">Cliente</option>
+          <option value="proveedor">Proveedor</option>
+          <option value="operador">Operador</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <label>Empresa</label>
+      <input id="f-empresa" placeholder="Ej. Bonafont">
+    </div>
+    <div class="frow frow2">
+      <div>
+        <label>Teléfono</label>
+        <input id="f-telefono" placeholder="+52 81 0000 0000">
+      </div>
+      <div>
+        <label>Email</label>
+        <input id="f-email" placeholder="correo@empresa.com">
+      </div>
+    </div>
+    <div class="frow">
+      <label>Notas</label>
+      <textarea id="f-notas" placeholder="Opcional"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-save" onclick="guardarContacto()">Guardar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -155,6 +244,7 @@ let activeTipo = "todos";
 let activeContactId = null;
 let searchQuery = "";
 let contactosCache = [];
+let plantillasCache = [];
 let counts = { SARA: 0, SOFIA: 0, NOA: 0 };
 let _debounce = null;
 
@@ -173,10 +263,31 @@ function renderTabs(){
   `).join('');
 }
 
+async function renderPermitido(){
+  const agent = AGENTES[activeAgent];
+  const box = document.getElementById('permitido');
+  box.innerHTML = '<div class="cab"><span class="ico">🔒</span><span class="txt">Cargando lo que ' + activeAgent + ' tiene permitido hacer…</span></div>';
+  try {
+    const r = await fetch('/api/plantillas-aprobadas?agente=' + activeAgent.toLowerCase(), { credentials: 'include' });
+    plantillasCache = r.ok ? await r.json() : [];
+  } catch { plantillasCache = []; }
+
+  box.innerHTML = `
+    <div class="cab"><span class="ico">🔒</span><span class="txt">Lo que ${activeAgent} tiene permitido enviar</span></div>
+    <div class="chips">
+      ${plantillasCache.length
+        ? plantillasCache.map(p => `<span class="pchip">${esc(p.nombre)}</span>`).join('')
+        : '<span class="pchip" style="opacity:.6">Sin plantillas configuradas para este agente</span>'}
+    </div>
+    <div class="regla">Fuera de estas plantillas aprobadas por Meta, ${activeAgent} <b>nunca</b> manda nada — ni texto libre, ni una versión "parecida". Si el equipo le pide algo que no está aquí, responde: <b>"Disculpa pero esa funcionalidad no te la puedo cumplir."</b></div>
+  `;
+}
+
 async function selectAgent(key){
   activeAgent = key; activeTipo = "todos"; activeContactId = null; searchQuery = "";
   document.getElementById('searchInput').value = "";
   renderTabs(); renderFilters();
+  await renderPermitido();
   await cargarContactos();
 }
 
@@ -210,7 +321,7 @@ function renderList(){
   const agent = AGENTES[activeAgent];
   const list = document.getElementById('list');
   if (contactosCache.length === 0) {
-    list.innerHTML = '<div class="empty-msg">Sin resultados para este filtro.</div>';
+    list.innerHTML = '<div class="empty-msg">Sin resultados para este filtro. Usa "➕ Nuevo contacto" para agregar uno.</div>';
     document.getElementById('detail').innerHTML = '';
     return;
   }
@@ -218,7 +329,10 @@ function renderList(){
   list.innerHTML = contactosCache.map(c=>`
     <div class="card ${c.id===activeContactId?'sel':''}" style="border-left-color:${c.id===activeContactId?agent.color:'var(--m-b1)'}" onclick="selectContacto('${c.id}')">
       <div class="row1">
-        <div class="nombre">${esc(c.nombre_completo)}</div>
+        <div>
+          <div class="nombre">${esc(c.nombre_completo)}</div>
+          ${c.puesto ? `<div class="puesto">${esc(c.puesto)}</div>` : ''}
+        </div>
         <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
       </div>
       <div class="empresa">${esc(c.empresa || '—')}</div>
@@ -250,10 +364,13 @@ async function renderDetail(){
     return;
   }
 
+  const tienePlantillas = plantillasCache.length > 0;
+
   detail.innerHTML = `
     <div class="d-head">
       <div>
         <div class="nombre">${esc(data.nombre_completo)}</div>
+        ${data.puesto ? `<div class="puesto">${esc(data.puesto)}</div>` : ''}
         <div class="empresa">${esc(data.empresa || '—')}</div>
       </div>
       <div class="agent-badge" style="background:${agent.bg};color:${agent.color}">${esc(data.agente_asignado)}</div>
@@ -266,7 +383,22 @@ async function renderDetail(){
       <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
       <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
     </div>
-    ${data.notas ? `<div class="field" style="margin-bottom:6px;"><label>Notas</label><div class="val">${esc(data.notas)}</div></div>` : ''}
+    ${data.notas ? `<div class="field" style="margin-bottom:14px;"><label>Notas</label><div class="val">${esc(data.notas)}</div></div>` : ''}
+
+    <div class="actions">
+      <button class="act-btn call" id="btnLlamar" ${data.telefono ? '' : 'disabled'} onclick="llamar('${data.id}')">📞 Llamar</button>
+      <button class="act-btn tpl" id="btnPlantilla" ${(data.telefono && tienePlantillas) ? '' : 'disabled'} onclick="togglePlantilla()">💬 Enviar plantilla aprobada</button>
+    </div>
+
+    <div class="tpl-panel" id="tplPanel">
+      <select id="tplSelect" onchange="renderTplCampos()">
+        ${plantillasCache.map(p => `<option value="${p.sid}">${esc(p.nombre)}</option>`).join('')}
+      </select>
+      <div class="tpl-fields" id="tplCampos"></div>
+      <button class="tpl-send" onclick="enviarPlantilla('${data.id}')">Enviar</button>
+      <div class="tpl-msg" id="tplMsg"></div>
+    </div>
+
     <div class="sec-title">Bitácora de interacciones (${data.interacciones.length})</div>
     <div class="bitacora">
       ${data.interacciones.length ? data.interacciones.map(e=>`
@@ -282,16 +414,116 @@ async function renderDetail(){
   `;
 }
 
+function togglePlantilla(){
+  const panel = document.getElementById('tplPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderTplCampos();
+}
+
+function renderTplCampos(){
+  const sid = document.getElementById('tplSelect').value;
+  const p = plantillasCache.find(x => x.sid === sid);
+  const box = document.getElementById('tplCampos');
+  if (!p) { box.innerHTML = ''; return; }
+  box.innerHTML = p.campos.map(c => `
+    <div>
+      <label>${esc(c.label)}</label>
+      <input data-key="${c.key}" placeholder="${esc(c.label)}">
+    </div>
+  `).join('');
+}
+
+async function enviarPlantilla(contactoId){
+  const sid = document.getElementById('tplSelect').value;
+  const inputs = document.querySelectorAll('#tplCampos input');
+  const variables = {};
+  inputs.forEach(i => { variables[i.dataset.key] = i.value; });
+  const msg = document.getElementById('tplMsg');
+  msg.textContent = 'Enviando…'; msg.className = 'tpl-msg';
+  try {
+    const r = await fetch('/api/contactos/' + encodeURIComponent(contactoId) + '/plantilla', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentSid: sid, variables }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+    msg.textContent = '✅ Enviado'; msg.className = 'tpl-msg ok';
+    await renderDetail();
+  } catch (e) {
+    msg.textContent = '❌ ' + e.message; msg.className = 'tpl-msg err';
+  }
+}
+
+async function llamar(contactoId){
+  const btn = document.getElementById('btnLlamar');
+  btn.disabled = true; btn.textContent = '📞 Llamando…';
+  try {
+    const r = await fetch('/api/contactos/' + encodeURIComponent(contactoId) + '/llamar', {
+      method: 'POST', credentials: 'include',
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+    await renderDetail();
+  } catch (e) {
+    alert('No se pudo llamar: ' + e.message);
+    btn.disabled = false; btn.textContent = '📞 Llamar';
+  }
+}
+
+function abrirModal(){
+  document.getElementById('modalAgente').textContent = activeAgent;
+  document.getElementById('f-nombre').value = '';
+  document.getElementById('f-puesto').value = '';
+  document.getElementById('f-empresa').value = '';
+  document.getElementById('f-telefono').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-notas').value = '';
+  document.getElementById('f-tipo').value = 'cliente';
+  document.getElementById('overlay').classList.add('open');
+}
+function cerrarModal(){ document.getElementById('overlay').classList.remove('open'); }
+
+async function guardarContacto(){
+  const nombre_completo = document.getElementById('f-nombre').value.trim();
+  if (!nombre_completo) { alert('El nombre es obligatorio'); return; }
+  const body = {
+    agente: activeAgent.toLowerCase(),
+    tipo: document.getElementById('f-tipo').value,
+    nombre_completo,
+    puesto: document.getElementById('f-puesto').value.trim(),
+    empresa: document.getElementById('f-empresa').value.trim(),
+    telefono: document.getElementById('f-telefono').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    notas: document.getElementById('f-notas').value.trim(),
+  };
+  try {
+    const r = await fetch('/api/contactos', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+    cerrarModal();
+    await cargarContactos();
+  } catch (e) {
+    alert('No se pudo guardar: ' + e.message);
+  }
+}
+
 document.getElementById('searchInput').addEventListener('input', (e)=>{
   searchQuery = e.target.value;
   clearTimeout(_debounce);
   _debounce = setTimeout(cargarContactos, 300);
 });
+document.getElementById('overlay').addEventListener('click', (e)=>{ if (e.target.id === 'overlay') cerrarModal(); });
 
 document.getElementById('updated').textContent = 'Cargado: ' + new Date().toLocaleString('es-MX', { dateStyle:'medium', timeStyle:'short' });
 
 renderTabs();
 renderFilters();
+renderPermitido();
 cargarContactos();
 </script>
 </body>

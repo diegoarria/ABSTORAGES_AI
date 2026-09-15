@@ -38,6 +38,7 @@ const attackWordlist  = require('./backend/services/attackWordlist');
 const attackStrikes   = require('./backend/services/attackStrikes');
 const humanDelay      = require('./backend/services/humanDelay');
 const domainLock      = require('./backend/middleware/domainLock');
+const plantillasAprobadas = require('./backend/services/plantillasAprobadas');
 
 // ── Detector de ataque en curso — activa el apagado de emergencia solo,
 // sin que nadie tenga que darse cuenta y apretar el switch a mano ──────────
@@ -1696,6 +1697,109 @@ app.get('/api/contactos/:id', adminUOps, async (req, res) => {
   const detalle = await contactos.obtenerDetalle(req.params.id);
   if (!detalle) return res.status(404).json({ error: 'Contacto no encontrado' });
   res.json(detalle);
+});
+
+// Alta/edición manual de un contacto — a diferencia de upsertContacto interno
+// (que solo dispara cuando un agente cierra un trato real), esto es para que
+// el equipo capture directamente nombre/puesto/empresa/teléfono de clientes,
+// proveedores u operadores en la pantalla de Base de Datos, sin que exista
+// todavía una conversación real de por medio.
+app.post('/api/contactos', soloAdmin, async (req, res) => {
+  try {
+    const { agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas } = req.body || {};
+    if (!agente || !['sara', 'sofia', 'noa'].includes(agente.toLowerCase())) {
+      return res.status(400).json({ error: 'agente requerido: sara, sofia o noa' });
+    }
+    if (!nombre_completo) return res.status(400).json({ error: 'nombre_completo requerido' });
+    if (!['cliente', 'proveedor', 'operador'].includes(tipo)) {
+      return res.status(400).json({ error: 'tipo requerido: cliente, proveedor u operador' });
+    }
+    const contacto = await contactos.upsertContacto({
+      agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas,
+      resumen_interaccion: 'Alta/edición manual desde Base de Datos', canal: 'manual',
+    });
+    res.json(contacto);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Lista de plantillas aprobadas por Meta que un agente tiene permitido usar —
+// única fuente de verdad, la misma que valida /api/contactos/:id/plantilla.
+app.get('/api/plantillas-aprobadas', adminUOps, (req, res) => {
+  res.json(plantillasAprobadas.listarPorAgente(req.query.agente));
+});
+
+// Envía una plantilla YA APROBADA a un contacto guardado — nunca texto libre.
+// Si el ContentSid no está en la lista permitida para el agente del contacto,
+// se rechaza de plano, sin excepción ("Disculpa pero esa funcionalidad no te
+// la puedo cumplir" es la misma regla, aplicada aquí en código).
+app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
+  try {
+    const { contentSid, variables } = req.body || {};
+    if (!contentSid) return res.status(400).json({ error: 'contentSid requerido' });
+
+    const contacto = await contactos.obtenerDetalle(req.params.id);
+    if (!contacto) return res.status(404).json({ error: 'Contacto no encontrado' });
+    if (!contacto.telefono) return res.status(400).json({ error: 'Este contacto no tiene teléfono guardado' });
+
+    const agente = (contacto.agente_asignado || '').toLowerCase();
+    const plantilla = plantillasAprobadas.buscarPlantilla(agente, contentSid);
+    if (!plantilla) {
+      return res.status(403).json({ error: 'Esa plantilla no está aprobada para este agente — no se puede enviar.' });
+    }
+
+    const from = WA_NUMBERS[agente] || TWILIO_WA_FROM;
+    if (!TWILIO_SID || !TWILIO_TOKEN || !from) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
+    const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+    const body = new URLSearchParams({
+      From: `whatsapp:${from}`,
+      To:   `whatsapp:${contacto.telefono.replace(/^whatsapp:/, '')}`,
+      ContentSid: contentSid,
+      ContentVariables: JSON.stringify(variables || {}),
+    });
+    const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${auth}` },
+      body,
+    });
+    const resp = await r.text();
+    if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 400)}` });
+
+    await contactos.upsertContacto({
+      agente, telefono: contacto.telefono,
+      resumen_interaccion: `Plantilla "${plantilla.nombre}" enviada manualmente desde Base de Datos`,
+      canal: 'whatsapp-plantilla',
+    });
+
+    res.json({ ok: true, twilio: JSON.parse(resp) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Dispara una llamada real (Vapi) a un contacto guardado.
+app.post('/api/contactos/:id/llamar', soloAdmin, async (req, res) => {
+  try {
+    const contacto = await contactos.obtenerDetalle(req.params.id);
+    if (!contacto) return res.status(404).json({ error: 'Contacto no encontrado' });
+    if (!contacto.telefono) return res.status(400).json({ error: 'Este contacto no tiene teléfono guardado' });
+
+    const resultado = await vapi.llamarProspecto({
+      nombre: contacto.nombre_completo, telefono: contacto.telefono,
+      empresa: contacto.empresa, cargo: contacto.puesto,
+    });
+
+    await contactos.upsertContacto({
+      agente: contacto.agente_asignado, telefono: contacto.telefono,
+      resumen_interaccion: 'Llamada disparada manualmente desde Base de Datos',
+      canal: 'llamada',
+    });
+
+    res.json({ ok: true, resultado });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Diagnóstico: crea un contacto sintético para probar la persistencia sin
