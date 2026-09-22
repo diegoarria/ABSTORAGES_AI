@@ -85,6 +85,16 @@ function saveSummary(id, summary) {
   saveSession(id, session);
 }
 
+// Borra una sesión por completo (archivo en disco) — borrado manual desde el
+// Historial de la plataforma. No hay papelera: una vez borrado, no hay forma
+// de recuperar esos mensajes.
+function deleteSession(id) {
+  const fp = filePath(id);
+  if (!fs.existsSync(fp)) return false;
+  fs.unlinkSync(fp);
+  return true;
+}
+
 // Lista todas las sesiones con su metadata
 function listSessions() {
   ensureDir();
@@ -105,4 +115,4 @@ function listSessions() {
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, listSessions };
+module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, listSessions, deleteSession };

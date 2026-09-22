@@ -2269,6 +2269,26 @@ app.get('/api/historial/sesiones/:id', adminUOps, async (req, res) => {
   });
 });
 
+// Borrado manual de una conversación del Historial — solo admin, sin
+// papelera: una vez borrado no hay forma de recuperarlo. Cubre tanto las
+// sesiones normales (memory.js, un archivo por sesión) como los hilos de
+// WhatsApp por grupo/2Chat (groupMessages.js).
+app.delete('/api/historial/sesiones/:id', soloAdmin, async (req, res) => {
+  try {
+    if (req.params.id.startsWith('2chat:')) {
+      const canalUuid = req.params.id.replace(/^2chat:/, '');
+      const borrados = grupoWA.limpiar(canalUuid);
+      if (!borrados) return res.status(404).json({ error: 'Conversación no encontrada' });
+      return res.json({ ok: true, mensajesBorrados: borrados });
+    }
+    const borrado = memory.deleteSession(req.params.id);
+    if (!borrado) return res.status(404).json({ error: 'Sesión no encontrada' });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── TARIFA DINÁMICA ──────────────────────────────────────────────────────
 app.get('/api/tarifa/contexto', (req, res) => {
   res.json(tariff.getContext());

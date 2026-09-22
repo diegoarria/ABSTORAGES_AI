@@ -57,6 +57,10 @@ body { background: var(--h-bg); color: var(--h-t1); font-family: var(--font-sans
 }
 .sess-item:hover { background:var(--h-s2); }
 .sess-item.on { background:rgba(47,111,237,.1); border-color:rgba(47,111,237,.35); }
+.sess-del { background:none; border:none; font-size:13px; padding:2px 4px; border-radius:6px; cursor:pointer; opacity:.55; line-height:1; }
+.sess-del:hover { opacity:1; background:rgba(255,92,92,.15); }
+.chat-del { background:none; border:1px solid var(--h-b1); color:var(--h-t2); font-size:12px; font-weight:600; padding:7px 12px; border-radius:8px; cursor:pointer; }
+.chat-del:hover { border-color:var(--h-red); color:var(--h-red); background:rgba(255,92,92,.08); }
 .sess-top { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:3px; }
 .sess-name { font-size:13px; font-weight:700; color:var(--h-t1); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .sess-badge { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:2px 6px; border-radius:4px; flex-shrink:0; }
@@ -72,7 +76,7 @@ body { background: var(--h-bg); color: var(--h-t1); font-family: var(--font-sans
 .empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; color:var(--h-t3); gap:8px; }
 .empty-icon { font-size:40px; opacity:.5; margin-bottom:6px; }
 
-.chat-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--h-b1); }
+.chat-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--h-b1); }
 .chat-title { font-size:17px; font-weight:800; }
 .chat-sub { font-size:12px; color:var(--h-t3); margin-top:2px; }
 
@@ -312,10 +316,14 @@ function render(lista) {
       : '';
     const meta = [s.empresa && s.empresa !== s.nombre ? s.empresa : '', s.telefono, participantesTxt, s.resumen].filter(Boolean).join(' · ');
     const activa = s.sessionId === sesionActual ? 'on' : '';
-    return `<div class="sess-item ${activa}" onclick="abrir('${s.sessionId.replace(/'/g,"\\'")}')">
+    const sidEsc = s.sessionId.replace(/'/g,"\\'");
+    return `<div class="sess-item ${activa}" onclick="abrir('${sidEsc}')">
       <div class="sess-top">
         <div class="sess-name">${esc(nombre)}</div>
-        <span class="sess-badge b-${s.agente}">${AGENTE_LABEL[s.agente] || s.agente}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="sess-badge b-${s.agente}">${AGENTE_LABEL[s.agente] || s.agente}</span>
+          <button class="sess-del" title="Borrar conversación" onclick="event.stopPropagation(); borrarSesion('${sidEsc}')">🗑️</button>
+        </div>
       </div>
       <div class="sess-meta">${esc(meta || (s.msgs + ' mensajes'))}</div>
       <div class="sess-date">${fmtFecha(s.updatedAt)} · ${s.msgs} msj</div>
@@ -344,6 +352,7 @@ async function abrir(sessionId) {
           <div class="chat-title">${esc(info.nombre || info.empresa || sessionId)}</div>
           <div class="chat-sub">${AGENTE_LABEL[data.agente] || data.agente} · ${data.historial.length} mensajes${participantesTxt ? ' · ' + esc(participantesTxt) : ''}${data.ip ? ' · IP ' + esc(data.ip) : ''}</div>
         </div>
+        <button class="chat-del" onclick="borrarSesion('${sessionId.replace(/'/g,"\\'")}')">🗑️ Borrar conversación</button>
       </div>
       <div id="msgs"></div>
     `;
@@ -356,6 +365,25 @@ async function abrir(sessionId) {
     `).join('');
   } catch (e) {
     main.innerHTML = '<div class="loading">No se pudo cargar la conversación (' + e.message + ')</div>';
+  }
+}
+
+async function borrarSesion(sessionId) {
+  const s = TODAS.find(x => x.sessionId === sessionId);
+  const nombre = s ? (s.nombre || s.empresa || sessionId) : sessionId;
+  if (!confirm(`¿Borrar la conversación con "${nombre}"?\n\nNo se puede deshacer — se pierde el historial completo de esos mensajes.`)) return;
+
+  try {
+    const r = await fetch('/api/historial/sesiones/' + encodeURIComponent(sessionId), { method: 'DELETE', credentials:'include' });
+    if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.error || ('HTTP ' + r.status)); }
+    TODAS = TODAS.filter(x => x.sessionId !== sessionId);
+    if (sesionActual === sessionId) {
+      sesionActual = null;
+      document.getElementById('main').innerHTML = '<div class="loading">Selecciona una conversación</div>';
+    }
+    render(document.getElementById('buscador').value.trim() ? TODAS.filter(matchLocal) : TODAS);
+  } catch (e) {
+    alert('No se pudo borrar: ' + e.message);
   }
 }
 
