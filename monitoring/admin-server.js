@@ -95,10 +95,90 @@ app.post('/internal/report-event', express.json(), async (req, res) => {
   }
 });
 
+// ── Registro de cada contacto proactivo real que sale (llamada o plantilla) ──
+// Reportado por el negocio justo después de un envío real (nunca de uno
+// omitido por pausa/límite) — permite que monitoring detecte solo un
+// volumen fuera de lo normal, sin que nadie tenga que preguntar primero.
+app.post('/internal/outbound-contact', express.json(), async (req, res) => {
+  const secreto = req.headers['x-intake-secret'];
+  if (!process.env.MONITORING_INTAKE_SECRET || secreto !== process.env.MONITORING_INTAKE_SECRET) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
+  const { agente, canal, destinatario, detalle } = req.body || {};
+  if (!agente || !canal) return res.status(400).json({ error: 'agente y canal requeridos' });
+  try {
+    await poolEscritura.query(
+      `INSERT INTO outbound_contact_log (agente, canal, destinatario, detalle) VALUES ($1, $2, $3, $4)`,
+      [agente, canal, destinatario || null, JSON.stringify(detalle || {})]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[admin-server] Error insertando outbound-contact:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── Agent control — fuente de verdad de qué IA está pausada ──────────────────
+// GET/POST bajo /internal usan el secreto compartido (el negocio nunca tiene
+// credenciales de esta base). GET/POST bajo /api usan sesión del panel — un
+// humano pausando/reanudando desde aquí directamente.
+async function leerAgentControl() {
+  const { rows } = await poolEscritura.query(`SELECT agente, paused, motivo, changed_by, changed_at FROM agent_control`);
+  return Object.fromEntries(rows.map(r => [r.agente, { paused: r.paused, motivo: r.motivo, changed_by: r.changed_by, changed_at: r.changed_at }]));
+}
+async function escribirAgentControl(agente, paused, motivo, changedBy) {
+  await poolEscritura.query(
+    `INSERT INTO agent_control (agente, paused, motivo, changed_by, changed_at) VALUES ($1, $2, $3, $4, NOW())
+     ON CONFLICT (agente) DO UPDATE SET paused = $2, motivo = $3, changed_by = $4, changed_at = NOW()`,
+    [agente, paused, motivo || null, changedBy || null]
+  );
+}
+
+app.get('/internal/agent-control', async (req, res) => {
+  const secreto = req.headers['x-intake-secret'];
+  if (!process.env.MONITORING_INTAKE_SECRET || secreto !== process.env.MONITORING_INTAKE_SECRET) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
+  try { res.json(await leerAgentControl()); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/internal/agent-control/:agente', express.json(), async (req, res) => {
+  const secreto = req.headers['x-intake-secret'];
+  if (!process.env.MONITORING_INTAKE_SECRET || secreto !== process.env.MONITORING_INTAKE_SECRET) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
+  const agente = req.params.agente;
+  if (!['sara', 'sofia', 'noa'].includes(agente)) return res.status(400).json({ error: 'agente inválido' });
+  const { paused, motivo, changedBy } = req.body || {};
+  try {
+    await escribirAgentControl(agente, !!paused, motivo, changedBy || 'negocio');
+    res.json(await leerAgentControl());
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // Todo lo demás bajo /api requiere sesión — el rol de Postgres (monitoring_admin)
 // ya limita qué puede leer/escribir, esto es la capa de "quién puede entrar
 // al panel en absoluto".
 app.use('/api', auth.requiereSesion);
+
+app.get('/api/agent-control', async (req, res) => {
+  try {
+    const { rows } = await pool.query(`SELECT agente, paused, motivo, changed_by, changed_at FROM agent_control ORDER BY agente`);
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/agent-control/:agente', async (req, res) => {
+  const agente = req.params.agente;
+  if (!['sara', 'sofia', 'noa'].includes(agente)) return res.status(400).json({ error: 'agente inválido' });
+  const { paused, motivo } = req.body || {};
+  try {
+    await escribirAgentControl(agente, !!paused, motivo, req.monitoringUser);
+    const { rows } = await pool.query(`SELECT agente, paused, motivo, changed_by, changed_at FROM agent_control ORDER BY agente`);
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 
 // ── Dashboard — estado actual por servicio + latencia promedio 24h ──────────
 app.get('/api/dashboard', async (req, res) => {

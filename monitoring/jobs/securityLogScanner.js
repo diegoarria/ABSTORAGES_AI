@@ -76,8 +76,45 @@ async function escanearConexionesInesperadas() {
   analizarSiHayAlgoUrgente();
 }
 
+// 4. Volumen anómalo de contacto proactivo (llamadas/plantillas reales que
+//    salieron de SARA/SOFIA/NOA) — esto es lo que hubiera cachado, desde el
+//    primer ciclo, el incidente real del 15 al 22-sep-2026 (SOFIA mandando
+//    ~100 plantillas/día sin que nadie se enterara). Corre sobre la última
+//    hora, no el día completo, para avisar temprano de una ráfaga en curso
+//    en vez de esperar a que se acumule el límite diario del negocio.
+const UMBRAL_HORA_HIGH     = 15;
+const UMBRAL_HORA_CRITICAL = 30;
+
+async function escanearVolumenSaliente() {
+  const { rows } = await pool.query(
+    `SELECT agente, COUNT(*) AS n, COUNT(DISTINCT destinatario) AS destinatarios
+     FROM outbound_contact_log
+     WHERE sent_at > NOW() - INTERVAL '1 hour'
+     GROUP BY agente
+     HAVING COUNT(*) >= $1`,
+    [UMBRAL_HORA_HIGH]
+  );
+
+  for (const row of rows) {
+    const n = Number(row.n);
+    const severidad = n >= UMBRAL_HORA_CRITICAL ? 'critical' : 'high';
+    await registrarSecurityEvent({
+      event_type: 'rate_limit_spike',
+      severity: severidad,
+      details: {
+        motivo: `${row.agente.toUpperCase()} mandó ${n} contactos proactivos en la última hora (${row.destinatarios} destinatarios distintos)`,
+        agente: row.agente,
+        ocurrencias: n,
+        destinatarios_distintos: Number(row.destinatarios),
+        ventana: '1 hour',
+      },
+    });
+    analizarSiHayAlgoUrgente();
+  }
+}
+
 async function correrSecurityScan() {
-  await Promise.allSettled([escanearFallasDeAuth(), escanearConexionesInesperadas()]);
+  await Promise.allSettled([escanearFallasDeAuth(), escanearConexionesInesperadas(), escanearVolumenSaliente()]);
 }
 
 module.exports = { correrSecurityScan };

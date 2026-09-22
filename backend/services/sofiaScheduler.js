@@ -19,6 +19,18 @@ const HORA_ENVIO      = Number(process.env.SOFIA_DISPONIBILIDAD_HORA || 8); // 8
 const VENTANA_HORAS   = Number(process.env.SOFIA_DISPONIBILIDAD_VENTANA_HORAS || 72);
 const CHEQUEO_MS      = 15 * 60 * 1000; // revisa cada 15 min si ya toca correr hoy
 
+// ── Piloto acotado (Semana 2 del roadmap) — lista blanca de teléfonos de
+// proveedores de confianza. Mientras esta ronda automática siga siendo el
+// mecanismo que causó el incidente del 16-22 sept, NUNCA debe tocar a "todos
+// los proveedores compatibles" por default — solo a quien esté aquí,
+// explícitamente, a propósito. Últimos 10 dígitos, separados por coma.
+const PILOTO_TELEFONOS = new Set(
+  (process.env.SOFIA_PILOTO_PROVEEDORES || '')
+    .split(',')
+    .map(t => t.replace(/\D/g, '').slice(-10))
+    .filter(Boolean)
+);
+
 let ultimaFechaEnviada = null; // 'YYYY-MM-DD' en hora de Monterrey — evita doble ronda el mismo día
 
 function horaYFechaMTY() {
@@ -33,6 +45,10 @@ async function correrSiToca(pushActividad) {
   if (!HABILITADO) return;
   if (agentPause.estaPausado('sofia')) {
     console.log('[SOFIA scheduler] SOFIA pausada — se omite la ronda diaria de hoy');
+    return;
+  }
+  if (!PILOTO_TELEFONOS.size) {
+    console.warn('[SOFIA scheduler] SOFIA_PILOTO_PROVEEDORES no configurada — por seguridad, esta ronda NUNCA corre "a todos" por default. Configúrala con los teléfonos del piloto para activarla.');
     return;
   }
   if (!tms.ENABLED) return;
@@ -62,6 +78,16 @@ async function correrSiToca(pushActividad) {
     proveedoresReales = await tms.proveedoresParaVapi();
   } catch (e) {
     console.error('[SOFIA scheduler] Error obteniendo proveedores del TMS:', e.message);
+    return;
+  }
+
+  // Piloto acotado — nunca contactar a nadie fuera de la lista blanca,
+  // aunque sea "compatible" con la ruta. Ver PILOTO_TELEFONOS arriba.
+  const antesDelFiltro = proveedoresReales.length;
+  proveedoresReales = proveedoresReales.filter(p => PILOTO_TELEFONOS.has((p.telefono || '').replace(/\D/g, '').slice(-10)));
+  console.log(`[SOFIA scheduler] Piloto: ${proveedoresReales.length}/${antesDelFiltro} proveedores reales están en la lista blanca del piloto`);
+  if (!proveedoresReales.length) {
+    pushActividad?.({ agente: 'SOFIA', tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Ronda diaria: ningún proveedor real coincide con la lista blanca del piloto — no se contactó a nadie' });
     return;
   }
 

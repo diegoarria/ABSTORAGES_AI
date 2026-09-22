@@ -40,6 +40,8 @@ const humanDelay      = require('./backend/services/humanDelay');
 const domainLock      = require('./backend/middleware/domainLock');
 const plantillasAprobadas = require('./backend/services/plantillasAprobadas');
 const agentPause      = require('./backend/services/agentPause');
+const monitoringControl = require('./backend/services/monitoringControl');
+const outboundRateLimit = require('./backend/services/outboundRateLimit');
 
 // ── Detector de ataque en curso — activa el apagado de emergencia solo,
 // sin que nadie tenga que darse cuenta y apretar el switch a mano ──────────
@@ -1748,6 +1750,10 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
     if (agentPause.estaPausado(agente)) {
       return res.status(423).json({ error: `${agente.toUpperCase()} está pausada — no puede contactar a nadie por ahora.` });
     }
+    const limiteManual = outboundRateLimit.registrarYVerificar(agente);
+    if (!limiteManual.permitido) {
+      return res.status(429).json({ error: `${agente.toUpperCase()} alcanzó su límite diario de contactos (${limiteManual.count}/${limiteManual.limite}).` });
+    }
     const plantilla = plantillasAprobadas.buscarPlantilla(agente, contentSid);
     if (!plantilla) {
       return res.status(403).json({ error: 'Esa plantilla no está aprobada para este agente — no se puede enviar.' });
@@ -1770,6 +1776,7 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
     const resp = await r.text();
     if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 400)}` });
 
+    monitoringControl.reportarContactoSaliente({ agente, canal: 'whatsapp_plantilla', destinatario: contacto.telefono, detalle: { contentSid, origen: 'base-de-datos-manual' } });
     await contactos.upsertContacto({
       agente, telefono: contacto.telefono,
       resumen_interaccion: `Plantilla "${plantilla.nombre}" enviada manualmente desde Base de Datos`,
@@ -1793,11 +1800,16 @@ app.post('/api/contactos/:id/llamar', soloAdmin, async (req, res) => {
     if (agentPause.estaPausado(agenteContacto)) {
       return res.status(423).json({ error: `${agenteContacto.toUpperCase()} está pausada — no puede contactar a nadie por ahora.` });
     }
+    const limiteLlamada = outboundRateLimit.registrarYVerificar(agenteContacto);
+    if (!limiteLlamada.permitido) {
+      return res.status(429).json({ error: `${agenteContacto.toUpperCase()} alcanzó su límite diario de contactos (${limiteLlamada.count}/${limiteLlamada.limite}).` });
+    }
 
     const resultado = await vapi.llamarProspecto({
       nombre: contacto.nombre_completo, telefono: contacto.telefono,
       empresa: contacto.empresa, cargo: contacto.puesto,
     });
+    monitoringControl.reportarContactoSaliente({ agente: agenteContacto, canal: 'llamada', destinatario: contacto.telefono, detalle: { origen: 'base-de-datos-manual' } });
 
     await contactos.upsertContacto({
       agente: contacto.agente_asignado, telefono: contacto.telefono,
@@ -2924,13 +2936,19 @@ app.post('/api/admin/emergencia/desactivar', soloAdmin, async (req, res) => {
 app.get('/api/admin/agentes/pausados', soloAdmin, (req, res) => {
   res.json(agentPause.listar());
 });
-app.post('/api/admin/agentes/:agente/pausar', soloAdmin, (req, res) => {
-  agentPause.pausar(req.params.agente, req.body?.motivo || `Pausado manualmente por ${req.user?.nombre || req.user?.email || 'admin'}`);
+app.post('/api/admin/agentes/:agente/pausar', soloAdmin, async (req, res) => {
+  const motivo = req.body?.motivo || `Pausado manualmente por ${req.user?.nombre || req.user?.email || 'admin'}`;
+  agentPause.pausar(req.params.agente, motivo);
+  await monitoringControl.empujar(req.params.agente, true, motivo); // monitoring queda como registro autoritativo, no solo el disco local
   res.json(agentPause.listar());
 });
-app.post('/api/admin/agentes/:agente/reanudar', soloAdmin, (req, res) => {
+app.post('/api/admin/agentes/:agente/reanudar', soloAdmin, async (req, res) => {
   agentPause.reanudar(req.params.agente);
+  await monitoringControl.empujar(req.params.agente, false, null);
   res.json(agentPause.listar());
+});
+app.get('/api/admin/agentes/limites', soloAdmin, (req, res) => {
+  res.json({ sara: outboundRateLimit.estado('sara'), sofia: outboundRateLimit.estado('sofia'), noa: outboundRateLimit.estado('noa') });
 });
 
 app.get('/api/metricas', soloAdmin, async (req, res) => {
@@ -3238,13 +3256,18 @@ async function revisarLeadsSinRespuesta() {
 }
 
 // ─── START ────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\n  ABSTORAGES AI Portal (modo lite)`);
   console.log(`  Portal:    http://localhost:${PORT}`);
   console.log(`  Simulator: http://localhost:${PORT}/simulator`);
   console.log(`  WhatsApp:  ${WA_LIVE ? '🟢 LIVE' : '🟡 stub'}`);
   console.log(`  TTS Voz:   ${EL_LIVE ? '🟢 LIVE' : '🟡 stub (agrega ELEVENLABS_API_KEY)'}`);
   console.log(`  Tarifas:   🟢 dinámicas\n`);
+  // Se espera la primera sincronización de agent-control ANTES de arrancar
+  // los schedulers — si no, hay una ventana en la que un scheduler podría
+  // correr con el estado local (posiblemente viejo/vacío) antes de adoptar
+  // el real. Ver monitoringControl.js para el porqué de esto.
+  await monitoringControl.iniciar();
   noaScheduler.iniciar(pushActividad);
   sofiaScheduler.iniciar(pushActividad);
   tms.iniciarPrewarmNOA();

@@ -17,6 +17,8 @@
 require('dotenv').config();
 const memory = require('./memory');
 const agentPause = require('./agentPause');
+const outboundRateLimit = require('./outboundRateLimit');
+const monitoringControl = require('./monitoringControl');
 
 // Tiene que coincidir EXACTO con el `phone` que arma el webhook de WhatsApp
 // (server-lite.js, From de Twilio) para que sea la misma sesión cuando la
@@ -50,6 +52,12 @@ async function enviarPlantilla(to, contentSid, variables) {
     console.warn(`[saraProactivo] SARA pausada — se omite plantilla a ${to}`);
     return { status: 'paused', to };
   }
+  const limite = outboundRateLimit.registrarYVerificar('sara');
+  if (!limite.permitido) {
+    console.error(`[saraProactivo] 🛑 SARA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite plantilla a ${to}`);
+    return { status: 'rate_limited', to };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'sara', canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
   if (!WA_LIVE) {
     console.log(`[saraProactivo STUB] → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
     return { status: 'stub', to };

@@ -25,6 +25,8 @@ const vapi  = require('./vapi');
 const incidentesNOA = require('./incidentesNOA');
 const twochat = require('./twochat');
 const agentPause = require('./agentPause');
+const outboundRateLimit = require('./outboundRateLimit');
+const monitoringControl = require('./monitoringControl');
 
 const TWILIO_SID      = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
@@ -51,6 +53,12 @@ async function enviarPlantilla(to, contentSid, variables) {
     console.warn(`[alertasStaff] NOA pausada — se omite plantilla a ${to}`);
     return { status: 'paused', to };
   }
+  const limite = outboundRateLimit.registrarYVerificar('noa');
+  if (!limite.permitido) {
+    console.error(`[alertasStaff] 🛑 NOA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite plantilla a ${to}`);
+    return { status: 'rate_limited', to };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'noa', canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
   if (!WA_LIVE) {
     console.log(`[alertasStaff STUB] → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
     return { status: 'stub', to };

@@ -48,4 +48,22 @@ function listar() {
   return { ...pausados };
 }
 
-module.exports = { pausar, reanudar, estaPausado, listar };
+// Sobreescribe el estado completo desde una fuente externa (monitoringControl,
+// que lo trae de la base de monitoring) — a diferencia de pausar/reanudar, esto
+// no dispara el push de vuelta a monitoring, es solo "adoptar lo que ya está
+// ahí". Usado en el arranque y en la resincronización periódica, para que un
+// disco local viejo/vacío (como pasó el 16-22 de septiembre con el volumen de
+// Railway) nunca vuelva a ganarle silenciosamente al estado real.
+function establecerEstadoCompleto(nuevoEstado) {
+  const anterior = JSON.stringify(pausados);
+  for (const k of Object.keys(pausados)) delete pausados[k];
+  for (const [agente, datos] of Object.entries(nuevoEstado || {})) {
+    if (datos?.paused) pausados[agente] = { motivo: datos.motivo, desde: datos.changed_at || new Date().toISOString() };
+  }
+  if (JSON.stringify(pausados) !== anterior) {
+    console.warn('[agentPause] Estado resincronizado desde monitoring:', JSON.stringify(pausados));
+  }
+  guardar();
+}
+
+module.exports = { pausar, reanudar, estaPausado, listar, establecerEstadoCompleto };

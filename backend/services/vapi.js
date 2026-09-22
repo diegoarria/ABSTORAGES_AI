@@ -7,6 +7,8 @@ const SARA_SYSTEM_PROMPT  = require('../agents/sara-prompt');
 const NOA_SYSTEM_PROMPT   = require('../agents/noa-prompt');
 const contactos           = require('./contactos');
 const agentPause          = require('./agentPause');
+const outboundRateLimit   = require('./outboundRateLimit');
+const monitoringControl   = require('./monitoringControl');
 
 const API_KEY               = process.env.VAPI_API_KEY;
 const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;             // SOFIA
@@ -100,6 +102,12 @@ async function llamarProveedor(proveedor, orden) {
     console.warn(`[Vapi] SOFIA pausada — se omite llamada a ${proveedor?.nombre} (folio ${orden?.folio})`);
     return { status: 'paused', proveedor: proveedor?.id };
   }
+  const limite = outboundRateLimit.registrarYVerificar('sofia');
+  if (!limite.permitido) {
+    console.error(`[Vapi] 🛑 SOFIA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada a ${proveedor?.nombre} (folio ${orden?.folio})`);
+    return { status: 'rate_limited', proveedor: proveedor?.id };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'sofia', canal: 'llamada', destinatario: proveedor?.telefono, detalle: { folio: orden?.folio, proveedor: proveedor?.nombre } });
   const primerMensaje =
     `${ESLOGAN}. Hola ${proveedor.nombre}, soy SOFIA. ` +
     `Tenemos un servicio urgente — folio ${orden.folio}. ` +
@@ -466,6 +474,12 @@ async function llamarLead(lead) {
     console.warn(`[Vapi] SARA pausada — se omite llamada de seguimiento a ${lead?.nombre || lead?.telefono}`);
     return { status: 'paused' };
   }
+  const limite = outboundRateLimit.registrarYVerificar('sara');
+  if (!limite.permitido) {
+    console.error(`[Vapi] 🛑 SARA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de seguimiento a ${lead?.nombre || lead?.telefono}`);
+    return { status: 'rate_limited' };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'sara', canal: 'llamada', destinatario: lead?.telefono, detalle: { tipo: 'seguimiento', folio: lead?.folio } });
   const raw = (lead.telefono || '').replace(/\D/g, '');
   if (raw.length < 10) {
     console.log(`[Vapi] Teléfono inválido para llamada de seguimiento: ${lead.telefono}`);
@@ -504,6 +518,12 @@ async function llamarConfirmacionVenta(lead) {
     console.warn(`[Vapi] SARA pausada — se omite llamada de confirmación a ${lead?.nombre || lead?.telefono}`);
     return { status: 'paused' };
   }
+  const limite = outboundRateLimit.registrarYVerificar('sara');
+  if (!limite.permitido) {
+    console.error(`[Vapi] 🛑 SARA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de confirmación a ${lead?.nombre || lead?.telefono}`);
+    return { status: 'rate_limited' };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'sara', canal: 'llamada', destinatario: lead?.telefono, detalle: { tipo: 'confirmacion_venta', folio: lead?.folio } });
   const raw = (lead.telefono || '').replace(/\D/g, '');
   if (raw.length < 10) {
     console.log(`[Vapi] Teléfono inválido para llamada de confirmación de venta: ${lead.telefono}`);
@@ -569,6 +589,12 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
     console.warn(`[Vapi] NOA pausada — se omite llamada de estatus (${rol}) a ${nombre || telefono}`);
     return { status: 'paused' };
   }
+  const limite = outboundRateLimit.registrarYVerificar('noa');
+  if (!limite.permitido) {
+    console.error(`[Vapi] 🛑 NOA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de estatus (${rol}) a ${nombre || telefono}`);
+    return { status: 'rate_limited' };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'noa', canal: 'llamada', destinatario: telefono, detalle: { tipo: 'estatus_' + rol, folio } });
   if (!telefono) {
     console.log(`[Vapi] NOA — sin teléfono para ${rol} del folio ${folio}, se omite llamada`);
     return { status: 'sin_telefono' };
@@ -648,6 +674,12 @@ async function llamarAlertaStaff({ telefono, nombreStaff, folio, motivo }) {
     console.warn(`[Vapi] NOA pausada — se omite llamada de alerta crítica a ${nombreStaff || telefono}`);
     return { status: 'paused' };
   }
+  const limite = outboundRateLimit.registrarYVerificar('noa');
+  if (!limite.permitido) {
+    console.error(`[Vapi] 🛑 NOA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de alerta crítica a ${nombreStaff || telefono}`);
+    return { status: 'rate_limited' };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'noa', canal: 'llamada', destinatario: telefono, detalle: { tipo: 'alerta_critica', folio, motivo } });
 
   const primerMensaje =
     `Hola ${nombreStaff || ''}, soy Noa, de monitoreo ABSTORAGES. Te marco por una alerta crítica ` +
