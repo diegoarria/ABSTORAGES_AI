@@ -161,5 +161,17 @@
     "primer_mensaje": "Hola, soy Carlos Mendoza de Transportes del Norte, necesito mover 20 pallets de Monterrey a Guadalajara el próximo lunes",
     "resumen": "Monterrey → Guadalajara el · del Norte",
     "sessionId": "call-test-001"
+  },
+  {
+    "id": "LEAD-MRAT2L1I",
+    "created_at": "2026-07-07T15:30:24.390Z",
+    "webhook_status": "sent",
+    "origen": null,
+    "destino": null,
+    "intent": "otro",
+    "sara_nota": "cotizacion_en_proceso",
+    "primer_mensaje": "Hola Sara",
+    "resumen": "",
+    "sessionId": "1783438198845-1mrn1"
   }
 ]

@@ -305,8 +305,10 @@ const AGENTE_LABEL = { sofia: 'SOFÍA', sara: 'SARA', noa: 'NOA' };
 
 // Aviso de "llamada en curso" — a diferencia de notificarLlamada (que avisa al
 // terminar), esto avisa apenas se conecta, para saber en tiempo real que una
-// IA está al teléfono. Va directo a Diego, no a la lista general de NOTIF_EMAIL.
+// IA está al teléfono. Va a Diego + Rafael, no a la lista general de NOTIF_EMAIL.
 const DIEGO_EMAIL = 'diego.arria@abstorages.com';
+const RAFAEL_EMAIL = 'rafael.arria@abstorages.com';
+const LLAMADA_INICIADA_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL];
 
 async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
   const label = AGENTE_LABEL[agente?.toLowerCase()] || agente?.toUpperCase() || 'Agente';
@@ -328,8 +330,8 @@ async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
     return;
   }
   try {
-    await gmailTransport.sendMail({ from: `SARA ABSTORAGES <${GMAIL_USER}>`, to: DIEGO_EMAIL, subject: asunto, html });
-    console.log(`[Gmail] ✅ Aviso de llamada en curso enviado a ${DIEGO_EMAIL}`);
+    await gmailTransport.sendMail({ from: `SARA ABSTORAGES <${GMAIL_USER}>`, to: LLAMADA_INICIADA_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de llamada en curso enviado a ${LLAMADA_INICIADA_EMAILS.join(', ')}`);
   } catch (e) {
     console.error('[Gmail] ❌ Error notificando llamada en curso:', e.message);
   }
@@ -340,7 +342,6 @@ async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
 // para las notificaciones push, así no hay que duplicar la lista de eventos
 // en dos lugares. Va a Diego + Rafael, no a la lista general de NOTIF_EMAIL
 // (esa es solo para leads comerciales).
-const RAFAEL_EMAIL = 'rafael.arria@abstorages.com';
 const ALERT_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL];
 
 async function notificarAlerta({ title, body, tipo }) {
