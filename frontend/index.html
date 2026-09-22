@@ -44,6 +44,7 @@
         <a href="/historial.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Historial de Conversaciones">🗂️ Historial</a>
         <a href="/memoria-agentes.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Memoria de Agentes">🧠 Memoria</a>
         <a href="/base-datos.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Base de Datos — clientes, proveedores y operadores">🗂️ Base de Datos</a>
+        <button class="btn-portal admin-only" id="btn-nueva-orden-manual" title="Registrar un cierre de venta hecho por un humano — dispara la búsqueda real de transportista, igual que un cierre de SARA">🚛 Nueva Orden Manual</button>
         <button class="btn-portal admin-only" id="btn-emergencia" title="Apagado de emergencia de SARA/SOFIA/NOA" style="background:#7f1d1d;color:#fff;border-color:#991b1b;">🔴 Emergencia</button>
       </div>
 
@@ -975,6 +976,7 @@
         // "operaciones" lo ve (la API ya lo bloquea, pero mejor ni mostrarlo).
         if (me.role !== 'admin') {
           document.getElementById('btn-emergencia')?.classList.add('hidden-role');
+          document.getElementById('btn-nueva-orden-manual')?.classList.add('hidden-role');
         }
 
         // Ocultar "Ver Portal" para roles externos si portal está vacío
@@ -1042,6 +1044,53 @@
       });
 
       cargarEstado();
+    })();
+
+    // ── Nueva orden manual — cierre de venta hecho por un humano ─────────────
+    (function() {
+      const btn = document.getElementById('btn-nueva-orden-manual');
+      if (!btn) return;
+      const overlay = document.getElementById('nom-overlay');
+
+      const campos = ['nombre','empresa','telefono','email','rfc','origen','destino','tipo_unidad','tipo_carga','peso_toneladas','precio_cotizado'];
+      function limpiarForm() {
+        campos.forEach(c => { const el = document.getElementById('nom-' + c); if (el) el.value = ''; });
+        document.getElementById('nom-msg').textContent = '';
+      }
+
+      btn.addEventListener('click', () => { limpiarForm(); overlay.classList.add('open'); });
+      document.getElementById('nom-cancelar')?.addEventListener('click', () => overlay.classList.remove('open'));
+      overlay?.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+
+      document.getElementById('nom-guardar')?.addEventListener('click', async () => {
+        const body = {};
+        campos.forEach(c => { body[c] = document.getElementById('nom-' + c).value.trim(); });
+        if (!body.nombre || !body.telefono || !body.origen || !body.destino) {
+          document.getElementById('nom-msg').textContent = 'Nombre, teléfono, origen y destino son obligatorios.';
+          document.getElementById('nom-msg').style.color = '#ef4444';
+          return;
+        }
+        if (!confirm(`¿Confirmar orden manual?\n\n${body.nombre} — ${body.empresa || 'sin empresa'}\n${body.origen} → ${body.destino}\n\nEsto dispara llamadas y WhatsApp reales a proveedores del TMS.`)) return;
+
+        const msg = document.getElementById('nom-msg');
+        msg.textContent = 'Guardando y lanzando búsqueda de transportista…';
+        msg.style.color = '';
+        try {
+          const r = await fetch('/api/admin/nueva-orden-manual', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          const data = await r.json();
+          if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+          msg.style.color = '#22c55e';
+          msg.textContent = `✅ Folio ${data.folio} creado — SOFIA ya está buscando transportista.`;
+          setTimeout(() => overlay.classList.remove('open'), 2500);
+        } catch (e) {
+          msg.style.color = '#ef4444';
+          msg.textContent = 'Error: ' + e.message;
+        }
+      });
     })();
 
     // ── Logout ──────────────────────────────────────────────────────────────
@@ -1640,6 +1689,44 @@
     setInterval(loadMetricas, 60_000);
   })();
   </script>
+  <!-- ── Modal: Nueva orden manual ─────────────────────────────────────────── -->
+  <div id="nom-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--ink-900,#10151C); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:12px; padding:22px 24px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto;">
+      <h2 style="font-size:15px; font-weight:800; margin:0 0 4px; color:var(--text-100,#EDF1F5);">🚛 Nueva orden manual</h2>
+      <p style="font-size:12px; color:var(--text-300,#9BA9B8); margin:0 0 16px;">Para un cierre de venta hecho por un humano (teléfono, en persona) — dispara la misma búsqueda real de transportista que un cierre de SARA.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Nombre *</label><input id="nom-nombre" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Empresa</label><input id="nom-empresa" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Teléfono *</label><input id="nom-telefono" placeholder="+52 81 0000 0000" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Email</label><input id="nom-email" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+      </div>
+      <div style="margin-bottom:10px;"><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">RFC</label><input id="nom-rfc" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Origen *</label><input id="nom-origen" placeholder="Monterrey" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Destino *</label><input id="nom-destino" placeholder="Ciudad de México" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Tipo de unidad</label><input id="nom-tipo_unidad" placeholder="Caja seca 53" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Tipo de carga</label><input id="nom-tipo_carga" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Peso (ton)</label><input id="nom-peso_toneladas" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+        <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Precio cotizado</label><input id="nom-precio_cotizado" placeholder="$18,500 MXN" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+      </div>
+
+      <div id="nom-msg" style="font-size:12px; margin-bottom:12px; min-height:16px;"></div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button id="nom-cancelar" style="background:none; border:1px solid var(--line,rgba(255,255,255,.08)); color:var(--text-300,#9BA9B8); font-size:12.5px; font-weight:600; padding:9px 16px; border-radius:8px; cursor:pointer;">Cancelar</button>
+        <button id="nom-guardar" style="background:#0EA968; border:none; color:#fff; font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:8px; cursor:pointer;">Confirmar orden</button>
+      </div>
+    </div>
+  </div>
+  <style>#nom-overlay.open { display:flex !important; }</style>
+
   <script src="/js/pwa.js"></script>
   <script src="/js/cap-push.js"></script>
 </body>

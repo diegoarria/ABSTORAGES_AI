@@ -1667,6 +1667,54 @@ app.post('/api/admin/db-migrate', soloAdmin, async (req, res) => {
   }
 });
 
+// ── Nueva orden manual — el mismo poder que NUEVA_ORDEN de SARA, pero para
+// un cierre real hecho por un humano (teléfono, en persona, fuera del chat).
+// Sin esto, SOFIA nunca se entera de un servicio cerrado por el equipo de
+// ventas si no pasó por la conversación con SARA — pedido explícito del
+// usuario (22-sep-2026). Dispara exactamente la misma cadena que un cierre
+// de la IA: guarda el lead, notifica al equipo, persiste la orden, y lanza
+// la búsqueda real de transportista (llamadas + WhatsApp) — sujeta a las
+// mismas protecciones que todo lo demás (agentPause, límite diario, etc.),
+// porque pasa por las mismas funciones de siempre.
+app.post('/api/admin/nueva-orden-manual', soloAdmin, async (req, res) => {
+  try {
+    const { nombre, empresa, telefono, email, rfc, origen, destino, tipo_unidad, tipo_carga, peso_toneladas, precio_cotizado } = req.body || {};
+    if (!nombre || !telefono || !origen || !destino) {
+      return res.status(400).json({ error: 'nombre, telefono, origen y destino son requeridos' });
+    }
+    const folio = req.body.folio?.trim() || `OP-ABS-${String(new Date().getFullYear()).slice(-2)}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    const sid = `manual_${folio}`;
+
+    const lead = leads.add({
+      nombre, empresa, telefono, email, rfc, origen, destino, tipo_unidad, tipo_carga, peso_toneladas, precio_cotizado,
+      folio, sara_nota: 'cierre_manual_humano', sessionId: sid,
+      primer_mensaje: `Orden capturada manualmente por ${req.user?.nombre || req.user?.email || 'admin'}`,
+    });
+
+    pushActividad({ agente: 'SOLOADMIN', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden manual ${folio} — ${empresa || nombre}`, sessionId: sid, metadata: { sessionId: sid, capturadaPor: req.user?.nombre || req.user?.email } });
+    sendPush({
+      title: '🚛 Nueva orden manual',
+      body: `${empresa || nombre} · ${origen}→${destino} · Folio ${folio} · capturada por ${req.user?.nombre || req.user?.email || 'admin'}`,
+      tag: 'nueva-orden', url: '/', tipo: 'NUEVA_ORDEN', urgente: true,
+    }).catch(() => {});
+
+    await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
+    contactos.upsertContacto({
+      agente: 'sara', tipo: 'cliente',
+      nombre_completo: nombre, telefono, email, empresa, tipo_carga,
+      resumen_interaccion: `Folio ${folio} — ${origen} → ${destino} (orden manual)`,
+      canal: 'manual',
+    }).catch(e => console.error('[contactos]', e.message));
+
+    buscarUnidadParaOrden(lead);
+    saraProactivo.enviarConfirmacionVenta(telefono, nombre, folio).catch(e => console.error('[saraProactivo venta]', e.message));
+
+    res.json({ ok: true, folio, lead });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Diagnóstico: guarda una orden sintética vía ordersStore para confirmar
 // que la persistencia en Postgres funciona de punta a punta.
 app.post('/api/admin/test-orden', soloAdmin, async (req, res) => {
