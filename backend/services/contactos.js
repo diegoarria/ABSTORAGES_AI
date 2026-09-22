@@ -23,6 +23,50 @@ function cargar() {
 }
 
 let cache = cargar();
+
+// ── Contactos permanentes — blindados contra pérdida de datos ────────────────
+// A diferencia de un alta normal (que solo vive en el archivo de disco, y por
+// lo tanto en el volumen de Railway), estos quedan también aquí, en código,
+// committeados a git. Así sobreviven incluso si el volumen se resetea o se
+// recrea desde cero — se reinsertan solos al arrancar si no están.
+// Pedido explícito del usuario (22-sep-2026): guardar este proveedor "para
+// siempre", el mismo criterio que ya usa ipBanlist.js con BANEOS_MANUALES.
+const CONTACTOS_PERMANENTES = [
+  {
+    agente: 'sofia', tipo: 'proveedor',
+    nombre_completo: 'Francisco Favio',
+    telefono: '+5216681328696',
+    notas: 'Clave: P1561 LOGVE',
+  },
+];
+
+function sembrarContactosPermanentes() {
+  let sembroAlguno = false;
+  for (const c of CONTACTOS_PERMANENTES) {
+    const tel = normalizarTelefono(c.telefono);
+    const yaExiste = cache.some(x => normalizarTelefono(x.telefono) === tel);
+    if (yaExiste) continue;
+    const ahora = new Date().toISOString();
+    cache.push({
+      id: `CT-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+      agente_asignado: c.agente.toUpperCase(), tipo: c.tipo,
+      nombre_completo: c.nombre_completo, puesto: c.puesto || null,
+      telefono: c.telefono, email: c.email || null, empresa: c.empresa || null,
+      tipo_carga: null, notas: c.notas || null,
+      fecha_primer_contacto: ahora, fecha_ultimo_contacto: ahora, created_at: ahora,
+      interacciones: [{ agente: c.agente.toUpperCase(), canal: 'permanente', resumen: 'Alta permanente — protegido en código, no solo en disco', fecha: ahora }],
+      permanente: true,
+    });
+    sembroAlguno = true;
+    console.log(`[Contactos] Sembrado contacto permanente: ${c.nombre_completo} (${c.telefono})`);
+  }
+  if (sembroAlguno) {
+    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+    catch (e) { console.error('[Contactos] Error guardando semilla permanente en disco:', e.message); }
+  }
+}
+sembrarContactosPermanentes();
+
 let saveTimer = null;
 function guardarDisco() {
   clearTimeout(saveTimer);
