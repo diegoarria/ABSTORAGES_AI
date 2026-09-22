@@ -13,6 +13,7 @@ const tms             = require('./tms');
 const vapi             = require('./vapi');
 const whatsappProactivo = require('./whatsappProactivo');
 const agentPause        = require('./agentPause');
+const notifier          = require('./notifier');
 
 const HABILITADO     = process.env.SOFIA_DISPONIBILIDAD_DIARIA === 'true';
 const HORA_ENVIO      = Number(process.env.SOFIA_DISPONIBILIDAD_HORA || 8); // 8am hora Monterrey
@@ -93,6 +94,12 @@ async function correrSiToca(pushActividad) {
 
   console.log(`[SOFIA scheduler] Ronda diaria — ${folios.length} folio(s) sin proveedor en las próximas ${VENTANA_HORAS}h`);
 
+  // Se acumula quién SÍ fue contactado de verdad (nunca lo pausado/omitido
+  // por límite) para mandar el reporte por email al terminar la ronda —
+  // así Diego y Rafael tienen registro exacto sin tener que estar viendo
+  // el panel en el momento.
+  const contactados = [];
+
   for (const f of folios) {
     const folio = f['Folio de servicio'];
     if (!folio) continue;
@@ -118,16 +125,30 @@ async function correrSiToca(pushActividad) {
       continue;
     }
 
-    try {
-      await whatsappProactivo.preguntarDisponibilidadATodos(compatibles, orden);
-      pushActividad?.({
-        agente: 'SOFIA', tipo: 'DISPONIBILIDAD_DIARIA',
-        mensaje: `Ronda diaria: folio ${folio} (${origen} → ${destino}) — disponibilidad solicitada a ${compatibles.length} proveedor(es)`,
-        metadata: { folio, proveedores: compatibles.length },
-      });
-    } catch (e) {
-      console.error(`[SOFIA scheduler] Error preguntando disponibilidad — folio ${folio}:`, e.message);
+    // Se manda uno por uno (no con preguntarDisponibilidadATodos) para poder
+    // saber exactamente a quién SÍ le llegó de verdad — necesario para el
+    // reporte por email, y para no reportar como "contactado" a alguien que
+    // en realidad se omitió por pausa o por límite diario.
+    for (const p of compatibles) {
+      try {
+        const r = await whatsappProactivo.preguntarDisponibilidad(p, orden);
+        const seOmitio = !r || ['paused', 'rate_limited', 'stub'].includes(r.status);
+        if (!seOmitio) contactados.push({ folio, ruta: orden.ruta, proveedor: p.nombre, telefono: p.telefono });
+      } catch (e) {
+        console.error(`[SOFIA scheduler] Error preguntando disponibilidad a ${p.nombre} — folio ${folio}:`, e.message);
+      }
     }
+
+    pushActividad?.({
+      agente: 'SOFIA', tipo: 'DISPONIBILIDAD_DIARIA',
+      mensaje: `Ronda diaria: folio ${folio} (${origen} → ${destino}) — disponibilidad solicitada a ${compatibles.length} proveedor(es)`,
+      metadata: { folio, proveedores: compatibles.length },
+    });
+  }
+
+  if (contactados.length) {
+    notifier.notificarRondaDisponibilidad(contactados, { fecha, foliosRevisados: folios.length }).catch(e =>
+      console.error('[SOFIA scheduler] Error mandando el reporte por email de la ronda:', e.message));
   }
 }
 

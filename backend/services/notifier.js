@@ -369,6 +369,49 @@ async function notificarAlerta({ title, body, tipo }) {
   }
 }
 
+// ── Reporte de la ronda diaria de disponibilidad de SOFIA — a Diego y Rafael,
+// con la lista exacta de a quién SÍ se le contactó de verdad (nunca incluye
+// a quien se omitió por pausa o por límite diario). Pedido explícito del
+// usuario para no depender de estar viendo el panel en vivo cada mañana.
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function notificarRondaDisponibilidad(contactados, { fecha, foliosRevisados }) {
+  const porFolio = {};
+  for (const c of contactados) {
+    (porFolio[c.folio] ||= { ruta: c.ruta, proveedores: [] }).proveedores.push(c);
+  }
+
+  const filas = Object.entries(porFolio).map(([folio, d]) => `
+    <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #e5e7eb;">
+      <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:6px;">📋 Folio ${esc(folio)} — ${esc(d.ruta)}</div>
+      ${d.proveedores.map(p => `<div style="font-size:13px;color:#374151;padding:3px 0;">• ${esc(p.proveedor)} — ${esc(p.telefono)}</div>`).join('')}
+    </div>`).join('');
+
+  const asunto = `🚚 SOFIA — Ronda de disponibilidad: ${contactados.length} proveedor(es) contactado(s)`;
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:20px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">SOFIA · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Ronda de disponibilidad · ${esc(fecha)} · ${foliosRevisados} folio(s) revisado(s)</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#111;"><strong>${contactados.length}</strong> proveedor(es) del piloto contactado(s) hoy:</p>
+      ${filas}
+    </div>
+  </div>`;
+
+  if (!gmailTransport) {
+    console.log(`[Notifier STUB] Ronda de disponibilidad — ${contactados.length} contactado(s)`);
+    return;
+  }
+  try {
+    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Reporte de ronda de disponibilidad enviado a ${ALERT_EMAILS.join(', ')}`);
+  } catch (e) {
+    console.error('[Gmail] ❌ Error enviando reporte de ronda de disponibilidad:', e.message);
+  }
+}
+
 async function notificarLlamada({ agente, nombre, telefono, resumen, transcript, duracionSeg, folio }) {
   const label = AGENTE_LABEL[agente] || agente?.toUpperCase() || 'Agente';
   const asunto = `📞 Llamada terminada — ${label}${folio ? ` · Folio ${folio}` : ''}`;
@@ -390,4 +433,4 @@ async function notificarLlamada({ agente, nombre, telefono, resumen, transcript,
   if (!enviado) console.log(`[Notifier STUB] Llamada terminada — ${label} con ${nombre}`);
 }
 
-module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta };
+module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad };
