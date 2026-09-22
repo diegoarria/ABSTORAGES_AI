@@ -53,6 +53,17 @@ const CHECKERS = {
     });
     return { status_code: r.status, raw: { ok: r.ok } };
   },
+  // El propio servidor de negocio (SARA/SOFIA/NOA) — a diferencia de los
+  // demás checkers, que vigilan proveedores externos, este vigila que el
+  // PROCESO SIGA VIVO. Agregado tras el incidente del 22-sep-2026: un error
+  // de sintaxis en un prompt tumbó todo el servidor en crash loop y nadie
+  // se enteró hasta horas después, porque nada estaba viendo si el negocio
+  // mismo respondía.
+  negocio: async () => {
+    const url = process.env.NEGOCIO_HEALTH_URL || 'https://abstoragesai-production.up.railway.app/health';
+    const r = await fetchConTimeout(url);
+    return { status_code: r.status, raw: { ok: r.ok } };
+  },
   cliengo: async () => {
     // Este proyecto no tiene integración de API con Cliengo (es un widget de
     // JS embebido en WordPress, sin credenciales de servidor) — esto es un
@@ -94,10 +105,14 @@ async function checarServicio(nombre, checker) {
 
   if (status === 'down') {
     fallosConsecutivos[nombre] = (fallosConsecutivos[nombre] || 0) + 1;
-    if (fallosConsecutivos[nombre] === 2) {
+    // "negocio" es el servidor completo de SARA/SOFIA/NOA — un solo fallo ya
+    // es crítico y se alerta de inmediato, no se espera a 2 checks (10 min)
+    // como con dependencias externas que pueden tener un hipo pasajero.
+    const umbral = nombre === 'negocio' ? 1 : 2;
+    if (fallosConsecutivos[nombre] === umbral) {
       await registrarSecurityEvent({
         event_type: 'other',
-        severity: 'high',
+        severity: nombre === 'negocio' ? 'critical' : 'high',
         details: { service: nombre, motivo: 'Fallas consecutivas de health-check', ultimo_error: error, status_code: statusCode },
       });
       analizarSiHayAlgoUrgente(); // dispara el analizador de inmediato, no espera los 15 min

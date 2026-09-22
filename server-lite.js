@@ -292,6 +292,13 @@ async function buscarUnidadParaOrden(lead) {
   }
 }
 
+// Health check público — sin auth, sin tocar TMS/DB, para que monitoring
+// pueda saber si el proceso está vivo o en crash loop. Registrado ANTES de
+// app.use(auth) a propósito, para no requerir sesión. Pedido tras el
+// incidente del 22-sep-2026 (comillas invertidas en sofia-prompt.js
+// tumbaron el servidor entero sin que nadie se enterara hasta horas después).
+app.get('/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
+
 // ─── MIDDLEWARE ────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '2mb' }));
 
