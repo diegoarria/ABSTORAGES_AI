@@ -152,6 +152,7 @@ function bloqueContactoConocido(contacto) {
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
     (interacciones ? `Interacciones previas relevantes:\n${interacciones}\n\n` : '\n') +
+    `IMPORTANTE: esta persona YA está registrada en la Base de Datos de ABSTORAGES — NO le pidas nombre completo, teléfono ni correo, y NO apliques la regla de "PRIMER MENSAJE" con ella (esa regla es solo para desconocidos). Si te saluda, salúdala por su nombre y sigue la conversación normal.\n` +
     `Ya la conoces — no repitas preguntas que ya tienes contestadas ahí, y usa ese historial para dar continuidad natural a la conversación. No lo menciones de forma robótica ("según mis registros..."), solo úsalo como lo haría alguien que de verdad se acuerda.`
   );
 }

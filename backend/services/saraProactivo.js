@@ -26,7 +26,12 @@ const monitoringControl = require('./monitoringControl');
 function normalizarE164(telefono) {
   const raw = String(telefono || '').replace(/\D/g, '');
   if (!raw) return null;
-  return raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
+  // Twilio entrega los celulares mexicanos entrantes como +521XXXXXXXXXX (con
+  // el "1" móvil). Si aquí se guardara sin ese "1", la sesión de memoria de lo
+  // que mandamos NO coincidiría con la de la respuesta, y la IA contestaría
+  // como si no hubiera mandado nada (pasó con Aziel el 24-sep-2026).
+  if (raw.length === 10 || ((raw.startsWith('52') || raw.startsWith('521')) && raw.length >= 12)) return `+521${raw.slice(-10)}`;
+  return `+${raw}`;
 }
 
 // Sin esto, cuando el cliente responde a un mensaje proactivo, SARA no

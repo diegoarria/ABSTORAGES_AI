@@ -1832,6 +1832,15 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
     if (!r.ok) return res.status(502).json({ error: `Twilio ${r.status}: ${resp.slice(0, 400)}` });
 
     monitoringControl.reportarContactoSaliente({ agente, canal: 'whatsapp_plantilla', destinatario: contacto.telefono, detalle: { contentSid, origen: 'base-de-datos-manual' } });
+    // Se registra en la MISMA sesión que usa el webhook (wa_<agente>_+521…) —
+    // sin esto, cuando el proveedor contesta, la IA no sabe qué le mandamos y
+    // responde como si fuera un desconocido (pasó con Aziel el 24-sep-2026).
+    try {
+      const d = String(contacto.telefono).replace(/\D/g, '');
+      const telSesion = d.length >= 10 ? `+521${d.slice(-10)}` : `+${d}`;
+      const textoEnviado = (plantilla.texto || '').replace(/\{\{(\d+)\}\}/g, (m, n) => (variables || {})[n] || '');
+      if (textoEnviado) memory.addMessage(agente === 'noa' ? `wa_${telSesion}` : `wa_${agente}_${telSesion}`, 'assistant', textoEnviado);
+    } catch (e) { console.error('[plantilla manual] No se pudo registrar en memoria:', e.message); }
     await contactos.upsertContacto({
       agente, telefono: contacto.telefono,
       resumen_interaccion: `Plantilla "${plantilla.nombre}" enviada manualmente desde Base de Datos`,
