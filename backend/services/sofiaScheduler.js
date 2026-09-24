@@ -14,6 +14,7 @@ const vapi             = require('./vapi');
 const whatsappProactivo = require('./whatsappProactivo');
 const agentPause        = require('./agentPause');
 const notifier          = require('./notifier');
+const contactos         = require('./contactos');
 
 const HABILITADO     = process.env.SOFIA_DISPONIBILIDAD_DIARIA === 'true';
 const HORA_ENVIO      = Number(process.env.SOFIA_DISPONIBILIDAD_HORA || 8); // 8am hora Monterrey
@@ -85,8 +86,28 @@ async function correrSiToca(pushActividad) {
   // Piloto acotado — nunca contactar a nadie fuera de la lista blanca,
   // aunque sea "compatible" con la ruta. Ver PILOTO_TELEFONOS arriba.
   const antesDelFiltro = proveedoresReales.length;
-  proveedoresReales = proveedoresReales.filter(p => PILOTO_TELEFONOS.has((p.telefono || '').replace(/\D/g, '').slice(-10)));
-  console.log(`[SOFIA scheduler] Piloto: ${proveedoresReales.length}/${antesDelFiltro} proveedores reales están en la lista blanca del piloto`);
+  const ult10 = t => (t || '').replace(/\D/g, '').slice(-10);
+  proveedoresReales = proveedoresReales.filter(p => PILOTO_TELEFONOS.has(ult10(p.telefono)));
+
+  // Proveedores guardados en la Base de Datos (no solo los del TMS) que estén
+  // en la lista blanca — así un proveedor dado de alta ahí sí entra a la ronda.
+  // Si la nota trae un trato específico ("Sr. Marco"), se usa como nombre en
+  // el mensaje en vez del nombre completo.
+  let desdeBD = [];
+  try {
+    const guardados = await contactos.listarPorAgente('SOFIA', { tipo: 'proveedor' });
+    const yaEstan = new Set(proveedoresReales.map(p => ult10(p.telefono)));
+    desdeBD = guardados
+      .filter(c => PILOTO_TELEFONOS.has(ult10(c.telefono)) && !yaEstan.has(ult10(c.telefono)))
+      .map(c => {
+        const trato = (c.notas || '').match(/"(Sr\.?\s[^"]+)"/);
+        return { id: c.id, nombre: trato ? trato[1] : c.nombre_completo, telefono: c.telefono, rutas: [], tipos_unidad: [], activo: true };
+      });
+  } catch (e) {
+    console.error('[SOFIA scheduler] Error leyendo proveedores de la Base de Datos:', e.message);
+  }
+  proveedoresReales = proveedoresReales.concat(desdeBD);
+  console.log(`[SOFIA scheduler] Piloto: ${proveedoresReales.length} proveedores en la lista blanca (${desdeBD.length} desde Base de Datos, ${proveedoresReales.length - desdeBD.length}/${antesDelFiltro} del TMS)`);
   if (!proveedoresReales.length) {
     pushActividad?.({ agente: 'SOFIA', tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Ronda diaria: ningún proveedor real coincide con la lista blanca del piloto — no se contactó a nadie' });
     return;
@@ -99,6 +120,8 @@ async function correrSiToca(pushActividad) {
   // así Diego y Rafael tienen registro exacto sin tener que estar viendo
   // el panel en el momento.
   const contactados = [];
+  const enviosPorProveedor = {};
+  const MAX_POR_PROVEEDOR = 2;
 
   for (const f of folios) {
     const folio = f['Folio de servicio'];
@@ -130,6 +153,12 @@ async function correrSiToca(pushActividad) {
     // reporte por email, y para no reportar como "contactado" a alguien que
     // en realidad se omitió por pausa o por límite diario.
     for (const p of compatibles) {
+      // Tope por proveedor por ronda — con pocos proveedores en el piloto y
+      // varios folios pendientes, sin esto una sola persona recibiría una
+      // avalancha de mensajes la misma mañana.
+      const k = ult10(p.telefono);
+      if ((enviosPorProveedor[k] || 0) >= MAX_POR_PROVEEDOR) continue;
+      enviosPorProveedor[k] = (enviosPorProveedor[k] || 0) + 1;
       try {
         const r = await whatsappProactivo.preguntarDisponibilidad(p, orden);
         const seOmitio = !r || ['paused', 'rate_limited', 'stub'].includes(r.status);
