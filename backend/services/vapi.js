@@ -198,10 +198,32 @@ async function llamarProveedor(proveedor, orden) {
 // ── Llamada "normal" de SOFIA — su prompt real, sin guion de negociación ─────
 // Para hablar con alguien del equipo (ej. Gabriel) como la planner que es,
 // sin forzar un folio/negociación falsa de prueba.
-async function llamarNormal(nombre, telefono) {
+async function llamarNormal(nombre, telefono, { motivo } = {}) {
+  if (agentPause.estaPausado('sofia')) {
+    console.warn(`[Vapi] SOFIA pausada — se omite llamada a ${nombre}`);
+    return { status: 'paused' };
+  }
+  const limite = outboundRateLimit.registrarYVerificar('sofia');
+  if (!limite.permitido) {
+    console.error(`[Vapi] 🛑 SOFIA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada a ${nombre}`);
+    return { status: 'rate_limited' };
+  }
+  monitoringControl.reportarContactoSaliente({ agente: 'sofia', canal: 'llamada', destinatario: telefono, detalle: { tipo: motivo ? 'trabajo_manual' : 'saludo' } });
+
   const primerMensaje = `${ESLOGAN}. Hola ${nombre}, soy SOFIA. ¿Cómo estás? ¿En qué te puedo ayudar?`;
 
-  const systemPrompt = SOFIA_SYSTEM_PROMPT + MODO_VOZ + SOFIA_VOZ_EXTRA + CIERRE_ESLOGAN;
+  let systemPrompt = SOFIA_SYSTEM_PROMPT + MODO_VOZ + SOFIA_VOZ_EXTRA + CIERRE_ESLOGAN;
+
+  // Proveedor ya guardado en la Base de Datos: trato de amigo, sin pedir datos
+  // ni carga por iniciativa propia (ver contactos.bloqueContactoConocido).
+  try {
+    const conocido = await contactos.buscarPorTelefono(telefono, 'sofia');
+    if (conocido) systemPrompt += contactos.bloqueContactoConocido(conocido);
+  } catch (e) { console.error('[Vapi] Error consultando contacto conocido:', e.message); }
+
+  systemPrompt += motivo
+    ? `\n\n## CONTEXTO DE ESTA LLAMADA\nEsta llamada la pidió el equipo de ABSTORAGES y SÍ es de trabajo. Motivo: ${motivo}. Trátalo con la calidez de siempre, pero atiende ese motivo.`
+    : `\n\n## CONTEXTO DE ESTA LLAMADA\nEs una llamada de saludo, NO de trabajo. Habla con calidez, como con un amigo: pregunta cómo está, platica lo que salga. NO pidas carga, disponibilidad, rutas, tarifas ni datos; si él saca el tema del trabajo, síguelo, pero no lo provoques.`;
 
   const payload = {
     phoneNumberId: PHONE_NUMBER_ID,

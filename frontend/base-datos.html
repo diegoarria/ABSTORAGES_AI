@@ -475,11 +475,20 @@ async function enviarPlantilla(contactoId){
 }
 
 async function llamar(contactoId){
+  const c = contactosCache.find(x => x.id === contactoId);
+  let motivo = '';
+  if (c && c.tipo === 'proveedor') {
+    const r0 = prompt('¿Motivo de la llamada?\n\nDéjalo VACÍO para una llamada de saludo (SOFIA solo platica, no habla de trabajo).\nEscribe el motivo solo si es una llamada de trabajo.');
+    if (r0 === null) return; // canceló
+    motivo = r0.trim();
+  }
   const btn = document.getElementById('btnLlamar');
   btn.disabled = true; btn.textContent = '📞 Llamando…';
   try {
     const r = await fetch('/api/contactos/' + encodeURIComponent(contactoId) + '/llamar', {
       method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ motivo }),
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));

@@ -1869,10 +1869,19 @@ app.post('/api/contactos/:id/llamar', soloAdmin, async (req, res) => {
       return res.status(429).json({ error: `${agenteContacto.toUpperCase()} alcanzó su límite diario de contactos (${limiteLlamada.count}/${limiteLlamada.limite}).` });
     }
 
-    const resultado = await vapi.llamarProspecto({
-      nombre: contacto.nombre_completo, telefono: contacto.telefono,
-      empresa: contacto.empresa, cargo: contacto.puesto,
-    });
+    // Proveedor de SOFIA: llamada con SU voz y trato de amigo (saludo por
+    // default; solo habla de trabajo si se indica un motivo). Con "Sr. …" en
+    // las notas se usa ese trato. Los demás contactos siguen igual que antes.
+    let resultado;
+    if (agenteContacto === 'sofia' && contacto.tipo === 'proveedor') {
+      const trato = (contacto.notas || '').match(/"(Sr\.?\s[^"]+)"/);
+      resultado = await vapi.llamarNormal(trato ? trato[1] : contacto.nombre_completo.split(' ')[0], contacto.telefono, { motivo: (req.body?.motivo || '').trim() || null });
+    } else {
+      resultado = await vapi.llamarProspecto({
+        nombre: contacto.nombre_completo, telefono: contacto.telefono,
+        empresa: contacto.empresa, cargo: contacto.puesto,
+      });
+    }
     monitoringControl.reportarContactoSaliente({ agente: agenteContacto, canal: 'llamada', destinatario: contacto.telefono, detalle: { origen: 'base-de-datos-manual' } });
 
     await contactos.upsertContacto({
