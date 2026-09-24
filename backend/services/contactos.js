@@ -93,6 +93,21 @@ async function upsertContacto(datos) {
   return contacto;
 }
 
+// Edita solo las rutas de un proveedor (permite vaciarlas, cosa que el upsert no hace)
+async function actualizarRutas(id, rutas) {
+  const valor = String(rutas || '').trim().slice(0, 500) || null;
+  if (USA_DB) {
+    try {
+      const { rows } = await db.query('UPDATE contactos SET rutas = $1 WHERE id = $2 RETURNING *', [valor, id]);
+      return rows[0] || null;
+    } catch (e) { console.error('[Contactos] Postgres falló actualizando rutas, cae a archivo:', e.message); }
+  }
+  const c = cache.find(x => x.id === id);
+  if (!c) return null;
+  c.rutas = valor; guardarDisco();
+  return c;
+}
+
 async function listarPorAgente(agente, opts = {}) {
   if (USA_DB) {
     try { return await db.listarContactosPorAgente(agente, opts); }
@@ -210,4 +225,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes();
 
-module.exports = { upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
+module.exports = { actualizarRutas, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };

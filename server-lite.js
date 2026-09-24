@@ -1839,6 +1839,14 @@ app.post('/api/contactos', soloAdmin, async (req, res) => {
   }
 });
 
+app.put('/api/contactos/:id/rutas', soloAdmin, async (req, res) => {
+  try {
+    const c = await contactos.actualizarRutas(req.params.id, (req.body || {}).rutas);
+    if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
+    res.json({ ok: true, rutas: c.rutas || null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // Lista de plantillas aprobadas por Meta que un agente tiene permitido usar —
 // única fuente de verdad, la misma que valida /api/contactos/:id/plantilla.
 app.get('/api/plantillas-aprobadas', adminUOps, (req, res) => {

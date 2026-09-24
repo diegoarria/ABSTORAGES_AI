@@ -344,6 +344,7 @@ function renderList(){
         <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
       </div>
       <div class="empresa">${esc(c.empresa || '—')}</div>
+      ${c.tipo === 'proveedor' ? `<div class="empresa" style="color:${c.rutas ? 'var(--m-acc)' : 'var(--m-amb)'};">🛣️ ${c.rutas ? esc(c.rutas) : 'Sin rutas'}</div>` : ''}
       <div class="meta">
         <span>${esc(c.telefono || '—')}</span>
         <span>Últ. contacto: ${fmtFecha(c.fecha_ultimo_contacto)}</span>
@@ -391,7 +392,7 @@ async function renderDetail(){
       <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
       <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
     </div>
-    ${data.tipo === 'proveedor' ? `<div class="field" style="margin-bottom:14px;"><label>Rutas que maneja</label><div class="val">${data.rutas ? esc(data.rutas) : '⚠️ Sin rutas capturadas — SOFIA no lo contacta automáticamente'}</div></div>` : ''}
+    ${data.tipo === 'proveedor' ? `<div class="field" style="margin-bottom:14px;"><label>Rutas que maneja</label><div class="val">${data.rutas ? esc(data.rutas) : '⚠️ Sin rutas capturadas — SOFIA no lo contacta automáticamente'}</div><button class="act-btn" style="margin-top:8px;" onclick="editarRutas('${data.id}')">✏️ Editar rutas</button></div>` : ''}
     ${data.notas ? `<div class="field" style="margin-bottom:14px;"><label>Notas</label><div class="val">${esc(data.notas)}</div></div>` : ''}
 
     <div class="actions">
@@ -516,6 +517,18 @@ function abrirModal(){
   document.getElementById('f-rutas').value = '';
   document.getElementById('f-tipo').value = 'cliente';
   document.getElementById('overlay').classList.add('open');
+}
+async function editarRutas(id){
+  const actual = (contactosCache.find(c => c.id === id) || {}).rutas || '';
+  const nuevo = prompt('Rutas que maneja (ej. MTY-GDL, MTY-CDMX, Bajío — o "todas"). Vacío = ninguna:', actual);
+  if (nuevo === null) return;
+  try {
+    const r = await fetch('/api/contactos/' + id + '/rutas', { method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ rutas: nuevo }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    await cargarContactos();
+    selectContacto(id);
+  } catch (e) { alert('No se pudo guardar: ' + e.message); }
 }
 function cerrarModal(){ document.getElementById('overlay').classList.remove('open'); }
 
