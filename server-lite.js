@@ -91,6 +91,7 @@ const { limpiarFormatoWhatsApp } = require('./backend/services/formatoWA');
 const gpsProviders = require('./backend/services/gpsProviders');
 const ordersStore = require('./backend/services/ordersStore');
 const contactos   = require('./backend/services/contactos');
+const rutasProveedor = require('./backend/services/rutasProveedor');
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
@@ -271,18 +272,34 @@ async function sendWhatsApp(to, text, agente = 'noa') {
 // al equipo en vez de quedarse callado — antes esto solo quedaba en un log.
 async function buscarUnidadParaOrden(lead) {
   try {
-    const proveedoresReales = await tms.proveedoresParaVapi();
+    // Solo proveedores de la Base de Datos de SOFIA con la ruta cubierta
+    // (rutasProveedor.js). Sin rutas capturadas = no se contacta solo. El
+    // TMS no trae rutas, así que ya no se usa como lista de envío masivo.
+    const bd = await contactos.listarPorAgente('sofia', { tipo: 'proveedor' }).catch(() => []);
+    const candidatos = bd.filter(c => c.telefono).map(c => ({
+      id: c.id, nombre: c.nombre_completo, telefono: c.telefono, rutas: c.rutas || '', tipos_unidad: [], activo: true,
+    }));
+    const { elegidos, omitidos } = rutasProveedor.filtrarPorRuta(candidatos, lead.origen, lead.destino);
+    const proveedoresReales = elegidos.map(p => ({ ...p, rutas: [] })); // ya filtrados por ruta arriba
     const compatibles = vapi.filtrarProveedores(proveedoresReales, lead);
+    if (omitidos.length) {
+      const sinRutas = omitidos.filter(o => o.motivo === 'sin rutas capturadas').length;
+      pushActividad({
+        agente: 'SOFIA', tipo: 'FILTRO_RUTA',
+        mensaje: `Folio ${lead.folio || ''} (${lead.origen || '?'} → ${lead.destino || '?'}): se contactará a ${compatibles.length} de ${candidatos.length} proveedores — ${omitidos.length - sinRutas} no manejan esa ruta${sinRutas ? `, ${sinRutas} sin rutas capturadas` : ''}`,
+        metadata: { folio: lead.folio, omitidos: omitidos.map(o => `${o.p.nombre}: ${o.motivo}`) },
+      });
+    }
     if (!compatibles.length) {
-      console.warn(`[SOFIA] Sin proveedores reales compatibles para folio ${lead.folio}`);
+      console.warn(`[SOFIA] Sin proveedores con la ruta cubierta para folio ${lead.folio}`);
       pushActividad({
         agente: 'SOFIA', tipo: 'SIN_UNIDAD',
-        mensaje: `Folio ${lead.folio || ''} — no se encontró ningún proveedor real compatible, nadie fue contactado`,
+        mensaje: `Folio ${lead.folio || ''} (${lead.origen || '?'} → ${lead.destino || '?'}) — ningún proveedor maneja esta ruta (o no tienen rutas capturadas), nadie fue contactado`,
         metadata: { folio: lead.folio },
       });
       sendPush({
         title: '⚠️ Sin unidad disponible — SOFIA',
-        body: `Folio ${lead.folio || ''} (${lead.empresa || lead.nombre || 'cliente'}) — ningún proveedor real compatible, revisar manualmente`,
+        body: `Folio ${lead.folio || ''} (${lead.empresa || lead.nombre || 'cliente'}) — ningún proveedor maneja esa ruta (o sin rutas capturadas), revisar manualmente`,
         tag: 'sin-unidad', url: '/', tipo: 'SIN_UNIDAD', urgente: true,
       }).catch(() => {});
       return;
@@ -1804,7 +1821,7 @@ app.get('/api/contactos/:id', adminUOps, async (req, res) => {
 // todavía una conversación real de por medio.
 app.post('/api/contactos', soloAdmin, async (req, res) => {
   try {
-    const { agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas } = req.body || {};
+    const { agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas, rutas } = req.body || {};
     if (!agente || !['sara', 'sofia', 'noa'].includes(agente.toLowerCase())) {
       return res.status(400).json({ error: 'agente requerido: sara, sofia o noa' });
     }
@@ -1813,7 +1830,7 @@ app.post('/api/contactos', soloAdmin, async (req, res) => {
       return res.status(400).json({ error: 'tipo requerido: cliente, proveedor u operador' });
     }
     const contacto = await contactos.upsertContacto({
-      agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas,
+      agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas, rutas,
       resumen_interaccion: 'Alta/edición manual desde Base de Datos', canal: 'manual',
     });
     res.json(contacto);

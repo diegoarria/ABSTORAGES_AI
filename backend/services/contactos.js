@@ -37,7 +37,7 @@ function normalizarTelefono(t) {
   return (t || '').replace(/\D/g, '').slice(-10);
 }
 
-function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas }) {
+function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas }) {
   const AGENTE = (agente || '').toUpperCase();
   const tel = normalizarTelefono(telefono);
   let existente = null;
@@ -55,6 +55,7 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
     existente.tipo_carga      = tipo_carga || existente.tipo_carga;
     existente.tipo            = tipo || existente.tipo;
     existente.notas           = notas || existente.notas;
+    existente.rutas           = rutas || existente.rutas;
     existente.fecha_ultimo_contacto = ahora;
     contacto = existente;
   } else {
@@ -62,7 +63,7 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
       id: `CT-${Date.now().toString(36).toUpperCase()}`,
       agente_asignado: AGENTE, tipo: tipo || null,
       nombre_completo: nombre_completo || 'Sin nombre', puesto: puesto || null, telefono: telefono || null,
-      email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null,
+      email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null, rutas: rutas || null,
       fecha_primer_contacto: ahora, fecha_ultimo_contacto: ahora, created_at: ahora,
     };
     cache.push(contacto);

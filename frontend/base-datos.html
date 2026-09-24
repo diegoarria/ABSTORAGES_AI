@@ -224,6 +224,11 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
         <input id="f-email" placeholder="correo@empresa.com">
       </div>
     </div>
+    <div class="frow" id="frow-rutas">
+      <label>Rutas que maneja (solo proveedores)</label>
+      <input id="f-rutas" placeholder="Ej. MTY-GDL, MTY-CDMX, Bajío — o &quot;todas&quot;">
+      <div style="font-size:11px;color:var(--m-t3);margin-top:4px;">SOFIA solo contacta automáticamente a proveedores con rutas capturadas.</div>
+    </div>
     <div class="frow">
       <label>Notas</label>
       <textarea id="f-notas" placeholder="Opcional"></textarea>
@@ -386,6 +391,7 @@ async function renderDetail(){
       <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
       <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
     </div>
+    ${data.tipo === 'proveedor' ? `<div class="field" style="margin-bottom:14px;"><label>Rutas que maneja</label><div class="val">${data.rutas ? esc(data.rutas) : '⚠️ Sin rutas capturadas — SOFIA no lo contacta automáticamente'}</div></div>` : ''}
     ${data.notas ? `<div class="field" style="margin-bottom:14px;"><label>Notas</label><div class="val">${esc(data.notas)}</div></div>` : ''}
 
     <div class="actions">
@@ -507,6 +513,7 @@ function abrirModal(){
   document.getElementById('f-telefono').value = '';
   document.getElementById('f-email').value = '';
   document.getElementById('f-notas').value = '';
+  document.getElementById('f-rutas').value = '';
   document.getElementById('f-tipo').value = 'cliente';
   document.getElementById('overlay').classList.add('open');
 }
@@ -524,6 +531,7 @@ async function guardarContacto(){
     telefono: document.getElementById('f-telefono').value.trim(),
     email: document.getElementById('f-email').value.trim(),
     notas: document.getElementById('f-notas').value.trim(),
+    rutas: document.getElementById('f-rutas').value.trim(),
   };
   try {
     const r = await fetch('/api/contactos', {
