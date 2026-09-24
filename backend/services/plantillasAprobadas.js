@@ -21,6 +21,8 @@ const PLANTILLAS = {
       campos: [{ key: '1', label: 'Nombre' }, { key: '2', label: 'Tipo de unidad' }, { key: '3', label: 'Origen' }, { key: '4', label: 'Destino' }, { key: '5', label: 'Fecha de salida' }] },
     { sid: 'HX18bea3252df319e388e9fe33bd568350', nombre: 'Estatus de folio',
       campos: [{ key: '1', label: 'Nombre' }, { key: '2', label: 'Folio' }, { key: '3', label: 'Resumen del estatus' }] },
+    { sid: 'HX098ade5f03dfa87b2b294ba40b060a21', nombre: 'Presentación SOFIA a proveedores',
+      campos: [{ key: '1', label: 'Nombre del proveedor' }] },
   ],
   noa: [
     { sid: 'HXfdaff679cd6a4222201401f616bd7a05', nombre: 'Estatus de seguimiento',
