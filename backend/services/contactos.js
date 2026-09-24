@@ -142,6 +142,17 @@ async function buscarPorTelefono(telefono, agente) {
 // Bloque de contexto a inyectar en el system prompt cuando quien escribe/llama
 // ya es un contacto conocido — esto es lo que convierte "está guardado" en
 // "la IA realmente se acuerda": se arma con las últimas interacciones reales.
+// Trato especial para proveedores guardados en la Base de Datos — pedido
+// explícito del usuario (24-sep-2026): tono de amigos y sin pedirles carga ni
+// disponibilidad por iniciativa propia; solo cuando el equipo lo pida.
+const TRATO_PROVEEDOR_BD =
+  `\n\n## 🤝 TRATO CON ESTE PROVEEDOR — INSTRUCCIÓN DIRECTA DE DIEGO\n` +
+  `Este proveedor es de confianza del equipo. Háblale como a un amigo cercano: cálido, natural, relajado, con confianza (sin formalismos de call center ni sonar a formulario). ` +
+  `NO le pidas carga, disponibilidad de unidad, rutas, tarifas ni ningún dato operativo por iniciativa tuya — ni al saludarlo, ni para "aprovechar la conversación". ` +
+  `Solo hablas de cargas o disponibilidad cuando (a) él mismo lo saca, o (b) el equipo de ABSTORAGES te lo pide expresamente en esta conversación o llamada (por ejemplo, una orden concreta). ` +
+  `Tampoco le pidas datos personales (nombre, teléfono, correo, RFC, empresa, documentos, etc.): ya los tienes registrados y volver a pedirlos es tedioso — nunca lo hagas. ` +
+  `Si solo saluda, agradece o platica, contesta de igual a igual y ya; no lo redirijas al trabajo.\n`;
+
 function bloqueContactoConocido(contacto) {
   const interacciones = (contacto.interacciones || []).slice(0, 5)
     .map(i => `- ${new Date(i.fecha).toLocaleDateString('es-MX')} (${i.canal || 'otro'}): ${i.resumen || 'sin detalle'}`)
@@ -150,6 +161,7 @@ function bloqueContactoConocido(contacto) {
     `\n\n---\n\n## 🧠 CONTACTO CONOCIDO — YA TIENES HISTORIAL CON ESTA PERSONA\n` +
     `**${contacto.nombre_completo}**${contacto.empresa ? ` — ${contacto.empresa}` : ''} (${contacto.tipo || 'contacto'}). ` +
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
+    (contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : '') +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
     (interacciones ? `Interacciones previas relevantes:\n${interacciones}\n\n` : '\n') +
     `IMPORTANTE: esta persona YA está registrada en la Base de Datos de ABSTORAGES — NO le pidas nombre completo, teléfono ni correo, y NO apliques la regla de "PRIMER MENSAJE" con ella (esa regla es solo para desconocidos). Si te saluda, salúdala por su nombre y sigue la conversación normal.\n` +
