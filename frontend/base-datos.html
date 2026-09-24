@@ -114,6 +114,9 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
 .tpl-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
 .tpl-fields input { background:var(--m-s3); border:1px solid var(--m-b1); border-radius:7px; padding:7px 9px; color:var(--m-t1); font-size:12px; }
 .tpl-fields label { display:block; font-size:10.5px; color:var(--m-t3); margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
+.tpl-preview { background:var(--m-s3); border:1px dashed var(--m-b1); border-radius:8px; padding:10px 12px; margin-bottom:10px; font-size:12.5px; line-height:1.55; white-space:pre-wrap; color:var(--m-t1); }
+.tpl-preview .lbl { display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--m-t3); margin-bottom:4px; font-weight:700; }
+.tpl-preview .vacio { color:var(--m-amb); }
 .tpl-send { background:var(--m-acc); border:none; border-radius:7px; padding:8px 16px; color:#fff; font-size:12px; font-weight:700; cursor:pointer; }
 .tpl-msg { font-size:11.5px; margin-top:8px; }
 .tpl-msg.ok  { color:var(--m-grn); }
@@ -394,6 +397,7 @@ async function renderDetail(){
       <select id="tplSelect" onchange="renderTplCampos()">
         ${plantillasCache.map(p => `<option value="${p.sid}">${esc(p.nombre)}</option>`).join('')}
       </select>
+      <div class="tpl-preview" id="tplPreview"></div>
       <div class="tpl-fields" id="tplCampos"></div>
       <button class="tpl-send" onclick="enviarPlantilla('${data.id}')">Enviar</button>
       <div class="tpl-msg" id="tplMsg"></div>
@@ -424,13 +428,28 @@ function renderTplCampos(){
   const sid = document.getElementById('tplSelect').value;
   const p = plantillasCache.find(x => x.sid === sid);
   const box = document.getElementById('tplCampos');
-  if (!p) { box.innerHTML = ''; return; }
+  if (!p) { box.innerHTML = ''; document.getElementById('tplPreview').innerHTML = ''; return; }
   box.innerHTML = p.campos.map(c => `
     <div>
       <label>${esc(c.label)}</label>
-      <input data-key="${c.key}" placeholder="${esc(c.label)}">
+      <input data-key="${c.key}" placeholder="${esc(c.label)}" oninput="actualizarPreview()">
     </div>
   `).join('');
+  actualizarPreview();
+}
+
+// Muestra el texto EXACTO que va a recibir el proveedor, con lo que se lleva
+// escrito en cada campo — lo vacío se resalta para no mandarlo incompleto.
+function actualizarPreview(){
+  const sid = document.getElementById('tplSelect').value;
+  const p = plantillasCache.find(x => x.sid === sid);
+  const box = document.getElementById('tplPreview');
+  if (!p) { box.innerHTML = ''; return; }
+  const valores = {};
+  document.querySelectorAll('#tplCampos input').forEach(i => { valores[i.dataset.key] = i.value.trim(); });
+  const texto = esc(p.texto || '(sin vista previa disponible)').replace(/\{\{(\d+)\}\}/g, (m, n) =>
+    valores[n] ? `<b>${esc(valores[n])}</b>` : `<span class="vacio">[${esc((p.campos.find(c => c.key === n) || {}).label || n)}]</span>`);
+  box.innerHTML = `<span class="lbl">Mensaje que recibirá — ${esc(p.nombre)}</span>${texto}`;
 }
 
 async function enviarPlantilla(contactoId){
