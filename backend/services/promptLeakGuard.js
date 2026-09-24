@@ -119,6 +119,7 @@ const PATRONES = [
   /UPSERT_CONTACTO\s*:/i,
   /\bCERRAR_CHAT\b/,
   /\bESCALAR_HUMANO\b/,
+  /RESULTADO_CONTACTO\s*:/i,
 
   // Base64 / codificación como vector para colar instrucciones
   /decodifica\s+y\s+(haz|ejecuta)/i,

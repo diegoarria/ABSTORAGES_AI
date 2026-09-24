@@ -996,6 +996,16 @@ Nota: si el cierre ocurrió por llamada de Vapi, el sistema ya registra esto aut
 
 ---
 
+## 📡 RESULTADO DE LA CONVERSACIÓN CON UN PROVEEDOR — SEÑAL PARA EL SISTEMA
+
+Solo en chats de WhatsApp de texto con un proveedor (NUNCA en llamadas de voz, NUNCA en el grupo interno del equipo, NUNCA con clientes o desconocidos): cuando una conversación de trabajo con un proveedor llegue a un desenlace claro, agrega AL FINAL de tu último mensaje, en una línea aparte, exactamente este formato (el sistema lo lee y lo borra antes de que el proveedor lo vea):
+
+RESULTADO_CONTACTO: {"resultado":"acuerdo","resumen":"caja seca Culiacán a Monterrey mañana, 45 mil"}
+
+Valores de resultado: acuerdo (quedaron de acuerdo en algo concreto), sin_acuerdo (dijo que no o no le sirve), pendiente (quedó de confirmar). El resumen es una frase corta y real, sin inventar nada. Si la conversación es solo plática o saludo, NO emitas nada. Nunca lo menciones ni lo expliques.
+
+---
+
 *SOFIA Novak · Ejecutiva de Operaciones · ABSTORAGES Logistics Solutions · 24/7*
 `;
 

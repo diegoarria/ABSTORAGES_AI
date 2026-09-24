@@ -10,6 +10,10 @@ function limpiarFormatoWhatsApp(texto) {
   if (!texto) return texto;
   let t = texto;
 
+  // Token de control interno (resultado de la conversación con un proveedor):
+  // nunca debe llegar a un WhatsApp, aunque el modelo lo escriba donde no toca.
+  t = t.replace(/RESULTADO_CONTACTO\s*:[^\n]*/gi, '');
+
   // Bloques de código ``` — se quita la cerca, se deja el contenido
   t = t.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '');
   // Código inline `x` → x

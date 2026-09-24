@@ -12,6 +12,8 @@
 // cada pocos minutos, el negocio se resincroniza contra monitoring en vez de
 // confiar ciegamente en su propio disco.
 const agentPause = require('./agentPause');
+const actividadBus = require('./actividadBus');
+const contactos = require('./contactos');
 
 const URL    = (process.env.MONITORING_INTAKE_URL || '').replace(/\/$/, '');
 const SECRET = process.env.MONITORING_INTAKE_SECRET;
@@ -57,7 +59,23 @@ async function empujar(agente, paused, motivo) {
 
 // Reporta un contacto proactivo real (nunca uno omitido por pausa/límite) —
 // fire-and-forget, no bloquea el envío real por esto.
+// Feed "En vivo": cada contacto saliente real aparece como evento con el
+// nombre de la persona (si está en la Base de Datos) — el texto lo arma el
+// sistema con datos reales, nunca la IA.
+async function emitirActividad({ agente, canal, destinatario, detalle }) {
+  try {
+    const c = destinatario ? await contactos.buscarPorTelefono(destinatario, agente).catch(() => null) : null;
+    const nombre = c?.nombre_completo ? `${c.nombre_completo}${c.empresa ? ' (' + c.empresa + ')' : ''}` : (detalle?.proveedor || destinatario || 'un contacto');
+    const A = String(agente || '').toUpperCase();
+    const mensaje = canal === 'llamada'
+      ? `${A} está llamando a ${nombre}${detalle?.folio ? ` (folio ${detalle.folio})` : ''}`
+      : `${A} le escribió a ${nombre} (plantilla de WhatsApp)`;
+    actividadBus.emitir({ agente: A, tipo: 'CONTACTO_SALIENTE', mensaje, metadata: { canal, telefono: destinatario || null } });
+  } catch (e) { console.error('[monitoringControl] Error emitiendo actividad:', e.message); }
+}
+
 function reportarContactoSaliente({ agente, canal, destinatario, detalle }) {
+  emitirActividad({ agente, canal, destinatario, detalle });
   if (!HABILITADO) return;
   fetchConTimeout('/internal/outbound-contact', {
     method: 'POST',

@@ -40,6 +40,7 @@ const humanDelay      = require('./backend/services/humanDelay');
 const domainLock      = require('./backend/middleware/domainLock');
 const plantillasAprobadas = require('./backend/services/plantillasAprobadas');
 const agentPause      = require('./backend/services/agentPause');
+const actividadBus    = require('./backend/services/actividadBus');
 const monitoringControl = require('./backend/services/monitoringControl');
 const outboundRateLimit = require('./backend/services/outboundRateLimit');
 
@@ -159,6 +160,8 @@ const actividadHistorial = [];
 const ACTIVIDAD_MAX = 100;
 const callsEnVivoNotificadas = new Set(); // callId ya avisado como "en llamada"
 
+const _ultimoAvisoRespuesta = new Map(); // teléfono → ts del último push "un proveedor contestó" (1 cada 30 min)
+
 function pushActividad(evento) {
   const ev = { ...evento, timestamp: evento.timestamp || new Date().toISOString() };
   actividadHistorial.push(ev);
@@ -166,6 +169,7 @@ function pushActividad(evento) {
   const msg = `data: ${JSON.stringify({ type: 'actividad', ...ev })}\n\n`;
   actividadClients.forEach(c => { try { c.write(msg); } catch {} });
 }
+actividadBus.conectar(pushActividad);
 
 // ─── ELEVENLABS ────────────────────────────────────────────────────────────
 const EL_KEY         = process.env.ELEVENLABS_API_KEY;
@@ -212,6 +216,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/UPSERT_CONTACTO\s*:[\s\S]*$/gi, '')
     .replace(/ALERTA_CRITICA\s*:[\s\S]*$/gi, '')
     .replace(/ESTATUS_SEGUIMIENTO\s*:[\s\S]*$/gi, '')
+    .replace(/RESULTADO_CONTACTO\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();
@@ -281,6 +286,10 @@ async function buscarUnidadParaOrden(lead) {
         tag: 'sin-unidad', url: '/', tipo: 'SIN_UNIDAD', urgente: true,
       }).catch(() => {});
       return;
+    }
+    if (!agentPause.estaPausado('sofia')) {
+      pushActividad({ agente: 'SOFIA', tipo: 'CONTACTANDO_PROVEEDORES', mensaje: `SOFIA empezó a contactar ${compatibles.length} proveedor(es) para el folio ${lead.folio || ''} (${lead.origen || ''} → ${lead.destino || ''})`, metadata: { folio: lead.folio } });
+      sendPush({ title: '🚚 SOFIA está contactando proveedores', body: `Folio ${lead.folio || ''} · ${lead.origen || ''}→${lead.destino || ''} · ${compatibles.length} proveedor(es)`, tag: 'sofia-contactando', url: '/actividad.html', tipo: 'CONTACTANDO_PROVEEDORES' }).catch(() => {});
     }
     vapi.lanzarLlamadasProveedores(lead, proveedoresReales)
       .then(r => pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: `Folio ${lead.folio || ''} — ${r.llamadas} llamadas a carriers iniciadas`, metadata: { folio: lead.folio, ...r } }))
@@ -566,6 +575,37 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     saveMessage(session, agente, 'assistant', respuesta);
     const bloques = splitForWhatsApp(limpiarControlParaCliente(respuesta));
     for (const bloque of bloques) await sendWhatsApp(phone, bloque, agente);
+
+    // ── Monitoreo en vivo: conversación, respuesta de proveedor y resultado ──
+    if ((agente === 'sofia' || agente === 'sara') && !personaEquipo) {
+      try {
+        const conocido = await contactos.buscarPorTelefono(phone, agente).catch(() => null);
+        const quien = conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : phone;
+        const corto = t => String(t || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+        const A = agente.toUpperCase();
+        pushActividad({ agente: A, tipo: 'CONVERSACION_WA', mensaje: `${quien}: "${corto(texto)}" → ${A}: "${corto(limpiarControlParaCliente(respuesta))}"`, sessionId: session, metadata: { telefono: phone, tipoContacto: conocido?.tipo || null } });
+
+        if (agente === 'sofia' && conocido?.tipo === 'proveedor') {
+          if (Date.now() - (_ultimoAvisoRespuesta.get(phone) || 0) > 30 * 60 * 1000) {
+            _ultimoAvisoRespuesta.set(phone, Date.now());
+            sendPush({ title: '💬 Un proveedor le contestó a SOFIA', body: `${quien}: "${corto(texto)}"`, tag: 'prov-respondio', url: '/actividad.html', tipo: 'PROVEEDOR_RESPONDIO' }).catch(() => {});
+          }
+          const rm = respuesta.match(/RESULTADO_CONTACTO:\s*(\{[^\n]+\})/);
+          if (rm) {
+            let r = {}; try { r = JSON.parse(rm[1]); } catch {}
+            const etiquetas = { acuerdo: '🤝 ACUERDO CERRADO', sin_acuerdo: '✖️ Sin acuerdo', pendiente: '⏳ Pendiente' };
+            if (etiquetas[r.resultado]) {
+              const detalleR = r.resumen ? ` · ${corto(r.resumen)}` : '';
+              pushActividad({ agente: 'SOFIA', tipo: 'RESULTADO_CONTACTO', mensaje: `${etiquetas[r.resultado]} con ${quien}${detalleR}`, sessionId: session, metadata: { resultado: r.resultado } });
+              if (r.resultado !== 'pendiente') {
+                sendPush({ title: `${etiquetas[r.resultado]} — SOFIA`, body: `${quien}${detalleR}`, tag: 'resultado-contacto', url: '/actividad.html', tipo: 'RESULTADO_CONTACTO', urgente: r.resultado === 'acuerdo' }).catch(() => {});
+              }
+            }
+          }
+        }
+      } catch (e) { console.error('[monitoreo en vivo]', e.message); }
+    }
+
     const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
     if (metaMatch) memory.updateMeta(session, { empresa: metaMatch[1].trim() });
 
@@ -3238,7 +3278,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3249,6 +3289,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/UPSERT_CONTACTO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/ALERTA_CRITICA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/ESTATUS_SEGUIMIENTO:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/RESULTADO_CONTACTO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();
