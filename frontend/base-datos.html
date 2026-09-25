@@ -1,255 +1,393 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Base de Datos — ABSTORAGES</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#04080f">
+<meta name="theme-color" content="#0B2A5B">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/design-system.css">
+<script>try{var t=localStorage.getItem('abs-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <style>
-:root {
-  --m-bg:   var(--ink-950);
-  --m-s1:   var(--ink-900);
-  --m-s2:   var(--ink-800);
-  --m-s3:   var(--ink-700);
-  --m-acc:  var(--brand-blue);
-  --m-grn:  var(--brand-green);
-  --m-amb:  var(--warn);
-  --m-red:  var(--critical);
-  --m-t1:   var(--text-100);
-  --m-t2:   var(--text-300);
-  --m-t3:   var(--text-500);
-  --m-b1:   var(--line);
+:root, :root[data-theme="light"] {
+  --bg:#F3F5F9; --surface:#FFFFFF; --surface-2:#F8FAFC; --surface-3:#EEF2F7;
+  --bd:#E2E8F0; --bd-strong:#CBD5E1;
+  --tx:#0F172A; --tx2:#475569; --tx3:#64748B;
+  --navy:#0B2A5B; --navy-2:#123A7A;
+  --acc:#1F5FD1; --acc-soft:#E8F0FE; --acc-tx:#1748A6;
+  --sara:#0B7D57; --sara-soft:#E3F5EE;
+  --sofia:#1F5FD1; --sofia-soft:#E8F0FE;
+  --noa:#B45309; --noa-soft:#FEF1DC;
+  --ok:#0B7D57; --ok-soft:#E3F5EE; --warn:#B45309; --warn-soft:#FEF1DC; --crit:#C62828; --crit-soft:#FDE8E8;
+  --shadow-1:0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
+  --shadow-2:0 4px 12px rgba(15,23,42,.08), 0 16px 40px rgba(15,23,42,.10);
+  --appbar:#0B2A5B; --appbar-tx:#EAF0FB; --appbar-mute:#9DB3D6;
+  --focus:0 0 0 3px rgba(31,95,209,.28);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--m-bg); color: var(--m-t1); font-family: var(--font-sans); min-height: 100vh; }
+:root[data-theme="dark"] {
+  --bg:#0A101C; --surface:#111A2B; --surface-2:#152036; --surface-3:#1B2942;
+  --bd:rgba(255,255,255,.09); --bd-strong:rgba(255,255,255,.18);
+  --tx:#E8EEF7; --tx2:#A9B6CA; --tx3:#8090A8;
+  --navy:#08111F; --navy-2:#0D1A30;
+  --acc:#5B93FF; --acc-soft:rgba(91,147,255,.14); --acc-tx:#8DB4FF;
+  --sara:#34D399; --sara-soft:rgba(52,211,153,.13);
+  --sofia:#5B93FF; --sofia-soft:rgba(91,147,255,.14);
+  --noa:#FBBF24; --noa-soft:rgba(251,191,36,.13);
+  --ok:#34D399; --ok-soft:rgba(52,211,153,.13); --warn:#FBBF24; --warn-soft:rgba(251,191,36,.13); --crit:#FF7A7A; --crit-soft:rgba(255,122,122,.13);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 8px 30px rgba(0,0,0,.5);
+  --appbar:#08111F; --appbar-tx:#E8EEF7; --appbar-mute:#7C8BA3;
+  --focus:0 0 0 3px rgba(91,147,255,.35);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html { -webkit-text-size-adjust:100%; }
+body { background:var(--bg); color:var(--tx); font-family:var(--font-sans); font-size:14px; line-height:1.5; min-height:100vh; -webkit-font-smoothing:antialiased; }
+button { font-family:inherit; }
+:focus-visible { outline:none; box-shadow:var(--focus); }
+svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
 
-.hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--m-s1); border-bottom:1px solid var(--m-b1); position:sticky; top:0; z-index:50; }
-.hdr-logo { font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--m-t1); display:flex; align-items:center; gap:8px; }
-.hdr-logo span { color:var(--m-acc); }
-.hdr-nav { display:flex; gap:4px; margin-left:auto; }
-.hn { background:none; border:none; color:var(--m-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
-.hn:hover, .hn.on { background:rgba(47,111,237,.12); color:var(--m-acc); }
+/* ── Barra de aplicación ─────────────────────────────────────────────── */
+.appbar { background:var(--appbar); color:var(--appbar-tx); position:sticky; top:0; z-index:60; border-bottom:1px solid rgba(255,255,255,.06); }
+.appbar-in { max-width:1440px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:22px; }
+.brand { display:flex; align-items:center; gap:11px; text-decoration:none; color:inherit; }
+.brand-mark { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,#2F6FED,#0EA968); display:grid; place-items:center; font-weight:800; font-size:13px; color:#fff; letter-spacing:-.02em; }
+.brand-name { font-weight:800; font-size:15px; letter-spacing:.06em; }
+.brand-sep { width:1px; height:22px; background:rgba(255,255,255,.18); }
+.brand-sub { font-size:13px; color:var(--appbar-mute); font-weight:500; }
+.appnav { display:flex; gap:2px; margin-left:auto; align-items:center; }
+.appnav button { background:none; border:none; color:var(--appbar-mute); font-size:13px; font-weight:500; padding:8px 13px; border-radius:7px; cursor:pointer; transition:background .15s,color .15s; }
+.appnav button:hover { color:var(--appbar-tx); background:rgba(255,255,255,.07); }
+.appnav button.on { color:#fff; background:rgba(255,255,255,.12); }
+.theme-btn { margin-left:8px; width:36px; height:36px; display:grid !important; place-items:center; padding:0 !important; }
 
-.wrap { max-width:1280px; margin:0 auto; padding:24px 24px 60px; }
-.top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
-.eyebrow { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--m-t3); margin-bottom:4px; }
-h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
-.updated { font-size:11px; color:var(--m-t3); }
+/* ── Página ──────────────────────────────────────────────────────────── */
+.page { max-width:1440px; margin:0 auto; padding:28px 28px 72px; }
+.crumbs { font-size:12px; color:var(--tx3); margin-bottom:10px; display:flex; gap:7px; align-items:center; }
+.crumbs a { color:var(--tx3); text-decoration:none; } .crumbs a:hover { color:var(--acc); }
+.page-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+.page-head h1 { font-size:28px; font-weight:800; letter-spacing:-.025em; line-height:1.15; }
+.page-head p { color:var(--tx2); font-size:14px; margin-top:6px; max-width:640px; }
+.updated { font-size:12px; color:var(--tx3); margin-top:8px; }
 
-.tabs { display:flex; gap:10px; margin-bottom:18px; }
-.tab { flex:1; position:relative; cursor:pointer; padding:14px 16px 12px; background:var(--m-s1); border:1px solid var(--m-b1); border-bottom:3px solid var(--m-b1); border-radius:10px 10px 0 0; transition:.15s; }
-.tab:hover { border-color:rgba(255,255,255,.14); }
-.tab.active { background:var(--m-s2); }
-.tab .name { font-size:14px; font-weight:800; letter-spacing:.02em; margin-bottom:2px; }
-.tab .role { font-size:11px; color:var(--m-t3); }
-.tab .count { position:absolute; top:12px; right:14px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
-.tab[data-agent="SARA"].active  { border-bottom-color:var(--m-grn); }
-.tab[data-agent="SOFIA"].active { border-bottom-color:var(--m-acc); }
-.tab[data-agent="NOA"].active   { border-bottom-color:var(--m-amb); }
-.tab[data-agent="SARA"]  .count { background:rgba(14,169,104,.15); color:var(--m-grn); }
-.tab[data-agent="SOFIA"] .count { background:rgba(47,111,237,.15); color:var(--m-acc); }
-.tab[data-agent="NOA"]   .count { background:rgba(240,169,59,.15); color:var(--m-amb); }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:8px; font-size:13px; font-weight:600; padding:9px 16px; cursor:pointer; border:1px solid transparent; transition:background .15s,border-color .15s,box-shadow .15s,transform .05s; white-space:nowrap; }
+.btn:active { transform:translateY(1px); }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+.btn-primary { background:var(--acc); color:#fff; box-shadow:0 1px 2px rgba(31,95,209,.35); }
+.btn-primary:hover:not(:disabled) { background:#1A52B8; }
+:root[data-theme="dark"] .btn-primary { color:#08111F; } :root[data-theme="dark"] .btn-primary:hover:not(:disabled) { background:#7BA8FF; }
+.btn-secondary { background:var(--surface); color:var(--tx); border-color:var(--bd-strong); }
+.btn-secondary:hover:not(:disabled) { background:var(--surface-3); }
+.btn-ghost { background:transparent; color:var(--acc-tx); }
+.btn-ghost:hover:not(:disabled) { background:var(--acc-soft); }
+.btn-sm { padding:6px 11px; font-size:12px; border-radius:7px; }
 
-/* ── Panel de "lo que tengo permitido hacer" ───────────────────────────── */
-.permitido { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:10px; padding:14px 18px; margin-bottom:16px; }
-.permitido .cab { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-.permitido .cab .ico { font-size:14px; }
-.permitido .cab .txt { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--m-t2); }
-.permitido .chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
-.pchip { font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:6px; background:var(--m-s2); border:1px solid var(--m-b1); color:var(--m-t1); }
-.permitido .regla { font-size:11.5px; color:var(--m-t3); line-height:1.5; border-top:1px solid var(--m-b1); padding-top:9px; }
-.permitido .regla b { color:var(--m-red); }
+/* ── Selector de agente ──────────────────────────────────────────────── */
+.agents { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+.agent { color:var(--tx); font-family:inherit; text-align:left; background:var(--surface); border:1px solid var(--bd); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:14px; cursor:pointer; box-shadow:var(--shadow-1); transition:border-color .15s, box-shadow .15s, transform .15s; position:relative; }
+.agent:hover { border-color:var(--bd-strong); transform:translateY(-1px); }
+.agent.active { border-color:var(--ag); box-shadow:0 0 0 1px var(--ag), var(--shadow-1); }
+.agent-av { width:44px; height:44px; border-radius:12px; background:var(--ag-soft); color:var(--ag); display:grid; place-items:center; font-weight:800; font-size:17px; flex-shrink:0; }
+.agent-nm { font-weight:800; font-size:15px; letter-spacing:.03em; }
+.agent-rl { font-size:12px; color:var(--tx3); margin-top:1px; }
+.agent-ct { margin-left:auto; text-align:right; }
+.agent-ct b { display:block; font-size:24px; font-weight:800; letter-spacing:-.02em; line-height:1; color:var(--tx); }
+.agent-ct span { font-size:11px; color:var(--tx3); text-transform:uppercase; letter-spacing:.06em; font-weight:600; }
 
-.controls { display:flex; gap:8px; margin-bottom:14px; }
-.search { flex:1; background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:9px 12px; color:var(--m-t1); font-size:13px; outline:none; transition:border-color .15s; }
-.search:focus { border-color:rgba(47,111,237,.5); }
-.filter { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:9px 13px; color:var(--m-t3); font-size:12px; cursor:pointer; font-weight:600; transition:all .15s; white-space:nowrap; }
-.filter.on { color:var(--m-t1); border-color:rgba(255,255,255,.18); background:var(--m-s3); }
-.btn-add { background:var(--m-acc); border:none; border-radius:8px; padding:9px 16px; color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; white-space:nowrap; }
-.btn-add:hover { filter:brightness(1.08); }
+/* ── Gobernanza: comunicaciones autorizadas ──────────────────────────── */
+.gov { background:var(--surface); border:1px solid var(--bd); border-radius:12px; margin-bottom:18px; box-shadow:var(--shadow-1); }
+.gov summary { list-style:none; display:flex; align-items:center; gap:10px; padding:13px 18px; cursor:pointer; font-size:13px; font-weight:600; color:var(--tx); border-radius:12px; }
+.gov summary::-webkit-details-marker { display:none; }
+.gov summary .i { color:var(--ok); }
+.gov summary .cnt { margin-left:6px; font-size:11px; font-weight:700; background:var(--surface-3); color:var(--tx2); padding:2px 8px; border-radius:20px; }
+.gov summary .chev { margin-left:auto; color:var(--tx3); transition:transform .2s; }
+.gov[open] summary .chev { transform:rotate(180deg); }
+.gov-body { padding:2px 18px 16px; border-top:1px solid var(--bd); }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 12px; }
+.pchip { font-size:12px; font-weight:600; padding:6px 12px; border-radius:20px; background:var(--surface-2); border:1px solid var(--bd); color:var(--tx); }
+.regla { font-size:12.5px; color:var(--tx2); line-height:1.6; }
+.regla b { color:var(--crit); font-weight:700; }
 
-.board { display:grid; grid-template-columns: 340px 1fr; gap:16px; align-items:start; }
+/* ── Tablero ─────────────────────────────────────────────────────────── */
+.board { display:grid; grid-template-columns:400px minmax(0,1fr); gap:18px; align-items:start; }
+.panel { background:var(--surface); border:1px solid var(--bd); border-radius:14px; box-shadow:var(--shadow-1); overflow:hidden; }
+.list-panel { position:sticky; top:78px; display:flex; flex-direction:column; max-height:calc(100vh - 100px); }
+.toolbar { padding:14px; border-bottom:1px solid var(--bd); display:flex; flex-direction:column; gap:12px; }
+.search-w { position:relative; }
+.search-w .i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--tx3); pointer-events:none; }
+.search { width:100%; background:var(--surface-2); border:1px solid var(--bd); border-radius:9px; padding:10px 12px 10px 36px; color:var(--tx); font-size:13px; outline:none; transition:border-color .15s, box-shadow .15s, background .15s; font-family:inherit; }
+.search::placeholder { color:var(--tx3); }
+.search:focus { border-color:var(--acc); box-shadow:var(--focus); background:var(--surface); }
+.seg { display:flex; background:var(--surface-3); border-radius:9px; padding:3px; gap:2px; }
+.filter { flex:1; text-align:center; font-size:12px; font-weight:600; color:var(--tx2); padding:6px 8px; border-radius:7px; cursor:pointer; transition:background .15s,color .15s; user-select:none; white-space:nowrap; }
+.filter:hover { color:var(--tx); }
+.filter.on { background:var(--surface); color:var(--tx); box-shadow:var(--shadow-1); }
+.list { overflow-y:auto; flex:1; }
+.row { display:flex; gap:12px; padding:13px 14px; border-bottom:1px solid var(--bd); cursor:pointer; position:relative; transition:background .12s; }
+.row:hover { background:var(--surface-2); }
+.row.sel { background:var(--acc-soft); }
+.row.sel::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--acc); }
+.av { width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:13px; flex-shrink:0; letter-spacing:.02em; }
+.av-cliente { background:var(--sara-soft); color:var(--sara); }
+.av-proveedor { background:var(--noa-soft); color:var(--noa); }
+.av-operador { background:var(--sofia-soft); color:var(--sofia); }
+.row-main { min-width:0; flex:1; }
+.row-top { display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
+.row .nombre { font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.row .fecha { font-size:11px; color:var(--tx3); white-space:nowrap; }
+.row .empresa { font-size:12.5px; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.row-meta { display:flex; gap:8px; align-items:center; margin-top:7px; flex-wrap:wrap; }
+.tel { font-size:12px; color:var(--tx3); font-family:var(--font-mono); }
+.tipo-tag { font-size:10.5px; font-weight:700; letter-spacing:.05em; padding:3px 8px; border-radius:20px; text-transform:uppercase; white-space:nowrap; }
+.tipo-cliente { background:var(--sara-soft); color:var(--sara); }
+.tipo-proveedor { background:var(--noa-soft); color:var(--noa); }
+.tipo-operador { background:var(--sofia-soft); color:var(--sofia); }
+.pill { font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; display:inline-flex; align-items:center; gap:5px; }
+.pill .i { width:12px; height:12px; }
+.pill-ok { background:var(--ok-soft); color:var(--ok); } .pill-warn { background:var(--warn-soft); color:var(--warn); }
+.empty-msg { padding:32px 20px; text-align:center; color:var(--tx3); font-size:13px; }
 
-.list { display:flex; flex-direction:column; gap:6px; max-height:72vh; overflow-y:auto; }
-.card { background:var(--m-s1); border:1px solid var(--m-b1); border-left:3px solid var(--m-b1); border-radius:0 10px 10px 0; padding:11px 13px; cursor:pointer; transition:.12s; }
-.card:hover { border-color:rgba(255,255,255,.14); }
-.card.sel { background:var(--m-s2); }
-.card .row1 { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-.card .nombre { font-size:13.5px; font-weight:600; }
-.card .puesto { font-size:11px; color:var(--m-t3); }
-.card .empresa { font-size:11.5px; color:var(--m-t3); margin:2px 0 7px; }
-.tipo-tag { font-size:11px; font-weight:800; letter-spacing:.05em; padding:2px 7px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
-.tipo-cliente   { background:rgba(14,169,104,.15);  color:var(--m-grn); }
-.tipo-proveedor { background:rgba(240,169,59,.15); color:var(--m-amb); }
-.tipo-operador  { background:rgba(47,111,237,.15); color:var(--m-acc); }
-.card .meta { display:flex; gap:10px; font-size:11px; color:var(--m-t3); }
+/* ── Detalle ─────────────────────────────────────────────────────────── */
+.detail { min-height:520px; }
+.d-head { padding:24px 28px; display:flex; gap:18px; align-items:flex-start; border-bottom:1px solid var(--bd); background:linear-gradient(180deg,var(--surface-2),var(--surface)); flex-wrap:wrap; }
+.d-av { width:64px; height:64px; border-radius:18px; font-size:22px; }
+.d-id { flex:1; min-width:220px; }
+.d-id .nombre { font-size:22px; font-weight:800; letter-spacing:-.02em; line-height:1.2; }
+.d-id .puesto { font-size:13.5px; color:var(--acc-tx); font-weight:600; margin-top:3px; }
+.d-id .empresa { font-size:13.5px; color:var(--tx2); margin-top:2px; }
+.d-tags { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.agent-badge { font-size:10.5px; font-weight:700; letter-spacing:.06em; padding:3px 9px; border-radius:20px; text-transform:uppercase; }
+.actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.d-body { padding:24px 28px 28px; display:flex; flex-direction:column; gap:26px; }
+.sec-title { font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--tx3); font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+.sec-title::after { content:""; flex:1; height:1px; background:var(--bd); }
+.sec-title .cnt { font-weight:600; letter-spacing:0; text-transform:none; background:var(--surface-3); padding:1px 8px; border-radius:20px; color:var(--tx2); }
+.fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px 24px; }
+.field label { display:block; font-size:11.5px; color:var(--tx3); margin-bottom:4px; font-weight:600; }
+.field .val { font-size:14px; font-weight:500; word-break:break-word; }
+.field .val.mono { font-family:var(--font-mono); font-size:13px; }
+.cover { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.cover-card { border:1px solid var(--bd); border-radius:12px; padding:16px 18px; background:var(--surface-2); }
+.cover-h { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cover-h span { font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:8px; color:var(--tx); }
+.tags { display:flex; flex-wrap:wrap; gap:7px; }
+.tagc { font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:7px; background:var(--surface); border:1px solid var(--bd-strong); color:var(--tx); }
+.hint { font-size:12.5px; color:var(--warn); background:var(--warn-soft); padding:9px 12px; border-radius:8px; line-height:1.5; }
+.hint.neutral { color:var(--tx2); background:var(--surface-3); }
+.stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.stat { border:1px solid var(--bd); border-radius:12px; padding:14px 16px; background:var(--surface); }
+.stat-v { font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1.1; }
+.stat-v .unit { font-size:13px; font-weight:600; color:var(--tx3); letter-spacing:0; }
+.stat-l { font-size:12px; color:var(--tx2); font-weight:600; margin-top:6px; }
+.stat-s { font-size:11.5px; color:var(--tx3); margin-top:2px; }
+.callout { border:1px solid var(--warn); background:var(--warn-soft); border-radius:12px; padding:14px 16px; }
+.callout-t { font-size:12.5px; font-weight:700; color:var(--warn); margin-bottom:8px; }
+.sug { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; padding:7px 0; font-size:13px; }
+.sug-b { display:flex; gap:6px; }
+.notes { font-size:14px; line-height:1.65; color:var(--tx); background:var(--surface-2); border:1px solid var(--bd); border-radius:12px; padding:14px 16px; white-space:pre-wrap; }
 
-.detail { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:10px; padding:20px 24px; min-height:480px; }
-.d-head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--m-b1); padding-bottom:14px; margin-bottom:14px; }
-.d-head .nombre { font-size:17px; font-weight:800; margin-bottom:2px; }
-.d-head .puesto { font-size:12.5px; color:var(--m-acc); font-weight:600; margin-bottom:2px; }
-.d-head .empresa { font-size:12.5px; color:var(--m-t3); }
-.agent-badge { font-size:11px; font-weight:800; letter-spacing:.06em; padding:3px 10px; border-radius:5px; text-transform:uppercase; height:fit-content; }
-.fields { display:grid; grid-template-columns:1fr 1fr; gap:10px 22px; margin-bottom:18px; }
-.field label { display:block; font-size:11px; color:var(--m-t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; font-weight:700; }
-.field .val { font-size:13px; }
-
-.actions { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
-.act-btn { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:8px 14px; color:var(--m-t1); font-size:12.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; }
-.act-btn:hover { border-color:rgba(255,255,255,.2); }
-.act-btn:disabled { opacity:.4; cursor:not-allowed; }
-.act-btn.call:hover { border-color:var(--m-grn); color:var(--m-grn); }
-.act-btn.tpl:hover { border-color:var(--m-acc); color:var(--m-acc); }
-
-.tpl-panel { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:10px; padding:14px 16px; margin-bottom:18px; display:none; }
+.tpl-panel { border:1px solid var(--bd); background:var(--surface-2); border-radius:12px; padding:18px; display:none; }
 .tpl-panel.open { display:block; }
-.tpl-panel select { width:100%; background:var(--m-s3); border:1px solid var(--m-b1); border-radius:7px; padding:8px 10px; color:var(--m-t1); font-size:12.5px; margin-bottom:10px; }
-.tpl-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
-.tpl-fields input { background:var(--m-s3); border:1px solid var(--m-b1); border-radius:7px; padding:7px 9px; color:var(--m-t1); font-size:12px; }
-.tpl-fields label { display:block; font-size:10.5px; color:var(--m-t3); margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
-.tpl-preview { background:var(--m-s3); border:1px dashed var(--m-b1); border-radius:8px; padding:10px 12px; margin-bottom:10px; font-size:12.5px; line-height:1.55; white-space:pre-wrap; color:var(--m-t1); }
-.tpl-preview .lbl { display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--m-t3); margin-bottom:4px; font-weight:700; }
-.tpl-preview .vacio { color:var(--m-amb); }
-.tpl-send { background:var(--m-acc); border:none; border-radius:7px; padding:8px 16px; color:#fff; font-size:12px; font-weight:700; cursor:pointer; }
-.tpl-msg { font-size:11.5px; margin-top:8px; }
-.tpl-msg.ok  { color:var(--m-grn); }
-.tpl-msg.err { color:var(--m-red); }
+.tpl-panel select, .tpl-fields input { width:100%; background:var(--surface); border:1px solid var(--bd-strong); border-radius:8px; padding:9px 11px; color:var(--tx); font-size:13px; font-family:inherit; }
+.tpl-panel select { margin-bottom:12px; }
+.tpl-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.tpl-fields label { display:block; font-size:11.5px; color:var(--tx3); margin-bottom:4px; font-weight:600; }
+.tpl-preview { background:var(--surface); border:1px dashed var(--bd-strong); border-radius:10px; padding:13px 15px; margin-bottom:12px; font-size:13.5px; line-height:1.6; white-space:pre-wrap; }
+.tpl-preview .lbl { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--tx3); margin-bottom:6px; font-weight:700; }
+.tpl-preview .vacio { color:var(--warn); font-weight:600; }
+.tpl-send { background:var(--acc); border:none; border-radius:8px; padding:9px 18px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; }
+:root[data-theme="dark"] .tpl-send { color:#08111F; }
+.tpl-msg { font-size:12.5px; margin-top:10px; font-weight:500; }
+.tpl-msg.ok { color:var(--ok); } .tpl-msg.err { color:var(--crit); }
 
-.sec-title { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--m-t3); font-weight:700; margin:0 0 10px; padding-top:12px; border-top:1px solid var(--m-b1); }
-.bitacora { display:flex; flex-direction:column; }
-.evento { display:flex; gap:14px; padding:10px 0; border-bottom:1px solid var(--m-b1); }
-.evento:last-child { border-bottom:none; }
-.evento .fecha { font-size:11px; color:var(--m-t3); width:100px; flex-shrink:0; padding-top:1px; }
-.evento .canal { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--m-t3); display:block; margin-bottom:2px; font-weight:700; }
-.evento .resumen { font-size:12.5px; line-height:1.55; }
-.empty-msg { padding:22px 12px; text-align:center; color:var(--m-t3); font-size:12px; border:1px dashed var(--m-b1); border-radius:10px; }
+.tl { position:relative; padding-left:22px; }
+.tl::before { content:""; position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:var(--bd); }
+.evento { position:relative; padding:0 0 18px; }
+.evento:last-child { padding-bottom:0; }
+.evento::before { content:""; position:absolute; left:-22px; top:5px; width:12px; height:12px; border-radius:50%; background:var(--surface); border:2px solid var(--acc); }
+.evento .fecha { font-size:12px; color:var(--tx3); margin-bottom:2px; }
+.evento .canal { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--acc-tx); font-weight:700; margin-right:8px; }
+.evento .resumen { font-size:13.5px; line-height:1.6; }
 
-/* ── Modal nuevo contacto ─────────────────────────────────────────────── */
-.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; align-items:center; justify-content:center; padding:20px; }
+/* ── Modal ───────────────────────────────────────────────────────────── */
+.overlay { display:none; position:fixed; inset:0; background:rgba(8,15,30,.55); backdrop-filter:blur(3px); z-index:100; align-items:center; justify-content:center; padding:20px; }
 .overlay.open { display:flex; }
-.modal { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:12px; padding:22px 24px; width:100%; max-width:440px; }
-.modal h2 { font-size:15px; font-weight:800; margin-bottom:16px; }
-.modal .frow { margin-bottom:12px; }
-.modal label { display:block; font-size:11px; color:var(--m-t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; font-weight:700; }
-.modal input, .modal select, .modal textarea { width:100%; background:var(--m-s2); border:1px solid var(--m-b1); border-radius:7px; padding:9px 11px; color:var(--m-t1); font-size:13px; font-family:inherit; }
-.modal textarea { resize:vertical; min-height:56px; }
-.modal .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
-.btn-cancel { background:none; border:1px solid var(--m-b1); border-radius:8px; padding:9px 16px; color:var(--m-t2); font-size:12.5px; font-weight:600; cursor:pointer; }
-.btn-save { background:var(--m-grn); border:none; border-radius:8px; padding:9px 16px; color:#fff; font-size:12.5px; font-weight:700; cursor:pointer; }
+.modal { background:var(--surface); border:1px solid var(--bd); border-radius:16px; width:100%; max-width:560px; max-height:calc(100vh - 40px); overflow-y:auto; box-shadow:var(--shadow-2); }
+.modal-h { padding:22px 26px 6px; }
+.modal h2 { font-size:18px; font-weight:800; letter-spacing:-.015em; }
+.modal .sub { font-size:13px; color:var(--tx2); margin-top:4px; }
+.modal-b { padding:16px 26px 6px; }
+.modal .frow { margin-bottom:14px; }
+.modal label { display:block; font-size:12px; color:var(--tx2); margin-bottom:5px; font-weight:600; }
+.modal input, .modal select, .modal textarea { width:100%; background:var(--surface); border:1px solid var(--bd-strong); border-radius:9px; padding:10px 12px; color:var(--tx); font-size:14px; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
+.modal input:focus, .modal select:focus, .modal textarea:focus { outline:none; border-color:var(--acc); box-shadow:var(--focus); }
+.modal textarea { resize:vertical; min-height:70px; }
+.modal .frow2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.modal .help { font-size:12px; color:var(--tx3); margin-top:5px; }
+.modal-actions { display:flex; justify-content:flex-end; gap:10px; padding:16px 26px 22px; border-top:1px solid var(--bd); margin-top:8px; background:var(--surface-2); border-radius:0 0 16px 16px; }
+.btn-cancel { background:var(--surface); border:1px solid var(--bd-strong); border-radius:8px; padding:9px 18px; color:var(--tx); font-size:13px; font-weight:600; cursor:pointer; }
+.btn-save { background:var(--acc); border:none; border-radius:8px; padding:9px 20px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; }
+:root[data-theme="dark"] .btn-save { color:#08111F; }
+
+@media (max-width:1100px) { .board { grid-template-columns:1fr; } .list-panel { position:static; max-height:none; } .list { max-height:420px; } .stats { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:760px) {
+  .appbar-in { padding:0 16px; gap:12px; } .brand-sep, .brand-sub { display:none; } .appnav { overflow-x:auto; }
+  .page { padding:20px 16px 56px; } .page-head h1 { font-size:23px; }
+  .agents { grid-template-columns:1fr; } .fields, .cover { grid-template-columns:1fr; } .d-head, .d-body { padding-left:18px; padding-right:18px; }
+  .tpl-fields, .modal .frow2 { grid-template-columns:1fr; }
+}
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
 </style>
 </head>
 <body>
 
-<header class="hdr">
-  <div class="hdr-logo">🗂️ <span>Base de</span> Datos</div>
-  <nav class="hdr-nav">
-    <button class="hn" onclick="location.href='/'">Portal</button>
-    <button class="hn" onclick="location.href='/memoria-agentes.html'">Memoria</button>
-    <button class="hn on">Base de Datos</button>
-    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
-  </nav>
+<header class="appbar">
+  <div class="appbar-in">
+    <a class="brand" href="/"><span class="brand-mark">AB</span><span class="brand-name">ABSTORAGES</span></a>
+    <span class="brand-sep"></span><span class="brand-sub">Base de Datos</span>
+    <nav class="appnav">
+      <button onclick="location.href='/'">Portal</button>
+      <button onclick="location.href='/actividad.html'">En vivo</button>
+      <button onclick="location.href='/colocaciones.html'">Colocaciones</button>
+      <button onclick="location.href='/memoria-agentes.html'">Memoria</button>
+      <button class="on">Base de Datos</button>
+      <button onclick="location.href='/ops-center.html'">Ops Center</button>
+      <button class="theme-btn" id="themeBtn" onclick="cambiarTema()" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema"></button>
+    </nav>
+  </div>
 </header>
 
-<div class="wrap">
-
-  <div class="top">
+<main class="page">
+  <div class="crumbs"><a href="/">Portal</a><span>/</span><span>Base de Datos</span></div>
+  <div class="page-head">
     <div>
-      <div class="eyebrow">ABSTORAGES · Directorio para llamadas y plantillas</div>
-      <h1>Base de datos</h1>
+      <h1>Directorio de contactos</h1>
+      <p>Clientes, proveedores y operadores de cada agente, con su historial de interacciones y las comunicaciones que tienen autorizadas.</p>
+      <div class="updated" id="updated"></div>
     </div>
-    <div class="updated" id="updated"></div>
+    <button class="btn btn-primary" onclick="abrirModal()" id="btnNuevo"></button>
   </div>
 
-  <div class="tabs" id="tabs"></div>
+  <div class="agents" id="tabs"></div>
 
-  <div class="permitido" id="permitido"></div>
-
-  <div class="controls">
-    <input class="search" id="searchInput" placeholder="Buscar por nombre, empresa o puesto…">
-    <div class="filter" data-tipo="todos" id="f-todos">Todos</div>
-    <div class="filter" data-tipo="cliente" id="f-cliente">Clientes</div>
-    <div class="filter" data-tipo="proveedor" id="f-proveedor">Proveedores</div>
-    <div class="filter" data-tipo="operador" id="f-operador">Operadores</div>
-    <button class="btn-add" onclick="abrirModal()">➕ Nuevo contacto</button>
-  </div>
+  <details class="gov" id="permitido"></details>
 
   <div class="board">
-    <div class="list" id="list"></div>
-    <div class="detail" id="detail"></div>
+    <section class="panel list-panel">
+      <div class="toolbar">
+        <div class="search-w"><span id="searchIco"></span><input class="search" id="searchInput" placeholder="Buscar por nombre, empresa o puesto" aria-label="Buscar contactos"></div>
+        <div class="seg" role="tablist">
+          <div class="filter" data-tipo="todos" id="f-todos">Todos</div>
+          <div class="filter" data-tipo="cliente" id="f-cliente">Clientes</div>
+          <div class="filter" data-tipo="proveedor" id="f-proveedor">Proveedores</div>
+          <div class="filter" data-tipo="operador" id="f-operador">Operadores</div>
+        </div>
+      </div>
+      <div class="list" id="list"></div>
+    </section>
+    <section class="panel detail" id="detail"></section>
   </div>
-
-</div>
+</main>
 
 <!-- ── Modal nuevo contacto ─────────────────────────────────────────────── -->
 <div class="overlay" id="overlay">
-  <div class="modal">
-    <h2>Nuevo contacto — <span id="modalAgente"></span></h2>
-    <div class="frow">
-      <label>Nombre completo</label>
-      <input id="f-nombre" placeholder="Ej. Carlos Ramírez">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <div class="modal-h">
+      <h2 id="modalTitulo">Nuevo contacto</h2>
+      <div class="sub">Se guardará en la base de <b id="modalAgente"></b>.</div>
     </div>
-    <div class="frow frow2">
-      <div>
-        <label>Puesto</label>
-        <input id="f-puesto" placeholder="Ej. Gerente de Compras">
+    <div class="modal-b">
+      <div class="frow">
+        <label for="f-nombre">Nombre completo</label>
+        <input id="f-nombre" placeholder="Ej. Carlos Ramírez">
       </div>
-      <div>
-        <label>Tipo</label>
-        <select id="f-tipo">
-          <option value="cliente">Cliente</option>
-          <option value="proveedor">Proveedor</option>
-          <option value="operador">Operador</option>
-        </select>
+      <div class="frow frow2">
+        <div>
+          <label for="f-puesto">Puesto</label>
+          <input id="f-puesto" placeholder="Ej. Gerente de Compras">
+        </div>
+        <div>
+          <label for="f-tipo">Tipo</label>
+          <select id="f-tipo" onchange="toggleCamposProveedor()">
+            <option value="cliente">Cliente</option>
+            <option value="proveedor">Proveedor</option>
+            <option value="operador">Operador</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="frow">
-      <label>Empresa</label>
-      <input id="f-empresa" placeholder="Ej. Bonafont">
-    </div>
-    <div class="frow frow2">
-      <div>
-        <label>Teléfono</label>
-        <input id="f-telefono" placeholder="+52 81 0000 0000">
+      <div class="frow">
+        <label for="f-empresa">Empresa</label>
+        <input id="f-empresa" placeholder="Ej. Bonafont">
       </div>
-      <div>
-        <label>Email</label>
-        <input id="f-email" placeholder="correo@empresa.com">
+      <div class="frow frow2">
+        <div>
+          <label for="f-telefono">Teléfono</label>
+          <input id="f-telefono" placeholder="+52 81 0000 0000">
+        </div>
+        <div>
+          <label for="f-email">Email</label>
+          <input id="f-email" placeholder="correo@empresa.com">
+        </div>
       </div>
-    </div>
-    <div class="frow" id="frow-rutas">
-      <label>Rutas que maneja (solo proveedores)</label>
-      <input id="f-rutas" placeholder="Ej. MTY-GDL, Desde Toluca, Bajío — o &quot;todas&quot;">
-      <div style="font-size:11px;color:var(--m-t3);margin-top:4px;">SOFIA solo contacta automáticamente a proveedores con rutas capturadas.</div>
-    </div>
-    <div class="frow" id="frow-unidades">
-      <label>Tipos de unidad / capacidad (solo proveedores)</label>
-      <input id="f-unidades" placeholder="Ej. caja seca 53, refrigerada, plataforma — 25 ton">
-      <div style="font-size:11px;color:var(--m-t3);margin-top:4px;">Opcional. Si lo capturas, SOFIA solo le pide unidades de estos tipos.</div>
-    </div>
-    <div class="frow">
-      <label>Notas</label>
-      <textarea id="f-notas" placeholder="Opcional"></textarea>
+      <div class="frow" id="frow-rutas">
+        <label for="f-rutas">Rutas que maneja</label>
+        <input id="f-rutas" placeholder="Ej. MTY-GDL, Desde Toluca, Bajío — o &quot;todas&quot;">
+        <div class="help">SOFIA solo contacta automáticamente a proveedores con rutas capturadas.</div>
+      </div>
+      <div class="frow" id="frow-unidades">
+        <label for="f-unidades">Tipos de unidad y capacidad</label>
+        <input id="f-unidades" placeholder="Ej. caja seca 53, refrigerada, plataforma — 25 ton">
+        <div class="help">Opcional. Si lo capturas, SOFIA solo le pide unidades de estos tipos.</div>
+      </div>
+      <div class="frow">
+        <label for="f-notas">Notas</label>
+        <textarea id="f-notas" placeholder="Opcional"></textarea>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn-save" onclick="guardarContacto()">Guardar</button>
+      <button class="btn-save" onclick="guardarContacto()">Guardar contacto</button>
     </div>
   </div>
 </div>
 
 <script>
+const IC = {
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  edit:'<path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  truck:'<rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+};
+function ico(n){ return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
+
+function pintarTema(){
+  const oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('themeBtn').innerHTML = ico(oscuro ? 'sun' : 'moon');
+}
+function cambiarTema(){
+  const nuevo = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', nuevo);
+  try { localStorage.setItem('abs-theme', nuevo); } catch (e) {}
+  pintarTema();
+}
+document.getElementById('btnNuevo').innerHTML = ico('plus') + ' Nuevo contacto';
+document.getElementById('searchIco').innerHTML = ico('search');
+pintarTema();
+
 const AGENTES = {
-  SARA:  { role: "Ventas · Clientes",                             color: "var(--m-grn)", bg: "rgba(14,169,104,.15)" },
-  SOFIA: { role: "Operaciones · Proveedores",                     color: "var(--m-acc)", bg: "rgba(47,111,237,.15)" },
-  NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--m-amb)", bg: "rgba(240,169,59,.15)" },
+  SARA:  { role: "Ventas · Clientes",                              color: "var(--sara)",  soft: "var(--sara-soft)" },
+  SOFIA: { role: "Operaciones · Proveedores",                      color: "var(--sofia)", soft: "var(--sofia-soft)" },
+  NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--noa)",   soft: "var(--noa-soft)" },
 };
 
 let activeAgent = "SARA";
@@ -265,35 +403,37 @@ function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt
 function fmtFecha(iso) { return iso ? new Date(iso).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }) : '—'; }
 function fmtFechaHora(iso) { return iso ? new Date(iso).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '—'; }
 function tipoLabel(t) { return t==='cliente' ? 'Cliente' : t==='proveedor' ? 'Proveedor' : 'Operador'; }
+function iniciales(n) { const p = String(n || '?').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?')[0] + (p.length > 1 ? p[p.length-1][0] : '')).toUpperCase(); }
+function partes(t) { return String(t || '').split(/[,;\n]+/).map(x => x.trim()).filter(Boolean); }
 
 function renderTabs(){
   document.getElementById('tabs').innerHTML = Object.entries(AGENTES).map(([key,a])=>`
-    <div class="tab ${key===activeAgent?'active':''}" data-agent="${key}" onclick="selectAgent('${key}')">
-      <div class="count" style="background:${a.bg};color:${a.color}">${counts[key]}</div>
-      <div class="name" style="color:${key===activeAgent?a.color:'var(--m-t1)'}">${key}</div>
-      <div class="role">${a.role}</div>
-    </div>
+    <button class="agent ${key===activeAgent?'active':''}" style="--ag:${a.color};--ag-soft:${a.soft}" onclick="selectAgent('${key}')" aria-pressed="${key===activeAgent}">
+      <span class="agent-av">${key[0]}</span>
+      <span><span class="agent-nm">${key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
+      <span class="agent-ct"><b>${counts[key]}</b><span>contactos</span></span>
+    </button>
   `).join('');
 }
 
 async function renderPermitido(){
-  const agent = AGENTES[activeAgent];
   const box = document.getElementById('permitido');
-  box.innerHTML = '<div class="cab"><span class="ico">🔒</span><span class="txt">Cargando lo que ' + activeAgent + ' tiene permitido hacer…</span></div>';
   try {
     const r = await fetch('/api/plantillas-aprobadas?agente=' + activeAgent.toLowerCase(), { credentials: 'include' });
     plantillasCache = r.ok ? await r.json() : [];
   } catch { plantillasCache = []; }
-
+  const abierto = box.open;
   box.innerHTML = `
-    <div class="cab"><span class="ico">🔒</span><span class="txt">Lo que ${activeAgent} tiene permitido enviar</span></div>
-    <div class="chips">
-      ${plantillasCache.length
-        ? plantillasCache.map(p => `<span class="pchip">${esc(p.nombre)}</span>`).join('')
-        : '<span class="pchip" style="opacity:.6">Sin plantillas configuradas para este agente</span>'}
-    </div>
-    <div class="regla">Fuera de estas plantillas aprobadas por Meta, ${activeAgent} <b>nunca</b> manda nada — ni texto libre, ni una versión "parecida". Si el equipo le pide algo que no está aquí, responde: <b>"Disculpa pero esa funcionalidad no te la puedo cumplir."</b></div>
-  `;
+    <summary>${ico('lock')} Comunicaciones autorizadas para ${activeAgent} <span class="cnt">${plantillasCache.length} plantilla${plantillasCache.length === 1 ? '' : 's'}</span><span class="chev">${ico('chev')}</span></summary>
+    <div class="gov-body">
+      <div class="chips">
+        ${plantillasCache.length
+          ? plantillasCache.map(p => `<span class="pchip">${esc(p.nombre)}</span>`).join('')
+          : '<span class="pchip" style="opacity:.7">Sin plantillas configuradas para este agente</span>'}
+      </div>
+      <div class="regla">Fuera de estas plantillas aprobadas por Meta, ${activeAgent} <b>nunca</b> envía nada: ni texto libre ni una versión parecida. Si el equipo le pide algo que no está aquí, responde: <b>"Disculpa pero esa funcionalidad no te la puedo cumplir"</b>.</div>
+    </div>`;
+  box.open = abierto;
 }
 
 async function selectAgent(key){
@@ -323,6 +463,7 @@ async function cargarContactos() {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     contactosCache = await r.json();
     counts[activeAgent] = contactosCache.length;
+    document.getElementById('updated').textContent = 'Actualizado a las ' + new Date().toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
     renderTabs();
     renderList();
   } catch (e) {
@@ -331,28 +472,24 @@ async function cargarContactos() {
 }
 
 function renderList(){
-  const agent = AGENTES[activeAgent];
   const list = document.getElementById('list');
   if (contactosCache.length === 0) {
-    list.innerHTML = '<div class="empty-msg">Sin resultados para este filtro. Usa "➕ Nuevo contacto" para agregar uno.</div>';
+    list.innerHTML = '<div class="empty-msg">Sin resultados para este filtro.<br>Usa “Nuevo contacto” para agregar uno.</div>';
     document.getElementById('detail').innerHTML = '';
     return;
   }
   if (!activeContactId || !contactosCache.find(c=>c.id===activeContactId)) activeContactId = contactosCache[0].id;
   list.innerHTML = contactosCache.map(c=>`
-    <div class="card ${c.id===activeContactId?'sel':''}" style="border-left-color:${c.id===activeContactId?agent.color:'var(--m-b1)'}" onclick="selectContacto('${c.id}')">
-      <div class="row1">
-        <div>
-          <div class="nombre">${esc(c.nombre_completo)}</div>
-          ${c.puesto ? `<div class="puesto">${esc(c.puesto)}</div>` : ''}
+    <div class="row ${c.id===activeContactId?'sel':''}" onclick="selectContacto('${c.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')selectContacto('${c.id}')">
+      <div class="av av-${c.tipo}">${esc(iniciales(c.nombre_completo))}</div>
+      <div class="row-main">
+        <div class="row-top"><div class="nombre">${esc(c.nombre_completo)}</div><div class="fecha">${fmtFecha(c.fecha_ultimo_contacto)}</div></div>
+        <div class="empresa">${esc([c.puesto, c.empresa].filter(Boolean).join(' · ') || '—')}</div>
+        <div class="row-meta">
+          <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
+          ${c.tipo === 'proveedor' ? (c.rutas ? `<span class="pill pill-ok">${ico('pin')} ${partes(c.rutas).length} ruta${partes(c.rutas).length === 1 ? '' : 's'}</span>` : `<span class="pill pill-warn">${ico('pin')} Sin rutas</span>`) : ''}
+          <span class="tel">${esc(c.telefono || '—')}</span>
         </div>
-        <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
-      </div>
-      <div class="empresa">${esc(c.empresa || '—')}</div>
-      ${c.tipo === 'proveedor' ? `<div class="empresa" style="color:${c.rutas ? 'var(--m-acc)' : 'var(--m-amb)'};">🛣️ ${c.rutas ? esc(c.rutas) : 'Sin rutas'}</div>` : ''}
-      <div class="meta">
-        <span>${esc(c.telefono || '—')}</span>
-        <span>Últ. contacto: ${fmtFecha(c.fecha_ultimo_contacto)}</span>
       </div>
     </div>
   `).join('');
@@ -366,7 +503,7 @@ async function renderDetail(){
   const c = contactosCache.find(x=>x.id===activeContactId);
   const detail = document.getElementById('detail');
   if(!c){ detail.innerHTML = ''; return; }
-  detail.innerHTML = '<div class="empty-msg">Cargando bitácora…</div>';
+  detail.innerHTML = '<div class="empty-msg">Cargando ficha…</div>';
 
   let data;
   try {
@@ -379,59 +516,84 @@ async function renderDetail(){
   }
 
   const tienePlantillas = plantillasCache.length > 0;
+  const esProv = data.tipo === 'proveedor';
+  const rutas = partes(data.rutas), unidades = partes(data.unidades);
 
   detail.innerHTML = `
     <div class="d-head">
-      <div>
+      <div class="av av-${data.tipo} d-av">${esc(iniciales(data.nombre_completo))}</div>
+      <div class="d-id">
         <div class="nombre">${esc(data.nombre_completo)}</div>
         ${data.puesto ? `<div class="puesto">${esc(data.puesto)}</div>` : ''}
-        <div class="empresa">${esc(data.empresa || '—')}</div>
+        <div class="empresa">${esc(data.empresa || 'Sin empresa registrada')}</div>
+        <div class="d-tags">
+          <span class="tipo-tag tipo-${data.tipo}">${tipoLabel(data.tipo)}</span>
+          <span class="agent-badge" style="background:${agent.soft};color:${agent.color}">Asignado a ${esc(data.agente_asignado)}</span>
+        </div>
       </div>
-      <div class="agent-badge" style="background:${agent.bg};color:${agent.color}">${esc(data.agente_asignado)}</div>
-    </div>
-    <div class="fields">
-      <div class="field"><label>Teléfono</label><div class="val">${esc(data.telefono || '—')}</div></div>
-      <div class="field"><label>Email</label><div class="val">${esc(data.email || '—')}</div></div>
-      <div class="field"><label>Tipo de carga / mercancía</label><div class="val">${esc(data.tipo_carga || '—')}</div></div>
-      <div class="field"><label>Clasificación</label><div class="val">${tipoLabel(data.tipo)}</div></div>
-      <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
-      <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
-    </div>
-    ${data.tipo === 'proveedor' ? `<div class="field" style="margin-bottom:14px;"><label>Rutas que maneja</label><div class="val">${data.rutas ? esc(data.rutas) : '⚠️ Sin rutas capturadas — SOFIA no lo contacta automáticamente'}</div><button class="act-btn" style="margin-top:8px;" onclick="editarRutas('${data.id}')">✏️ Editar rutas</button></div>
-      <div class="field" style="margin-bottom:14px;"><label>Tipos de unidad / capacidad</label><div class="val">${data.unidades ? esc(data.unidades) : 'Sin capturar — no se filtra por tipo de unidad'}</div><button class="act-btn" style="margin-top:8px;" onclick="editarUnidades('${data.id}')">✏️ Editar unidades</button></div>
-      <div class="field" style="margin-bottom:14px;" id="desempeno-box"><label>Desempeño con SOFIA</label><div class="val">Cargando…</div></div>
-      <div id="sugerencias-box"></div>` : ''}
-    ${data.notas ? `<div class="field" style="margin-bottom:14px;"><label>Notas</label><div class="val">${esc(data.notas)}</div></div>` : ''}
-
-    <div class="actions">
-      <button class="act-btn call" id="btnLlamar" ${data.telefono ? '' : 'disabled'} onclick="llamar('${data.id}')">📞 Llamar</button>
-      <button class="act-btn tpl" id="btnPlantilla" ${(data.telefono && tienePlantillas) ? '' : 'disabled'} onclick="togglePlantilla()">💬 Enviar plantilla aprobada</button>
+      <div class="actions">
+        <button class="btn btn-primary" id="btnLlamar" ${data.telefono ? '' : 'disabled'} onclick="llamar('${data.id}')">${ico('phone')} Llamar</button>
+        <button class="btn btn-secondary" id="btnPlantilla" ${(data.telefono && tienePlantillas) ? '' : 'disabled'} onclick="togglePlantilla()">${ico('chat')} Enviar plantilla</button>
+      </div>
     </div>
 
-    <div class="tpl-panel" id="tplPanel">
-      <select id="tplSelect" onchange="renderTplCampos()">
-        ${plantillasCache.map(p => `<option value="${p.sid}">${esc(p.nombre)}</option>`).join('')}
-      </select>
-      <div class="tpl-preview" id="tplPreview"></div>
-      <div class="tpl-fields" id="tplCampos"></div>
-      <button class="tpl-send" onclick="enviarPlantilla('${data.id}')">Enviar</button>
-      <div class="tpl-msg" id="tplMsg"></div>
-    </div>
+    <div class="d-body">
+      <div class="tpl-panel" id="tplPanel">
+        <select id="tplSelect" onchange="renderTplCampos()" aria-label="Plantilla aprobada">
+          ${plantillasCache.map(p => `<option value="${p.sid}">${esc(p.nombre)}</option>`).join('')}
+        </select>
+        <div class="tpl-preview" id="tplPreview"></div>
+        <div class="tpl-fields" id="tplCampos"></div>
+        <button class="tpl-send" onclick="enviarPlantilla('${data.id}')">Enviar plantilla aprobada</button>
+        <div class="tpl-msg" id="tplMsg"></div>
+      </div>
 
-    <div class="sec-title">Bitácora de interacciones (${data.interacciones.length})</div>
-    <div class="bitacora">
-      ${data.interacciones.length ? data.interacciones.map(e=>`
-        <div class="evento">
-          <div class="fecha">${fmtFechaHora(e.fecha)}</div>
-          <div>
-            <span class="canal">${esc(e.agente)} · ${esc(e.canal || 'otro')}</span>
-            <div class="resumen">${esc(e.resumen || '—')}</div>
+      <section>
+        <div class="sec-title">Información de contacto</div>
+        <div class="fields">
+          <div class="field"><label>Teléfono</label><div class="val mono">${esc(data.telefono || '—')}</div></div>
+          <div class="field"><label>Correo electrónico</label><div class="val">${esc(data.email || '—')}</div></div>
+          <div class="field"><label>Mercancía habitual</label><div class="val">${esc(data.tipo_carga || '—')}</div></div>
+          <div class="field"><label>Clasificación</label><div class="val">${tipoLabel(data.tipo)}</div></div>
+          <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
+          <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
+        </div>
+      </section>
+
+      ${esProv ? `
+      <section>
+        <div class="sec-title">Cobertura operativa</div>
+        <div class="cover">
+          <div class="cover-card">
+            <div class="cover-h"><span>${ico('pin')} Rutas que maneja</span><button class="btn btn-ghost btn-sm" onclick="editarRutas('${data.id}')">${ico('edit')} Editar</button></div>
+            ${rutas.length ? `<div class="tags">${rutas.map(r => `<span class="tagc">${esc(r)}</span>`).join('')}</div>` : '<div class="hint">Sin rutas capturadas. SOFIA no lo contacta automáticamente hasta que las agregues.</div>'}
+          </div>
+          <div class="cover-card">
+            <div class="cover-h"><span>${ico('truck')} Unidades y capacidad</span><button class="btn btn-ghost btn-sm" onclick="editarUnidades('${data.id}')">${ico('edit')} Editar</button></div>
+            ${unidades.length ? `<div class="tags">${unidades.map(u => `<span class="tagc">${esc(u)}</span>`).join('')}</div>` : '<div class="hint neutral">Sin capturar. No se filtra por tipo de unidad.</div>'}
           </div>
         </div>
-      `).join('') : '<div class="empty-msg">Sin interacciones registradas.</div>'}
+      </section>
+      <div id="sugerencias-box"></div>
+      <section>
+        <div class="sec-title">Desempeño con SOFIA</div>
+        <div id="desempeno-box"><div class="empty-msg">Cargando…</div></div>
+      </section>` : ''}
+
+      ${data.notas ? `<section><div class="sec-title">Notas</div><div class="notes">${esc(data.notas)}</div></section>` : ''}
+
+      <section>
+        <div class="sec-title">Bitácora de interacciones <span class="cnt">${data.interacciones.length}</span></div>
+        ${data.interacciones.length ? `<div class="tl">${data.interacciones.map(e=>`
+          <div class="evento">
+            <div class="fecha">${fmtFechaHora(e.fecha)}</div>
+            <div><span class="canal">${esc(e.agente)} · ${esc(e.canal || 'otro')}</span></div>
+            <div class="resumen">${esc(e.resumen || '—')}</div>
+          </div>`).join('')}</div>` : '<div class="empty-msg">Sin interacciones registradas.</div>'}
+      </section>
     </div>
   `;
-  if (data.tipo === 'proveedor') cargarDesempeno(data);
+  if (esProv) cargarDesempeno(data);
 }
 
 function togglePlantilla(){
@@ -499,7 +661,7 @@ async function llamar(contactoId){
     motivo = r0.trim();
   }
   const btn = document.getElementById('btnLlamar');
-  btn.disabled = true; btn.textContent = '📞 Llamando…';
+  btn.disabled = true; btn.textContent = 'Llamando…';
   try {
     const r = await fetch('/api/contactos/' + encodeURIComponent(contactoId) + '/llamar', {
       method: 'POST', credentials: 'include',
@@ -511,7 +673,7 @@ async function llamar(contactoId){
     await renderDetail();
   } catch (e) {
     alert('No se pudo llamar: ' + e.message);
-    btn.disabled = false; btn.textContent = '📞 Llamar';
+    btn.disabled = false; btn.innerHTML = ico('phone') + ' Llamar';
   }
 }
 
@@ -526,21 +688,30 @@ function abrirModal(){
   document.getElementById('f-rutas').value = '';
   document.getElementById('f-unidades').value = '';
   document.getElementById('f-tipo').value = 'cliente';
+  toggleCamposProveedor();
   document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-nombre').focus(), 30);
 }
 async function cargarDesempeno(data){
   try {
     const st = await (await fetch('/api/proveedores/' + encodeURIComponent(data.telefono || 'x') + '/desempeno', { credentials:'include' })).json();
     const box = document.getElementById('desempeno-box');
-    if (box) box.innerHTML = '<label>Desempeño con SOFIA</label><div class="val">' + (st.contactado
-      ? `Puntaje <b>${Math.round(st.puntaje*100)}</b>/100 · contactado ${st.contactado} vez/veces · respondió ${st.respondio}${st.medianaMin != null ? ' (tarda ~' + st.medianaMin + ' min)' : ''} · tuvo unidad ${st.acepto} · colocado ${st.colocado}${st.retraso ? ' · ' + st.retraso + ' retraso(s)' : ''}`
-      : 'Aún sin historial (arranca en 50/100).') + '</div>';
+    if (box) {
+      const nuevo = !st.contactado;
+      const tile = (v, l, s) => `<div class="stat"><div class="stat-v">${v}</div><div class="stat-l">${l}</div>${s ? `<div class="stat-s">${s}</div>` : ''}</div>`;
+      box.innerHTML = `<div class="stats">
+        ${tile(Math.round(st.puntaje*100) + '<span class="unit">/100</span>', 'Puntaje SOFIA', nuevo ? 'Sin historial · inicia en 50' : '')}
+        ${tile(st.contactado, 'Veces contactado', st.respondio + ' respondió')}
+        ${tile(st.medianaMin != null ? st.medianaMin + '<span class="unit"> min</span>' : '—', 'Tiempo típico de respuesta', st.acepto + ' con unidad')}
+        ${tile(st.colocado, 'Servicios colocados', st.retraso ? st.retraso + ' con retraso' : 'Sin retrasos')}
+      </div>`;
+    }
     const sg = await (await fetch('/api/sugerencias-proveedor', { credentials:'include' })).json();
     const mias = sg.filter(x => String(x.telefono).replace(/\D/g,'').slice(-10) === String(data.telefono||'').replace(/\D/g,'').slice(-10));
     const sb = document.getElementById('sugerencias-box');
-    if (sb && mias.length) sb.innerHTML = '<div class="field" style="margin-bottom:14px;"><label>💡 Sugerencias del proveedor (pendientes)</label>' + mias.map(x =>
-      `<div class="val" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;">${{ruta_agregar:'Agregar ruta',ruta_quitar:'Quitar ruta',unidad_agregar:'Agregar unidad'}[x.tipo]}: <b>${esc(x.valor)}</b>
-       <button class="act-btn" onclick="resolverSugerencia('${x.id}',true)">✅ Aprobar</button><button class="act-btn" onclick="resolverSugerencia('${x.id}',false)">Descartar</button></div>`).join('') + '</div>';
+    if (sb && mias.length) sb.innerHTML = `<div class="callout"><div class="callout-t">Sugerencias del proveedor pendientes de tu aprobación</div>` + mias.map(x =>
+      `<div class="sug"><span>${{ruta_agregar:'Agregar ruta',ruta_quitar:'Quitar ruta',unidad_agregar:'Agregar unidad'}[x.tipo]}: <b>${esc(x.valor)}</b></span>
+       <span class="sug-b"><button class="btn btn-primary btn-sm" onclick="resolverSugerencia('${x.id}',true)">Aprobar</button><button class="btn btn-ghost btn-sm" onclick="resolverSugerencia('${x.id}',false)">Descartar</button></span></div>`).join('') + '</div>';
   } catch (e) { /* el desempeño es informativo — nunca rompe la ficha */ }
 }
 async function resolverSugerencia(id, aprobar){
@@ -573,6 +744,7 @@ async function editarRutas(id){
   } catch (e) { alert('No se pudo guardar: ' + e.message); }
 }
 function cerrarModal(){ document.getElementById('overlay').classList.remove('open'); }
+function toggleCamposProveedor(){ const p = document.getElementById('f-tipo').value === 'proveedor'; document.getElementById('frow-rutas').style.display = p ? '' : 'none'; document.getElementById('frow-unidades').style.display = p ? '' : 'none'; }
 
 async function guardarContacto(){
   const nombre_completo = document.getElementById('f-nombre').value.trim();
