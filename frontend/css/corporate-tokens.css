@@ -1,0 +1,30 @@
+/* Tokens de color/sombras del estilo corporativo (claro y oscuro) */
+:root, :root[data-theme="light"] {
+  --bg:#F3F5F9; --surface:#FFFFFF; --surface-2:#F8FAFC; --surface-3:#EEF2F7;
+  --bd:#E2E8F0; --bd-strong:#CBD5E1;
+  --tx:#0F172A; --tx2:#475569; --tx3:#64748B;
+  --navy:#0B2A5B; --navy-2:#123A7A;
+  --acc:#1F5FD1; --acc-soft:#E8F0FE; --acc-tx:#1748A6;
+  --sara:#0B7D57; --sara-soft:#E3F5EE;
+  --sofia:#1F5FD1; --sofia-soft:#E8F0FE;
+  --noa:#B45309; --noa-soft:#FEF1DC;
+  --ok:#0B7D57; --ok-soft:#E3F5EE; --warn:#B45309; --warn-soft:#FEF1DC; --crit:#C62828; --crit-soft:#FDE8E8;
+  --shadow-1:0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
+  --shadow-2:0 4px 12px rgba(15,23,42,.08), 0 16px 40px rgba(15,23,42,.10);
+  --appbar:#0B2A5B; --appbar-tx:#EAF0FB; --appbar-mute:#9DB3D6;
+  --focus:0 0 0 3px rgba(31,95,209,.28);
+}
+:root[data-theme="dark"] {
+  --bg:#0A101C; --surface:#111A2B; --surface-2:#152036; --surface-3:#1B2942;
+  --bd:rgba(255,255,255,.09); --bd-strong:rgba(255,255,255,.18);
+  --tx:#E8EEF7; --tx2:#A9B6CA; --tx3:#8090A8;
+  --navy:#08111F; --navy-2:#0D1A30;
+  --acc:#5B93FF; --acc-soft:rgba(91,147,255,.14); --acc-tx:#8DB4FF;
+  --sara:#34D399; --sara-soft:rgba(52,211,153,.13);
+  --sofia:#5B93FF; --sofia-soft:rgba(91,147,255,.14);
+  --noa:#FBBF24; --noa-soft:rgba(251,191,36,.13);
+  --ok:#34D399; --ok-soft:rgba(52,211,153,.13); --warn:#FBBF24; --warn-soft:rgba(251,191,36,.13); --crit:#FF7A7A; --crit-soft:rgba(255,122,122,.13);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 8px 30px rgba(0,0,0,.5);
+  --appbar:#08111F; --appbar-tx:#E8EEF7; --appbar-mute:#7C8BA3;
+  --focus:0 0 0 3px rgba(91,147,255,.35);
+}
