@@ -12,7 +12,7 @@ function limpiarFormatoWhatsApp(texto) {
 
   // Token de control interno (resultado de la conversación con un proveedor):
   // nunca debe llegar a un WhatsApp, aunque el modelo lo escriba donde no toca.
-  t = t.replace(/(RESULTADO_CONTACTO|OFERTA_PROVEEDOR|ESTATUS_UNIDAD|OPERADOR_UNIDAD|SUGERENCIA_PROVEEDOR)\s*:[^\n]*/gi, '');
+  t = t.replace(/(RESULTADO_CONTACTO|OFERTA_PROVEEDOR|ESTATUS_UNIDAD|OPERADOR_UNIDAD|RECLAMO_PAGO|SUGERENCIA_PROVEEDOR)\s*:[^\n]*/gi, '');
 
   // Bloques de código ``` — se quita la cerca, se deja el contenido
   t = t.replace(/```[a-zA-Z]*\n?/g, '').replace(/```/g, '');

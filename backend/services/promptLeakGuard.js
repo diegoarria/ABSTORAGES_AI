@@ -123,6 +123,7 @@ const PATRONES = [
   /OFERTA_PROVEEDOR\s*:/i,
   /ESTATUS_UNIDAD\s*:/i,
   /OPERADOR_UNIDAD\s*:/i,
+  /RECLAMO_PAGO\s*:/i,
   /SUGERENCIA_PROVEEDOR\s*:/i,
 
   // Base64 / codificación como vector para colar instrucciones

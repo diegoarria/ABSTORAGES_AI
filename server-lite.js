@@ -224,6 +224,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/OFERTA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/ESTATUS_UNIDAD\s*:[\s\S]*$/gi, '')
     .replace(/OPERADOR_UNIDAD\s*:[\s\S]*$/gi, '')
+    .replace(/RECLAMO_PAGO\s*:[\s\S]*$/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
@@ -600,7 +601,11 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     await chatStream(systemPrompt, [...history, { role: 'user', content: contenidoParaClaude }], (c) => { respuesta += c; }, () => {});
     memory.addMessage(session, 'assistant', respuesta);
     saveMessage(session, agente, 'assistant', respuesta);
-    const bloques = splitForWhatsApp(limpiarControlParaCliente(respuesta));
+    // Reclamo de pago de un proveedor: SOFIA no dice nada más que la frase acordada
+    // (aunque el modelo agregue algo, aquí se fuerza el texto exacto).
+    const FRASE_RECLAMO_PAGO = 'Enseguida lo revisaré con el equipo de administración, ellos podrán resolverte este tema lo antes posible.';
+    const textoSalida = (agente === 'sofia' && !personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO : limpiarControlParaCliente(respuesta);
+    const bloques = splitForWhatsApp(textoSalida);
     for (const bloque of bloques) await sendWhatsApp(phone, bloque, agente);
 
     // ── Monitoreo en vivo: conversación, respuesta de proveedor y resultado ──
@@ -3363,7 +3368,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'SUGERENCIA_PROVEEDOR:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3378,6 +3383,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/OFERTA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/ESTATUS_UNIDAD:\s*\{[\s\S]*?\}/gi, '')
     .replace(/OPERADOR_UNIDAD:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/RECLAMO_PAGO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')

@@ -147,12 +147,34 @@ function procesarSenales({ telefono, nombre, respuesta }) {
       }
     }
 
+    const rp = json(respuesta, 'RECLAMO_PAGO');
+    if (rp) escalarReclamoPago({ telefono, nombre, resumen: rp.resumen });
+
     const sg = json(respuesta, 'SUGERENCIA_PROVEEDOR');
     if (sg) {
       const s = colocaciones.agregarSugerencia({ telefono, nombre, tipo: sg.tipo, valor: sg.valor });
       if (s) feed({ tipo: 'SUGERENCIA', mensaje: `${quien} sugiere ${{ ruta_agregar: 'agregar la ruta', ruta_quitar: 'quitar la ruta', unidad_agregar: 'agregar el tipo de unidad' }[s.tipo]} "${s.valor}" — pendiente de tu aprobación en Base de Datos` });
     }
   } catch (e) { console.error('[sofiaOperacion] Error procesando señales:', e.message); }
+}
+
+// ── Reclamos de pago: SOFIA no responde nada de fondo — escala a Administración ──
+const RECLAMO_A = ['manuel', 'rafael']; // claves en backend/data/staff-contacts.json
+const _ultimoReclamo = new Map();       // teléfono → ts (evita avisar 5 veces por 5 mensajes seguidos)
+const contactosSvc = require('./contactos');
+function escalarReclamoPago({ telefono, nombre, resumen }) {
+  const k = colocaciones.tel10(telefono);
+  if (Date.now() - (_ultimoReclamo.get(k) || 0) < 15 * 60 * 1000) return; // ya avisado hace poco
+  _ultimoReclamo.set(k, Date.now());
+  const quien = nombre || 'Un proveedor';
+  const detalle = String(resumen || 'sin detalle').replace(/\s+/g, ' ').slice(0, 220);
+  const mensaje = `Reclamo de pago — ${quien}: ${detalle}. SOFIA le respondió que lo revisan con Administración. Búscalo en la Base de Datos.`;
+  feed({ tipo: 'RECLAMO_PAGO', mensaje: `${quien} reclama un pago: ${detalle}`, metadata: { proveedor: quien } });
+  push({ title: `Reclamo de pago — ${quien}`, body: detalle, tag: 'reclamo-pago-' + k, url: '/actividad.html', tipo: 'RECLAMO_PAGO', urgente: true });
+  whatsappProactivo.avisarEquipo('sofia', 'SOFIA', mensaje, RECLAMO_A)
+    .catch(e => console.error('[sofiaOperacion] Error avisando reclamo de pago:', e.message));
+  contactosSvc.buscarPorTelefono(telefono, 'sofia').then(c => c && contactosSvc.upsertContacto({ agente: 'sofia', tipo: c.tipo, nombre_completo: c.nombre_completo, telefono: c.telefono, resumen_interaccion: `Reclamo de pago: ${detalle} — escalado a Manuel y Rafael`, canal: 'whatsapp' }))
+    .catch(() => {});
 }
 
 // ── Aprobación humana → SOFIA cierra ────────────────────────────────────────
