@@ -209,6 +209,7 @@ CREATE TABLE IF NOT EXISTS contactos (
   empresa VARCHAR(255),
   tipo_carga TEXT,
   notas TEXT,
+  unidades TEXT, -- proveedores: tipos de unidad / capacidad
   rutas TEXT, -- proveedores: rutas que maneja (ver rutasProveedor.js)
   fecha_primer_contacto TIMESTAMPTZ DEFAULT NOW(),
   fecha_ultimo_contacto TIMESTAMPTZ DEFAULT NOW(),
@@ -217,6 +218,7 @@ CREATE TABLE IF NOT EXISTS contactos (
 );
 
 ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT;
+ALTER TABLE contactos ADD COLUMN IF NOT EXISTS unidades TEXT;
 
 -- ─── INTERACCIONES (bitácora por contacto, puede haber de varios agentes) ────
 CREATE TABLE IF NOT EXISTS interacciones (

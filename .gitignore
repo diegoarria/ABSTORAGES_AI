@@ -10,3 +10,4 @@ data/emergency-shutdown.json
 monitoring/data/*.json
 monitoring/admin-panel/dist/
 dist/
+data/sofia-operacion.json

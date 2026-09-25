@@ -148,7 +148,7 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
 // no vacíos + fecha_ultimo_contacto y agrega una interacción. Si no existe,
 // crea el contacto (agente_asignado = agente, nunca se sobreescribe después)
 // más su primera interacción.
-async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, resumen_interaccion, canal }) {
+async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, unidades, resumen_interaccion, canal }) {
   let existente = null;
   if (telefono) {
     const { rows } = await query('SELECT * FROM contactos WHERE telefono = $1 LIMIT 1', [telefono]);
@@ -170,16 +170,17 @@ async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, 
          tipo_carga      = COALESCE(NULLIF($5,''), tipo_carga),
          notas           = COALESCE(NULLIF($6,''), notas),
          rutas           = COALESCE(NULLIF($8,''), rutas),
+         unidades        = COALESCE(NULLIF($9,''), unidades),
          fecha_ultimo_contacto = NOW()
        WHERE id = $7 RETURNING *`,
-      [nombre_completo || '', telefono || '', email || '', empresa || '', tipo_carga || '', notas || '', existente.id, rutas || '']
+      [nombre_completo || '', telefono || '', email || '', empresa || '', tipo_carga || '', notas || '', existente.id, rutas || '', unidades || '']
     );
     contacto = rows[0];
   } else {
     const { rows } = await query(
-      `INSERT INTO contactos (agente_asignado, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [agente.toUpperCase(), tipo, nombre_completo || 'Sin nombre', telefono || null, email || null, empresa || null, tipo_carga || null, notas || null, rutas || null]
+      `INSERT INTO contactos (agente_asignado, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, unidades)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+      [agente.toUpperCase(), tipo, nombre_completo || 'Sin nombre', telefono || null, email || null, empresa || null, tipo_carga || null, notas || null, rutas || null, unidades || null]
     );
     contacto = rows[0];
   }

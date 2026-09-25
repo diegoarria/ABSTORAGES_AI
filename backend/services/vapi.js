@@ -348,14 +348,12 @@ async function lanzarLlamadasProveedores(orden, todosProveedores) {
   console.log(`[Vapi] Lanzando ${compatibles.length} llamadas para folio ${orden.folio}`);
 
   // Inicializar store para este folio
-  resultadosPorFolio.set(orden.folio, {
-    folio:    orden.folio,
-    orden,
-    llamadas: compatibles.length,
-    respuestas: [],
-    ganador:  null,
-    inicio:   new Date().toISOString(),
-  });
+  // Con la escalera por olas este método se llama varias veces por folio —
+  // se acumula en vez de borrar lo que ya llegó de olas anteriores.
+  const previo = resultadosPorFolio.get(orden.folio);
+  resultadosPorFolio.set(orden.folio, previo
+    ? { ...previo, llamadas: previo.llamadas + compatibles.length }
+    : { folio: orden.folio, orden, llamadas: compatibles.length, respuestas: [], ganador: null, inicio: new Date().toISOString() });
 
   // Lanzar todas en paralelo — Vapi maneja la concurrencia
   const resultados = await Promise.allSettled(
@@ -411,6 +409,8 @@ function procesarResultadoLlamada(webhookData) {
       console.log(`[Vapi] Ganador para ${folio}: ${proveedorId} a ${precio}`);
     }
   }
+  try { require('./sofiaOperacion').ofertaPorLlamada(folio, proveedorId, { disponible, precio }); }
+  catch (e) { console.error('[Vapi] Error avisando a sofiaOperacion:', e.message); }
 
   return resultado;
 }

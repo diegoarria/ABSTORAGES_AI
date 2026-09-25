@@ -92,6 +92,9 @@ const gpsProviders = require('./backend/services/gpsProviders');
 const ordersStore = require('./backend/services/ordersStore');
 const contactos   = require('./backend/services/contactos');
 const rutasProveedor = require('./backend/services/rutasProveedor');
+const sofiaOperacion = require('./backend/services/sofiaOperacion');
+const colocaciones = require('./backend/services/colocaciones');
+const kpisSofia = require('./backend/services/kpisSofia');
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
@@ -218,6 +221,9 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/ALERTA_CRITICA\s*:[\s\S]*$/gi, '')
     .replace(/ESTATUS_SEGUIMIENTO\s*:[\s\S]*$/gi, '')
     .replace(/RESULTADO_CONTACTO\s*:[\s\S]*$/gi, '')
+    .replace(/OFERTA_PROVEEDOR\s*:[\s\S]*$/gi, '')
+    .replace(/ESTATUS_UNIDAD\s*:[\s\S]*$/gi, '')
+    .replace(/SUGERENCIA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();
@@ -272,25 +278,29 @@ async function sendWhatsApp(to, text, agente = 'noa') {
 // al equipo en vez de quedarse callado — antes esto solo quedaba en un log.
 async function buscarUnidadParaOrden(lead) {
   try {
-    // Solo proveedores de la Base de Datos de SOFIA con la ruta cubierta
-    // (rutasProveedor.js). Sin rutas capturadas = no se contacta solo. El
-    // TMS no trae rutas, así que ya no se usa como lista de envío masivo.
+    // Solo proveedores de la Base de Datos de SOFIA con la ruta (y el tipo de
+    // unidad, si lo tienen capturado) cubiertos. Sin rutas capturadas = no se
+    // contacta solo. El TMS no trae rutas, así que ya no se usa como lista de
+    // envío masivo.
     const bd = await contactos.listarPorAgente('sofia', { tipo: 'proveedor' }).catch(() => []);
     const candidatos = bd.filter(c => c.telefono).map(c => ({
-      id: c.id, nombre: c.nombre_completo, telefono: c.telefono, rutas: c.rutas || '', tipos_unidad: [], activo: true,
+      id: c.id, nombre: c.nombre_completo, telefono: c.telefono, rutas: c.rutas || '', unidades: c.unidades || '',
     }));
-    const { elegidos, omitidos } = rutasProveedor.filtrarPorRuta(candidatos, lead.origen, lead.destino);
-    const proveedoresReales = elegidos.map(p => ({ ...p, rutas: [] })); // ya filtrados por ruta arriba
-    const compatibles = vapi.filtrarProveedores(proveedoresReales, lead);
+    const { elegidos, omitidos } = rutasProveedor.filtrarPorRuta(candidatos, lead.origen, lead.destino, lead.tipo_unidad);
     if (omitidos.length) {
-      const sinRutas = omitidos.filter(o => o.motivo === 'sin rutas capturadas').length;
+      const cuenta = m => omitidos.filter(o => o.motivo === m).length;
+      const partes = [
+        cuenta('no maneja esa ruta') && `${cuenta('no maneja esa ruta')} no manejan esa ruta`,
+        cuenta('no maneja ese tipo de unidad') && `${cuenta('no maneja ese tipo de unidad')} no manejan ese tipo de unidad`,
+        cuenta('sin rutas capturadas') && `${cuenta('sin rutas capturadas')} sin rutas capturadas`,
+      ].filter(Boolean).join(', ');
       pushActividad({
         agente: 'SOFIA', tipo: 'FILTRO_RUTA',
-        mensaje: `Folio ${lead.folio || ''} (${lead.origen || '?'} → ${lead.destino || '?'}): se contactará a ${compatibles.length} de ${candidatos.length} proveedores — ${omitidos.length - sinRutas} no manejan esa ruta${sinRutas ? `, ${sinRutas} sin rutas capturadas` : ''}`,
+        mensaje: `Folio ${lead.folio || ''} (${lead.origen || '?'} → ${lead.destino || '?'}): ${elegidos.length} de ${candidatos.length} proveedores cubren el servicio — ${partes}`,
         metadata: { folio: lead.folio, omitidos: omitidos.map(o => `${o.p.nombre}: ${o.motivo}`) },
       });
     }
-    if (!compatibles.length) {
+    if (!elegidos.length) {
       console.warn(`[SOFIA] Sin proveedores con la ruta cubierta para folio ${lead.folio}`);
       pushActividad({
         agente: 'SOFIA', tipo: 'SIN_UNIDAD',
@@ -304,15 +314,12 @@ async function buscarUnidadParaOrden(lead) {
       }).catch(() => {});
       return;
     }
-    if (!agentPause.estaPausado('sofia')) {
-      pushActividad({ agente: 'SOFIA', tipo: 'CONTACTANDO_PROVEEDORES', mensaje: `SOFIA empezó a contactar ${compatibles.length} proveedor(es) para el folio ${lead.folio || ''} (${lead.origen || ''} → ${lead.destino || ''})`, metadata: { folio: lead.folio } });
-      sendPush({ title: '🚚 SOFIA está contactando proveedores', body: `Folio ${lead.folio || ''} · ${lead.origen || ''}→${lead.destino || ''} · ${compatibles.length} proveedor(es)`, tag: 'sofia-contactando', url: '/actividad.html', tipo: 'CONTACTANDO_PROVEEDORES' }).catch(() => {});
+    if (agentPause.estaPausado('sofia')) {
+      pushActividad({ agente: 'SOFIA', tipo: 'SIN_UNIDAD', mensaje: `Folio ${lead.folio || ''}: SOFIA está pausada — nadie fue contactado`, metadata: { folio: lead.folio } });
+      return;
     }
-    vapi.lanzarLlamadasProveedores(lead, proveedoresReales)
-      .then(r => pushActividad({ agente: 'SOFIA', tipo: 'VAPI_INICIADO', mensaje: `Folio ${lead.folio || ''} — ${r.llamadas} llamadas a carriers iniciadas`, metadata: { folio: lead.folio, ...r } }))
-      .catch(e => console.error('[Vapi] Error lanzando llamadas:', e.message));
-    whatsappProactivo.preguntarDisponibilidadATodos(compatibles, lead)
-      .catch(e => console.error('[whatsappProactivo] Error preguntando disponibilidad:', e.message));
+    // Ranking + escalera por olas + horario + seguimiento: ver sofiaOperacion.js
+    sofiaOperacion.iniciarBusqueda(lead, elegidos);
   } catch (e) {
     console.error('[SOFIA] Error buscando unidad real para folio', lead.folio, ':', e.message);
   }
@@ -607,6 +614,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
             _ultimoAvisoRespuesta.set(phone, Date.now());
             sendPush({ title: '💬 Un proveedor le contestó a SOFIA', body: `${quien}: "${corto(texto)}"`, tag: 'prov-respondio', url: '/actividad.html', tipo: 'PROVEEDOR_RESPONDIO' }).catch(() => {});
           }
+          sofiaOperacion.procesarSenales({ telefono: phone, nombre: conocido?.nombre_completo, respuesta });
           const rm = respuesta.match(/RESULTADO_CONTACTO:\s*(\{[^\n]+\})/);
           if (rm) {
             let r = {}; try { r = JSON.parse(rm[1]); } catch {}
@@ -1821,7 +1829,7 @@ app.get('/api/contactos/:id', adminUOps, async (req, res) => {
 // todavía una conversación real de por medio.
 app.post('/api/contactos', soloAdmin, async (req, res) => {
   try {
-    const { agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas, rutas } = req.body || {};
+    const { agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas, rutas, unidades } = req.body || {};
     if (!agente || !['sara', 'sofia', 'noa'].includes(agente.toLowerCase())) {
       return res.status(400).json({ error: 'agente requerido: sara, sofia o noa' });
     }
@@ -1830,7 +1838,7 @@ app.post('/api/contactos', soloAdmin, async (req, res) => {
       return res.status(400).json({ error: 'tipo requerido: cliente, proveedor u operador' });
     }
     const contacto = await contactos.upsertContacto({
-      agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas, rutas,
+      agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas, rutas, unidades,
       resumen_interaccion: 'Alta/edición manual desde Base de Datos', canal: 'manual',
     });
     res.json(contacto);
@@ -1846,6 +1854,52 @@ app.put('/api/contactos/:id/rutas', soloAdmin, async (req, res) => {
     res.json({ ok: true, rutas: c.rutas || null });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
+
+app.put('/api/contactos/:id/unidades', soloAdmin, async (req, res) => {
+  try {
+    const c = await contactos.actualizarUnidades(req.params.id, (req.body || {}).unidades);
+    if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
+    res.json({ ok: true, unidades: c.unidades || null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Colocaciones de SOFIA: ofertas, aprobación, ranking, sugerencias, KPIs ───
+app.get('/api/colocaciones', adminUOps, (req, res) => {
+  const lista = colocaciones.todas().sort((a, b) => new Date(b.creada) - new Date(a.creada)).slice(0, 100)
+    .map(c => ({ ...c, comparativo: colocaciones.comparativo(c) }));
+  res.json(lista);
+});
+app.post('/api/colocaciones/:folio/aprobar', soloAdmin, async (req, res) => {
+  try {
+    const { tel, manual, precio } = req.body || {};
+    const r = await sofiaOperacion.aprobar(req.params.folio, { tel, manual, precio: precio ? Number(precio) : undefined, aprobadoPor: req.user?.nombre || req.user?.email });
+    res.json(r);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+app.get('/api/proveedores/ranking', adminUOps, (req, res) => res.json(colocaciones.ranking()));
+app.get('/api/proveedores/:telefono/desempeno', adminUOps, (req, res) => res.json(colocaciones.estadisticas(req.params.telefono)));
+
+app.get('/api/sugerencias-proveedor', adminUOps, (req, res) => res.json(colocaciones.sugerencias(req.query.estado === 'todas' ? null : 'pendiente')));
+app.post('/api/sugerencias-proveedor/:id/resolver', soloAdmin, async (req, res) => {
+  try {
+    const s = colocaciones.sugerencias(null).find(x => x.id === req.params.id);
+    if (!s || s.estado !== 'pendiente') return res.status(404).json({ error: 'Sugerencia no encontrada o ya resuelta' });
+    if (req.body?.aprobar) {
+      const c = await contactos.buscarPorTelefono(s.telefono, 'sofia');
+      if (!c) return res.status(404).json({ error: 'No encuentro al proveedor en la Base de Datos' });
+      const lista = t => String(t || '').split(/[,;\n]+/).map(x => x.trim()).filter(Boolean);
+      const esta = (arr, v) => arr.some(x => x.toLowerCase() === v.toLowerCase());
+      if (s.tipo === 'ruta_agregar') { const a = lista(c.rutas); if (!esta(a, s.valor)) a.push(s.valor); await contactos.actualizarRutas(c.id, a.join(', ')); }
+      else if (s.tipo === 'ruta_quitar') await contactos.actualizarRutas(c.id, lista(c.rutas).filter(x => x.toLowerCase() !== s.valor.toLowerCase()).join(', '));
+      else if (s.tipo === 'unidad_agregar') { const a = lista(c.unidades); if (!esta(a, s.valor)) a.push(s.valor); await contactos.actualizarUnidades(c.id, a.join(', ')); }
+    }
+    colocaciones.resolverSugerencia(s.id, req.body?.aprobar ? 'aprobada' : 'descartada');
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/kpis/sofia', adminUOps, async (req, res) => { try { res.json(await kpisSofia.vista()); } catch (e) { res.status(500).json({ error: e.message }); } });
+app.post('/api/kpis/sofia/enviar', soloAdmin, async (req, res) => { try { res.json(await kpisSofia.enviar()); } catch (e) { res.status(500).json({ error: e.message }); } });
 
 // Lista de plantillas aprobadas por Meta que un agente tiene permitido usar —
 // única fuente de verdad, la misma que valida /api/contactos/:id/plantilla.
@@ -3303,7 +3357,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3315,6 +3369,9 @@ function limpiarControlParaCliente(texto) {
     .replace(/ALERTA_CRITICA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/ESTATUS_SEGUIMIENTO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/RESULTADO_CONTACTO:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/OFERTA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/ESTATUS_UNIDAD:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/SUGERENCIA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
     .trim();
@@ -3429,6 +3486,8 @@ app.listen(PORT, async () => {
   await monitoringControl.iniciar();
   noaScheduler.iniciar(pushActividad);
   sofiaScheduler.iniciar(pushActividad);
+  sofiaOperacion.iniciar({ sendPush });
+  kpisSofia.iniciar();
   tms.iniciarPrewarmNOA();
   setInterval(revisarLeadsSinRespuesta, 30 * 60 * 1000);
 });

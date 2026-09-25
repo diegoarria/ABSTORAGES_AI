@@ -95,14 +95,36 @@ function cubreRuta(rutasTexto, origen, destino) {
 }
 
 // Separa los proveedores en contactables (ruta cubierta) y omitidos, con motivo
-function filtrarPorRuta(proveedores, origen, destino) {
+function filtrarPorRuta(proveedores, origen, destino, tipoUnidad) {
   const elegidos = [], omitidos = [];
   for (const p of proveedores) {
     if (!String(p.rutas || '').trim()) { omitidos.push({ p, motivo: 'sin rutas capturadas' }); continue; }
     const r = cubreRuta(p.rutas, origen, destino);
-    if (r.ok) elegidos.push(p); else omitidos.push({ p, motivo: 'no maneja esa ruta' });
+    if (!r.ok) { omitidos.push({ p, motivo: 'no maneja esa ruta' }); continue; }
+    if (!cubreUnidad(p.unidades, tipoUnidad)) { omitidos.push({ p, motivo: 'no maneja ese tipo de unidad' }); continue; }
+    elegidos.push(p);
   }
   return { elegidos, omitidos };
 }
 
-module.exports = { cubreRuta, filtrarPorRuta, parsear };
+// ── Tipo de unidad ──────────────────────────────────────────────────────────
+const FAMILIAS_UNIDAD = {
+  seca: /seca|caja cerrada|dry/, refrigerada: /refriger|termo|reefer|frio/, plataforma: /plataforma|plana|flat/,
+  pipa: /pipa|cisterna|tanque/, tolva: /tolva|granel/, torton: /torton|rabon|3\.?5|camioneta|pickup/, cama_baja: /cama baja|low ?boy|lowboy/,
+  full: /full|doble remolque|doble articulado/,
+};
+function familias(texto) {
+  const t = norm(texto);
+  return new Set(Object.entries(FAMILIAS_UNIDAD).filter(([, re]) => re.test(t)).map(([k]) => k));
+}
+// Proveedor con unidades capturadas: debe manejar la que pide la orden. Sin
+// unidades capturadas, o una orden cuyo tipo no reconocemos, no se descarta
+// (la ruta ya es el filtro estricto).
+function cubreUnidad(unidadesTexto, tipoOrden) {
+  if (!String(unidadesTexto || '').trim()) return true;
+  const pedidas = familias(tipoOrden);
+  if (!pedidas.size) return true;
+  return hayInterseccion(familias(unidadesTexto), pedidas);
+}
+
+module.exports = { cubreRuta, cubreUnidad, filtrarPorRuta, parsear };

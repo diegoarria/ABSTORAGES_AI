@@ -433,4 +433,14 @@ async function notificarLlamada({ agente, nombre, telefono, resumen, transcript,
   if (!enviado) console.log(`[Notifier STUB] Llamada terminada — ${label} con ${nombre}`);
 }
 
-module.exports = { notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad };
+
+// KPIs diarios de SOFIA — Diego + Rafael. El texto respeta la estructura
+// acordada tal cual; el HTML solo lo pone en un bloque legible.
+async function notificarKPIsSofia({ asunto, texto }) {
+  const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;"><pre style="margin:0;font-family:inherit;font-size:15px;line-height:1.8;color:#111;white-space:pre-wrap;">${esc(texto)}</pre></div>`;
+  if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}\n${texto}`); return; }
+  await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, text: texto, html });
+  console.log(`[Gmail] ✅ KPIs de SOFIA enviados a ${ALERT_EMAILS.join(', ')}`);
+}
+
+module.exports = { notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad };

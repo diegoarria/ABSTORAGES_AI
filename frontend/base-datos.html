@@ -229,6 +229,11 @@ h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
       <input id="f-rutas" placeholder="Ej. MTY-GDL, MTY-CDMX, Bajío — o &quot;todas&quot;">
       <div style="font-size:11px;color:var(--m-t3);margin-top:4px;">SOFIA solo contacta automáticamente a proveedores con rutas capturadas.</div>
     </div>
+    <div class="frow" id="frow-unidades">
+      <label>Tipos de unidad / capacidad (solo proveedores)</label>
+      <input id="f-unidades" placeholder="Ej. caja seca 53, refrigerada, plataforma — 25 ton">
+      <div style="font-size:11px;color:var(--m-t3);margin-top:4px;">Opcional. Si lo capturas, SOFIA solo le pide unidades de estos tipos.</div>
+    </div>
     <div class="frow">
       <label>Notas</label>
       <textarea id="f-notas" placeholder="Opcional"></textarea>
@@ -392,7 +397,10 @@ async function renderDetail(){
       <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
       <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
     </div>
-    ${data.tipo === 'proveedor' ? `<div class="field" style="margin-bottom:14px;"><label>Rutas que maneja</label><div class="val">${data.rutas ? esc(data.rutas) : '⚠️ Sin rutas capturadas — SOFIA no lo contacta automáticamente'}</div><button class="act-btn" style="margin-top:8px;" onclick="editarRutas('${data.id}')">✏️ Editar rutas</button></div>` : ''}
+    ${data.tipo === 'proveedor' ? `<div class="field" style="margin-bottom:14px;"><label>Rutas que maneja</label><div class="val">${data.rutas ? esc(data.rutas) : '⚠️ Sin rutas capturadas — SOFIA no lo contacta automáticamente'}</div><button class="act-btn" style="margin-top:8px;" onclick="editarRutas('${data.id}')">✏️ Editar rutas</button></div>
+      <div class="field" style="margin-bottom:14px;"><label>Tipos de unidad / capacidad</label><div class="val">${data.unidades ? esc(data.unidades) : 'Sin capturar — no se filtra por tipo de unidad'}</div><button class="act-btn" style="margin-top:8px;" onclick="editarUnidades('${data.id}')">✏️ Editar unidades</button></div>
+      <div class="field" style="margin-bottom:14px;" id="desempeno-box"><label>Desempeño con SOFIA</label><div class="val">Cargando…</div></div>
+      <div id="sugerencias-box"></div>` : ''}
     ${data.notas ? `<div class="field" style="margin-bottom:14px;"><label>Notas</label><div class="val">${esc(data.notas)}</div></div>` : ''}
 
     <div class="actions">
@@ -423,6 +431,7 @@ async function renderDetail(){
       `).join('') : '<div class="empty-msg">Sin interacciones registradas.</div>'}
     </div>
   `;
+  if (data.tipo === 'proveedor') cargarDesempeno(data);
 }
 
 function togglePlantilla(){
@@ -515,8 +524,41 @@ function abrirModal(){
   document.getElementById('f-email').value = '';
   document.getElementById('f-notas').value = '';
   document.getElementById('f-rutas').value = '';
+  document.getElementById('f-unidades').value = '';
   document.getElementById('f-tipo').value = 'cliente';
   document.getElementById('overlay').classList.add('open');
+}
+async function cargarDesempeno(data){
+  try {
+    const st = await (await fetch('/api/proveedores/' + encodeURIComponent(data.telefono || 'x') + '/desempeno', { credentials:'include' })).json();
+    const box = document.getElementById('desempeno-box');
+    if (box) box.innerHTML = '<label>Desempeño con SOFIA</label><div class="val">' + (st.contactado
+      ? `Puntaje <b>${Math.round(st.puntaje*100)}</b>/100 · contactado ${st.contactado} vez/veces · respondió ${st.respondio}${st.medianaMin != null ? ' (tarda ~' + st.medianaMin + ' min)' : ''} · tuvo unidad ${st.acepto} · colocado ${st.colocado}${st.retraso ? ' · ' + st.retraso + ' retraso(s)' : ''}`
+      : 'Aún sin historial (arranca en 50/100).') + '</div>';
+    const sg = await (await fetch('/api/sugerencias-proveedor', { credentials:'include' })).json();
+    const mias = sg.filter(x => String(x.telefono).replace(/\D/g,'').slice(-10) === String(data.telefono||'').replace(/\D/g,'').slice(-10));
+    const sb = document.getElementById('sugerencias-box');
+    if (sb && mias.length) sb.innerHTML = '<div class="field" style="margin-bottom:14px;"><label>💡 Sugerencias del proveedor (pendientes)</label>' + mias.map(x =>
+      `<div class="val" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;">${{ruta_agregar:'Agregar ruta',ruta_quitar:'Quitar ruta',unidad_agregar:'Agregar unidad'}[x.tipo]}: <b>${esc(x.valor)}</b>
+       <button class="act-btn" onclick="resolverSugerencia('${x.id}',true)">✅ Aprobar</button><button class="act-btn" onclick="resolverSugerencia('${x.id}',false)">Descartar</button></div>`).join('') + '</div>';
+  } catch (e) { /* el desempeño es informativo — nunca rompe la ficha */ }
+}
+async function resolverSugerencia(id, aprobar){
+  try {
+    const r = await fetch('/api/sugerencias-proveedor/' + id + '/resolver', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ aprobar }) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    await cargarContactos(); renderDetail();
+  } catch (e) { alert('No se pudo: ' + e.message); }
+}
+async function editarUnidades(id){
+  const actual = (contactosCache.find(c => c.id === id) || {}).unidades || '';
+  const nuevo = prompt('Tipos de unidad / capacidad (ej. caja seca 53, refrigerada, plataforma — 25 ton). Vacío = sin filtro:', actual);
+  if (nuevo === null) return;
+  try {
+    const r = await fetch('/api/contactos/' + id + '/unidades', { method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ unidades: nuevo }) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    await cargarContactos(); selectContacto(id);
+  } catch (e) { alert('No se pudo guardar: ' + e.message); }
 }
 async function editarRutas(id){
   const actual = (contactosCache.find(c => c.id === id) || {}).rutas || '';
@@ -545,6 +587,7 @@ async function guardarContacto(){
     email: document.getElementById('f-email').value.trim(),
     notas: document.getElementById('f-notas').value.trim(),
     rutas: document.getElementById('f-rutas').value.trim(),
+    unidades: document.getElementById('f-unidades').value.trim(),
   };
   try {
     const r = await fetch('/api/contactos', {

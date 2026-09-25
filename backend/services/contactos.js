@@ -37,7 +37,7 @@ function normalizarTelefono(t) {
   return (t || '').replace(/\D/g, '').slice(-10);
 }
 
-function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas }) {
+function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas, unidades }) {
   const AGENTE = (agente || '').toUpperCase();
   const tel = normalizarTelefono(telefono);
   let existente = null;
@@ -56,6 +56,7 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
     existente.tipo            = tipo || existente.tipo;
     existente.notas           = notas || existente.notas;
     existente.rutas           = rutas || existente.rutas;
+    existente.unidades        = unidades || existente.unidades;
     existente.fecha_ultimo_contacto = ahora;
     contacto = existente;
   } else {
@@ -63,7 +64,7 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
       id: `CT-${Date.now().toString(36).toUpperCase()}`,
       agente_asignado: AGENTE, tipo: tipo || null,
       nombre_completo: nombre_completo || 'Sin nombre', puesto: puesto || null, telefono: telefono || null,
-      email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null, rutas: rutas || null,
+      email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null, rutas: rutas || null, unidades: unidades || null,
       fecha_primer_contacto: ahora, fecha_ultimo_contacto: ahora, created_at: ahora,
     };
     cache.push(contacto);
@@ -94,19 +95,22 @@ async function upsertContacto(datos) {
 }
 
 // Edita solo las rutas de un proveedor (permite vaciarlas, cosa que el upsert no hace)
-async function actualizarRutas(id, rutas) {
-  const valor = String(rutas || '').trim().slice(0, 500) || null;
+async function actualizarCampoProveedor(id, campo, texto) {
+  if (!['rutas', 'unidades'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
+  const valor = String(texto || '').trim().slice(0, 500) || null;
   if (USA_DB) {
     try {
-      const { rows } = await db.query('UPDATE contactos SET rutas = $1 WHERE id = $2 RETURNING *', [valor, id]);
+      const { rows } = await db.query(`UPDATE contactos SET ${campo} = $1 WHERE id = $2 RETURNING *`, [valor, id]);
       return rows[0] || null;
-    } catch (e) { console.error('[Contactos] Postgres falló actualizando rutas, cae a archivo:', e.message); }
+    } catch (e) { console.error(`[Contactos] Postgres falló actualizando ${campo}, cae a archivo:`, e.message); }
   }
   const c = cache.find(x => x.id === id);
   if (!c) return null;
-  c.rutas = valor; guardarDisco();
+  c[campo] = valor; guardarDisco();
   return c;
 }
+const actualizarRutas = (id, t) => actualizarCampoProveedor(id, 'rutas', t);
+const actualizarUnidades = (id, t) => actualizarCampoProveedor(id, 'unidades', t);
 
 async function listarPorAgente(agente, opts = {}) {
   if (USA_DB) {
@@ -225,4 +229,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes();
 
-module.exports = { actualizarRutas, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
+module.exports = { actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };

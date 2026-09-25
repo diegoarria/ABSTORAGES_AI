@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Colocaciones — ABSTORAGES</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#04080f">
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/design-system.css">
+<style>
+:root { --m-bg:var(--ink-950); --m-s1:var(--ink-900); --m-s2:var(--ink-800); --m-s3:var(--ink-700); --m-acc:var(--brand-blue); --m-grn:var(--brand-green); --m-amb:var(--warn); --m-red:var(--critical); --m-t1:var(--text-100); --m-t2:var(--text-300); --m-t3:var(--text-500); --m-b1:var(--line); }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--m-bg); color:var(--m-t1); font-family:var(--font-sans); min-height:100vh; }
+.hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--m-s1); border-bottom:1px solid var(--m-b1); position:sticky; top:0; z-index:50; }
+.hdr-logo { font-weight:800; font-size:15px; display:flex; align-items:center; gap:8px; }
+.hdr-logo span { color:var(--m-acc); }
+.hdr-nav { display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; }
+.hn { background:none; border:none; color:var(--m-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; }
+.hn:hover, .hn.on { background:rgba(47,111,237,.12); color:var(--m-acc); }
+.wrap { max-width:980px; margin:0 auto; padding:22px 24px 60px; }
+.top { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+h1 { font-size:20px; font-weight:800; }
+.live { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--m-t2); }
+.dot { width:9px; height:9px; border-radius:50%; background:var(--m-t3); }
+.dot.on { background:var(--m-grn); box-shadow:0 0 0 0 rgba(14,169,104,.6); animation:pulse 1.8s infinite; }
+@keyframes pulse { 70% { box-shadow:0 0 0 8px rgba(14,169,104,0); } 100% { box-shadow:0 0 0 0 rgba(14,169,104,0); } }
+@media (prefers-reduced-motion:reduce) { .dot.on { animation:none; } }
+.controls { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.chip { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:8px 13px; color:var(--m-t3); font-size:12px; font-weight:700; cursor:pointer; }
+.chip.on { color:var(--m-t1); border-color:rgba(255,255,255,.2); background:var(--m-s3); }
+.chip.sep { margin-left:auto; }
+.feed { display:flex; flex-direction:column; gap:6px; }
+.ev { display:grid; grid-template-columns:58px 74px 1fr; gap:12px; align-items:start; background:var(--m-s1); border:1px solid var(--m-b1); border-left:3px solid var(--m-b1); border-radius:0 10px 10px 0; padding:10px 13px; }
+.ev.hito { background:var(--m-s2); }
+.ev .t { font-family:var(--font-mono); font-size:11px; color:var(--m-t3); padding-top:2px; }
+.badge { font-size:10.5px; font-weight:800; letter-spacing:.05em; padding:3px 8px; border-radius:5px; text-align:center; text-transform:uppercase; }
+.ag-SARA { background:rgba(14,169,104,.15); color:var(--m-grn); } .ev.ag-SARA { border-left-color:var(--m-grn); }
+.ag-SOFIA { background:rgba(47,111,237,.15); color:var(--m-acc); } .ev.ag-SOFIA { border-left-color:var(--m-acc); }
+.ag-NOA { background:rgba(240,169,59,.15); color:var(--m-amb); } .ev.ag-NOA { border-left-color:var(--m-amb); }
+.ag-OTRO { background:rgba(255,255,255,.08); color:var(--m-t2); }
+.ev .msg { font-size:13px; line-height:1.5; word-break:break-word; }
+.ev .tipo { display:block; font-size:10.5px; color:var(--m-t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px; font-weight:700; }
+.vacio { padding:30px 12px; text-align:center; color:var(--m-t3); font-size:13px; border:1px dashed var(--m-b1); border-radius:10px; }
+@media (max-width:600px) { .ev { grid-template-columns:1fr; gap:4px; } .ev .t { order:3; } }
+.card { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:12px; padding:16px; margin-bottom:12px; }
+.card h3 { font-size:15px; font-weight:800; }
+.sub { font-size:12px; color:var(--m-t3); margin-top:2px; }
+.tag { display:inline-block; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:5px; text-transform:uppercase; letter-spacing:.05em; }
+.t-buscando { background:rgba(47,111,237,.15); color:var(--m-acc); } .t-colocado { background:rgba(14,169,104,.15); color:var(--m-grn); } .t-sin_unidad { background:rgba(240,90,90,.15); color:var(--m-red); }
+table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12.5px; }
+th { text-align:left; color:var(--m-t3); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; padding:6px 8px; }
+td { padding:8px; border-top:1px solid var(--m-b1); vertical-align:top; }
+tr.rec td { background:rgba(14,169,104,.08); }
+.btn { background:var(--m-acc); color:#fff; border:none; border-radius:8px; padding:7px 13px; font-weight:700; font-size:12px; cursor:pointer; }
+.btn.sec { background:var(--m-s3); color:var(--m-t1); }
+.kpi { white-space:pre-wrap; font-family:var(--font-mono); font-size:13px; line-height:1.7; background:var(--m-s2); border-radius:10px; padding:14px; margin-top:8px; }
+.tabla-wrap { overflow-x:auto; }
+input.man { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:7px 10px; color:var(--m-t1); font-size:12px; }
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-logo">🚚 <span>Coloca</span>ciones</div>
+  <nav class="hdr-nav">
+    <button class="hn" onclick="location.href='/'">Portal</button>
+    <button class="hn" onclick="location.href='/actividad.html'">En vivo</button>
+    <button class="hn on">Colocaciones</button>
+    <button class="hn" onclick="location.href='/historial.html'">Historial</button>
+    <button class="hn" onclick="location.href='/base-datos.html'">Base de Datos</button>
+    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Colocaciones de SOFIA</h1>
+      <div class="sub">Ofertas por servicio, recomendación y aprobación. SOFIA no asigna sola — tú decides.</div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="chip on" data-f="buscando">En búsqueda</button>
+    <button class="chip" data-f="colocado">Colocados</button>
+    <button class="chip" data-f="sin_unidad">Sin unidad</button>
+    <button class="chip" data-f="ranking">🏆 Ranking de proveedores</button>
+    <button class="chip" data-f="kpis">📊 KPIs</button>
+  </div>
+  <div id="cont"><div class="vacio">Cargando…</div></div>
+</div>
+<script>
+let filtro = 'buscando', datos = [];
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const $ = n => '$' + Number(n).toLocaleString('es-MX');
+const hora = iso => iso ? new Date(iso).toLocaleString('es-MX', { dateStyle:'short', timeStyle:'short' }) : '—';
+const ESTADO = { esperando:'⏳ esperando', respondio:'💬 respondió', acepto:'✅ tiene unidad', rechazo:'✖️ no tiene', sin_respuesta:'🔇 sin respuesta' };
+const SEG = { pendiente:'por preguntar', consultado:'preguntado, esperando', salio:'🚚 salió', en_ruta:'🛣️ en ruta', entregado:'✅ entregado', retraso:'⚠️ retraso', sin_confirmacion:'⚠️ sin confirmar' };
+
+async function api(url, opt) { const r = await fetch(url, { credentials:'include', ...opt }); const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status)); return d; }
+
+function tarjeta(c) {
+  const provs = Object.values(c.proveedores || {});
+  const comp = c.comparativo || [];
+  const ofertas = comp.length ? `<table><tr><th>Proveedor</th><th>Precio</th><th>Unidad</th><th>Historial</th><th></th></tr>${comp.map(f => `
+    <tr class="${f.recomendado ? 'rec' : ''}"><td><b>${esc(f.nombre)}</b>${f.recomendado ? ' <span class="tag t-colocado">recomendado</span>' : ''}${f.notas ? `<div class="sub">${esc(f.notas)}</div>` : ''}</td>
+    <td>${f.precio ? $(f.precio) : 'sin precio'}</td><td>${esc(f.unidad || '—')}</td>
+    <td>${f.colocado} servicio(s)${f.medianaMin != null ? ` · responde en ~${f.medianaMin} min` : ''}${f.retraso ? ` · ${f.retraso} retraso(s)` : ''}</td>
+    <td>${c.estado === 'buscando' ? `<button class="btn" onclick="aprobar('${esc(c.folio)}','${esc(f.tel)}','${esc(f.nombre)}',${f.precio || 0})">Aprobar y cerrar</button>` : ''}</td></tr>`).join('')}</table>` : '';
+  const contactados = provs.length ? `<div class="sub" style="margin-top:10px;">Contactados: ${provs.map(p => `${esc(p.nombre)} (${ESTADO[p.estado] || p.estado}, ola ${p.ola})`).join(' · ')}</div>` : '';
+  const pend = (c.pendientes || []).length ? `<div class="sub">En espera de siguiente ola: ${c.pendientes.map(p => esc(p.nombre)).join(', ')}</div>` : '';
+  const ganador = c.ganador ? `<div style="margin-top:10px;font-size:13px;">✅ <b>${esc(c.ganador.nombre)}</b>${c.ganador.precio ? ' a ' + $(c.ganador.precio) : ''} · aprobó ${esc(c.ganador.aprobadoPor || '—')} · ${hora(c.colocadoEn)}<div class="sub">Unidad: ${SEG[c.seguimiento?.estado] || '—'}${c.seguimiento?.detalle ? ' — ' + esc(c.seguimiento.detalle) : ''}</div></div>` : '';
+  const manual = c.estado === 'buscando' ? `<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;"><input class="man" id="m-${esc(c.folio)}" placeholder="Colocar con otro proveedor (nombre)"><button class="btn sec" onclick="manual('${esc(c.folio)}')">Colocar manualmente</button></div>` : '';
+  return `<div class="card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;"><div><h3>${esc(c.folio)} · ${esc(c.origen)} → ${esc(c.destino)}</h3><div class="sub">${esc(c.empresa || '')} · ${esc(c.tipo_unidad || 'unidad por definir')} · creada ${hora(c.creada)}${c.urgente ? ' · 🔥 urgente' : ''}</div></div><span class="tag t-${c.estado}">${c.estado.replace('_',' ')}</span></div>${ofertas}${contactados}${pend}${ganador}${manual}</div>`;
+}
+
+async function render() {
+  const cont = document.getElementById('cont');
+  try {
+    if (filtro === 'ranking') {
+      const r = await api('/api/proveedores/ranking');
+      cont.innerHTML = r.length ? `<div class="card tabla-wrap"><table><tr><th>#</th><th>Proveedor</th><th>Puntaje</th><th>Contactado</th><th>Respondió</th><th>Tiempo típico</th><th>Aceptó</th><th>Colocado</th><th>Retrasos</th></tr>${r.map((p, i) => `<tr><td>${i+1}</td><td><b>${esc(p.nombre)}</b></td><td>${(p.puntaje*100).toFixed(0)}</td><td>${p.contactado}</td><td>${p.respondio}</td><td>${p.medianaMin != null ? p.medianaMin + ' min' : '—'}</td><td>${p.acepto}</td><td>${p.colocado}</td><td>${p.retraso}</td></tr>`).join('')}</table><div class="sub" style="margin-top:10px;">Puntaje 0–100: 40% respuesta, 20% rapidez, 20% aceptación, 20% cumplimiento. Un proveedor sin historial arranca en 50.</div></div>` : '<div class="vacio">Aún no hay historial de proveedores.</div>';
+      return;
+    }
+    if (filtro === 'kpis') {
+      const k = await api('/api/kpis/sofia');
+      cont.innerHTML = `<div class="card"><h3>KPIs de hoy</h3><div class="kpi">${esc(k.texto)}</div><div style="margin-top:12px;"><button class="btn" onclick="enviarKpis()">Enviar por email ahora (Diego y Rafael)</button></div><div class="sub" style="margin-top:8px;">Se envían solos todos los días a las 19:00.</div></div>`;
+      return;
+    }
+    datos = await api('/api/colocaciones');
+    const lista = datos.filter(c => c.estado === filtro);
+    cont.innerHTML = lista.length ? lista.map(tarjeta).join('') : '<div class="vacio">Nada por aquí por ahora.</div>';
+  } catch (e) { cont.innerHTML = `<div class="vacio">No se pudo cargar: ${esc(e.message)}</div>`; }
+}
+async function aprobar(folio, tel, nombre, precio) {
+  if (!confirm(`¿Colocar el folio ${folio} con ${nombre}${precio ? ' a ' + $(precio) : ''}? SOFIA le avisará por plantilla aprobada.`)) return;
+  try { const r = await api('/api/colocaciones/' + encodeURIComponent(folio) + '/aprobar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ tel }) }); alert(r.mensajeAlGanador ? 'Listo. Se le avisó al proveedor.' : 'Listo. (No se pudo mandar el aviso al proveedor — avísale tú.)'); render(); }
+  catch (e) { alert('No se pudo: ' + e.message); }
+}
+async function manual(folio) {
+  const nombre = document.getElementById('m-' + folio).value.trim();
+  if (!nombre) return alert('Escribe el nombre del proveedor');
+  if (!confirm(`¿Marcar el folio ${folio} como colocado con ${nombre}? (No se le manda ningún mensaje.)`)) return;
+  try { await api('/api/colocaciones/' + encodeURIComponent(folio) + '/aprobar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ manual: nombre }) }); render(); }
+  catch (e) { alert('No se pudo: ' + e.message); }
+}
+async function enviarKpis() {
+  if (!confirm('¿Enviar los KPIs de hoy por email a Diego y Rafael?')) return;
+  try { await api('/api/kpis/sofia/enviar', { method:'POST' }); alert('Enviado.'); } catch (e) { alert('No se pudo: ' + e.message); }
+}
+document.querySelectorAll('.chip[data-f]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.chip[data-f]').forEach(x => x.classList.remove('on')); b.classList.add('on'); filtro = b.dataset.f; render();
+}));
+render(); setInterval(() => { if (filtro !== 'kpis') render(); }, 20000);
+</script>
+</body>
+</html>

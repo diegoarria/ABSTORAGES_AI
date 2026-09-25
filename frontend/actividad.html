@@ -54,6 +54,7 @@ h1 { font-size:20px; font-weight:800; }
   <nav class="hdr-nav">
     <button class="hn" onclick="location.href='/'">Portal</button>
     <button class="hn on">En vivo</button>
+    <button class="hn" onclick="location.href='/colocaciones.html'">Colocaciones</button>
     <button class="hn" onclick="location.href='/historial.html'">Historial</button>
     <button class="hn" onclick="location.href='/base-datos.html'">Base de Datos</button>
     <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
@@ -81,9 +82,9 @@ h1 { font-size:20px; font-weight:800; }
 </div>
 
 <script>
-const HITOS = new Set(['NUEVA_ORDEN','CONTACTANDO_PROVEEDORES','RESULTADO_CONTACTO','PROVEEDOR_GANADOR','SIN_UNIDAD','FILTRO_RUTA','ALERTA_CRITICA','ALERTA_INTENTO_ATAQUE','ALERTA_FUGA_PROMPT','ALERTA_ABUSO','LLAMADA_TERMINADA']);
+const HITOS = new Set(['NUEVA_ORDEN','CONTACTANDO_PROVEEDORES','RESULTADO_CONTACTO','PROVEEDOR_GANADOR','SIN_UNIDAD','FILTRO_RUTA','OFERTA','EN_ESPERA_HORARIO','SEGUIMIENTO_UNIDAD','SUGERENCIA','ALERTA_CRITICA','ALERTA_INTENTO_ATAQUE','ALERTA_FUGA_PROMPT','ALERTA_ABUSO','LLAMADA_TERMINADA']);
 const ETIQUETA = {
-  CONTACTO_SALIENTE:'Contacto saliente', CONVERSACION_WA:'Conversación', CONTACTANDO_PROVEEDORES:'Búsqueda de unidad', FILTRO_RUTA:'Filtro por ruta',
+  CONTACTO_SALIENTE:'Contacto saliente', CONVERSACION_WA:'Conversación', CONTACTANDO_PROVEEDORES:'Búsqueda de unidad', FILTRO_RUTA:'Filtro por ruta', OFERTA:'Oferta', EN_ESPERA_HORARIO:'En espera de horario', SEGUIMIENTO_UNIDAD:'Seguimiento de unidad', SUGERENCIA:'Sugerencia', RECORDATORIO:'Recordatorio', SIN_RESPUESTA:'Sin respuesta',
   RESULTADO_CONTACTO:'Resultado', NUEVA_ORDEN:'Nueva orden', PROVEEDOR_GANADOR:'Proveedor asignado', SIN_UNIDAD:'Sin unidad',
   LLAMADA_TERMINADA:'Llamada terminada', LLAMADA_VIVO:'Llamada en curso', VAPI_INICIADO:'Llamadas iniciadas', VAPI_RESULTADO:'Resultado de llamada',
   DISPONIBILIDAD_DIARIA:'Ronda de disponibilidad', ALERTA_CRITICA:'Alerta crítica', MENSAJE_USUARIO:'Mensaje', MENSAJE_SARA:'Respuesta', MENSAJE_SOFIA:'Respuesta', MENSAJE_NOA:'Respuesta',
