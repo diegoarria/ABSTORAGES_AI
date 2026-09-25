@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/design-system.css"/>
+  <link rel="stylesheet" href="/css/shell.css"/>
+  <script src="/js/shell.js"></script>
   <style>
     /* ── TOKENS ── alias hacia design-system.css ─────────────── */
     :root {
@@ -583,9 +585,13 @@
     .wr-icon.running { background: var(--b18); border: 1px solid var(--b); color: var(--b); animation: wrSpin .8s linear infinite; }
     .wr-icon.done    { background: rgba(14,169,104,.12); border: 1px solid var(--g30); color: var(--g); }
     @keyframes wrSpin { to { transform: rotate(360deg); } }
+  
+    /* ── Corporativo: barra global arriba; el header del simulador queda como subbarra ── */
+    [data-theme="light"] { --g18:rgba(11,125,87,.16); --g30:rgba(11,125,87,.30); --b18:rgba(31,95,209,.16); --br3:rgba(15,23,42,.18); }
+    .header .h-brand, .header .h-sep { display:none !important; }
   </style>
 </head>
-<body>
+<body data-shell-title="AI Simulator">
 
 <!-- ╔═══════ HEADER ═══════╗ -->
 <header class="header">
@@ -622,11 +628,11 @@
 <!-- ╔═══════ SCENARIOS ═══════╗ -->
 <div class="scenarios">
   <span class="sc-label">Escenarios</span>
-  <button class="sc-btn" data-scenario="1"><span class="sc-ico">🚛</span> Cliente nuevo CDMX→MTY</button>
-  <button class="sc-btn" data-scenario="2"><span class="sc-ico">⚡</span> Cotización urgente 24h</button>
-  <button class="sc-btn" data-scenario="3"><span class="sc-ico">🔍</span> Buscar transportista</button>
-  <button class="sc-btn" data-scenario="4"><span class="sc-ico">⚠️</span> Alerta GPS en ruta</button>
-  <button class="sc-btn" data-scenario="5"><span class="sc-ico">🔄</span> Recuperar cliente inactivo</button>
+  <button class="sc-btn" data-scenario="1"><span class="sc-ico"></span> Cliente nuevo CDMX→MTY</button>
+  <button class="sc-btn" data-scenario="2"><span class="sc-ico"></span> Cotización urgente 24h</button>
+  <button class="sc-btn" data-scenario="3"><span class="sc-ico"></span> Buscar transportista</button>
+  <button class="sc-btn" data-scenario="4"><span class="sc-ico"></span> Alerta GPS en ruta</button>
+  <button class="sc-btn" data-scenario="5"><span class="sc-ico"></span> Recuperar cliente inactivo</button>
   <button class="sc-reset" id="btn-reset">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>

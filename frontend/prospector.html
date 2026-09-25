@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -153,18 +153,10 @@ body { background: var(--pr-bg); color: var(--pr-t1); font-family: var(--font-sa
   .prospects-grid { grid-template-columns:1fr; }
 }
 </style>
+<link rel="stylesheet" href="/css/shell.css">
+<script src="/js/shell.js"></script>
 </head>
-<body>
-
-<header class="hdr">
-  <div class="hdr-logo">🚛 <span>SARA</span> Prospector</div>
-  <nav class="hdr-nav">
-    <button class="hn" onclick="location.href='/'">Portal</button>
-    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
-    <button class="hn" onclick="location.href='/historial.html'">Historial</button>
-    <button class="hn" onclick="location.href='/memoria-agentes.html'">Memoria</button>
-  </nav>
-</header>
+<body data-shell-title="SARA Prospector">
 
 <div class="wrap">
 
@@ -225,7 +217,7 @@ Director de Supply Chain</textarea>
         </select>
       </div>
 
-      <button class="btn-buscar" id="btn-buscar" onclick="buscar()">🔍 Buscar en Apollo + Lusha</button>
+      <button class="btn-buscar" id="btn-buscar" onclick="buscar()">Buscar en Apollo + Lusha</button>
       <div id="creditos" style="font-size:11px;color:var(--pr-t3);text-align:center"></div>
     </div>
 
@@ -243,20 +235,20 @@ Director de Supply Chain</textarea>
     <div class="bulk-bar" id="bulk-bar">
       <span class="bulk-txt" id="bulk-txt">0 seleccionados</span>
       <button class="btn-iniciar" onclick="iniciarSecuencia()">▶ Iniciar secuencia con seleccionados</button>
-      <button class="btn-sm-acc" onclick="deseleccionarTodo()">✕ Cancelar</button>
+      <button class="btn-sm-acc" onclick="deseleccionarTodo()">Cancelar</button>
     </div>
 
     <!-- Tabs -->
     <div class="pipe-tabs">
-      <button class="ptab on" data-tab="busqueda" onclick="switchTab('busqueda')">🔍 Resultados</button>
-      <button class="ptab" data-tab="secuencia" onclick="switchTab('secuencia')">⚡ En secuencia</button>
-      <button class="ptab" data-tab="respondieron" onclick="switchTab('respondieron')">💬 Respondieron</button>
-      <button class="ptab" data-tab="citas" onclick="switchTab('citas')">📅 Citas</button>
+      <button class="ptab on" data-tab="busqueda" onclick="switchTab('busqueda')">Resultados</button>
+      <button class="ptab" data-tab="secuencia" onclick="switchTab('secuencia')">En secuencia</button>
+      <button class="ptab" data-tab="respondieron" onclick="switchTab('respondieron')">Respondieron</button>
+      <button class="ptab" data-tab="citas" onclick="switchTab('citas')">Citas</button>
     </div>
 
     <div id="content-area">
       <div class="empty">
-        <div class="empty-icon">🎯</div>
+        <div class="empty-icon"></div>
         <h3>Busca prospectos para empezar</h3>
         <p>SARA buscará en Apollo.io y Lusha los contactos más relevantes para ABSTORAGES.</p>
       </div>

@@ -1,0 +1,39 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ABSTORAGES — SHELL CORPORATIVO (barra de aplicación compartida)
+   Se pinta desde js/shell.js. Usa los tokens de design-system.css.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root { --appbar-bg:#0B2A5B; --appbar-tx:#EAF0FB; --appbar-mute:#9DB3D6; --focus-ring:0 0 0 3px rgba(31,95,209,.28); }
+:root[data-theme="dark"] { --appbar-bg:#08111F; --appbar-tx:#E8EEF7; --appbar-mute:#7C8BA3; --focus-ring:0 0 0 3px rgba(91,147,255,.35); }
+body.has-shell { -webkit-font-smoothing:antialiased; }
+.abs-appbar { background:var(--appbar-bg); color:var(--appbar-tx); position:sticky; top:0; z-index:200; border-bottom:1px solid rgba(255,255,255,.06); font-family:var(--font-sans); }
+.abs-appbar-in { max-width:1600px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:22px; }
+.abs-brand { display:flex; align-items:center; gap:11px; text-decoration:none; color:inherit; flex-shrink:0; }
+.abs-mark { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,#2F6FED,#0EA968); display:grid; place-items:center; font-weight:800; font-size:13px; color:#fff; letter-spacing:-.02em; }
+.abs-name { font-weight:800; font-size:15px; letter-spacing:.06em; }
+.abs-sep { width:1px; height:22px; background:rgba(255,255,255,.18); }
+.abs-sub { font-size:13px; color:var(--appbar-mute); font-weight:500; white-space:nowrap; }
+.abs-nav { display:flex; gap:2px; margin-left:auto; align-items:center; overflow-x:auto; scrollbar-width:none; }
+.abs-nav::-webkit-scrollbar { display:none; }
+.abs-nav a, .abs-nav button { background:none; border:none; color:var(--appbar-mute); font-family:inherit; font-size:13px; font-weight:500; padding:8px 12px; border-radius:7px; cursor:pointer; text-decoration:none; white-space:nowrap; transition:background .15s,color .15s; }
+.abs-nav a:hover, .abs-nav button:hover { color:var(--appbar-tx); background:rgba(255,255,255,.07); }
+.abs-nav a.on { color:#fff; background:rgba(255,255,255,.13); }
+.abs-nav a:focus-visible, .abs-nav button:focus-visible { outline:none; box-shadow:var(--focus-ring); }
+.abs-theme { width:36px; height:36px; display:grid !important; place-items:center; padding:0 !important; margin-left:6px; flex-shrink:0; }
+.abs-theme svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+@media (max-width:820px) { .abs-appbar-in { padding:0 14px; gap:12px; } .abs-sep, .abs-sub { display:none; } }
+
+/* ── Portal (index.html): su barra propia toma el mismo look corporativo ── */
+:root[data-theme] .portal-header { background:var(--appbar-bg) !important; border-bottom:1px solid rgba(255,255,255,.06) !important; height:60px; padding:0 28px; gap:22px; backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:none; }
+:root[data-theme] .portal-header .header-logo { height:30px; padding:3px 9px; border-radius:7px; box-shadow:none; }
+:root[data-theme] .portal-header .header-nav-links { gap:2px; overflow-x:auto; scrollbar-width:none; }
+:root[data-theme] .portal-header .header-nav-links::-webkit-scrollbar { display:none; }
+:root[data-theme] .portal-header .btn-portal { background:none; border:none; color:var(--appbar-mute); font-size:13px; font-weight:500; padding:8px 12px; border-radius:7px; letter-spacing:0; transform:none; box-shadow:none; }
+:root[data-theme] .portal-header .btn-portal:hover { color:var(--appbar-tx); background:rgba(255,255,255,.08); transform:none; box-shadow:none; }
+:root[data-theme] .portal-header .btn-portal.admin-only { border:1px solid rgba(255,255,255,.22); color:var(--appbar-tx); }
+:root[data-theme] .portal-header #btn-emergencia { background:#B42323 !important; color:#fff !important; border:1px solid #D33 !important; font-weight:600; }
+:root[data-theme] .portal-header .theme-toggle { background:transparent; border:1px solid rgba(255,255,255,.2); color:var(--appbar-tx); border-radius:8px; }
+:root[data-theme] .portal-header .theme-toggle:hover { background:rgba(255,255,255,.1); color:#fff; transform:none; }
+:root[data-theme] .portal-header .header-user-section { border-left-color:rgba(255,255,255,.16); color:var(--appbar-mute); }
+:root[data-theme] .portal-header .header-status, :root[data-theme] .portal-header .header-user-section * { color:var(--appbar-mute); }
+:root[data-theme] .portal-header .btn-logout { background:transparent !important; border:1px solid rgba(255,255,255,.2) !important; color:var(--appbar-mute) !important; border-radius:8px; }
+:root[data-theme] .portal-header .btn-logout:hover { background:rgba(255,255,255,.1) !important; color:#fff !important; }

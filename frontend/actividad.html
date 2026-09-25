@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -47,20 +47,10 @@ h1 { font-size:20px; font-weight:800; }
 .vacio { padding:30px 12px; text-align:center; color:var(--m-t3); font-size:13px; border:1px dashed var(--m-b1); border-radius:10px; }
 @media (max-width:600px) { .ev { grid-template-columns:1fr; gap:4px; } .ev .t { order:3; } }
 </style>
+<link rel="stylesheet" href="/css/shell.css">
+<script src="/js/shell.js"></script>
 </head>
-<body>
-<header class="hdr">
-  <div class="hdr-logo">📡 <span>En</span> vivo</div>
-  <nav class="hdr-nav">
-    <button class="hn" onclick="location.href='/'">Portal</button>
-    <button class="hn on">En vivo</button>
-    <button class="hn" onclick="location.href='/colocaciones.html'">Colocaciones</button>
-    <button class="hn" onclick="location.href='/historial.html'">Historial</button>
-    <button class="hn" onclick="location.href='/base-datos.html'">Base de Datos</button>
-    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
-  </nav>
-</header>
-
+<body data-shell-title="Actividad en vivo">
 <div class="wrap">
   <div class="top">
     <div>

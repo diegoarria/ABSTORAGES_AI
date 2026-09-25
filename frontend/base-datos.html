@@ -12,7 +12,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/design-system.css">
-<script>try{var t=localStorage.getItem('abs-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 <style>
 :root, :root[data-theme="light"] {
   --bg:#F3F5F9; --surface:#FFFFFF; --surface-2:#F8FAFC; --surface-3:#EEF2F7;
@@ -241,24 +240,10 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
 }
 @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
 </style>
+<link rel="stylesheet" href="/css/shell.css">
+<script src="/js/shell.js"></script>
 </head>
-<body>
-
-<header class="appbar">
-  <div class="appbar-in">
-    <a class="brand" href="/"><span class="brand-mark">AB</span><span class="brand-name">ABSTORAGES</span></a>
-    <span class="brand-sep"></span><span class="brand-sub">Base de Datos</span>
-    <nav class="appnav">
-      <button onclick="location.href='/'">Portal</button>
-      <button onclick="location.href='/actividad.html'">En vivo</button>
-      <button onclick="location.href='/colocaciones.html'">Colocaciones</button>
-      <button onclick="location.href='/memoria-agentes.html'">Memoria</button>
-      <button class="on">Base de Datos</button>
-      <button onclick="location.href='/ops-center.html'">Ops Center</button>
-      <button class="theme-btn" id="themeBtn" onclick="cambiarTema()" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema"></button>
-    </nav>
-  </div>
-</header>
+<body data-shell-title="Base de Datos">
 
 <main class="page">
   <div class="crumbs"><a href="/">Portal</a><span>/</span><span>Base de Datos</span></div>
@@ -370,19 +355,8 @@ const IC = {
 };
 function ico(n){ return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
 
-function pintarTema(){
-  const oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.getElementById('themeBtn').innerHTML = ico(oscuro ? 'sun' : 'moon');
-}
-function cambiarTema(){
-  const nuevo = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', nuevo);
-  try { localStorage.setItem('abs-theme', nuevo); } catch (e) {}
-  pintarTema();
-}
 document.getElementById('btnNuevo').innerHTML = ico('plus') + ' Nuevo contacto';
 document.getElementById('searchIco').innerHTML = ico('search');
-pintarTema();
 
 const AGENTES = {
   SARA:  { role: "Ventas · Clientes",                              color: "var(--sara)",  soft: "var(--sara-soft)" },

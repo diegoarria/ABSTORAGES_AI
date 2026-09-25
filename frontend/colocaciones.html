@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -61,20 +61,10 @@ tr.rec td { background:rgba(14,169,104,.08); }
 .tabla-wrap { overflow-x:auto; }
 input.man { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:7px 10px; color:var(--m-t1); font-size:12px; }
 </style>
+<link rel="stylesheet" href="/css/shell.css">
+<script src="/js/shell.js"></script>
 </head>
-<body>
-<header class="hdr">
-  <div class="hdr-logo">🚚 <span>Coloca</span>ciones</div>
-  <nav class="hdr-nav">
-    <button class="hn" onclick="location.href='/'">Portal</button>
-    <button class="hn" onclick="location.href='/actividad.html'">En vivo</button>
-    <button class="hn on">Colocaciones</button>
-    <button class="hn" onclick="location.href='/historial.html'">Historial</button>
-    <button class="hn" onclick="location.href='/base-datos.html'">Base de Datos</button>
-    <button class="hn" onclick="location.href='/ops-center.html'">Ops Center</button>
-  </nav>
-</header>
-
+<body data-shell-title="Colocaciones de SOFIA">
 <div class="wrap">
   <div class="top">
     <div>
@@ -86,8 +76,8 @@ input.man { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:
     <button class="chip on" data-f="buscando">En búsqueda</button>
     <button class="chip" data-f="colocado">Colocados</button>
     <button class="chip" data-f="sin_unidad">Sin unidad</button>
-    <button class="chip" data-f="ranking">🏆 Ranking de proveedores</button>
-    <button class="chip" data-f="kpis">📊 KPIs</button>
+    <button class="chip" data-f="ranking">Ranking de proveedores</button>
+    <button class="chip" data-f="kpis">KPIs</button>
   </div>
   <div id="cont"><div class="vacio">Cargando…</div></div>
 </div>
