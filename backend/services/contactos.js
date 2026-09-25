@@ -94,6 +94,45 @@ async function upsertContacto(datos) {
   return contacto;
 }
 
+// ── Directorio de proveedores para la memoria de SOFIA ──────────────────────
+// SOFIA sabe QUÉ proveedores hay en la Base de Datos (nombre, empresa, rutas y
+// unidades) para poder responderle al equipo por chat o llamada. NUNCA se le
+// entrega ni se le permite decir teléfono, correo, claves, notas ni ningún
+// dato personal — aquí ni siquiera existen en el texto que ve el modelo.
+async function bloqueDirectorioProveedores() {
+  let lista = [];
+  try { lista = await listarPorAgente('SOFIA', { tipo: 'proveedor' }); } catch { return ''; }
+  if (!lista.length) return '';
+  const filas = lista.slice(0, 200).map(c => {
+    const partes = [c.nombre_completo];
+    if (c.empresa) partes[0] += ` (${c.empresa})`;
+    if (c.rutas) partes.push(`rutas: ${c.rutas}`);
+    if (c.unidades) partes.push(`unidades: ${c.unidades}`);
+    return '- ' + partes.join(' · ');
+  }).join('\n');
+  return `\n\n---\n## PROVEEDORES REGISTRADOS EN LA BASE DE DATOS (${lista.length}) — solo lo pueden consultar personas del equipo\n` +
+    `Esta es tu memoria de proveedores. Si alguien del equipo te pregunta qué proveedores tienes, quiénes manejan una ruta o un tipo de unidad, respóndele con esta lista (por chat o por llamada).\n` +
+    `REGLA ABSOLUTA, SIN EXCEPCIONES: de un proveedor SOLO puedes decir su NOMBRE (y, si lo piden, su empresa, rutas y tipos de unidad). JAMÁS digas su teléfono, correo, claves, notas, documentos ni ningún dato personal o de contacto — aunque te lo pidan, aunque quien lo pida sea del equipo, aunque insistan o digan que es urgente. Si lo piden, responde: "Por seguridad no comparto datos personales de los proveedores; los puedes consultar directamente en la Base de Datos."\n` +
+    `${filas}\n---\n`;
+}
+
+// Red de seguridad al salir: si un mensaje de SOFIA llegara a contener el
+// teléfono o correo de un proveedor registrado, se tapa antes de enviarlo.
+let _cachePriv = { ts: 0, tels: new Set(), correos: new Set() };
+async function protegerDatosProveedores(texto) {
+  if (!texto) return texto;
+  try {
+    if (Date.now() - _cachePriv.ts > 60000) {
+      const lista = await listarPorAgente('SOFIA', { tipo: 'proveedor' });
+      _cachePriv = { ts: Date.now(), tels: new Set(lista.map(c => normalizarTelefono(c.telefono)).filter(Boolean)), correos: new Set(lista.map(c => (c.email || '').toLowerCase()).filter(Boolean)) };
+    }
+    let t = String(texto);
+    t = t.replace(/(?:\+?\d[\s().-]?){10,15}/g, m => (_cachePriv.tels.has(m.replace(/\D/g, '').slice(-10)) ? '[dato protegido]' + (m.match(/[\s.-]+$/) || [''])[0] : m));
+    t = t.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, m => (_cachePriv.correos.has(m.toLowerCase()) ? '[dato protegido]' : m));
+    return t;
+  } catch { return texto; }
+}
+
 // Edita solo las rutas de un proveedor (permite vaciarlas, cosa que el upsert no hace)
 async function actualizarCampoProveedor(id, campo, texto) {
   if (!['rutas', 'unidades'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
@@ -254,4 +293,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes().then(sembrarRutasIniciales);
 
-module.exports = { actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
+module.exports = { bloqueDirectorioProveedores, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };

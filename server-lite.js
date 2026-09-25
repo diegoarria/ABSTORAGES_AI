@@ -231,6 +231,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     console.warn(`[WA] ⚠️ Se bloqueó un token de control que iba a salir hacia ${to}`);
   }
   text = limpiarFormatoWhatsApp(text);
+  text = await contactos.protegerDatosProveedores(text); // nunca sale el teléfono/correo de un proveedor
   if (!text) { console.log(`[WA] Mensaje vacío tras filtrar control, no se envía a ${to}`); return; }
 
   if (!WA_LIVE) {
@@ -493,6 +494,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const personaEquipo = staffDirectory.buscarPorTelefono(phone);
     if (personaEquipo) {
       systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
+      if (agente === 'sofia') systemPrompt += await contactos.bloqueDirectorioProveedores();
     } else {
       // No es equipo interno — ¿ya es un contacto conocido (proveedor/cliente
       // con quien ya se cerró algo antes)? Si sí, se le da continuidad real.
@@ -1004,6 +1006,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // 1:1 fuera del grupo interno — si no es equipo, ¿ya es un contacto
       // conocido (proveedor/cliente con historial real)? El grupo se salta
       // esto porque ahí todos son equipo interno por definición.
+      if (personaEquipo && agente === 'sofia') systemPrompt += await contactos.bloqueDirectorioProveedores();
       if (!esGrupo && !personaEquipo) {
         const contactoConocido = await contactos.buscarPorTelefono(remitentePhone, agente);
         if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
@@ -2819,6 +2822,8 @@ async function handleChat(agente, req, res) {
     const visitorCtx = visitorMemory.buildContext(visitorId);
     if (visitorCtx) systemPrompt += `\n\n${visitorCtx}`;
   }
+
+  if (agente === 'sofia' && req.user) systemPrompt += await contactos.bloqueDirectorioProveedores();
 
   if (callMode) systemPrompt += '\n\n🎙️ MODO LLAMADA DE VOZ: El cliente está en una llamada. Responde en máximo 2 oraciones cortas y directas. Sin listas, sin markdown, sin asteriscos. Habla natural como en una conversación telefónica. IMPORTANTE: Aunque estés en modo voz, SIEMPRE debes emitir el bloque LEAD_DATA al final de tu respuesta cuando tengas datos del cliente — es obligatorio en todos los modos.';
 
