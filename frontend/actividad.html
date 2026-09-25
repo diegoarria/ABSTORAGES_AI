@@ -3,78 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>En vivo — ABSTORAGES</title>
+<title>Actividad en vivo — ABSTORAGES</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#04080f">
+<meta name="theme-color" content="#0B2A5B">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/design-system.css">
-<style>
-:root { --m-bg:var(--ink-950); --m-s1:var(--ink-900); --m-s2:var(--ink-800); --m-s3:var(--ink-700); --m-acc:var(--brand-blue); --m-grn:var(--brand-green); --m-amb:var(--warn); --m-red:var(--critical); --m-t1:var(--text-100); --m-t2:var(--text-300); --m-t3:var(--text-500); --m-b1:var(--line); }
-* { box-sizing:border-box; margin:0; padding:0; }
-body { background:var(--m-bg); color:var(--m-t1); font-family:var(--font-sans); min-height:100vh; }
-.hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--m-s1); border-bottom:1px solid var(--m-b1); position:sticky; top:0; z-index:50; }
-.hdr-logo { font-weight:800; font-size:15px; display:flex; align-items:center; gap:8px; }
-.hdr-logo span { color:var(--m-acc); }
-.hdr-nav { display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; }
-.hn { background:none; border:none; color:var(--m-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; }
-.hn:hover, .hn.on { background:rgba(47,111,237,.12); color:var(--m-acc); }
-.wrap { max-width:980px; margin:0 auto; padding:22px 24px 60px; }
-.top { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
-h1 { font-size:20px; font-weight:800; }
-.live { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--m-t2); }
-.dot { width:9px; height:9px; border-radius:50%; background:var(--m-t3); }
-.dot.on { background:var(--m-grn); box-shadow:0 0 0 0 rgba(14,169,104,.6); animation:pulse 1.8s infinite; }
-@keyframes pulse { 70% { box-shadow:0 0 0 8px rgba(14,169,104,0); } 100% { box-shadow:0 0 0 0 rgba(14,169,104,0); } }
-@media (prefers-reduced-motion:reduce) { .dot.on { animation:none; } }
-.controls { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
-.chip { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:8px 13px; color:var(--m-t3); font-size:12px; font-weight:700; cursor:pointer; }
-.chip.on { color:var(--m-t1); border-color:rgba(255,255,255,.2); background:var(--m-s3); }
-.chip.sep { margin-left:auto; }
-.feed { display:flex; flex-direction:column; gap:6px; }
-.ev { display:grid; grid-template-columns:58px 74px 1fr; gap:12px; align-items:start; background:var(--m-s1); border:1px solid var(--m-b1); border-left:3px solid var(--m-b1); border-radius:0 10px 10px 0; padding:10px 13px; }
-.ev.hito { background:var(--m-s2); }
-.ev .t { font-family:var(--font-mono); font-size:11px; color:var(--m-t3); padding-top:2px; }
-.badge { font-size:10.5px; font-weight:800; letter-spacing:.05em; padding:3px 8px; border-radius:5px; text-align:center; text-transform:uppercase; }
-.ag-SARA { background:rgba(14,169,104,.15); color:var(--m-grn); } .ev.ag-SARA { border-left-color:var(--m-grn); }
-.ag-SOFIA { background:rgba(47,111,237,.15); color:var(--m-acc); } .ev.ag-SOFIA { border-left-color:var(--m-acc); }
-.ag-NOA { background:rgba(240,169,59,.15); color:var(--m-amb); } .ev.ag-NOA { border-left-color:var(--m-amb); }
-.ag-OTRO { background:rgba(255,255,255,.08); color:var(--m-t2); }
-.ev .msg { font-size:13px; line-height:1.5; word-break:break-word; }
-.ev .tipo { display:block; font-size:10.5px; color:var(--m-t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px; font-weight:700; }
-.vacio { padding:30px 12px; text-align:center; color:var(--m-t3); font-size:13px; border:1px dashed var(--m-b1); border-radius:10px; }
-@media (max-width:600px) { .ev { grid-template-columns:1fr; gap:4px; } .ev .t { order:3; } }
-</style>
 <link rel="stylesheet" href="/css/shell.css">
+<link rel="stylesheet" href="/css/corporate.css">
 <script src="/js/shell.js"></script>
+<style>
+.page-w { max-width:1100px; margin:0 auto; padding:24px 28px 56px; }
+.live { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--tx2); background:var(--surface); border:1px solid var(--bd); border-radius:20px; padding:6px 13px; box-shadow:var(--shadow-1); }
+.dot { width:9px; height:9px; border-radius:50%; background:var(--tx3); }
+.dot.on { background:var(--ok); box-shadow:0 0 0 0 rgba(11,125,87,.5); animation:pulse 1.8s infinite; }
+@keyframes pulse { 70% { box-shadow:0 0 0 8px rgba(11,125,87,0); } 100% { box-shadow:0 0 0 0 rgba(11,125,87,0); } }
+.bar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+.bar .seg { min-width:320px; }
+.hitos { margin-left:auto; }
+.feed { background:var(--surface); border:1px solid var(--bd); border-radius:14px; box-shadow:var(--shadow-1); overflow:hidden; }
+.ev { display:grid; grid-template-columns:76px 88px 1fr; gap:16px; align-items:start; padding:15px 20px; border-bottom:1px solid var(--bd); position:relative; }
+.ev:last-child { border-bottom:none; }
+.ev.hito { background:var(--surface-2); }
+.ev.hito::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--ag); }
+.ev .t { font-size:12.5px; color:var(--tx3); font-variant-numeric:tabular-nums; padding-top:3px; }
+.ev .who { font-size:11px; font-weight:700; letter-spacing:.06em; padding:4px 10px; border-radius:20px; text-align:center; text-transform:uppercase; background:var(--ag-soft); color:var(--ag); width:fit-content; }
+.ev .tipo { display:block; font-size:11px; color:var(--tx3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:3px; font-weight:700; }
+.ev .msg { font-size:14px; line-height:1.55; word-break:break-word; }
+.a-SARA { --ag:var(--sara); --ag-soft:var(--sara-soft); } .a-SOFIA { --ag:var(--sofia); --ag-soft:var(--sofia-soft); } .a-NOA { --ag:var(--noa); --ag-soft:var(--noa-soft); } .a-OTRO { --ag:var(--tx2); --ag-soft:var(--surface-3); }
+@media (max-width:640px) { .page-w { padding:20px 16px 48px; } .ev { grid-template-columns:1fr; gap:6px; } .ev .t { order:3; } .bar .seg { min-width:0; width:100%; } }
+</style>
 </head>
 <body data-shell-title="Actividad en vivo">
-<div class="wrap">
-  <div class="top">
+<main class="page-w">
+  <div class="crumbs"><a href="/">Portal</a><span>/</span><span>En vivo</span></div>
+  <div class="page-head">
     <div>
-      <h1>Actividad de SARA, SOFIA y NOA</h1>
-      <div style="font-size:12px;color:var(--m-t3);margin-top:3px;">Cada contacto, respuesta y resultado, en tiempo real. Los textos los arma el sistema con datos reales.</div>
+      <h1>Actividad en vivo</h1>
+      <p>Cada contacto, respuesta y resultado de SARA, SOFIA y NOA en tiempo real. Los textos los arma el sistema con datos reales.</p>
     </div>
     <div class="live"><span class="dot" id="dot"></span><span id="estado">Conectando…</span></div>
   </div>
 
-  <div class="controls">
-    <button class="chip on" data-ag="TODOS">Todos</button>
-    <button class="chip" data-ag="SARA">SARA</button>
-    <button class="chip" data-ag="SOFIA">SOFIA</button>
-    <button class="chip" data-ag="NOA">NOA</button>
-    <button class="chip sep" id="solo-hitos">Solo hitos</button>
+  <div class="bar">
+    <div class="seg" id="segAg">
+      <div class="filter on" data-ag="TODOS">Todos</div>
+      <div class="filter" data-ag="SARA">SARA</div>
+      <div class="filter" data-ag="SOFIA">SOFIA</div>
+      <div class="filter" data-ag="NOA">NOA</div>
+    </div>
+    <button class="btn btn-secondary btn-sm hitos" id="solo-hitos">Solo hitos</button>
   </div>
 
-  <div class="feed" id="feed"><div class="vacio">Esperando actividad…</div></div>
-</div>
+  <div class="feed" id="feed"><div class="empty-msg">Esperando actividad…</div></div>
+</main>
 
 <script>
 const HITOS = new Set(['NUEVA_ORDEN','CONTACTANDO_PROVEEDORES','RESULTADO_CONTACTO','PROVEEDOR_GANADOR','SIN_UNIDAD','FILTRO_RUTA','OFERTA','EN_ESPERA_HORARIO','SEGUIMIENTO_UNIDAD','SUGERENCIA','ALERTA_CRITICA','ALERTA_INTENTO_ATAQUE','ALERTA_FUGA_PROMPT','ALERTA_ABUSO','LLAMADA_TERMINADA']);
 const ETIQUETA = {
-  CONTACTO_SALIENTE:'Contacto saliente', CONVERSACION_WA:'Conversación', CONTACTANDO_PROVEEDORES:'Búsqueda de unidad', FILTRO_RUTA:'Filtro por ruta', OFERTA:'Oferta', EN_ESPERA_HORARIO:'En espera de horario', SEGUIMIENTO_UNIDAD:'Seguimiento de unidad', SUGERENCIA:'Sugerencia', RECORDATORIO:'Recordatorio', SIN_RESPUESTA:'Sin respuesta',
+  CONTACTO_SALIENTE:'Contacto saliente', CONVERSACION_WA:'Conversación', CONTACTANDO_PROVEEDORES:'Búsqueda de unidad', FILTRO_RUTA:'Filtro por ruta',
+  OFERTA:'Oferta', EN_ESPERA_HORARIO:'En espera de horario', SEGUIMIENTO_UNIDAD:'Seguimiento de unidad', SUGERENCIA:'Sugerencia', RECORDATORIO:'Recordatorio', SIN_RESPUESTA:'Sin respuesta',
   RESULTADO_CONTACTO:'Resultado', NUEVA_ORDEN:'Nueva orden', PROVEEDOR_GANADOR:'Proveedor asignado', SIN_UNIDAD:'Sin unidad',
   LLAMADA_TERMINADA:'Llamada terminada', LLAMADA_VIVO:'Llamada en curso', VAPI_INICIADO:'Llamadas iniciadas', VAPI_RESULTADO:'Resultado de llamada',
   DISPONIBILIDAD_DIARIA:'Ronda de disponibilidad', ALERTA_CRITICA:'Alerta crítica', MENSAJE_USUARIO:'Mensaje', MENSAJE_SARA:'Respuesta', MENSAJE_SOFIA:'Respuesta', MENSAJE_NOA:'Respuesta',
@@ -90,13 +80,13 @@ function agClase(a){ a = String(a||'').toUpperCase(); return ['SARA','SOFIA','NO
 function render(){
   const feed = document.getElementById('feed');
   const lista = eventos.filter(e => (filtroAg === 'TODOS' || String(e.agente||'').toUpperCase() === filtroAg) && (!soloHitos || HITOS.has(e.tipo)));
-  if (!lista.length){ feed.innerHTML = '<div class="vacio">Sin actividad para este filtro por ahora.</div>'; return; }
+  if (!lista.length){ feed.innerHTML = '<div class="empty-msg">Sin actividad para este filtro por ahora.</div>'; return; }
   feed.innerHTML = lista.map(e => {
     const c = agClase(e.agente);
-    return `<div class="ev ag-${c} ${HITOS.has(e.tipo) ? 'hito' : ''}">
+    return `<div class="ev a-${c} ${HITOS.has(e.tipo) ? 'hito' : ''}">
       <div class="t">${esc(hora(e.timestamp))}</div>
-      <div><div class="badge ag-${c}">${esc(e.agente || '—')}</div></div>
-      <div class="msg"><span class="tipo">${esc(ETIQUETA[e.tipo] || e.tipo || '')}</span>${esc(e.mensaje || '')}</div>
+      <div><span class="who">${esc(e.agente || '—')}</span></div>
+      <div><span class="tipo">${esc(ETIQUETA[e.tipo] || e.tipo || '')}</span><div class="msg">${esc(e.mensaje || '')}</div></div>
     </div>`;
   }).join('');
 }
@@ -107,12 +97,12 @@ function agregar(e){
   render();
 }
 
-document.querySelectorAll('.chip[data-ag]').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.chip[data-ag]').forEach(x => x.classList.remove('on'));
+document.querySelectorAll('#segAg .filter').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#segAg .filter').forEach(x => x.classList.remove('on'));
   b.classList.add('on'); filtroAg = b.dataset.ag; render();
 }));
 document.getElementById('solo-hitos').addEventListener('click', e => {
-  soloHitos = !soloHitos; e.currentTarget.classList.toggle('on', soloHitos); render();
+  soloHitos = !soloHitos; e.currentTarget.classList.toggle('btn-primary', soloHitos); e.currentTarget.classList.toggle('btn-secondary', !soloHitos); render();
 });
 
 function conectar(){

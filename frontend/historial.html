@@ -5,138 +5,89 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Historial de Conversaciones — ABSTORAGES</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0a0f1e">
+<meta name="theme-color" content="#0B2A5B">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/design-system.css">
-<style>
-/* Alias hacia los tokens corporativos de design-system.css */
-:root {
-  --h-bg:   var(--ink-950);
-  --h-s1:   var(--ink-900);
-  --h-s2:   var(--ink-800);
-  --h-s3:   var(--ink-700);
-  --h-acc:  var(--brand-blue);
-  --h-grn:  var(--brand-green);
-  --h-amb:  var(--warn);
-  --h-red:  var(--critical);
-  --h-t1:   var(--text-100);
-  --h-t2:   var(--text-300);
-  --h-t3:   var(--text-500);
-  --h-b1:   var(--line);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--h-bg); color: var(--h-t1); font-family: var(--font-sans); min-height: 100vh; }
-
-.hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--h-s1); border-bottom:1px solid var(--h-b1); position:sticky; top:0; z-index:50; }
-.hdr-logo { font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--h-t1); display:flex; align-items:center; gap:8px; }
-.hdr-logo span { color:var(--h-acc); }
-.hdr-nav { display:flex; gap:4px; margin-left:auto; }
-.hn { background:none; border:none; color:var(--h-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
-.hn:hover, .hn.on { background:rgba(47,111,237,.12); color:var(--h-acc); }
-
-.wrap { display:flex; height:calc(100vh - 57px); }
-.sidebar { width:340px; border-right:1px solid var(--h-b1); display:flex; flex-direction:column; flex-shrink:0; }
-.main { flex:1; overflow-y:auto; padding:24px; }
-
-.search-panel { padding:16px; border-bottom:1px solid var(--h-b1); display:flex; flex-direction:column; gap:10px; }
-.search-panel input {
-  background: var(--h-s2); border:1px solid var(--h-b1); border-radius:8px;
-  color:var(--h-t1); font-size:13px; padding:9px 12px; outline:none; width:100%;
-}
-.search-panel input:focus { border-color:var(--h-acc); }
-.count { font-size:11px; color:var(--h-t3); }
-
-.sess-list { flex:1; overflow-y:auto; padding:6px; }
-.sess-item {
-  padding:11px 12px; border-radius:10px; cursor:pointer; margin-bottom:4px;
-  border:1px solid transparent; transition:background .12s;
-}
-.sess-item:hover { background:var(--h-s2); }
-.sess-item.on { background:rgba(47,111,237,.1); border-color:rgba(47,111,237,.35); }
-.sess-del { background:none; border:none; font-size:13px; padding:2px 4px; border-radius:6px; cursor:pointer; opacity:.55; line-height:1; }
-.sess-del:hover { opacity:1; background:rgba(255,92,92,.15); }
-.chat-del { background:none; border:1px solid var(--h-b1); color:var(--h-t2); font-size:12px; font-weight:600; padding:7px 12px; border-radius:8px; cursor:pointer; }
-.chat-del:hover { border-color:var(--h-red); color:var(--h-red); background:rgba(255,92,92,.08); }
-.sess-top { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:3px; }
-.sess-name { font-size:13px; font-weight:700; color:var(--h-t1); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.sess-badge { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:2px 6px; border-radius:4px; flex-shrink:0; }
-.b-sara   { background:var(--brand-green-dim); color:var(--brand-green-light); }
-.b-sofia  { background:var(--brand-blue-dim);  color:var(--brand-blue-light); }
-.b-noa    { background:var(--warn-dim);        color:var(--warn); }
-.b-hector { background:rgba(168,85,247,.15); color:#a855f7; }
-.b-grupo  { background:rgba(255,255,255,.1); color:var(--h-t2); }
-.b-desconocido { background:rgba(255,255,255,.08); color:var(--h-t3); }
-.sess-meta { font-size:11px; color:var(--h-t3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.sess-date { font-size:11px; color:var(--h-t3); margin-top:3px; }
-
-.empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; color:var(--h-t3); gap:8px; }
-.empty-icon { font-size:40px; opacity:.5; margin-bottom:6px; }
-
-.chat-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--h-b1); }
-.chat-title { font-size:17px; font-weight:800; }
-.chat-sub { font-size:12px; color:var(--h-t3); margin-top:2px; }
-
-.msg { max-width:70%; margin-bottom:14px; display:flex; flex-direction:column; }
-.msg.user { align-items:flex-end; margin-left:auto; }
-.msg.assistant { align-items:flex-start; }
-.msg-bubble { padding:10px 14px; border-radius:12px; font-size:13.5px; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
-.msg.user .msg-bubble { background:var(--h-acc); color:#fff; border-bottom-right-radius:3px; }
-.msg.assistant .msg-bubble { background:var(--h-s2); border:1px solid var(--h-b1); border-bottom-left-radius:3px; }
-.msg-time { font-size:11px; color:var(--h-t3); margin-top:4px; padding:0 4px; }
-
-.loading { text-align:center; padding:40px; color:var(--h-t3); font-size:13px; }
-
-.mode-tabs { display:flex; gap:4px; padding:12px 16px 0; }
-.mode-tab { flex:1; background:var(--h-s2); border:1px solid var(--h-b1); color:var(--h-t2); font-size:12px; font-weight:700; padding:8px; border-radius:8px; cursor:pointer; transition:all .12s; }
-.mode-tab.on { background:rgba(47,111,237,.14); border-color:rgba(47,111,237,.4); color:var(--h-acc); }
-
-.agent-filters { display:flex; gap:6px; padding:12px 16px 0; }
-.af-chip { background:var(--h-s2); border:1px solid var(--h-b1); color:var(--h-t3); font-size:11px; font-weight:700; padding:5px 11px; border-radius:100px; cursor:pointer; transition:all .12s; opacity:.55; }
-.af-chip[data-ag="sara"].on  { background:var(--brand-green-dim); border-color:var(--brand-green); color:var(--brand-green-light); opacity:1; }
-.af-chip[data-ag="sofia"].on { background:var(--brand-blue-dim);  border-color:var(--brand-blue);  color:var(--brand-blue-light); opacity:1; }
-.af-chip[data-ag="noa"].on   { background:var(--warn-dim);        border-color:var(--warn);        color:var(--warn); opacity:1; }
-
-.call-resumen { background:var(--h-s2); border:1px solid var(--h-b1); border-radius:10px; padding:14px 16px; margin-bottom:18px; font-size:13.5px; line-height:1.6; color:var(--h-t1); }
-.call-resumen-label { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--h-t3); margin-bottom:6px; }
-.call-transcript { background:var(--h-s1); border:1px solid var(--h-b1); border-radius:10px; padding:14px 16px; font-size:12.5px; line-height:1.7; color:var(--h-t2); white-space:pre-wrap; word-break:break-word; }
-</style>
 <link rel="stylesheet" href="/css/shell.css">
+<link rel="stylesheet" href="/css/corporate.css">
 <script src="/js/shell.js"></script>
+<style>
+.page-hist { max-width:1600px; margin:0 auto; padding:24px 28px 56px; }
+.board { grid-template-columns:420px minmax(0,1fr); }
+.list-panel { max-height:calc(100vh - 100px); }
+.detail { min-height:calc(100vh - 100px); }
+.chips-row { display:flex; gap:8px; flex-wrap:wrap; }
+.af-chip { font-family:inherit; font-size:12px; font-weight:700; padding:6px 13px; border-radius:20px; border:1px solid var(--bd-strong); background:var(--surface); color:var(--tx3); cursor:pointer; transition:all .15s; letter-spacing:.02em; }
+.af-chip:hover { color:var(--tx); }
+.af-chip[data-ag="sara"].on  { background:var(--sara-soft); border-color:var(--sara); color:var(--sara); }
+.af-chip[data-ag="sofia"].on { background:var(--sofia-soft); border-color:var(--sofia); color:var(--sofia); }
+.af-chip[data-ag="noa"].on   { background:var(--noa-soft); border-color:var(--noa); color:var(--noa); }
+.count { font-size:12px; color:var(--tx3); }
+.av-ag-sara { background:var(--sara-soft); color:var(--sara); } .av-ag-sofia { background:var(--sofia-soft); color:var(--sofia); } .av-ag-noa { background:var(--noa-soft); color:var(--noa); }
+.av-ag-hector { background:rgba(124,58,237,.12); color:#7C3AED; } .av-ag-grupo, .av-ag-desconocido { background:var(--surface-3); color:var(--tx2); }
+.av .i { width:18px; height:18px; }
+.ag-sara { background:var(--sara-soft); color:var(--sara); } .ag-sofia { background:var(--sofia-soft); color:var(--sofia); } .ag-noa { background:var(--noa-soft); color:var(--noa); }
+.ag-hector { background:rgba(124,58,237,.12); color:#7C3AED; } .ag-grupo, .ag-desconocido { background:var(--surface-3); color:var(--tx2); }
+.pill-neutral { background:var(--surface-3); color:var(--tx2); }
+.row-meta { justify-content:space-between; }
+.row-meta .tel { font-family:inherit; }
+.icon-btn { background:none; border:none; color:var(--tx3); width:28px; height:28px; border-radius:7px; display:grid; place-items:center; cursor:pointer; transition:background .15s,color .15s; }
+.icon-btn:hover { background:var(--crit-soft); color:var(--crit); }
+.icon-btn .i { width:15px; height:15px; }
+.btn-danger-o:hover:not(:disabled) { border-color:var(--crit); color:var(--crit); background:var(--crit-soft); }
+.blank { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; min-height:420px; color:var(--tx3); padding:20px; }
+.blank .i { width:36px; height:36px; opacity:.5; }
+.blank h3 { font-size:16px; color:var(--tx); font-weight:700; margin-top:6px; }
+.thread { display:flex; flex-direction:column; gap:18px; }
+.msg { display:flex; flex-direction:column; max-width:74%; }
+.msg.user { align-self:flex-end; align-items:flex-end; }
+.msg.assistant { align-self:flex-start; align-items:flex-start; }
+.msg-who { font-size:11px; font-weight:700; color:var(--tx3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
+.msg-bubble { padding:12px 16px; border-radius:14px; font-size:14px; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+.msg.user .msg-bubble { background:var(--acc); color:#fff; border-bottom-right-radius:4px; }
+:root[data-theme="dark"] .msg.user .msg-bubble { color:#08111F; }
+.msg.assistant .msg-bubble { background:var(--surface-2); border:1px solid var(--bd); border-bottom-left-radius:4px; }
+.msg-time { font-size:11.5px; color:var(--tx3); margin-top:5px; }
+.transcript { background:var(--surface-2); border:1px solid var(--bd); border-radius:12px; padding:18px 20px; font-size:13.5px; line-height:1.8; color:var(--tx2); white-space:pre-wrap; word-break:break-word; }
+@media (max-width:1100px) { .board { grid-template-columns:1fr; } .list-panel { max-height:460px; position:static; } .msg { max-width:92%; } }
+</style>
 </head>
 <body data-shell-title="Historial de conversaciones">
 
-<div class="wrap">
-  <aside class="sidebar">
-    <div class="mode-tabs">
-      <button class="mode-tab on" id="tab-chats" onclick="cambiarModo('chats')">Chats</button>
-      <button class="mode-tab" id="tab-llamadas" onclick="cambiarModo('llamadas')">Llamadas</button>
+<main class="page-hist">
+  <div class="crumbs"><a href="/">Portal</a><span>/</span><span>Historial</span></div>
+  <div class="page-head">
+    <div>
+      <h1>Historial de conversaciones</h1>
+      <p>Todos los chats y llamadas de SARA, SOFIA y NOA, con el detalle completo de cada interacción.</p>
     </div>
-    <div class="agent-filters" id="agent-filters">
-      <button class="af-chip on" data-ag="sara" onclick="toggleFiltroAgente('sara')">SARA</button>
-      <button class="af-chip on" data-ag="sofia" onclick="toggleFiltroAgente('sofia')">SOFÍA</button>
-      <button class="af-chip on" data-ag="noa" onclick="toggleFiltroAgente('noa')">NOA</button>
-    </div>
-    <div class="search-panel">
-      <input id="buscador" type="text" placeholder="Buscar por nombre, empresa, teléfono…" oninput="MODO === 'chats' ? buscar(this.value) : buscarLlamadas(this.value)">
-      <div class="count" id="contador"></div>
-    </div>
-    <div class="sess-list" id="sess-list">
-      <div class="loading">Cargando conversaciones…</div>
-    </div>
-  </aside>
+  </div>
 
-  <main class="main" id="main">
-    <div class="empty">
-      <div class="empty-icon"></div>
-      <h3>Selecciona una conversación</h3>
-      <p>Elige un chat de la lista para ver el historial completo.</p>
-    </div>
-  </main>
-</div>
+  <div class="board">
+    <section class="panel list-panel">
+      <div class="toolbar">
+        <div class="seg" role="tablist">
+          <div class="filter on" id="tab-chats" onclick="cambiarModo('chats')" role="tab">Chats</div>
+          <div class="filter" id="tab-llamadas" onclick="cambiarModo('llamadas')" role="tab">Llamadas</div>
+        </div>
+        <div class="chips-row" id="agent-filters">
+          <button class="af-chip on" data-ag="sara" onclick="toggleFiltroAgente('sara')">SARA</button>
+          <button class="af-chip on" data-ag="sofia" onclick="toggleFiltroAgente('sofia')">SOFÍA</button>
+          <button class="af-chip on" data-ag="noa" onclick="toggleFiltroAgente('noa')">NOA</button>
+        </div>
+        <div class="search-w"><span id="searchIco"></span><input class="search" id="buscador" type="text" placeholder="Buscar por nombre, empresa o teléfono" aria-label="Buscar" oninput="MODO === 'chats' ? buscar(this.value) : buscarLlamadas(this.value)"></div>
+        <div class="count" id="contador"></div>
+      </div>
+      <div class="list" id="sess-list"><div class="empty-msg">Cargando conversaciones…</div></div>
+    </section>
+
+    <section class="panel detail" id="main"></section>
+  </div>
+</main>
 
 <script>
 let TODAS = [];
@@ -172,24 +123,24 @@ function aplicarFiltroAgente(lista) {
   return lista.filter(s => !AGENTES_FILTRABLES.includes(s.agente) || FILTRO_AGENTES.has(s.agente));
 }
 
+function vacioDetalle(m) {
+  return `<div class="blank">${ico(m === 'chats' ? 'chat' : 'phone')}<h3>Selecciona ${m === 'chats' ? 'una conversación' : 'una llamada'}</h3><p>Elige ${m === 'chats' ? 'un chat' : 'una llamada'} de la lista para ver el detalle completo.</p></div>`;
+}
+function iniciales(n) { const p = String(n || '?').trim().split(/\s+/).filter(Boolean); return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase(); }
+
 function cambiarModo(m) {
   MODO = m;
   document.getElementById('tab-chats').classList.toggle('on', m === 'chats');
   document.getElementById('tab-llamadas').classList.toggle('on', m === 'llamadas');
   document.getElementById('agent-filters').style.display = m === 'chats' ? 'flex' : 'none';
   document.getElementById('buscador').value = '';
-  document.getElementById('main').innerHTML = `
-    <div class="empty">
-      <div class="empty-icon">${m === 'chats' ? '💬' : '📞'}</div>
-      <h3>Selecciona ${m === 'chats' ? 'una conversación' : 'una llamada'}</h3>
-      <p>Elige ${m === 'chats' ? 'un chat' : 'una llamada'} de la lista para ver el detalle completo.</p>
-    </div>`;
+  document.getElementById('main').innerHTML = vacioDetalle(m);
   if (m === 'chats') { render(TODAS); }
   else { cargarLlamadas(); }
 }
 
 async function cargarLlamadas() {
-  document.getElementById('sess-list').innerHTML = '<div class="loading">Cargando llamadas…</div>';
+  document.getElementById('sess-list').innerHTML = '<div class="empty-msg">Cargando llamadas…</div>';
   try {
     const r = await fetch('/api/vapi/llamadas?limit=300', { credentials:'include' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -197,7 +148,7 @@ async function cargarLlamadas() {
     renderLlamadas(LLAMADAS);
   } catch (e) {
     document.getElementById('sess-list').innerHTML =
-      '<div class="loading">No se pudo cargar el historial de llamadas (' + e.message + ')</div>';
+      '<div class="empty-msg">No se pudo cargar el historial de llamadas (' + e.message + ')</div>';
   }
 }
 
@@ -207,7 +158,7 @@ function renderLlamadas(lista) {
   contador.textContent = lista.length + ' llamada' + (lista.length === 1 ? '' : 's');
 
   if (!lista.length) {
-    list.innerHTML = '<div class="loading">Sin llamadas registradas</div>';
+    list.innerHTML = '<div class="empty-msg">Sin llamadas registradas</div>';
     return;
   }
 
@@ -216,13 +167,13 @@ function renderLlamadas(lista) {
     const activa = c.id === llamadaActual ? 'on' : '';
     const dur = c.duracionSeg ? Math.round(c.duracionSeg) + 's' : '';
     const meta = [c.folio, c.telefono, dur].filter(Boolean).join(' · ');
-    return `<div class="sess-item ${activa}" onclick="abrirLlamada('${c.id.replace(/'/g,"\\'")}')">
-      <div class="sess-top">
-        <div class="sess-name">${esc(nombre)}</div>
-        <span class="sess-badge b-${c.agente}">${AGENTE_LABEL[c.agente] || c.agente}</span>
+    return `<div class="row ${activa ? 'sel' : ''}" onclick="abrirLlamada('${c.id.replace(/'/g,"\\'")}')">
+      <div class="av av-ag-${c.agente}">${ico('phone')}</div>
+      <div class="row-main">
+        <div class="row-top"><div class="nombre">${esc(nombre)}</div><span class="tipo-tag ag-${c.agente}">${AGENTE_LABEL[c.agente] || c.agente}</span></div>
+        <div class="empresa">${esc(meta || 'Sin datos')}</div>
+        <div class="row-meta"><span class="tel">${fmtFecha(c.timestamp)}</span></div>
       </div>
-      <div class="sess-meta">${esc(meta || 'Sin datos')}</div>
-      <div class="sess-date">${fmtFecha(c.timestamp)}</div>
     </div>`;
   }).join('');
 }
@@ -243,18 +194,27 @@ function abrirLlamada(id) {
   renderLlamadas(LLAMADAS);
   const c = LLAMADAS.find(x => x.id === id);
   const main = document.getElementById('main');
-  if (!c) { main.innerHTML = '<div class="loading">Llamada no encontrada</div>'; return; }
+  if (!c) { main.innerHTML = '<div class="empty-msg">Llamada no encontrada</div>'; return; }
 
   const dur = c.duracionSeg ? `${Math.round(c.duracionSeg / 60 * 10) / 10} min` : '—';
   main.innerHTML = `
-    <div class="chat-header">
-      <div>
-        <div class="chat-title">${esc(c.nombre || c.telefono || 'Contacto')}</div>
-        <div class="chat-sub">${AGENTE_LABEL[c.agente] || c.agente} · ${esc(c.telefono || '')} · ${dur} · ${fmtFecha(c.timestamp)}${c.folio ? ' · Folio ' + esc(c.folio) : ''}</div>
+    <div class="d-head">
+      <div class="av av-ag-${c.agente} d-av">${esc(iniciales(c.nombre || c.telefono))}</div>
+      <div class="d-id">
+        <div class="nombre">${esc(c.nombre || c.telefono || 'Contacto')}</div>
+        <div class="empresa">${esc(c.telefono || 'Sin teléfono')}</div>
+        <div class="d-tags">
+          <span class="tipo-tag ag-${c.agente}">${AGENTE_LABEL[c.agente] || c.agente}</span>
+          <span class="pill pill-neutral">${ico('clock')} ${dur}</span>
+          <span class="pill pill-neutral">${fmtFecha(c.timestamp)}</span>
+          ${c.folio ? `<span class="pill pill-neutral">Folio ${esc(c.folio)}</span>` : ''}
+        </div>
       </div>
     </div>
-    ${c.resumen ? `<div class="call-resumen"><div class="call-resumen-label">Resumen de la llamada</div>${esc(c.resumen)}</div>` : ''}
-    <div class="call-transcript">${c.transcript ? esc(c.transcript) : 'Sin transcripción disponible.'}</div>
+    <div class="d-body">
+      ${c.resumen ? `<section><div class="sec-title">Resumen de la llamada</div><div class="notes">${esc(c.resumen)}</div></section>` : ''}
+      <section><div class="sec-title">Transcripción</div><div class="transcript">${c.transcript ? esc(c.transcript) : 'Sin transcripción disponible.'}</div></section>
+    </div>
   `;
 }
 
@@ -266,7 +226,7 @@ async function cargarSesiones() {
     render(TODAS);
   } catch (e) {
     document.getElementById('sess-list').innerHTML =
-      '<div class="loading">No se pudo cargar el historial (' + e.message + ')</div>';
+      '<div class="empty-msg">No se pudo cargar el historial (' + e.message + ')</div>';
   }
 }
 
@@ -295,7 +255,7 @@ function render(lista) {
   contador.textContent = lista.length + ' conversaci' + (lista.length === 1 ? 'ón' : 'ones');
 
   if (!lista.length) {
-    list.innerHTML = '<div class="loading">Sin resultados</div>';
+    list.innerHTML = '<div class="empty-msg">Sin resultados</div>';
     return;
   }
 
@@ -309,16 +269,13 @@ function render(lista) {
     const meta = [s.empresa && s.empresa !== s.nombre ? s.empresa : '', s.telefono, participantesTxt, s.resumen].filter(Boolean).join(' · ');
     const activa = s.sessionId === sesionActual ? 'on' : '';
     const sidEsc = s.sessionId.replace(/'/g,"\\'");
-    return `<div class="sess-item ${activa}" onclick="abrir('${sidEsc}')">
-      <div class="sess-top">
-        <div class="sess-name">${esc(nombre)}</div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span class="sess-badge b-${s.agente}">${AGENTE_LABEL[s.agente] || s.agente}</span>
-          <button class="sess-del" title="Borrar conversación" onclick="event.stopPropagation(); borrarSesion('${sidEsc}')">🗑️</button>
-        </div>
+    return `<div class="row ${activa ? 'sel' : ''}" onclick="abrir('${sidEsc}')">
+      <div class="av av-ag-${s.agente}">${esc(iniciales(nombre))}</div>
+      <div class="row-main">
+        <div class="row-top"><div class="nombre">${esc(nombre)}</div><span class="tipo-tag ag-${s.agente}">${AGENTE_LABEL[s.agente] || s.agente}</span></div>
+        <div class="empresa">${esc(meta || (s.msgs + ' mensajes'))}</div>
+        <div class="row-meta"><span class="tel">${fmtFecha(s.updatedAt)} · ${s.msgs} msj</span><button class="icon-btn" title="Borrar conversación" aria-label="Borrar conversación" onclick="event.stopPropagation(); borrarSesion('${sidEsc}')">${ico('trash')}</button></div>
       </div>
-      <div class="sess-meta">${esc(meta || (s.msgs + ' mensajes'))}</div>
-      <div class="sess-date">${fmtFecha(s.updatedAt)} · ${s.msgs} msj</div>
     </div>`;
   }).join('');
 }
@@ -327,7 +284,7 @@ async function abrir(sessionId) {
   sesionActual = sessionId;
   render(document.getElementById('buscador').value.trim() ? TODAS.filter(matchLocal) : TODAS);
   const main = document.getElementById('main');
-  main.innerHTML = '<div class="loading">Cargando conversación…</div>';
+  main.innerHTML = '<div class="empty-msg">Cargando conversación…</div>';
 
   try {
     const r = await fetch('/api/historial/sesiones/' + encodeURIComponent(sessionId), { credentials:'include' });
@@ -339,24 +296,31 @@ async function abrir(sessionId) {
       : (info.telefono || '');
 
     main.innerHTML = `
-      <div class="chat-header">
-        <div>
-          <div class="chat-title">${esc(info.nombre || info.empresa || sessionId)}</div>
-          <div class="chat-sub">${AGENTE_LABEL[data.agente] || data.agente} · ${data.historial.length} mensajes${participantesTxt ? ' · ' + esc(participantesTxt) : ''}${data.ip ? ' · IP ' + esc(data.ip) : ''}</div>
+      <div class="d-head">
+        <div class="av av-ag-${data.agente} d-av">${esc(iniciales(info.nombre || info.empresa || sessionId))}</div>
+        <div class="d-id">
+          <div class="nombre">${esc(info.nombre || info.empresa || sessionId)}</div>
+          <div class="empresa">${esc(participantesTxt || 'Sin teléfono registrado')}</div>
+          <div class="d-tags">
+            <span class="tipo-tag ag-${data.agente}">${AGENTE_LABEL[data.agente] || data.agente}</span>
+            <span class="pill pill-neutral">${data.historial.length} mensajes</span>
+            ${data.ip ? `<span class="pill pill-neutral">IP ${esc(data.ip)}</span>` : ''}
+          </div>
         </div>
-        <button class="chat-del" onclick="borrarSesion('${sessionId.replace(/'/g,"\\'")}')">🗑️ Borrar conversación</button>
+        <div class="actions"><button class="btn btn-secondary btn-danger-o" onclick="borrarSesion('${sessionId.replace(/'/g,"\\'")}')">${ico('trash')} Borrar conversación</button></div>
       </div>
-      <div id="msgs"></div>
+      <div class="d-body"><div class="thread" id="msgs"></div></div>
     `;
     const msgs = document.getElementById('msgs');
     msgs.innerHTML = data.historial.map(m => `
       <div class="msg ${m.role === 'user' ? 'user' : 'assistant'}">
+        <div class="msg-who">${m.role === 'user' ? 'Contacto' : (AGENTE_LABEL[data.agente] || 'Agente')}</div>
         <div class="msg-bubble">${esc(m.content)}</div>
         <div class="msg-time">${fmtFecha(m.ts)}</div>
       </div>
     `).join('');
   } catch (e) {
-    main.innerHTML = '<div class="loading">No se pudo cargar la conversación (' + e.message + ')</div>';
+    main.innerHTML = '<div class="empty-msg">No se pudo cargar la conversación (' + e.message + ')</div>';
   }
 }
 
@@ -371,7 +335,7 @@ async function borrarSesion(sessionId) {
     TODAS = TODAS.filter(x => x.sessionId !== sessionId);
     if (sesionActual === sessionId) {
       sesionActual = null;
-      document.getElementById('main').innerHTML = '<div class="loading">Selecciona una conversación</div>';
+      document.getElementById('main').innerHTML = vacioDetalle('chats');
     }
     render(document.getElementById('buscador').value.trim() ? TODAS.filter(matchLocal) : TODAS);
   } catch (e) {
@@ -381,6 +345,8 @@ async function borrarSesion(sessionId) {
 
 function matchLocal(s) { return true; } // placeholder, el filtrado real ya llegó del server
 
+document.getElementById('searchIco').innerHTML = ico('search');
+document.getElementById('main').innerHTML = vacioDetalle('chats');
 cargarSesiones();
 </script>
 </body>

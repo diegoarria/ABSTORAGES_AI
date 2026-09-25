@@ -5,140 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Memoria de Agentes — ABSTORAGES</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#04080f">
+<meta name="theme-color" content="#0B2A5B">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/design-system.css">
-<style>
-/* Alias hacia los tokens corporativos de design-system.css */
-:root {
-  --m-bg:   var(--ink-950);
-  --m-s1:   var(--ink-900);
-  --m-s2:   var(--ink-800);
-  --m-s3:   var(--ink-700);
-  --m-acc:  var(--brand-blue);
-  --m-grn:  var(--brand-green);
-  --m-amb:  var(--warn);
-  --m-red:  var(--critical);
-  --m-t1:   var(--text-100);
-  --m-t2:   var(--text-300);
-  --m-t3:   var(--text-500);
-  --m-b1:   var(--line);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--m-bg); color: var(--m-t1); font-family: var(--font-sans); min-height: 100vh; }
-
-/* ── Header ─────────────────────────────────────────────────────────────── */
-.hdr { display:flex; align-items:center; gap:16px; padding:14px 24px; background:var(--m-s1); border-bottom:1px solid var(--m-b1); position:sticky; top:0; z-index:50; }
-.hdr-logo { font-weight:800; font-size:15px; letter-spacing:-.02em; color:var(--m-t1); display:flex; align-items:center; gap:8px; }
-.hdr-logo span { color:var(--m-acc); }
-.hdr-nav { display:flex; gap:4px; margin-left:auto; }
-.hn { background:none; border:none; color:var(--m-t2); font-size:13px; font-weight:500; padding:7px 14px; border-radius:8px; cursor:pointer; transition:all .15s; }
-.hn:hover, .hn.on { background:rgba(47,111,237,.12); color:var(--m-acc); }
-
-/* ── Layout ─────────────────────────────────────────────────────────────── */
-.wrap { max-width:1280px; margin:0 auto; padding:24px 24px 60px; }
-.top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
-.eyebrow { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--m-t3); margin-bottom:4px; }
-h1 { font-size:20px; font-weight:800; letter-spacing:-.01em; }
-.updated { font-size:11px; color:var(--m-t3); }
-
-/* ── Tabs por agente ────────────────────────────────────────────────────── */
-.tabs { display:flex; gap:10px; margin-bottom:18px; }
-.tab { flex:1; position:relative; cursor:pointer; padding:14px 16px 12px; background:var(--m-s1); border:1px solid var(--m-b1); border-bottom:3px solid var(--m-b1); border-radius:10px 10px 0 0; transition:.15s; }
-.tab:hover { border-color:rgba(255,255,255,.14); }
-.tab.active { background:var(--m-s2); }
-.tab .name { font-size:14px; font-weight:800; letter-spacing:.02em; margin-bottom:2px; }
-.tab .role { font-size:11px; color:var(--m-t3); }
-.tab .count { position:absolute; top:12px; right:14px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
-.tab[data-agent="SARA"].active  { border-bottom-color:var(--m-grn); }
-.tab[data-agent="SOFIA"].active { border-bottom-color:var(--m-acc); }
-.tab[data-agent="NOA"].active   { border-bottom-color:var(--m-amb); }
-.tab[data-agent="SARA"]  .count { background:rgba(14,169,104,.15); color:var(--m-grn); }
-.tab[data-agent="SOFIA"] .count { background:rgba(47,111,237,.15); color:var(--m-acc); }
-.tab[data-agent="NOA"]   .count { background:rgba(240,169,59,.15); color:var(--m-amb); }
-
-/* ── Controles ──────────────────────────────────────────────────────────── */
-.controls { display:flex; gap:8px; margin-bottom:14px; }
-.search { flex:1; background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:9px 12px; color:var(--m-t1); font-size:13px; outline:none; transition:border-color .15s; }
-.search:focus { border-color:rgba(47,111,237,.5); }
-.filter { background:var(--m-s2); border:1px solid var(--m-b1); border-radius:8px; padding:9px 13px; color:var(--m-t3); font-size:12px; cursor:pointer; font-weight:600; transition:all .15s; }
-.filter.on { color:var(--m-t1); border-color:rgba(255,255,255,.18); background:var(--m-s3); }
-
-/* ── Board: lista + detalle ─────────────────────────────────────────────── */
-.board { display:grid; grid-template-columns: 340px 1fr; gap:16px; align-items:start; }
-
-.list { display:flex; flex-direction:column; gap:6px; max-height:72vh; overflow-y:auto; }
-.card { background:var(--m-s1); border:1px solid var(--m-b1); border-left:3px solid var(--m-b1); border-radius:0 10px 10px 0; padding:11px 13px; cursor:pointer; transition:.12s; }
-.card:hover { border-color:rgba(255,255,255,.14); }
-.card.sel { background:var(--m-s2); }
-.card .row1 { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-.card .nombre { font-size:13.5px; font-weight:600; }
-.card .empresa { font-size:11.5px; color:var(--m-t3); margin:2px 0 7px; }
-.tipo-tag { font-size:11px; font-weight:800; letter-spacing:.05em; padding:2px 7px; border-radius:4px; text-transform:uppercase; white-space:nowrap; }
-.tipo-cliente   { background:rgba(14,169,104,.15);  color:var(--m-grn); }
-.tipo-proveedor { background:rgba(240,169,59,.15); color:var(--m-amb); }
-.tipo-operador  { background:rgba(47,111,237,.15); color:var(--m-acc); }
-.card .meta { display:flex; gap:10px; font-size:11px; color:var(--m-t3); }
-
-.detail { background:var(--m-s1); border:1px solid var(--m-b1); border-radius:10px; padding:20px 24px; min-height:480px; }
-.d-head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--m-b1); padding-bottom:14px; margin-bottom:14px; }
-.d-head .nombre { font-size:17px; font-weight:800; margin-bottom:2px; }
-.d-head .empresa { font-size:12.5px; color:var(--m-t3); }
-.agent-badge { font-size:11px; font-weight:800; letter-spacing:.06em; padding:3px 10px; border-radius:5px; text-transform:uppercase; height:fit-content; }
-.fields { display:grid; grid-template-columns:1fr 1fr; gap:10px 22px; margin-bottom:18px; }
-.field label { display:block; font-size:11px; color:var(--m-t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; font-weight:700; }
-.field .val { font-size:13px; }
-
-.sec-title { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--m-t3); font-weight:700; margin:0 0 10px; padding-top:12px; border-top:1px solid var(--m-b1); }
-.bitacora { display:flex; flex-direction:column; }
-.evento { display:flex; gap:14px; padding:10px 0; border-bottom:1px solid var(--m-b1); }
-.evento:last-child { border-bottom:none; }
-.evento .fecha { font-size:11px; color:var(--m-t3); width:100px; flex-shrink:0; padding-top:1px; }
-.evento .canal { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--m-t3); display:block; margin-bottom:2px; font-weight:700; }
-.evento .resumen { font-size:12.5px; line-height:1.55; }
-.empty-msg { padding:22px 12px; text-align:center; color:var(--m-t3); font-size:12px; border:1px dashed var(--m-b1); border-radius:10px; }
-</style>
 <link rel="stylesheet" href="/css/shell.css">
+<link rel="stylesheet" href="/css/corporate.css">
 <script src="/js/shell.js"></script>
 </head>
 <body data-shell-title="Memoria de agentes">
-
-<div class="wrap">
-
-  <div class="top">
+<main class="page">
+  <div class="crumbs"><a href="/">Portal</a><span>/</span><span>Memoria de agentes</span></div>
+  <div class="page-head">
     <div>
-      <div class="eyebrow">ABSTORAGES · Sistema multiagente</div>
       <h1>Memoria de agentes</h1>
+      <p>Lo que SARA, SOFIA y NOA recuerdan de cada persona: datos de contacto, historial y notas. Es una vista de solo lectura.</p>
+      <div class="updated" id="updated"></div>
     </div>
-    <div class="updated" id="updated"></div>
   </div>
 
-  <div class="tabs" id="tabs"></div>
-
-  <div class="controls">
-    <input class="search" id="searchInput" placeholder="Buscar por nombre, empresa o tipo de carga…">
-    <div class="filter" data-tipo="todos" id="f-todos">Todos</div>
-    <div class="filter" data-tipo="cliente" id="f-cliente">Clientes</div>
-    <div class="filter" data-tipo="proveedor" id="f-proveedor">Proveedores</div>
-    <div class="filter" data-tipo="operador" id="f-operador">Operadores</div>
-  </div>
+  <div class="agents" id="tabs"></div>
 
   <div class="board">
-    <div class="list" id="list"></div>
-    <div class="detail" id="detail"></div>
+    <section class="panel list-panel">
+      <div class="toolbar">
+        <div class="search-w"><span id="searchIco"></span><input class="search" id="searchInput" placeholder="Buscar por nombre, empresa o tipo de carga" aria-label="Buscar contactos"></div>
+        <div class="seg">
+          <div class="filter" data-tipo="todos" id="f-todos">Todos</div>
+          <div class="filter" data-tipo="cliente" id="f-cliente">Clientes</div>
+          <div class="filter" data-tipo="proveedor" id="f-proveedor">Proveedores</div>
+          <div class="filter" data-tipo="operador" id="f-operador">Operadores</div>
+        </div>
+      </div>
+      <div class="list" id="list"></div>
+    </section>
+    <section class="panel detail" id="detail"></section>
   </div>
-
-</div>
+</main>
 
 <script>
 const AGENTES = {
-  SARA:  { role: "Ventas · Clientes",                             color: "var(--m-grn)", bg: "rgba(14,169,104,.15)" },
-  SOFIA: { role: "Operaciones · Proveedores",                     color: "var(--m-acc)", bg: "rgba(47,111,237,.15)" },
-  NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--m-amb)", bg: "rgba(240,169,59,.15)" },
+  SARA:  { role: "Ventas · Clientes",                              color: "var(--sara)",  soft: "var(--sara-soft)" },
+  SOFIA: { role: "Operaciones · Proveedores",                      color: "var(--sofia)", soft: "var(--sofia-soft)" },
+  NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--noa)",   soft: "var(--noa-soft)" },
 };
 
 let activeAgent = "SARA";
@@ -153,14 +65,15 @@ function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt
 function fmtFecha(iso) { return iso ? new Date(iso).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }) : '—'; }
 function fmtFechaHora(iso) { return iso ? new Date(iso).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '—'; }
 function tipoLabel(t) { return t==='cliente' ? 'Cliente' : t==='proveedor' ? 'Proveedor' : 'Operador'; }
+function iniciales(n) { const p = String(n || '?').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?')[0] + (p.length > 1 ? p[p.length-1][0] : '')).toUpperCase(); }
 
 function renderTabs(){
   document.getElementById('tabs').innerHTML = Object.entries(AGENTES).map(([key,a])=>`
-    <div class="tab ${key===activeAgent?'active':''}" data-agent="${key}" onclick="selectAgent('${key}')">
-      <div class="count" style="background:${a.bg};color:${a.color}">${counts[key]}</div>
-      <div class="name" style="color:${key===activeAgent?a.color:'var(--m-t1)'}">${key}</div>
-      <div class="role">${a.role}</div>
-    </div>
+    <button class="agent ${key===activeAgent?'active':''}" style="--ag:${a.color};--ag-soft:${a.soft}" onclick="selectAgent('${key}')" aria-pressed="${key===activeAgent}">
+      <span class="agent-av">${key[0]}</span>
+      <span><span class="agent-nm">${key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
+      <span class="agent-ct"><b>${counts[key]}</b><span>contactos</span></span>
+    </button>
   `).join('');
 }
 
@@ -198,7 +111,6 @@ async function cargarContactos() {
 }
 
 function renderList(){
-  const agent = AGENTES[activeAgent];
   const list = document.getElementById('list');
   if (contactosCache.length === 0) {
     list.innerHTML = '<div class="empty-msg">Sin resultados para este filtro.</div>';
@@ -207,15 +119,12 @@ function renderList(){
   }
   if (!activeContactId || !contactosCache.find(c=>c.id===activeContactId)) activeContactId = contactosCache[0].id;
   list.innerHTML = contactosCache.map(c=>`
-    <div class="card ${c.id===activeContactId?'sel':''}" style="border-left-color:${c.id===activeContactId?agent.color:'var(--m-b1)'}" onclick="selectContacto('${c.id}')">
-      <div class="row1">
-        <div class="nombre">${esc(c.nombre_completo)}</div>
-        <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
-      </div>
-      <div class="empresa">${esc(c.empresa || '—')}</div>
-      <div class="meta">
-        <span>${esc(c.telefono || '—')}</span>
-        <span>Últ. contacto: ${fmtFecha(c.fecha_ultimo_contacto)}</span>
+    <div class="row ${c.id===activeContactId?'sel':''}" onclick="selectContacto('${c.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')selectContacto('${c.id}')">
+      <div class="av av-${c.tipo}">${esc(iniciales(c.nombre_completo))}</div>
+      <div class="row-main">
+        <div class="row-top"><div class="nombre">${esc(c.nombre_completo)}</div><div class="fecha">${fmtFecha(c.fecha_ultimo_contacto)}</div></div>
+        <div class="empresa">${esc([c.puesto, c.empresa].filter(Boolean).join(' · ') || '—')}</div>
+        <div class="row-meta"><span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span><span class="tel">${esc(c.telefono || '—')}</span></div>
       </div>
     </div>
   `).join('');
@@ -229,7 +138,7 @@ async function renderDetail(){
   const c = contactosCache.find(x=>x.id===activeContactId);
   const detail = document.getElementById('detail');
   if(!c){ detail.innerHTML = ''; return; }
-  detail.innerHTML = '<div class="empty-msg">Cargando bitácora…</div>';
+  detail.innerHTML = '<div class="empty-msg">Cargando ficha…</div>';
 
   let data;
   try {
@@ -243,32 +152,39 @@ async function renderDetail(){
 
   detail.innerHTML = `
     <div class="d-head">
-      <div>
+      <div class="av av-${data.tipo} d-av">${esc(iniciales(data.nombre_completo))}</div>
+      <div class="d-id">
         <div class="nombre">${esc(data.nombre_completo)}</div>
-        <div class="empresa">${esc(data.empresa || '—')}</div>
-      </div>
-      <div class="agent-badge" style="background:${agent.bg};color:${agent.color}">${esc(data.agente_asignado)}</div>
-    </div>
-    <div class="fields">
-      <div class="field"><label>Teléfono</label><div class="val">${esc(data.telefono || '—')}</div></div>
-      <div class="field"><label>Email</label><div class="val">${esc(data.email || '—')}</div></div>
-      <div class="field"><label>Tipo de carga / mercancía</label><div class="val">${esc(data.tipo_carga || '—')}</div></div>
-      <div class="field"><label>Clasificación</label><div class="val">${tipoLabel(data.tipo)}</div></div>
-      <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
-      <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
-    </div>
-    ${data.notas ? `<div class="field" style="margin-bottom:6px;"><label>Notas</label><div class="val">${esc(data.notas)}</div></div>` : ''}
-    <div class="sec-title">Bitácora de interacciones (${data.interacciones.length})</div>
-    <div class="bitacora">
-      ${data.interacciones.length ? data.interacciones.map(e=>`
-        <div class="evento">
-          <div class="fecha">${fmtFechaHora(e.fecha)}</div>
-          <div>
-            <span class="canal">${esc(e.agente)} · ${esc(e.canal || 'otro')}</span>
-            <div class="resumen">${esc(e.resumen || '—')}</div>
-          </div>
+        ${data.puesto ? `<div class="puesto">${esc(data.puesto)}</div>` : ''}
+        <div class="empresa">${esc(data.empresa || 'Sin empresa registrada')}</div>
+        <div class="d-tags">
+          <span class="tipo-tag tipo-${data.tipo}">${tipoLabel(data.tipo)}</span>
+          <span class="agent-badge" style="background:${agent.soft};color:${agent.color}">Asignado a ${esc(data.agente_asignado)}</span>
         </div>
-      `).join('') : '<div class="empty-msg">Sin interacciones registradas.</div>'}
+      </div>
+    </div>
+    <div class="d-body">
+      <section>
+        <div class="sec-title">Información de contacto</div>
+        <div class="fields">
+          <div class="field"><label>Teléfono</label><div class="val mono">${esc(data.telefono || '—')}</div></div>
+          <div class="field"><label>Correo electrónico</label><div class="val">${esc(data.email || '—')}</div></div>
+          <div class="field"><label>Mercancía habitual</label><div class="val">${esc(data.tipo_carga || '—')}</div></div>
+          <div class="field"><label>Clasificación</label><div class="val">${tipoLabel(data.tipo)}</div></div>
+          <div class="field"><label>Primer contacto</label><div class="val">${fmtFecha(data.fecha_primer_contacto)}</div></div>
+          <div class="field"><label>Último contacto</label><div class="val">${fmtFecha(data.fecha_ultimo_contacto)}</div></div>
+        </div>
+      </section>
+      ${data.notas ? `<section><div class="sec-title">Notas</div><div class="notes">${esc(data.notas)}</div></section>` : ''}
+      <section>
+        <div class="sec-title">Bitácora de interacciones <span class="cnt">${data.interacciones.length}</span></div>
+        ${data.interacciones.length ? `<div class="tl">${data.interacciones.map(e=>`
+          <div class="evento">
+            <div class="fecha">${fmtFechaHora(e.fecha)}</div>
+            <div><span class="canal">${esc(e.agente)} · ${esc(e.canal || 'otro')}</span></div>
+            <div class="resumen">${esc(e.resumen || '—')}</div>
+          </div>`).join('')}</div>` : '<div class="empty-msg">Sin interacciones registradas.</div>'}
+      </section>
     </div>
   `;
 }
@@ -279,6 +195,7 @@ document.getElementById('searchInput').addEventListener('input', (e)=>{
   _debounce = setTimeout(cargarContactos, 300);
 });
 
+document.getElementById('searchIco').innerHTML = ico('search');
 document.getElementById('updated').textContent = 'Cargado: ' + new Date().toLocaleString('es-MX', { dateStyle:'medium', timeStyle:'short' });
 
 renderTabs();
