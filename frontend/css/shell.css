@@ -8,7 +8,7 @@ body.has-shell { -webkit-font-smoothing:antialiased; }
 .abs-appbar { background:var(--appbar-bg); color:var(--appbar-tx); position:sticky; top:0; z-index:200; border-bottom:1px solid rgba(255,255,255,.06); font-family:var(--font-sans); }
 .abs-appbar-in { max-width:1600px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:22px; }
 .abs-brand { display:flex; align-items:center; gap:11px; text-decoration:none; color:inherit; flex-shrink:0; }
-.abs-mark { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,#2F6FED,#0EA968); display:grid; place-items:center; font-weight:800; font-size:13px; color:#fff; letter-spacing:-.02em; }
+.abs-mark { width:34px; height:34px; display:block; object-fit:contain; }
 .abs-name { font-weight:800; font-size:15px; letter-spacing:.06em; }
 .abs-sep { width:1px; height:22px; background:rgba(255,255,255,.18); }
 .abs-sub { font-size:13px; color:var(--appbar-mute); font-weight:500; white-space:nowrap; }

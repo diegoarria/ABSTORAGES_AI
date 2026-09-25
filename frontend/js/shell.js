@@ -63,7 +63,7 @@
     bar.className = 'abs-appbar'; bar.id = 'abs-appbar';
     bar.innerHTML =
       '<div class="abs-appbar-in">' +
-        '<a class="abs-brand" href="/"><span class="abs-mark">AB</span><span class="abs-name">ABSTORAGES</span></a>' +
+        '<a class="abs-brand" href="/"><img class="abs-mark" src="/img/logo-mark.png" alt="" width="34" height="34"><span class="abs-name">ABSTORAGES</span></a>' +
         (titulo ? '<span class="abs-sep"></span><span class="abs-sub">' + esc(titulo) + '</span>' : '') +
         '<nav class="abs-nav" aria-label="Navegación principal">' +
           LINKS.map(function (l) { return '<a href="' + l[0] + '"' + (path === l[0] ? ' class="on" aria-current="page"' : '') + '>' + l[1] + '</a>'; }).join('') +
