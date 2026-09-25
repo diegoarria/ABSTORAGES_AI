@@ -35,6 +35,9 @@ tr.rec td:first-child { border-radius:10px 0 0 10px; } tr.rec td:last-child { bo
 .man { display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; padding-top:16px; border-top:1px solid var(--bd); }
 .man input { flex:1; min-width:220px; background:var(--surface); border:1px solid var(--bd-strong); border-radius:9px; padding:9px 12px; color:var(--tx); font-size:13.5px; font-family:inherit; }
 .man input:focus { outline:none; border-color:var(--acc); box-shadow:var(--focus); }
+.hitos { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.hito { font-size:11.5px; font-weight:600; padding:5px 11px; border-radius:20px; background:var(--surface-3); color:var(--tx3); }
+.hito.ok { background:var(--ok-soft); color:var(--ok); }
 .kpi { white-space:pre-wrap; font-family:var(--font-mono); font-size:14px; line-height:1.9; background:var(--surface-2); border:1px solid var(--bd); border-radius:12px; padding:18px 20px; margin-top:12px; }
 @media (max-width:640px) { .page-w { padding:20px 16px 48px; } .card { padding:18px; } }
 </style>
@@ -65,7 +68,16 @@ function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace
 const $ = n => '$' + Number(n).toLocaleString('es-MX');
 const hora = iso => iso ? new Date(iso).toLocaleString('es-MX', { dateStyle:'short', timeStyle:'short' }) : '—';
 const ESTADO = { esperando:'esperando', respondio:'respondió', acepto:'tiene unidad', rechazo:'no tiene', sin_respuesta:'sin respuesta' };
-const SEG = { pendiente:'por preguntar', consultado:'preguntado, esperando', salio:'salió', en_ruta:'en ruta', entregado:'entregado', retraso:'retraso', sin_confirmacion:'sin confirmar' };
+const HITOS = [['asignado','Asignado'],['unidad_confirmada','Unidad confirmada'],['llego_carga','En carga'],['cargado','Cargado'],['en_ruta','En ruta'],['llego_destino','En destino'],['entregado','Entregado'],['evidencia','Evidencia']];
+function lineaHitos(c) {
+  const h = c.hitos || {};
+  const chips = HITOS.map(([k, l]) => h[k] ? `<span class="hito ok" title="${hora(h[k].en)}${h[k].detalle ? ' — ' + esc(h[k].detalle) : ''}">${l}</span>` : `<span class="hito">${l}</span>`).join('');
+  const op = c.operador && (c.operador.nombre || c.operador.placas || c.operador.telefono)
+    ? `<div class="line"><b>Operador:</b> ${esc(c.operador.nombre || '—')} · <b>Placas:</b> ${esc(c.operador.placas || '—')} · <b>Tel.:</b> ${esc(c.operador.telefono || '—')}</div>`
+    : '<div class="line" style="color:var(--warn)">Aún sin datos del operador y la unidad.</div>';
+  const ret = (c.retrasos || []).length ? `<div class="line" style="color:var(--crit)"><b>Retrasos:</b> ${c.retrasos.map(r => esc(r.detalle || 'sin detalle') + ' (' + hora(r.en) + ')').join(' · ')}</div>` : '';
+  return `<div class="hitos">${chips}</div>${op}${ret}`;
+}
 
 async function api(url, opt) { const r = await fetch(url, { credentials:'include', ...opt }); const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status)); return d; }
 
@@ -79,7 +91,7 @@ function tarjeta(c) {
     <td>${c.estado === 'buscando' ? `<button class="btn btn-primary btn-sm" onclick="aprobar('${esc(c.folio)}','${esc(f.tel)}','${esc(f.nombre)}',${f.precio || 0})">Aprobar y cerrar</button>` : ''}</td></tr>`).join('')}</table></div>` : '';
   const contactados = provs.length ? `<div class="line"><b>Contactados:</b> ${provs.map(p => `${esc(p.nombre)} (${ESTADO[p.estado] || p.estado}, ola ${p.ola})`).join(' · ')}</div>` : '';
   const pend = (c.pendientes || []).length ? `<div class="line"><b>En espera de la siguiente ola:</b> ${c.pendientes.map(p => esc(p.nombre)).join(', ')}</div>` : '';
-  const ganador = c.ganador ? `<div class="win"><b>${esc(c.ganador.nombre)}</b>${c.ganador.precio ? ' a ' + $(c.ganador.precio) : ''} · aprobó ${esc(c.ganador.aprobadoPor || '—')} · ${hora(c.colocadoEn)}<div class="sub">Unidad: ${SEG[c.seguimiento?.estado] || '—'}${c.seguimiento?.detalle ? ' — ' + esc(c.seguimiento.detalle) : ''}</div></div>` : '';
+  const ganador = c.ganador ? `<div class="win"><b>${esc(c.ganador.nombre)}</b>${c.ganador.precio ? ' a ' + $(c.ganador.precio) : ''} · aprobó ${esc(c.ganador.aprobadoPor || '—')} · ${hora(c.colocadoEn)}</div>${lineaHitos(c)}` : '';
   const manual = c.estado === 'buscando' ? `<div class="man"><input id="m-${esc(c.folio)}" placeholder="Colocar con otro proveedor (nombre)"><button class="btn btn-secondary btn-sm" onclick="manual('${esc(c.folio)}')">Colocar manualmente</button></div>` : '';
   return `<div class="card"><div class="card-h"><div><h3>${esc(c.folio)} · ${esc(c.origen)} → ${esc(c.destino)}</h3><div class="sub">${esc(c.empresa || '')} · ${esc(c.tipo_unidad || 'unidad por definir')} · creada ${hora(c.creada)}${c.urgente ? ' · urgente' : ''}</div></div><span class="tag t-${c.estado}">${c.estado.replace('_',' ')}</span></div>${ofertas}${contactados}${pend}${ganador}${manual}</div>`;
 }

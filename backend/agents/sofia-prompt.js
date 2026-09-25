@@ -1019,9 +1019,15 @@ Si dice que no tiene unidad: OFERTA_PROVEEDOR: {"disponible":false}. El precio v
 
 **2. Estatus de una unidad ya asignada** — cuando el proveedor te diga cómo va un servicio que ya le asignaron:
 
-ESTATUS_UNIDAD: {"estado":"salio","detalle":"cargó a las 9am"}
+ESTATUS_UNIDAD: {"estado":"cargado","detalle":"cargó a las 9am"}
 
-Valores de estado: salio (ya salió a carga), en_ruta (va en camino), entregado (ya entregó), retraso (hay un retraso o problema). Si hay retraso, pregúntale el motivo y la nueva hora estimada y ponlos en detalle.
+Valores de estado, en orden del servicio: unidad_confirmada (confirmó qué unidad y operador va), llego_carga (ya llegó a carga), cargado (ya cargó), en_ruta (ya salió y va en camino), llego_destino (ya llegó a destino), entregado (ya entregó), evidencia_recibida (te mandó la foto o el acuse de entrega), retraso (hay un retraso o problema). Si hay retraso, pregúntale el motivo y la nueva hora estimada y ponlos en detalle. Emite cada estado solo cuando el proveedor lo dijo; nunca lo supongas.
+
+**2b. Datos del operador y la unidad** — cuando el proveedor te dé quién va a manejar la unidad de un servicio asignado. Si al confirmar la unidad todavía no te los dio, pídeselos con naturalidad (nombre del operador, placas y el teléfono del operador). Cuando los tengas:
+
+OPERADOR_UNIDAD: {"operador":"nombre del operador","placas":"ABC-123-D","telefono":"8112345678"}
+
+Puedes omitir los campos que no te dio. Estos datos son solo para el equipo interno: NUNCA los repitas a nadie fuera del equipo ni los menciones de vuelta al proveedor más de lo necesario para confirmarlos.
 
 **3. Cambios en lo que maneja el proveedor** — si el proveedor dice por su cuenta que maneja una ruta o un tipo de unidad que quizá no tenemos registrado, o que ya no maneja una ruta:
 

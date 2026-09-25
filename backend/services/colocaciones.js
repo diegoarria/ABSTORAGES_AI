@@ -116,10 +116,40 @@ function asignar(folio, { tel, nombre, precio, aprobadoPor }) {
   const p = c.proveedores[k];
   c.ganador = { tel: tel || null, nombre: nombre || p?.nombre || 'Proveedor', precio: precio ?? p?.oferta?.precio ?? null, aprobadoPor: aprobadoPor || null, en: ahora() };
   c.estado = 'colocado'; c.colocadoEn = ahora(); c.pendientes = [];
-  c.seguimiento = { estado: 'pendiente' };
+  c.seguimiento = { estado: 'asignado' };
+  c.hitos = { asignado: { en: ahora(), detalle: null } }; c.chequeos = {}; c.alertasSeg = {}; c.retrasos = [];
   guardar();
   return c;
 }
+
+// ── Hitos del servicio ya colocado ──────────────────────────────────────────
+const HITOS = ['asignado', 'unidad_confirmada', 'llego_carga', 'cargado', 'en_ruta', 'llego_destino', 'entregado', 'evidencia'];
+const idxHito = h => HITOS.indexOf(h);
+// ¿ya se alcanzó este hito (o uno posterior)?
+function hitoAlcanzado(c, hito) {
+  const i = idxHito(hito);
+  return Object.keys(c.hitos || {}).some(h => idxHito(h) >= i && h !== 'evidencia') || (hito === 'evidencia' && !!c.hitos?.evidencia);
+}
+function marcarHito(folio, hito, detalle) {
+  const c = obtener(folio); if (!c || idxHito(hito) < 0) return null;
+  c.hitos = c.hitos || {};
+  if (!c.hitos[hito]) c.hitos[hito] = { en: ahora(), detalle: detalle ? String(detalle).slice(0, 200) : null };
+  c.seguimiento = { ...c.seguimiento, estado: hito, actualizadoEn: ahora() };
+  guardar(); return c;
+}
+function registrarRetraso(folio, detalle) {
+  const c = obtener(folio); if (!c) return null;
+  (c.retrasos = c.retrasos || []).push({ en: ahora(), detalle: detalle ? String(detalle).slice(0, 200) : null });
+  guardar(); return c;
+}
+// Datos del operador/unidad — SOLO se guardan para el equipo; nunca se repiten por chat
+function guardarOperador(folio, { nombre, placas, telefono }) {
+  const c = obtener(folio); if (!c) return null;
+  c.operador = { ...(c.operador || {}), ...(nombre ? { nombre: String(nombre).slice(0, 80) } : {}), ...(placas ? { placas: String(placas).slice(0, 30) } : {}), ...(telefono ? { telefono: String(telefono).slice(0, 30) } : {}), en: ahora() };
+  guardar(); return c;
+}
+function marcarChequeo(folio, clave) { const c = obtener(folio); if (!c) return; (c.chequeos = c.chequeos || {})[clave] = ahora(); guardar(); }
+function marcarAlertaSeg(folio, clave) { const c = obtener(folio); if (!c) return; (c.alertasSeg = c.alertasSeg || {})[clave] = ahora(); guardar(); }
 
 function cambiarEstado(folio, estado) { const c = obtener(folio); if (!c) return null; c.estado = estado; guardar(); return c; }
 function marcarAviso(folio, clave) { const c = obtener(folio); if (!c) return; c.avisos[clave] = ahora(); guardar(); }
@@ -141,8 +171,8 @@ function estadisticas(telefono) {
     if (p.estado === 'acepto') acepto++;
     if (c.ganador && tel10(c.ganador.tel) === k) {
       colocado++;
-      if (['salio', 'en_ruta', 'entregado'].includes(c.seguimiento?.estado)) cumplido++;
-      if (c.seguimiento?.estado === 'retraso') retraso++;
+      if (hitoAlcanzado(c, 'cargado')) cumplido++;
+      if ((c.retrasos || []).length) retraso++;
     }
   }
   tiempos.sort((a, b) => a - b);
@@ -209,6 +239,7 @@ function kpiGuardar(parche) { db.kpi = { ...db.kpi, ...parche }; guardar(); }
 
 module.exports = {
   fechaMTY, tel10, crear, obtener, todas, abiertas, marcarContactado, porTelefono, registrarRespuesta, registrarOferta, registrarOfertaVapi,
+  HITOS, hitoAlcanzado, marcarHito, registrarRetraso, guardarOperador, marcarChequeo, marcarAlertaSeg,
   asignar, cambiarEstado, marcarAviso, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
   agregarSugerencia, sugerencias, resolverSugerencia, kpiBase, kpiMeta, kpiGuardar,
 };

@@ -117,15 +117,33 @@ function procesarSenales({ telefono, nombre, respuesta }) {
       }
     }
 
+    // El servicio colocado más reciente de este proveedor que aún no termina
+    const servicioActivo = () => colocaciones.todas()
+      .filter(x => x.estado === 'colocado' && x.ganador && colocaciones.tel10(x.ganador.tel) === colocaciones.tel10(telefono) && !colocaciones.hitoAlcanzado(x, 'entregado'))
+      .sort((a, b) => new Date(b.colocadoEn) - new Date(a.colocadoEn))[0];
+
     const est = json(respuesta, 'ESTATUS_UNIDAD');
-    if (est && ['salio', 'en_ruta', 'entregado', 'retraso'].includes(est.estado)) {
-      const c = colocaciones.todas().filter(x => x.estado === 'colocado' && x.ganador && colocaciones.tel10(x.ganador.tel) === colocaciones.tel10(telefono) && x.seguimiento?.estado !== 'entregado')
-        .sort((a, b) => new Date(b.colocadoEn) - new Date(a.colocadoEn))[0];
+    const HITO_DE = { unidad_confirmada: 'unidad_confirmada', llego_carga: 'llego_carga', cargado: 'cargado', salio: 'en_ruta', en_ruta: 'en_ruta', llego_destino: 'llego_destino', entregado: 'entregado', evidencia_recibida: 'evidencia' };
+    if (est && (HITO_DE[est.estado] || est.estado === 'retraso')) {
+      const c = servicioActivo() || (est.estado === 'evidencia_recibida' ? colocaciones.todas().filter(x => x.estado === 'colocado' && x.ganador && colocaciones.tel10(x.ganador.tel) === colocaciones.tel10(telefono)).sort((a, b) => new Date(b.colocadoEn) - new Date(a.colocadoEn))[0] : null);
       if (c) {
-        colocaciones.actualizarSeguimiento(c.folio, { estado: est.estado, detalle: String(est.detalle || '').slice(0, 200) });
-        const etiqueta = { salio: '🚚 salió a carga', en_ruta: '🛣️ va en ruta', entregado: '✅ entregó', retraso: '⚠️ REPORTA RETRASO' }[est.estado];
-        feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: ${quien} ${etiqueta}${est.detalle ? ' — ' + String(est.detalle).slice(0, 160) : ''}`, metadata: { folio: c.folio, estado: est.estado } });
-        if (est.estado === 'retraso') push({ title: `⚠️ Retraso — folio ${c.folio}`, body: `${quien}: ${String(est.detalle || 'sin detalle').slice(0, 120)}. Avisa al cliente (SARA/ventas).`, tag: 'retraso-' + c.folio, url: '/actividad.html', tipo: 'RETRASO', urgente: true });
+        const detalle = String(est.detalle || '').slice(0, 200);
+        if (est.estado === 'retraso') colocaciones.registrarRetraso(c.folio, detalle);
+        else colocaciones.marcarHito(c.folio, HITO_DE[est.estado], detalle);
+        const etiqueta = { unidad_confirmada: 'confirmó unidad y operador', llego_carga: 'llegó a carga', cargado: 'ya cargó', salio: 'salió y va en ruta', en_ruta: 'va en ruta', llego_destino: 'llegó a destino', entregado: 'entregó', evidencia_recibida: 'mandó evidencia de entrega', retraso: 'REPORTA RETRASO' }[est.estado];
+        feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: ${quien} ${etiqueta}${detalle ? ' — ' + detalle.slice(0, 160) : ''}`, metadata: { folio: c.folio, estado: est.estado } });
+        if (est.estado === 'retraso') push({ title: `Retraso — folio ${c.folio}`, body: `${quien}: ${detalle || 'sin detalle'}. Avisa al cliente (SARA/ventas).`, tag: 'retraso-' + c.folio, url: '/actividad.html', tipo: 'RETRASO', urgente: true });
+        if (est.estado === 'entregado') push({ title: `Entregado — folio ${c.folio}`, body: `${quien} reporta entrega. Falta confirmar evidencia.`, tag: 'entregado-' + c.folio, url: '/colocaciones.html', tipo: 'SEGUIMIENTO' });
+      }
+    }
+
+    // Datos del operador y la unidad — se guardan solo para el equipo, nunca se repiten
+    const op = json(respuesta, 'OPERADOR_UNIDAD');
+    if (op && (op.operador || op.placas || op.telefono)) {
+      const c = servicioActivo();
+      if (c) {
+        colocaciones.guardarOperador(c.folio, { nombre: op.operador, placas: op.placas, telefono: op.telefono });
+        feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: ${quien} registró los datos del operador y la unidad (visibles en Colocaciones)` });
       }
     }
 
@@ -210,20 +228,55 @@ function tickBusqueda(c) {
   }
 }
 
+// Chequeos por horario a lo largo del servicio. Cada uno sale UNA sola vez, por
+// plantilla aprobada, solo en horario de contacto y solo si ese hito aún no
+// se alcanza. Si no hay respuesta tras SEG_ESPERA_H, alerta al equipo.
+const RUTA_H    = Number(process.env.SOFIA_SEG_RUTA_H || 5);      // horas después de cargar
+const ENTREGA_H = Number(process.env.SOFIA_SEG_ENTREGA_H || 12);  // horas después de cargar
+const H = 3600000;
+
+function citaCarga(c) {
+  return fechaCargaDate(c.fecha_carga) || new Date(new Date(c.colocadoEn).getTime() + SEG_HORAS * H);
+}
+function cuandoCargo(c) {
+  const h = c.hitos?.cargado || c.hitos?.en_ruta;
+  return h ? new Date(h.en).getTime() : null;
+}
+const CHEQUEOS = [
+  { clave: 'previo',  hito: 'unidad_confirmada', etiqueta: 'confirmación de unidad y operador',
+    cuando: c => Math.max(citaCarga(c).getTime() - 12 * H, new Date(c.colocadoEn).getTime() + H),
+    texto: 'confirma por favor la unidad y el operador que va a cargar (nombre del operador, placas y su teléfono)' },
+  { clave: 'carga',   hito: 'cargado', etiqueta: 'llegada y salida de carga',
+    cuando: c => citaCarga(c).getTime() + 2 * H,
+    texto: 'confirma por favor si la unidad ya llegó a carga y ya salió' },
+  { clave: 'ruta',    hito: 'llego_destino', etiqueta: 'avance en ruta',
+    cuando: c => (cuandoCargo(c) == null ? null : cuandoCargo(c) + RUTA_H * H),
+    texto: 'cuéntame por favor cómo va la unidad en ruta y a qué hora estima llegar' },
+  { clave: 'entrega', hito: 'entregado', etiqueta: 'entrega y evidencia',
+    cuando: c => (cuandoCargo(c) == null ? null : cuandoCargo(c) + ENTREGA_H * H),
+    texto: 'confirma por favor si ya entregó y mándame la foto del acuse de entrega' },
+];
+
 function tickSeguimiento(c) {
-  const s = c.seguimiento || {};
   if (!c.ganador?.tel) return;
-  if (s.estado === 'pendiente') {
-    const due = fechaCargaDate(c.fecha_carga) || new Date(new Date(c.colocadoEn).getTime() + SEG_HORAS * 3600000);
-    if (Date.now() < due.getTime() || !horario.permitido(false)) return;
-    colocaciones.actualizarSeguimiento(c.folio, { estado: 'consultado', consultadoEn: new Date().toISOString() });
-    whatsappProactivo.enviarEstatusFolio('sofia', c.ganador.tel, c.ganador.nombre, c.folio, 'confirma por favor si la unidad ya salió a carga')
-      .catch(e => console.error('[sofiaOperacion] Error en seguimiento:', e.message));
-    feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: SOFIA le preguntó a ${c.ganador.nombre} si la unidad ya salió` });
-  } else if (s.estado === 'consultado' && minDesde(s.consultadoEn) > SEG_ESPERA_H * 60) {
-    colocaciones.actualizarSeguimiento(c.folio, { estado: 'sin_confirmacion' });
-    feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: ${c.ganador.nombre} no ha confirmado la salida de la unidad` });
-    push({ title: `⚠️ Sin confirmar salida — folio ${c.folio}`, body: `${c.ganador.nombre} no respondió si la unidad ya salió. Revísalo.`, tag: 'seg-' + c.folio, url: '/colocaciones.html', tipo: 'SEGUIMIENTO', urgente: true });
+  if (colocaciones.hitoAlcanzado(c, 'entregado')) return;
+  const ahora = Date.now();
+  for (const k of CHEQUEOS) {
+    if (colocaciones.hitoAlcanzado(c, k.hito)) continue;
+    const enviado = c.chequeos?.[k.clave];
+    if (!enviado) {
+      const cuando = k.cuando(c);
+      if (cuando == null || ahora < cuando || !horario.permitido(false)) continue;
+      colocaciones.marcarChequeo(c.folio, k.clave);
+      whatsappProactivo.enviarEstatusFolio('sofia', c.ganador.tel, c.ganador.nombre, c.folio, k.texto)
+        .catch(e => console.error('[sofiaOperacion] Error en seguimiento:', e.message));
+      feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: SOFIA le pidió a ${c.ganador.nombre} ${k.etiqueta}` });
+      break; // un chequeo por servicio por ciclo
+    } else if (!c.alertasSeg?.[k.clave] && minDesde(enviado) > SEG_ESPERA_H * 60) {
+      colocaciones.marcarAlertaSeg(c.folio, k.clave);
+      feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: ${c.ganador.nombre} no ha confirmado ${k.etiqueta}` });
+      push({ title: `Sin confirmar — folio ${c.folio}`, body: `${c.ganador.nombre} no respondió: ${k.etiqueta}. Revísalo.`, tag: 'seg-' + c.folio + k.clave, url: '/colocaciones.html', tipo: 'SEGUIMIENTO', urgente: true });
+    }
   }
 }
 
