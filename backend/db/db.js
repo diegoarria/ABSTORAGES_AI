@@ -148,7 +148,21 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
 // no vacíos + fecha_ultimo_contacto y agrega una interacción. Si no existe,
 // crea el contacto (agente_asignado = agente, nunca se sobreescribe después)
 // más su primera interacción.
+// El schema.sql solo se aplica a mano (POST /api/admin/db-migrate), así que
+// una columna nueva NO existe en producción hasta que alguien lo corra — y
+// cada UPDATE/INSERT que la mencione fallaba. Aquí las columnas de proveedor
+// se aseguran solas, una vez por arranque, antes de usarlas.
+let columnasContactos = null;
+function asegurarColumnasContactos() {
+  if (!columnasContactos) {
+    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT')
+      .catch(e => { columnasContactos = null; throw e; });
+  }
+  return columnasContactos;
+}
+
 async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, unidades, resumen_interaccion, canal }) {
+  await asegurarColumnasContactos();
   let existente = null;
   if (telefono) {
     const { rows } = await query('SELECT * FROM contactos WHERE telefono = $1 LIMIT 1', [telefono]);
@@ -350,6 +364,7 @@ async function aplicarSchema() {
 }
 
 module.exports = {
+  asegurarColumnasContactos,
   pool,
   query,
   getClient,

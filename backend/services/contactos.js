@@ -100,6 +100,7 @@ async function actualizarCampoProveedor(id, campo, texto) {
   const valor = String(texto || '').trim().slice(0, 500) || null;
   if (USA_DB) {
     try {
+      await db.asegurarColumnasContactos();
       const { rows } = await db.query(`UPDATE contactos SET ${campo} = $1 WHERE id = $2 RETURNING *`, [valor, id]);
       return rows[0] || null;
     } catch (e) { console.error(`[Contactos] Postgres falló actualizando ${campo}, cae a archivo:`, e.message); }
@@ -211,6 +212,30 @@ const CONTACTOS_PERMANENTES = [
   },
 ];
 
+// Rutas que el usuario ya pasó por chat (24-sep-2026) — se cargan solas si el
+// proveedor todavía no tiene rutas capturadas. Si alguien las edita después
+// desde Base de Datos, esto nunca las pisa.
+const RUTAS_INICIALES = [
+  { telefono: '+525666687965', nombre: 'Rubén Díaz', empresa: 'Transportes Kamir', rutas: 'Toluca, CDMX, Guadalajara, Monterrey' },
+  { telefono: '+528712361247', nombre: 'Aziel', empresa: 'Risoco', rutas: 'Guadalajara-Monterrey, Monterrey-Torreón, Monterrey-Gómez Palacio' },
+];
+
+async function sembrarRutasIniciales() {
+  for (const r of RUTAS_INICIALES) {
+    try {
+      let c = await buscarPorTelefono(r.telefono, 'sofia');
+      if (!c) {
+        await upsertContacto({ agente: 'sofia', tipo: 'proveedor', nombre_completo: r.nombre, empresa: r.empresa, telefono: r.telefono, rutas: r.rutas,
+          resumen_interaccion: 'Alta con rutas iniciales', canal: 'permanente' });
+        console.log(`[Contactos] Creado ${r.nombre} con rutas iniciales`);
+      } else if (!String(c.rutas || '').trim()) {
+        await actualizarRutas(c.id, r.rutas);
+        console.log(`[Contactos] Rutas iniciales cargadas a ${c.nombre_completo}`);
+      }
+    } catch (e) { console.error(`[Contactos] Error cargando rutas iniciales de ${r.nombre}:`, e.message); }
+  }
+}
+
 async function sembrarContactosPermanentes() {
   for (const c of CONTACTOS_PERMANENTES) {
     try {
@@ -227,6 +252,6 @@ async function sembrarContactosPermanentes() {
     }
   }
 }
-sembrarContactosPermanentes();
+sembrarContactosPermanentes().then(sembrarRutasIniciales);
 
 module.exports = { actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
