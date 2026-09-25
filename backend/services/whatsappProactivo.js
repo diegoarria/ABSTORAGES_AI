@@ -65,6 +65,7 @@ const TWILIO_WA_FROM = {
 const CONTENT_SID_DISPONIBILIDAD = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD || null;
 const CONTENT_SID_AVISO_EQUIPO   = process.env.TWILIO_CONTENT_SID_AVISO_EQUIPO   || null;
 const CONTENT_SID_ESTATUS_FOLIO  = process.env.TWILIO_CONTENT_SID_ESTATUS_FOLIO  || null;
+const CONTENT_SID_RECLAMO_PAGO   = process.env.TWILIO_CONTENT_SID_RECLAMO_PAGO   || null;
 
 function telefonoValido(t) {
   return t && t !== '—' && /\d{8,}/.test(String(t));
@@ -151,6 +152,26 @@ async function avisarEquipo(agente, remitenteLabel, mensaje, destinatariosClaves
   return resultados;
 }
 
+// ── 2b. Reclamo de pago de un proveedor — a quien atiende Administración ──
+// Plantilla propia (sofia_reclamo_pago): "Reclamo de pago de proveedor.
+// Proveedor: {{1}}. Detalle: {{2}}. ..." Si su ContentSid aún no está en
+// Railway, cae al aviso genérico al equipo para que la alerta nunca se pierda.
+async function avisarReclamoPago(agente, destinatariosClaves, proveedor, detalle) {
+  if (!CONTENT_SID_RECLAMO_PAGO) {
+    return avisarEquipo(agente, agente.toUpperCase(), `Reclamo de pago — ${proveedor}: ${detalle}. Búscalo en la Base de Datos.`, destinatariosClaves);
+  }
+  const destinatarios = (destinatariosClaves || []).map(k => STAFF[k]).filter(Boolean);
+  const limpio = t => String(t || '').replace(/\s+/g, ' ').trim().slice(0, 300);
+  const resultados = await Promise.allSettled(
+    destinatarios.map(d => enviarPlantilla(agente, d.telefono, CONTENT_SID_RECLAMO_PAGO, { '1': limpio(proveedor) || 'un proveedor', '2': limpio(detalle) || 'sin detalle' }))
+  );
+  resultados.forEach((r, i) => {
+    if (r.status === 'rejected') console.error(`[whatsappProactivo] Error avisando reclamo de pago a ${destinatarios[i]?.nombre}:`, r.reason?.message);
+    else registrarEnMemoria(agente, destinatarios[i].telefono, `Reclamo de pago de proveedor. Proveedor: ${limpio(proveedor)}. Detalle: ${limpio(detalle)}. Por favor revísalo con Administración y dale seguimiento. — SOFIA, ABSTORAGES Logistics Solutions`);
+  });
+  return resultados;
+}
+
 // ── 3. Estatus de folio — SARA/SOFIA a cliente o proveedor ────────────────
 async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   if (!CONTENT_SID_ESTATUS_FOLIO) { console.warn('[whatsappProactivo] Plantilla de estatus de folio aún no aprobada — se omite'); return null; }
@@ -164,4 +185,4 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   return resultado;
 }
 
-module.exports = { preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
+module.exports = { avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };

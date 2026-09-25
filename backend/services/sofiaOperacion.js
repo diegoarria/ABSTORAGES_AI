@@ -168,10 +168,10 @@ function escalarReclamoPago({ telefono, nombre, resumen }) {
   _ultimoReclamo.set(k, Date.now());
   const quien = nombre || 'Un proveedor';
   const detalle = String(resumen || 'sin detalle').replace(/\s+/g, ' ').slice(0, 220);
-  const mensaje = `Reclamo de pago — ${quien}: ${detalle}. SOFIA le respondió que lo revisan con Administración. Búscalo en la Base de Datos.`;
+
   feed({ tipo: 'RECLAMO_PAGO', mensaje: `${quien} reclama un pago: ${detalle}`, metadata: { proveedor: quien } });
   push({ title: `Reclamo de pago — ${quien}`, body: detalle, tag: 'reclamo-pago-' + k, url: '/actividad.html', tipo: 'RECLAMO_PAGO', urgente: true });
-  whatsappProactivo.avisarEquipo('sofia', 'SOFIA', mensaje, RECLAMO_A)
+  whatsappProactivo.avisarReclamoPago('sofia', RECLAMO_A, quien, detalle)
     .catch(e => console.error('[sofiaOperacion] Error avisando reclamo de pago:', e.message));
   contactosSvc.buscarPorTelefono(telefono, 'sofia').then(c => c && contactosSvc.upsertContacto({ agente: 'sofia', tipo: c.tipo, nombre_completo: c.nombre_completo, telefono: c.telefono, resumen_interaccion: `Reclamo de pago: ${detalle} — escalado a Manuel y Rafael`, canal: 'whatsapp' }))
     .catch(() => {});
