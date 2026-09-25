@@ -7,6 +7,7 @@
 //   "MTY-GDL"          ruta ida y vuelta entre esas dos plazas
 //   "Bajío"            cualquier ruta que toque esa zona
 //   "Monterrey"        cualquier ruta que toque esa ciudad
+//   "Desde Toluca"    solo cargas que SALEN de esa ciudad
 //   "todas" / "nacional"  cualquier ruta
 // Un proveedor SIN rutas capturadas nunca se contacta automáticamente.
 
@@ -73,6 +74,8 @@ function parsear(texto) {
   return String(texto || '').split(/[,;\n]+/).map(s => s.trim()).filter(Boolean).map(entrada => {
     const t = norm(entrada);
     if (COMODINES.has(t)) return { comodin: true, entrada };
+    const desde = /^(desde|salidas? de|sale de)\s+/i.test(t) ? entrada.replace(/^(desde|salidas? de|sale de)\s+/i, '').trim() : null;
+    if (desde) return { soloOrigen: desde, entrada };
     const lados = entrada.split(/\s*(?:<->|->|→|↔|–|—|-|>)\s*|\s+a\s+/i).map(s => s.trim()).filter(Boolean);
     return { lados: lados.slice(0, 2), entrada };
   });
@@ -83,7 +86,9 @@ function cubreRuta(rutasTexto, origen, destino) {
   const o = claves(origen), d = claves(destino);
   for (const r of parsear(rutasTexto)) {
     if (r.comodin) return { ok: true, por: r.entrada };
-    if (r.lados.length === 2) {
+    if (r.soloOrigen) {
+      if (hayInterseccion(claves(r.soloOrigen), o)) return { ok: true, por: r.entrada };
+    } else if (r.lados.length === 2) {
       const a = claves(r.lados[0]), b = claves(r.lados[1]);
       if ((hayInterseccion(a, o) && hayInterseccion(b, d)) || (hayInterseccion(a, d) && hayInterseccion(b, o))) return { ok: true, por: r.entrada };
     } else if (r.lados.length === 1) {

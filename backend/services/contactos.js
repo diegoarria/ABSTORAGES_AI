@@ -216,7 +216,7 @@ const CONTACTOS_PERMANENTES = [
 // proveedor todavía no tiene rutas capturadas. Si alguien las edita después
 // desde Base de Datos, esto nunca las pisa.
 const RUTAS_INICIALES = [
-  { telefono: '+525666687965', nombre: 'Rubén Díaz', empresa: 'Transportes Kamir', rutas: 'Toluca, CDMX, Guadalajara, Monterrey' },
+  { telefono: '+525666687965', nombre: 'Rubén Díaz', empresa: 'Transportes Kamir', rutas: 'Desde Toluca, Desde CDMX, Desde Guadalajara, Desde Monterrey', reemplaza: 'Toluca, CDMX, Guadalajara, Monterrey' },
   { telefono: '+528712361247', nombre: 'Aziel', empresa: 'Risoco', rutas: 'Guadalajara-Monterrey, Monterrey-Torreón, Monterrey-Gómez Palacio' },
 ];
 
@@ -228,7 +228,7 @@ async function sembrarRutasIniciales() {
         await upsertContacto({ agente: 'sofia', tipo: 'proveedor', nombre_completo: r.nombre, empresa: r.empresa, telefono: r.telefono, rutas: r.rutas,
           resumen_interaccion: 'Alta con rutas iniciales', canal: 'permanente' });
         console.log(`[Contactos] Creado ${r.nombre} con rutas iniciales`);
-      } else if (!String(c.rutas || '').trim()) {
+      } else if (!String(c.rutas || '').trim() || (r.reemplaza && c.rutas === r.reemplaza)) {
         await actualizarRutas(c.id, r.rutas);
         console.log(`[Contactos] Rutas iniciales cargadas a ${c.nombre_completo}`);
       }
