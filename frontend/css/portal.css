@@ -1,0 +1,108 @@
+:root, :root[data-theme="light"] {
+  --bg:#F3F5F9; --surface:#FFFFFF; --surface-2:#F8FAFC; --surface-3:#EEF2F7;
+  --bd:#E2E8F0; --bd-strong:#CBD5E1;
+  --tx:#0F172A; --tx2:#475569; --tx3:#64748B;
+  --navy:#0B2A5B; --navy-2:#123A7A;
+  --acc:#1F5FD1; --acc-soft:#E8F0FE; --acc-tx:#1748A6;
+  --sara:#0B7D57; --sara-soft:#E3F5EE;
+  --sofia:#1F5FD1; --sofia-soft:#E8F0FE;
+  --noa:#B45309; --noa-soft:#FEF1DC;
+  --ok:#0B7D57; --ok-soft:#E3F5EE; --warn:#B45309; --warn-soft:#FEF1DC; --crit:#C62828; --crit-soft:#FDE8E8;
+  --shadow-1:0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
+  --shadow-2:0 4px 12px rgba(15,23,42,.08), 0 16px 40px rgba(15,23,42,.10);
+  --appbar:#0B2A5B; --appbar-tx:#EAF0FB; --appbar-mute:#9DB3D6;
+  --focus:0 0 0 3px rgba(31,95,209,.28);
+}
+:root[data-theme="dark"] {
+  --bg:#0A101C; --surface:#111A2B; --surface-2:#152036; --surface-3:#1B2942;
+  --bd:rgba(255,255,255,.09); --bd-strong:rgba(255,255,255,.18);
+  --tx:#E8EEF7; --tx2:#A9B6CA; --tx3:#8090A8;
+  --navy:#08111F; --navy-2:#0D1A30;
+  --acc:#5B93FF; --acc-soft:rgba(91,147,255,.14); --acc-tx:#8DB4FF;
+  --sara:#34D399; --sara-soft:rgba(52,211,153,.13);
+  --sofia:#5B93FF; --sofia-soft:rgba(91,147,255,.14);
+  --noa:#FBBF24; --noa-soft:rgba(251,191,36,.13);
+  --ok:#34D399; --ok-soft:rgba(52,211,153,.13); --warn:#FBBF24; --warn-soft:rgba(251,191,36,.13); --crit:#FF7A7A; --crit-soft:rgba(255,122,122,.13);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 8px 30px rgba(0,0,0,.5);
+  --appbar:#08111F; --appbar-tx:#E8EEF7; --appbar-mute:#7C8BA3;
+  --focus:0 0 0 3px rgba(91,147,255,.35);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PORTAL — capa de rediseño corporativo sobre css/styles.css
+   Mismos paneles, tipografía y componentes que Base de Datos.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root[data-theme] body { background:var(--bg) !important; color:var(--tx); font-family:var(--font-sans); -webkit-font-smoothing:antialiased; }
+:root[data-theme] body::before { display:none !important; }
+
+/* Layout: tres paneles independientes, con aire alrededor */
+:root[data-theme] .cmd-scroll-wrap { padding:18px 22px 22px; }
+:root[data-theme] .command-layout { background:transparent !important; gap:18px; grid-template-columns:38fr 24fr 38fr; overflow:visible; min-width:980px; }
+:root[data-theme] .cmd-col, :root[data-theme] .cmd-center { background:var(--surface) !important; border:1px solid var(--bd); border-radius:16px; box-shadow:var(--shadow-1); overflow:hidden; color:var(--tx) !important; }
+:root[data-theme] .cmd-center { background:var(--surface-2) !important; }
+
+/* Encabezado de cada panel */
+:root[data-theme] .cmd-col-head, :root[data-theme] .cmd-col-head.sara, :root[data-theme] .cmd-col-head.sofia { height:auto; padding:16px 20px; background:var(--surface) !important; border-top:none !important; border-bottom:1px solid var(--bd); gap:14px; position:relative; }
+:root[data-theme] .cmd-col-head.sara::after, :root[data-theme] .cmd-col-head.sofia::after { content:""; position:absolute; left:20px; right:20px; bottom:-1px; height:2px; border-radius:2px; }
+:root[data-theme] .cmd-col-head.sara::after { background:var(--sara); } :root[data-theme] .cmd-col-head.sofia::after { background:var(--sofia); }
+:root[data-theme] .cmd-avatar { width:44px; height:44px; border-radius:50%; border:2px solid var(--surface); box-shadow:0 0 0 1px var(--bd-strong); }
+:root[data-theme] .cmd-name, :root[data-theme] .cmd-col-head.sara .cmd-name, :root[data-theme] .cmd-col-head.sofia .cmd-name { font-size:16px; font-weight:800; letter-spacing:-.01em; color:var(--tx) !important; }
+:root[data-theme] .cmd-sub, :root[data-theme] .cmd-col-head.sara .cmd-sub, :root[data-theme] .cmd-col-head.sofia .cmd-sub { font-size:12.5px; color:var(--tx3) !important; opacity:1; }
+:root[data-theme] .cmd-action-btn, :root[data-theme] .cmd-col-head.sara .cmd-action-btn, :root[data-theme] .cmd-col-head.sofia .cmd-action-btn { width:34px; height:34px; border-radius:9px; background:var(--surface) !important; border:1px solid var(--bd-strong) !important; color:var(--tx2) !important; transform:none; }
+:root[data-theme] .cmd-action-btn:hover { background:var(--surface-3) !important; color:var(--tx) !important; transform:none; }
+
+/* Mensajes */
+:root[data-theme] .chat-messages { background:var(--surface) !important; padding:24px 22px 16px; gap:20px; color:var(--tx) !important; }
+:root[data-theme] .message-avatar { width:34px; height:34px; border-radius:50%; }
+:root[data-theme] .message-bubble { max-width:80%; padding:12px 16px; border-radius:14px; font-size:14px; line-height:1.62; color:var(--tx) !important; box-shadow:none !important; }
+:root[data-theme] .message.assistant .message-bubble { background:var(--surface-2) !important; border:1px solid var(--bd) !important; border-top-left-radius:4px; }
+:root[data-theme] .message.user .message-bubble { background:var(--acc) !important; border:none !important; border-top-right-radius:4px; color:#fff !important; }
+:root[data-theme="dark"] .message.user .message-bubble { color:#08111F !important; }
+:root[data-theme] .message-bubble strong { color:var(--acc-tx); }
+:root[data-theme] .message.user .message-bubble strong { color:inherit; }
+:root[data-theme] .message.user .message-avatar { background:var(--surface-3); color:var(--tx2); border:1px solid var(--bd); }
+
+/* Entrada de texto */
+:root[data-theme] .chat-input-area { padding:14px 18px; background:var(--surface) !important; border-top:1px solid var(--bd); gap:10px; }
+:root[data-theme] .chat-input { background:var(--surface-2) !important; border:1px solid var(--bd-strong) !important; border-radius:12px; color:var(--tx) !important; font-size:14px; padding:11px 15px; }
+:root[data-theme] .chat-input:focus { border-color:var(--acc) !important; box-shadow:var(--focus) !important; background:var(--surface) !important; }
+:root[data-theme] .chat-input::placeholder { color:var(--tx3); }
+:root[data-theme] .btn-send { width:42px; height:42px; border-radius:12px; background:var(--acc) !important; color:#fff !important; box-shadow:none !important; }
+:root[data-theme="dark"] .btn-send { color:#08111F !important; }
+:root[data-theme] .btn-send:hover { filter:brightness(1.08); transform:none; box-shadow:none !important; }
+:root[data-theme] .btn-send:disabled { background:var(--surface-3) !important; color:var(--tx3) !important; }
+:root[data-theme] .btn-mic { width:42px; height:42px; border-radius:12px; background:var(--surface) !important; border:1px solid var(--bd-strong) !important; color:var(--tx2) !important; }
+:root[data-theme] .btn-mic:hover { background:var(--surface-3) !important; color:var(--tx) !important; }
+
+/* Centro de mando */
+:root[data-theme] .cmd-center-head { height:auto; padding:16px 20px; border-bottom:1px solid var(--bd); background:var(--surface); }
+:root[data-theme] .cmd-center-head::before { display:none; }
+:root[data-theme] .cmd-center-title { font-size:16px; font-weight:800; letter-spacing:-.01em; color:var(--tx); }
+:root[data-theme] .live-indicator { font-family:var(--font-sans); font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--crit); background:var(--crit-soft); padding:5px 11px; border-radius:20px; }
+:root[data-theme] .live-dot { box-shadow:none; background:var(--crit); }
+:root[data-theme] .mando-gear { width:34px; height:34px; border-radius:9px; background:var(--surface) !important; border:1px solid var(--bd-strong) !important; color:var(--tx2) !important; }
+:root[data-theme] .mando-gear:hover { background:var(--surface-3) !important; }
+:root[data-theme] .cmd-stage-dots { padding:14px 20px; border-bottom:1px solid var(--bd); }
+:root[data-theme] .cmd-stage-dot { background:var(--surface-3); color:var(--tx3); border:1px solid var(--bd); }
+:root[data-theme] .cmd-stage-dot.captured { background:var(--ok); color:#fff; border-color:var(--ok); }
+:root[data-theme] .cmd-event-feed { padding:8px 14px; }
+:root[data-theme] .cmd-event-item { background:var(--surface); border:1px solid var(--bd); border-radius:12px; padding:12px 14px; margin:8px 0; box-shadow:var(--shadow-1); }
+:root[data-theme] .cmd-event-title { color:var(--tx); font-weight:700; font-size:13px; }
+:root[data-theme] .cmd-event-detail { color:var(--tx2); font-size:12.5px; }
+:root[data-theme] .cmd-event-time { color:var(--tx3); }
+:root[data-theme] .cmd-event-empty { color:var(--tx3); font-size:13px; }
+:root[data-theme] .cmd-setup-panel { background:var(--surface); border-top:1px solid var(--bd); }
+:root[data-theme] .cmd-setup-input, :root[data-theme] .cmd-setup-tag-input { background:var(--surface-2); border:1px solid var(--bd-strong); border-radius:8px; color:var(--tx); }
+:root[data-theme] .cmd-setup-label, :root[data-theme] .cmd-setup-field label, :root[data-theme] .cmd-setup-toggle-label { color:var(--tx2); }
+:root[data-theme] .cmd-setup-save { background:var(--acc); color:#fff; border:none; border-radius:9px; font-weight:600; }
+:root[data-theme] .cmd-mando-footer { padding:12px 16px; border-top:1px solid var(--bd); background:var(--surface); }
+:root[data-theme] .cmd-reset-btn { background:var(--surface); border:1px solid var(--bd-strong); color:var(--tx); border-radius:9px; padding:9px; font-weight:600; font-size:13px; width:100%; }
+:root[data-theme] .cmd-reset-btn:hover { background:var(--surface-3); }
+:root[data-theme] .cmd-match-panel { color:var(--tx); }
+
+/* Barra superior: estado y usuario */
+:root[data-theme] .status-dot.online { box-shadow:none; }
+
+/* Variables que el HTML del portal usa con un color oscuro de respaldo — se definen para que sigan el tema */
+:root[data-theme] { --bg-panel:var(--surface-2); --texto-dim:var(--tx3); --bg-user:var(--surface-3); --acento:var(--acc); }
+:root[data-theme] #portal-overlay { background:var(--bg) !important; }

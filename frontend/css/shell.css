@@ -37,3 +37,5 @@ body.has-shell { -webkit-font-smoothing:antialiased; }
 :root[data-theme] .portal-header .header-status, :root[data-theme] .portal-header .header-user-section * { color:var(--appbar-mute); }
 :root[data-theme] .portal-header .btn-logout { background:transparent !important; border:1px solid rgba(255,255,255,.2) !important; color:var(--appbar-mute) !important; border-radius:8px; }
 :root[data-theme] .portal-header .btn-logout:hover { background:rgba(255,255,255,.1) !important; color:#fff !important; }
+:root[data-theme] .portal-header .header-user { background:transparent !important; border:1px solid rgba(255,255,255,.2) !important; border-radius:9px; padding:4px 8px; }
+:root[data-theme] .portal-header .header-user-name { color:var(--appbar-tx) !important; }
