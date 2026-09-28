@@ -1,0 +1,525 @@
+[
+  {
+    "codigo": "P0163",
+    "empresa": "SOLUCIONES SEVER SA DE CV",
+    "nombre": "BERNARDO GARZA",
+    "telefono": "+5218119103303",
+    "servicios": 34,
+    "costo_promedio": 18545,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P633",
+    "empresa": "ESTEBAN NAVARRO TORRES",
+    "nombre": "ESTEBAN NAVARRO TORRES",
+    "telefono": "+5212223107760",
+    "servicios": 30,
+    "costo_promedio": 17667,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P966",
+    "empresa": "TRANS GROUP JR SAPI DE CV",
+    "nombre": "JOSE ROSARIO ORTIZ",
+    "telefono": "+5214492662158",
+    "servicios": 18,
+    "costo_promedio": 18972,
+    "estatus_catalogo": "Suspendido"
+  },
+  {
+    "codigo": "P1151",
+    "empresa": "IRENE ISABEL GARZA LEAL",
+    "nombre": "IRENE ISABEL GARZA LEAL",
+    "telefono": "+5218136024336",
+    "servicios": 13,
+    "costo_promedio": 18923,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1082",
+    "empresa": "GUSTAVO GARCIA CORTEZ",
+    "nombre": "CESAR ALAN HERNANDEZ GONZALEZ",
+    "telefono": "+5218991058078",
+    "servicios": 11,
+    "costo_promedio": 18600,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1122",
+    "empresa": "TRANSPORTES ESPECIALIZADOS KAMIR",
+    "nombre": "RUBEN DIAZ RODRIGUEZ",
+    "telefono": "+5215510199558",
+    "servicios": 9,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Recurrente",
+    "fusionar_con_telefono": "+5215666687965"
+  },
+  {
+    "codigo": "P75",
+    "empresa": "PORTEADORA DE BIENES Y SERVICIOS SA DE CV",
+    "nombre": "GERARDO",
+    "telefono": "+5212211002573",
+    "servicios": 9,
+    "costo_promedio": 19556,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1072",
+    "empresa": "EXPRESS GRAN TIBURON SA DE CV",
+    "nombre": "VIRGINIA LOPEZ",
+    "telefono": "+5218116395065",
+    "servicios": 9,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Intermitente"
+  },
+  {
+    "codigo": "P844",
+    "empresa": "JUAN LOZA CARRILLO",
+    "nombre": "OSMAR LOZA",
+    "telefono": "+5213310258217",
+    "servicios": 8,
+    "costo_promedio": 18750,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1279",
+    "empresa": "MARIO CABRERA GARZA",
+    "nombre": "MARIO CABRERA GARZA",
+    "telefono": "+5218182566666",
+    "servicios": 7,
+    "costo_promedio": 17071,
+    "estatus_catalogo": "Potencial"
+  },
+  {
+    "codigo": "P1101",
+    "empresa": "NANCY YAZMIN GOMEZ GOMEZ",
+    "nombre": "OCTAVIO CARMONA",
+    "telefono": "+5217225703730",
+    "servicios": 6,
+    "costo_promedio": 18833,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P0424",
+    "empresa": "PEDRO ALBERTO CHACON GUERRERO",
+    "nombre": "EDSON CHACON",
+    "telefono": "+5217226071908",
+    "servicios": 6,
+    "costo_promedio": 18000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1164",
+    "empresa": "ALEJANDRO GARAY GUERRERO",
+    "nombre": "ALEJANDRO GARAY GUERRERO",
+    "telefono": "+5215570684250",
+    "servicios": 5,
+    "costo_promedio": 18600,
+    "estatus_catalogo": "Potencial"
+  },
+  {
+    "codigo": "P1404",
+    "empresa": "ALGO EXPRESS LOGISTICS SA DE CV",
+    "nombre": "FERNANDO ALCALÁ ORTIZ",
+    "telefono": "+5218127482989",
+    "servicios": 4,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1479",
+    "empresa": "JOSE RAMON FLORES ALANIS",
+    "nombre": "JOSE RAMON FLORES ALANIS",
+    "telefono": "+5218110302029",
+    "servicios": 4,
+    "costo_promedio": 19750,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1103",
+    "empresa": "KARLA STEPHANIE PUGA PEREZ",
+    "nombre": "HUMBERTO",
+    "telefono": "+5213314477585",
+    "servicios": 4,
+    "costo_promedio": 18750,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1581",
+    "empresa": "TRANSPORTES ECOLOGICOS ZERG SA DE CV",
+    "nombre": "RICARDO MARTINEZ TELLO",
+    "telefono": "+5214491866655",
+    "servicios": 3,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Potencial"
+  },
+  {
+    "codigo": "P1580",
+    "empresa": "MARCOS ARZATE VILLAVICENCIO",
+    "nombre": "JOSÉ ISRAEL DÍAZ DÍAZ",
+    "telefono": "+5215527021863",
+    "servicios": 3,
+    "costo_promedio": 19667,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1561",
+    "empresa": "LOGISTICA VALOR Y EXITO",
+    "nombre": "FRANCISCO FAVIO ESPINOZA MONTOYA",
+    "telefono": "+5216681328696",
+    "servicios": 3,
+    "costo_promedio": 19333,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1242",
+    "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
+    "nombre": "ORLANDO VAZQUEZ",
+    "telefono": "+5214495410182",
+    "servicios": 3,
+    "costo_promedio": 20000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1242",
+    "empresa": "AUTOTRANSPORTES PERTH SA DE CV",
+    "nombre": "MICHELL JAIR CERDA VIDALES",
+    "telefono": "+5218186545194",
+    "servicios": 3,
+    "costo_promedio": 18333,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1131",
+    "empresa": "ALEJANDRO CHAVERO MUÑOZ",
+    "nombre": "ALEJANDRO CHAVERO MUÑOZ",
+    "telefono": "+5215546002445",
+    "servicios": 3,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1195",
+    "empresa": "TRANSPORTES AB BARRON S DE RL DE CV",
+    "nombre": "CLAUDIA SANTIAGO",
+    "telefono": "+5216567509253",
+    "servicios": 3,
+    "costo_promedio": 18000,
+    "estatus_catalogo": "Intermitente"
+  },
+  {
+    "codigo": "P1505",
+    "empresa": "ERICK DANIEL RENDON ROBLES",
+    "nombre": "ERICK DANIEL RENDÓN ROBLES",
+    "telefono": "+5212271535732",
+    "servicios": 2,
+    "costo_promedio": 20000,
+    "estatus_catalogo": "Potencial"
+  },
+  {
+    "codigo": "P1434",
+    "empresa": "RISOCO LOGISTICS",
+    "nombre": "DAVID ALVAREZ",
+    "telefono": "+5218711680772",
+    "servicios": 2,
+    "costo_promedio": 22500,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1121",
+    "empresa": "MARIA DEL CARMEN CAVAZOS IBARRA",
+    "nombre": "ANTONIO CAVAZOS",
+    "telefono": "+5218182717459",
+    "servicios": 2,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1500",
+    "empresa": "DEFROA",
+    "nombre": "ALEJANDRO SANTOS",
+    "telefono": "+5215610720643",
+    "servicios": 2,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1516",
+    "empresa": "LINEA EXPRESS DE AMERICA",
+    "nombre": "ALVARO DANIEL",
+    "telefono": "+5218123975510",
+    "servicios": 2,
+    "costo_promedio": 19500,
+    "estatus_catalogo": "Suspendido"
+  },
+  {
+    "codigo": "P1308",
+    "empresa": "MIRIAM ELIDETH MOLINA MALDONADO",
+    "nombre": "WILIAM",
+    "telefono": "+5215534612594",
+    "servicios": 2,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1259",
+    "empresa": "TRANSPORTES VIAVANZA",
+    "nombre": "ALBERTO VIQUEZ",
+    "telefono": "+5215573374409",
+    "servicios": 2,
+    "costo_promedio": 18500,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1128",
+    "empresa": "RODOLFO ANGELES NAVA",
+    "nombre": "MONICA CRUZ",
+    "telefono": "+5215526644914",
+    "servicios": 2,
+    "costo_promedio": 17000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1157",
+    "empresa": "BRYAN OZIEL GAMBOA GAYTAN",
+    "nombre": "LORENA RIVERA GONZALEZ",
+    "telefono": "+5218129206441",
+    "servicios": 2,
+    "costo_promedio": 17500,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1166",
+    "empresa": "SBM LOGISTICS",
+    "nombre": "DANTE",
+    "telefono": "+5218186892327",
+    "servicios": 2,
+    "costo_promedio": 17000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P970",
+    "empresa": "FANY GUADALUPE GARCIA RIVERA",
+    "nombre": "FANNY GARCIA",
+    "telefono": "+5217223896629",
+    "servicios": 2,
+    "costo_promedio": 16000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1558",
+    "empresa": "TRANSPORTADORA GEOS",
+    "nombre": "GABRIELA ORTEGA",
+    "telefono": "+5216121089197",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Intermitente"
+  },
+  {
+    "codigo": "P1450",
+    "empresa": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
+    "nombre": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
+    "telefono": "+5214771178050",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1596",
+    "empresa": "NOVAKLOGISTICS",
+    "nombre": "RICARDO ALFREDO RODRIGUEZ RUBIO",
+    "telefono": "+5218115018533",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1585",
+    "empresa": "SKYBRIDGE LOGISTICS",
+    "nombre": "JOSUE RODRIGUEZ",
+    "telefono": "+5218140055654",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Potencial"
+  },
+  {
+    "codigo": "P1591",
+    "empresa": "HEBERTO JAVIER RODRIGUEZ PERALES",
+    "nombre": "HEBERTO JAVIER RODRIGUEZ PERALES",
+    "telefono": "+5218661122432",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1593",
+    "empresa": "MIGUEL ALEJANDRO ESCAMILLA SOLIS",
+    "nombre": "KARLA ESCAMILLA",
+    "telefono": "+5215591808647",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Intermitente"
+  },
+  {
+    "codigo": "P1554",
+    "empresa": "TRANSPORTES REVIARYA",
+    "nombre": "MONSERRAT JIMENEZ",
+    "telefono": "+5217731366218",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1577",
+    "empresa": "DISTRIBUIDORA JEYAPA",
+    "nombre": "ELIAS HERNANDEZ",
+    "telefono": "+5213310086988",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Potencial"
+  },
+  {
+    "codigo": "P1534",
+    "empresa": "ROJAS TRAILERS",
+    "nombre": "DIEGO ROJAS",
+    "telefono": "+5218182094019",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1467",
+    "empresa": "TSM CONNECT SA DE CV",
+    "nombre": "DARIO CEPEDA",
+    "telefono": "+5218448669341",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1523",
+    "empresa": "JOSE HOMERO ROMO REYES",
+    "nombre": "EMANUEL PEREZ",
+    "telefono": "+5218182052031",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P222",
+    "empresa": "AUTOLINEAS VIFE",
+    "nombre": "MAXIMILIANO VILLARREAL",
+    "telefono": "+5218116366118",
+    "servicios": 1,
+    "costo_promedio": 21000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1518",
+    "empresa": "JUAN GABRIEL MENDEZ VILLARREAL",
+    "nombre": "JUAN GABRIEL MENDEZ VILLARREAL",
+    "telefono": "+5218666976087",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Potencial"
+  },
+  {
+    "codigo": "P1274",
+    "empresa": "ALAN ALVARADO GARCIA",
+    "nombre": "ALAN ALVARADO GARCIA",
+    "telefono": "+5215566104047",
+    "servicios": 1,
+    "costo_promedio": 20000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1277",
+    "empresa": "GUADALUPE EUSTOLIA SANCHEZ MORA",
+    "nombre": "GUADALUPE EUSTOLIA",
+    "telefono": "+5217151737940",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1052",
+    "empresa": "JLC TRANSPORTACIONES SA DE CV",
+    "nombre": "LAZARO ALANIS",
+    "telefono": "+5218261010380",
+    "servicios": 1,
+    "costo_promedio": 18000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1261",
+    "empresa": "JAZZIA MERARI PIÑA ISLAS",
+    "nombre": "JAZZIA MERARI PIÑA ISLAS",
+    "telefono": "+5213324505440",
+    "servicios": 1,
+    "costo_promedio": 18000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1212",
+    "empresa": "JOSE ANTONIO TREJO MATA",
+    "nombre": "JOSE ANTONIO TREJO MATA",
+    "telefono": "+5214622100984",
+    "servicios": 1,
+    "costo_promedio": 18000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1241",
+    "empresa": "EMMANUEL ALEJANDRO OLIVARES HERNANDEZ",
+    "nombre": "ADANAI ORTEGA",
+    "telefono": "+5215639514158",
+    "servicios": 1,
+    "costo_promedio": 18000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1191",
+    "empresa": "JOSÉ ANGEL GARCÍA HERRERA",
+    "nombre": "JOSE ANGEL GARCIA HERRERA",
+    "telefono": "+5217121599991",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1225",
+    "empresa": "TYR DESTINOS TERRESTRES",
+    "nombre": "DANIEL CASTILLO",
+    "telefono": "+5215518401266",
+    "servicios": 1,
+    "costo_promedio": 17000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1106",
+    "empresa": "SYCMEX TRANSPORTES ESPECIALIZADOS",
+    "nombre": "HUGO ENIQUEZ RODRIGUEZ MALAGON",
+    "telefono": "+5215582333882",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1042",
+    "empresa": "LOGISTICA DE GRAN PESO SA DE CV",
+    "nombre": "ELIAS",
+    "telefono": "+5214778542852",
+    "servicios": 1,
+    "costo_promedio": 22000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1099",
+    "empresa": "FRUCTUOSO BUSTOS GONZÁLEZ",
+    "nombre": "FRUCTUOSO BUSTOS GONZÁLEZ",
+    "telefono": "+5215529697082",
+    "servicios": 1,
+    "costo_promedio": 19000,
+    "estatus_catalogo": "Baja"
+  }
+]

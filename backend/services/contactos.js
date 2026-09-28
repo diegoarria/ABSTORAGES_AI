@@ -275,38 +275,72 @@ async function sembrarRutasIniciales() {
   }
 }
 
-// Proveedores de la ruta Monterrey ⇄ Gómez Palacio (catálogo AppSheet, 27-sep-2026).
-// Se cargan solos al arrancar, una sola vez por proveedor (se buscan por teléfono, o
-// por nombre+empresa si no tienen). Los dados de Baja en el catálogo se guardan pero
-// SIN la ruta, para que SOFIA no los contacte por su cuenta. Los costos van en el
-// campo "tarifas" (no en notas): notas sí pueden llegarle a SOFIA en una conversación
-// con ese proveedor y el costo nunca debe salir hacia él.
-const RUTA_MTY_GP = 'Monterrey-Gómez Palacio';
-async function sembrarProveedoresRutaMtyGp() {
+// ── Carga de proveedores desde el catálogo (AppSheet), por ruta ─────────────
+// Archivos backend/data/proveedores-*.json. Reglas:
+//  · Proveedor nuevo (por teléfono) → se crea con su ruta, unidades "caja seca 53"
+//    y clave/estatus en notas. Los dados de Baja/Suspendido se guardan SIN ruta,
+//    para que SOFIA no los contacte por su cuenta.
+//  · Proveedor que ya existía → se le SUMA la ruta (sin borrar las que tenía) y su
+//    tarifa, una sola vez por archivo (marca en data/seed-flags.json), para no
+//    pisar lo que alguien edite después desde la Base de Datos.
+//  · Los costos van en "tarifas" (no en notas): las notas sí pueden llegarle a SOFIA
+//    en una conversación con ese proveedor y el costo nunca debe salir hacia él.
+const UNIDAD_DEFAULT = 'caja seca 53';
+const FLAGS_FILE = path.join(__dirname, '../../data/seed-flags.json');
+function leerFlags() { try { return JSON.parse(fs.readFileSync(FLAGS_FILE, 'utf8')); } catch { return {}; } }
+function marcarFlag(k) { const f = leerFlags(); f[k] = new Date().toISOString(); try { fs.mkdirSync(path.dirname(FLAGS_FILE), { recursive: true }); fs.writeFileSync(FLAGS_FILE, JSON.stringify(f, null, 2)); } catch (e) { console.error('[Contactos] No se pudo guardar la marca', k, e.message); } }
+const uneLista = (actual, nuevo) => { const a = String(actual || '').split(/[,;\n]+/).map(x => x.trim()).filter(Boolean); if (!a.some(x => x.toLowerCase() === nuevo.toLowerCase())) a.push(nuevo); return a.join(', '); };
+
+async function cargarCatalogoRuta({ archivo, ruta, flag }) {
   let lista;
-  try { lista = require('../data/proveedores-mty-gomez-palacio.json'); } catch { return; }
-  let nuevos = 0;
+  try { lista = require('../data/' + archivo); } catch { return; }
+  const yaFusionado = !!leerFlags()[flag];
+  let nuevos = 0, fusionados = 0, fallos = 0;
   for (const p of lista) {
     try {
-      const existente = p.telefono
-        ? await buscarPorTelefono(p.telefono, 'sofia')
-        : (await listarPorAgente('SOFIA', { tipo: 'proveedor', q: p.empresa })).find(c => (c.empresa || '') === p.empresa || c.nombre_completo === p.nombre);
-      const baja = p.estatus_catalogo === 'Baja';
-      const tarifas = `${RUTA_MTY_GP}: $${Number(p.costo_promedio).toLocaleString('es-MX')} promedio · ${p.servicios} servicio(s) en la ruta`;
-      let c = existente;
+      const inactivo = ['Baja', 'Suspendido'].includes(p.estatus_catalogo);
+      const linea = `${ruta}: $${Number(p.costo_promedio).toLocaleString('es-MX')} promedio · ${p.servicios} servicio(s) en la ruta`;
+      let c = null;
+      if (p.fusionar_con_telefono) c = await buscarPorTelefono(p.fusionar_con_telefono, 'sofia');
+      if (!c && p.telefono && !p.fusionar_con_telefono) c = await buscarPorTelefono(p.telefono, 'sofia');
+      if (!c && !p.telefono) c = (await listarPorAgente('SOFIA', { tipo: 'proveedor', q: p.empresa })).find(x => (x.empresa || '') === p.empresa) || null;
       if (!c) {
         c = await upsertContacto({
           agente: 'sofia', tipo: 'proveedor', nombre_completo: p.nombre, empresa: p.empresa, telefono: p.telefono || undefined,
           notas: `Clave: ${p.codigo} · Estatus en catálogo: ${p.estatus_catalogo}`,
-          rutas: baja ? undefined : RUTA_MTY_GP,
-          resumen_interaccion: 'Alta desde el catálogo de proveedores (ruta Monterrey–Gómez Palacio)', canal: 'permanente',
+          rutas: inactivo ? undefined : ruta, unidades: UNIDAD_DEFAULT,
+          resumen_interaccion: `Alta desde el catálogo de proveedores (ruta ${ruta})`, canal: 'permanente',
         });
+        await actualizarCampoProveedor(c.id, 'tarifas', linea);
         nuevos++;
+      } else if (!yaFusionado) {
+        if (!inactivo) await actualizarCampoProveedor(c.id, 'rutas', uneLista(c.rutas, ruta));
+        if (!String(c.tarifas || '').includes(ruta)) await actualizarCampoProveedor(c.id, 'tarifas', [c.tarifas, linea].filter(Boolean).join(' | '));
+        fusionados++;
       }
-      if (c && !String(c.tarifas || '').trim()) await actualizarCampoProveedor(c.id, 'tarifas', tarifas);
-    } catch (e) { console.error(`[Contactos] Error cargando proveedor ${p.codigo}:`, e.message); }
+    } catch (e) { fallos++; console.error(`[Contactos] Error cargando proveedor ${p.codigo} (${archivo}):`, e.message); }
   }
-  if (nuevos) console.log(`[Contactos] Cargados ${nuevos} proveedores de la ruta Monterrey–Gómez Palacio`);
+  if (!fallos) marcarFlag(flag);
+  if (nuevos || fusionados) console.log(`[Contactos] ${ruta}: ${nuevos} proveedores nuevos, ${fusionados} existentes actualizados`);
+}
+
+// Unidad por defecto para todo proveedor de SOFIA que no tenga nada capturado (una sola vez)
+async function unidadPorDefectoProveedores() {
+  const flag = 'unidad-default-caja-seca-53';
+  if (leerFlags()[flag]) return;
+  try {
+    const lista = await listarPorAgente('SOFIA', { tipo: 'proveedor' });
+    let n = 0;
+    for (const c of lista) if (!String(c.unidades || '').trim()) { await actualizarCampoProveedor(c.id, 'unidades', UNIDAD_DEFAULT); n++; }
+    marcarFlag(flag);
+    if (n) console.log(`[Contactos] Unidad "${UNIDAD_DEFAULT}" asignada a ${n} proveedores sin unidades`);
+  } catch (e) { console.error('[Contactos] Error asignando unidad por defecto:', e.message); }
+}
+
+async function sembrarCatalogos() {
+  await cargarCatalogoRuta({ archivo: 'proveedores-mty-gomez-palacio.json', ruta: 'Monterrey-Gómez Palacio', flag: 'catalogo-mty-gp-2026-09-27' });
+  await cargarCatalogoRuta({ archivo: 'proveedores-mty-guadalajara.json', ruta: 'Monterrey-Guadalajara', flag: 'catalogo-mty-gdl-2026-09-27' });
+  await unidadPorDefectoProveedores();
 }
 
 async function sembrarContactosPermanentes() {
@@ -325,6 +359,6 @@ async function sembrarContactosPermanentes() {
     }
   }
 }
-sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarProveedoresRutaMtyGp);
+sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarCatalogos);
 
 module.exports = { bloqueDirectorioProveedores, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
