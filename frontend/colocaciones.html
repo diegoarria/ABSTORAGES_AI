@@ -38,6 +38,13 @@ tr.rec td:first-child { border-radius:10px 0 0 10px; } tr.rec td:last-child { bo
 .hitos { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
 .hito { font-size:11.5px; font-weight:600; padding:5px 11px; border-radius:20px; background:var(--surface-3); color:var(--tx3); }
 .hito.ok { background:var(--ok-soft); color:var(--ok); }
+.ctx { margin-top:14px; }
+.ctx-box { background:var(--surface-2); border:1px solid var(--bd); border-radius:12px; padding:12px 14px; font-size:13px; line-height:1.6; }
+.ctx-box .lbl { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--tx3); margin-bottom:4px; }
+.ctx-imgs { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.ctx-imgs a img { width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--bd); display:block; }
+.ctx-add { display:flex; gap:8px; margin-top:10px; }
+.ctx-add input { flex:1; background:var(--surface); border:1px solid var(--bd-strong); border-radius:9px; padding:8px 11px; color:var(--tx); font-size:13px; font-family:inherit; }
 .kpi { white-space:pre-wrap; font-family:var(--font-mono); font-size:14px; line-height:1.9; background:var(--surface-2); border:1px solid var(--bd); border-radius:12px; padding:18px 20px; margin-top:12px; }
 @media (max-width:640px) { .page-w { padding:20px 16px 48px; } .card { padding:18px; } }
 </style>
@@ -93,7 +100,7 @@ function tarjeta(c) {
   const pend = (c.pendientes || []).length ? `<div class="line"><b>En espera de la siguiente ola:</b> ${c.pendientes.map(p => esc(p.nombre)).join(', ')}</div>` : '';
   const ganador = c.ganador ? `<div class="win"><b>${esc(c.ganador.nombre)}</b>${c.ganador.precio ? ' a ' + $(c.ganador.precio) : ''} · aprobó ${esc(c.ganador.aprobadoPor || '—')} · ${hora(c.colocadoEn)}</div>${lineaHitos(c)}` : '';
   const manual = c.estado === 'buscando' ? `<div class="man"><input id="m-${esc(c.folio)}" placeholder="Colocar con otro proveedor (nombre)"><button class="btn btn-secondary btn-sm" onclick="manual('${esc(c.folio)}')">Colocar manualmente</button></div>` : '';
-  return `<div class="card"><div class="card-h"><div><h3>${esc(c.folio)} · ${esc(c.origen)} → ${esc(c.destino)}</h3><div class="sub">${esc(c.empresa || '')} · ${esc(c.tipo_unidad || 'unidad por definir')} · creada ${hora(c.creada)}${c.urgente ? ' · urgente' : ''}</div></div><span class="tag t-${c.estado}">${c.estado.replace('_',' ')}</span></div>${ofertas}${contactados}${pend}${ganador}${manual}</div>`;
+  return `<div class="card" data-folio="${esc(c.folio)}"><div class="card-h"><div><h3>${esc(c.folio)} · ${esc(c.origen)} → ${esc(c.destino)}</h3><div class="sub">${esc(c.empresa || '')} · ${esc(c.tipo_unidad || 'unidad por definir')} · creada ${hora(c.creada)}${c.urgente ? ' · urgente' : ''}</div></div><span class="tag t-${c.estado}">${c.estado.replace('_',' ')}</span></div><div class="ctx" id="ctx-${esc(c.folio)}"></div>${ofertas}${contactados}${pend}${ganador}${manual}</div>`;
 }
 
 async function render() {
@@ -112,7 +119,25 @@ async function render() {
     datos = await api('/api/colocaciones');
     const lista = datos.filter(c => c.estado === filtro);
     cont.innerHTML = lista.length ? lista.map(tarjeta).join('') : '<div class="empty-msg">Nada por aquí por ahora.</div>';
+    lista.forEach(cargarContexto);
   } catch (e) { cont.innerHTML = `<div class="empty-msg">No se pudo cargar: ${esc(e.message)}</div>`; }
+}
+async function cargarContexto(c) {
+  const box = document.getElementById('ctx-' + c.folio); if (!box) return;
+  try {
+    const r = await fetch('/api/folios/' + encodeURIComponent(c.folio) + '/contexto', { credentials: 'include' });
+    if (!r.ok) return; // folios sin notas ni imágenes (órdenes de SARA) no muestran nada
+    const d = await r.json();
+    box.innerHTML = `<div class="ctx-box"><div class="lbl">Notas e imágenes del folio (las ven SARA, SOFIA y NOA)</div>
+      ${d.notas ? `<div>${esc(d.notas).replace(/\n/g, '<br>')}</div>` : '<div style="color:var(--tx3)">Sin notas.</div>'}
+      ${d.adjuntos.length ? `<div class="ctx-imgs">${d.adjuntos.map(a => `<a href="/api/folios/${encodeURIComponent(c.folio)}/adjuntos/${a.id}" target="_blank" title="${esc(a.descripcion || a.nombre)}"><img src="/api/folios/${encodeURIComponent(c.folio)}/adjuntos/${a.id}" alt="${esc(a.nombre)}" loading="lazy"></a>`).join('')}</div>` : ''}
+      <div class="ctx-add"><input id="nota-${esc(c.folio)}" placeholder="Agregar una nota para las IA"><button class="btn btn-secondary btn-sm" onclick="agregarNota('${esc(c.folio)}')">Agregar</button></div></div>`;
+  } catch {}
+}
+async function agregarNota(folio) {
+  const i = document.getElementById('nota-' + folio); const t = i.value.trim(); if (!t) return;
+  try { await api('/api/folios/' + encodeURIComponent(folio) + '/notas', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ texto: t }) }); render(); }
+  catch (e) { alert('No se pudo: ' + e.message); }
 }
 async function aprobar(folio, tel, nombre, precio) {
   if (!confirm(`¿Colocar el folio ${folio} con ${nombre}${precio ? ' a ' + $(precio) : ''}? SOFIA le avisará por plantilla aprobada.`)) return;
@@ -133,7 +158,7 @@ async function enviarKpis() {
 document.querySelectorAll('#segF .filter').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('#segF .filter').forEach(x => x.classList.remove('on')); b.classList.add('on'); filtro = b.dataset.f; render();
 }));
-render(); setInterval(() => { if (filtro !== 'kpis') render(); }, 20000);
+render(); setInterval(() => { if (filtro !== 'kpis' && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#cont') && document.activeElement.tagName === 'INPUT')) render(); }, 20000);
 </script>
 </body>
 </html>

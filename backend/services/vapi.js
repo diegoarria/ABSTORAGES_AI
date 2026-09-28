@@ -130,6 +130,9 @@ async function llamarProveedor(proveedor, orden) {
     `Objetivo: confirmar disponibilidad y obtener el mejor precio. El margen mínimo de ABSTORAGES es 20%. ` +
     `Si acepta, dile que le confirmamos en los próximos minutos.`;
 
+  // Notas e imágenes que el equipo dejó de ESTE folio (solo este folio)
+  try { systemPrompt += require('./folioContexto').bloque({ alcance: 'folios', folios: [orden.folio] }); } catch (e) { console.error('[Vapi] Error leyendo contexto del folio:', e.message); }
+
   // ¿Ya es un proveedor conocido, con historial de negociaciones previas?
   try {
     const contactoConocido = await contactos.buscarPorTelefono(proveedor.telefono, 'sofia');
@@ -636,6 +639,8 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
         `dónde va, si tiene algún incidente o retraso, y hora estimada de llegada. Es una llamada de seguimiento breve, no de negociación.`
       : `Estás llamando al cliente del folio ${folio} (ruta: ${ruta}) para darle un estatus breve y tranquilizador de su envío. ` +
         `No reveles información interna (proveedor, costos). Si el cliente tiene una duda que no puedes resolver, dile que el equipo lo contacta.`);
+
+  try { systemPrompt += require('./folioContexto').bloque({ alcance: 'folios', folios: [folio] }); } catch (e) { console.error('[Vapi] Error leyendo contexto del folio:', e.message); }
 
   // ¿Ya has hablado antes con este transportista/cliente? (proveedores se
   // guardan como 'sofia' al cerrar el trato — NOA consulta el mismo registro).

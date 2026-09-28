@@ -95,6 +95,7 @@ const rutasProveedor = require('./backend/services/rutasProveedor');
 const sofiaOperacion = require('./backend/services/sofiaOperacion');
 const colocaciones = require('./backend/services/colocaciones');
 const kpisSofia = require('./backend/services/kpisSofia');
+const folioContexto = require('./backend/services/folioContexto');
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
@@ -497,7 +498,11 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     if (personaEquipo) {
       systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
       if (agente === 'sofia') systemPrompt += await contactos.bloqueDirectorioProveedores();
+      systemPrompt += folioContexto.bloque(); // panorama completo de lo que el equipo está pidiendo
     } else {
+      // Proveedor o cliente: solo el folio en el que participa
+      const foliosPersona = [...folioContexto.foliosPorTelefono(phone), ...(agente === 'sofia' ? colocaciones.porTelefono(phone, false).map(c => c.folio) : [])];
+      if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
       // No es equipo interno — ¿ya es un contacto conocido (proveedor/cliente
       // con quien ya se cerró algo antes)? Si sí, se le da continuidad real.
       const contactoConocido = await contactos.buscarPorTelefono(phone, agente);
@@ -1013,6 +1018,11 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // conocido (proveedor/cliente con historial real)? El grupo se salta
       // esto porque ahí todos son equipo interno por definición.
       if (personaEquipo && agente === 'sofia') systemPrompt += await contactos.bloqueDirectorioProveedores();
+      if (personaEquipo) systemPrompt += folioContexto.bloque();
+      else if (!esGrupo) {
+        const foliosPersona = [...folioContexto.foliosPorTelefono(remitentePhone), ...(agente === 'sofia' ? colocaciones.porTelefono(remitentePhone, false).map(c => c.folio) : [])];
+        if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
+      }
       if (!esGrupo && !personaEquipo) {
         const contactoConocido = await contactos.buscarPorTelefono(remitentePhone, agente);
         if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
@@ -1759,7 +1769,7 @@ app.post('/api/admin/db-migrate', soloAdmin, async (req, res) => {
 // porque pasa por las mismas funciones de siempre.
 app.post('/api/admin/nueva-orden-manual', soloAdmin, async (req, res) => {
   try {
-    const { nombre, empresa, telefono, email, rfc, origen, destino, tipo_unidad, tipo_carga, peso_toneladas, precio_cotizado } = req.body || {};
+    const { nombre, empresa, telefono, email, rfc, origen, destino, tipo_unidad, tipo_carga, peso_toneladas, precio_cotizado, notas } = req.body || {};
     if (!nombre || !telefono || !origen || !destino) {
       return res.status(400).json({ error: 'nombre, telefono, origen y destino son requeridos' });
     }
@@ -1771,6 +1781,9 @@ app.post('/api/admin/nueva-orden-manual', soloAdmin, async (req, res) => {
       folio, sara_nota: 'cierre_manual_humano', sessionId: sid,
       primer_mensaje: `Orden capturada manualmente por ${req.user?.nombre || req.user?.email || 'admin'}`,
     });
+
+    // Notas del equipo (y, después, las imágenes) → memoria de SARA, SOFIA y NOA
+    folioContexto.registrar(folio, { notas, resumen: { empresa: empresa || nombre, origen, destino, tipo_unidad, tipo_carga, telefono }, por: req.user?.nombre || req.user?.email });
 
     pushActividad({ agente: 'SOLOADMIN', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden manual ${folio} — ${empresa || nombre}`, sessionId: sid, metadata: { sessionId: sid, capturadaPor: req.user?.nombre || req.user?.email } });
     sendPush({
@@ -1794,6 +1807,33 @@ app.post('/api/admin/nueva-orden-manual', soloAdmin, async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// ── Contexto del folio: notas e imágenes que SARA, SOFIA y NOA ven ──────────
+app.post('/api/folios/:folio/adjuntos', soloAdmin, express.raw({ type: 'image/*', limit: '9mb' }), async (req, res) => {
+  try {
+    if (!folioContexto.obtener(req.params.folio)) return res.status(404).json({ error: 'Folio sin contexto registrado' });
+    if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: 'Imagen vacía o formato no soportado' });
+    const r = await folioContexto.agregarAdjunto(req.params.folio, req.body, String(req.headers['content-type'] || '').split(';')[0], decodeURIComponent(String(req.headers['x-nombre'] || '')));
+    res.json({ ok: true, ...r });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+app.get('/api/folios/:folio/contexto', adminUOps, (req, res) => {
+  const e = folioContexto.publico(folioContexto.obtener(req.params.folio));
+  if (!e) return res.status(404).json({ error: 'Sin contexto para ese folio' });
+  res.json(e);
+});
+app.post('/api/folios/:folio/notas', soloAdmin, (req, res) => {
+  const t = String((req.body || {}).texto || '').trim();
+  if (!t) return res.status(400).json({ error: 'texto requerido' });
+  const e = folioContexto.agregarNota(req.params.folio, t, req.user?.nombre || req.user?.email);
+  if (!e) return res.status(404).json({ error: 'Folio sin contexto registrado' });
+  res.json({ ok: true, notas: e.notas });
+});
+app.get('/api/folios/:folio/adjuntos/:id', adminUOps, (req, res) => {
+  const a = folioContexto.rutaArchivo(req.params.folio, req.params.id);
+  if (!a || !require('fs').existsSync(a.ruta)) return res.status(404).json({ error: 'Imagen no encontrada' });
+  res.type(a.mime); res.sendFile(a.ruta);
 });
 
 // Diagnóstico: guarda una orden sintética vía ordersStore para confirmar
@@ -2852,6 +2892,7 @@ async function handleChat(agente, req, res) {
   }
 
   if (agente === 'sofia' && req.user) systemPrompt += await contactos.bloqueDirectorioProveedores();
+  if (req.user) systemPrompt += folioContexto.bloque();
 
   if (callMode) systemPrompt += '\n\n🎙️ MODO LLAMADA DE VOZ: El cliente está en una llamada. Responde en máximo 2 oraciones cortas y directas. Sin listas, sin markdown, sin asteriscos. Habla natural como en una conversación telefónica. IMPORTANTE: Aunque estés en modo voz, SIEMPRE debes emitir el bloque LEAD_DATA al final de tu respuesta cuando tengas datos del cliente — es obligatorio en todos los modos.';
 

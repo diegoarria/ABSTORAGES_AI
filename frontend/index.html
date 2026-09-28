@@ -1061,7 +1061,30 @@
       function limpiarForm() {
         campos.forEach(c => { const el = document.getElementById('nom-' + c); if (el) el.value = ''; });
         document.getElementById('nom-msg').textContent = '';
+        const n = document.getElementById('nom-notas'); if (n) n.value = '';
+        const f = document.getElementById('nom-imagenes'); if (f) f.value = '';
+        const pv = document.getElementById('nom-previews'); if (pv) pv.innerHTML = '';
       }
+
+      // Reduce cada imagen (máx. 1600 px, JPEG) antes de subirla: fotos de celular pesan varios MB
+      function reducir(file) {
+        return new Promise((ok, fail) => {
+          const img = new Image(); const url = URL.createObjectURL(file);
+          img.onload = () => {
+            const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+            const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+            c.toBlob(b => b ? ok(b) : fail(new Error('No se pudo procesar ' + file.name)), 'image/jpeg', 0.85);
+          };
+          img.onerror = () => { URL.revokeObjectURL(url); fail(new Error('No se pudo leer ' + file.name)); };
+          img.src = url;
+        });
+      }
+      document.getElementById('nom-imagenes')?.addEventListener('change', (e) => {
+        const pv = document.getElementById('nom-previews'); pv.innerHTML = '';
+        [...e.target.files].slice(0, 12).forEach(f => { const i = document.createElement('img'); i.src = URL.createObjectURL(f); i.style.cssText = 'width:54px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.08))'; pv.appendChild(i); });
+      });
 
       btn.addEventListener('click', () => { limpiarForm(); overlay.classList.add('open'); });
       document.getElementById('nom-cancelar')?.addEventListener('click', () => overlay.classList.remove('open'));
@@ -1070,6 +1093,8 @@
       document.getElementById('nom-guardar')?.addEventListener('click', async () => {
         const body = {};
         campos.forEach(c => { body[c] = document.getElementById('nom-' + c).value.trim(); });
+        body.notas = document.getElementById('nom-notas').value.trim();
+        const archivos = [...(document.getElementById('nom-imagenes').files || [])].slice(0, 12);
         if (!body.nombre || !body.telefono || !body.origen || !body.destino) {
           document.getElementById('nom-msg').textContent = 'Nombre, teléfono, origen y destino son obligatorios.';
           document.getElementById('nom-msg').style.color = '#ef4444';
@@ -1088,8 +1113,18 @@
           });
           const data = await r.json();
           if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
-          msg.style.color = '#22c55e';
-          msg.textContent = `✅ Folio ${data.folio} creado — SOFIA ya está buscando transportista.`;
+          let subidas = 0, fallidas = 0;
+          for (const f of archivos) {
+            msg.textContent = `Folio ${data.folio} creado. Subiendo imágenes (${subidas + fallidas + 1}/${archivos.length})…`;
+            try {
+              const blob = await reducir(f);
+              const up = await fetch('/api/folios/' + encodeURIComponent(data.folio) + '/adjuntos', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'image/jpeg', 'X-Nombre': encodeURIComponent(f.name) }, body: blob });
+              if (!up.ok) throw new Error((await up.json().catch(() => ({}))).error || ('HTTP ' + up.status));
+              subidas++;
+            } catch (err) { fallidas++; console.error('[imagen]', err.message); }
+          }
+          msg.style.color = fallidas ? '#f59e0b' : '#22c55e';
+          msg.textContent = `✅ Folio ${data.folio} creado — SOFIA ya está buscando transportista.` + (archivos.length ? ` Imágenes: ${subidas} subida(s)${fallidas ? `, ${fallidas} con error` : ''}.` : '');
           setTimeout(() => overlay.classList.remove('open'), 2500);
         } catch (e) {
           msg.style.color = '#ef4444';
@@ -1720,6 +1755,17 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
         <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Peso (ton)</label><input id="nom-peso_toneladas" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
         <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Precio cotizado</label><input id="nom-precio_cotizado" placeholder="$18,500 MXN" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
+      </div>
+
+      <div style="margin-bottom:10px;">
+        <label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Notas para SARA, SOFIA y NOA (lo que se está pidiendo)</label>
+        <textarea id="nom-notas" rows="3" placeholder="Ej. Cliente pide unidad con rampa, cita de carga a las 7:00, contacto en planta: Sr. Pérez. Mercancía frágil." style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px; resize:vertical; font-family:inherit;"></textarea>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Imágenes del folio (orden de compra, packing list, foto de la carga…)</label>
+        <input id="nom-imagenes" type="file" accept="image/*" multiple style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;">
+        <div id="nom-previews" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+        <div style="font-size:11px; color:var(--text-500,#66788C); margin-top:4px;">Hasta 12 imágenes. Las IA las leen y las tienen presentes por WhatsApp y por llamada.</div>
       </div>
 
       <div id="nom-msg" style="font-size:12px; margin-bottom:12px; min-height:16px;"></div>
