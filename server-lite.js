@@ -97,6 +97,7 @@ const colocaciones = require('./backend/services/colocaciones');
 const kpisSofia = require('./backend/services/kpisSofia');
 const folioContexto = require('./backend/services/folioContexto');
 const { aTuteo } = require('./backend/services/tuteo');
+const requerimiento = require('./backend/services/requerimiento');
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
@@ -320,17 +321,51 @@ async function buscarUnidadParaOrden(lead) {
         body: `Folio ${lead.folio || ''} (${lead.empresa || lead.nombre || 'cliente'}) — ningún proveedor maneja esa ruta (o sin rutas capturadas), revisar manualmente`,
         tag: 'sin-unidad', url: '/', tipo: 'SIN_UNIDAD', urgente: true,
       }).catch(() => {});
-      return;
+      return { estado: 'sin_ruta', candidatos: candidatos.length };
     }
     if (agentPause.estaPausado('sofia')) {
       pushActividad({ agente: 'SOFIA', tipo: 'SIN_UNIDAD', mensaje: `Folio ${lead.folio || ''}: SOFIA está pausada — nadie fue contactado`, metadata: { folio: lead.folio } });
-      return;
+      return { estado: 'pausada' };
     }
     // Ranking + escalera por olas + horario + seguimiento: ver sofiaOperacion.js
     sofiaOperacion.iniciarBusqueda(lead, elegidos);
+    return { estado: 'iniciada', elegidos: elegidos.length, omitidos: omitidos.length, candidatos: candidatos.length };
   } catch (e) {
     console.error('[SOFIA] Error buscando unidad real para folio', lead.folio, ':', e.message);
+    return { estado: 'error', error: e.message };
   }
+}
+
+
+// ── Requerimiento de unidad enviado por el equipo a SOFIA por WhatsApp ─────
+// Lee folio, cliente, ruta, unidad y citas, y arranca la búsqueda con los
+// proveedores de la Base de Datos que cubren esa ruta (escalera de olas, horario,
+// tope diario y pausa incluidos). Devuelve el texto de confirmación para el equipo.
+async function procesarRequerimiento(rq, persona) {
+  const por = persona?.nombre || 'el equipo';
+  const existente = colocaciones.obtener(rq.folio);
+  if (existente) return `El folio ${rq.folio} ya está en el sistema (estado: ${existente.estado.replace('_', ' ')}). No lo volví a lanzar para no molestar dos veces a los proveedores.`;
+  const cargaTxt = requerimiento.cuando(rq.carga), descargaTxt = requerimiento.cuando(rq.descarga);
+  const lead = {
+    folio: rq.folio, empresa: rq.cliente, nombre: rq.cliente, origen: rq.origen, destino: rq.destino, tipo_unidad: rq.tipo_unidad,
+    fecha_carga: cargaTxt, fecha_descarga: descargaTxt, sara_nota: 'requerimiento_whatsapp', sessionId: `req_${rq.folio}`,
+  };
+  await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
+  folioContexto.registrar(rq.folio, {
+    notas: `Requerimiento recibido por WhatsApp de ${por}. Cita de carga: ${cargaTxt}. Cita de descarga: ${descargaTxt}. Origen completo: ${rq.origenCompleto}. Destino completo: ${rq.destinoCompleto}.`,
+    resumen: { empresa: rq.cliente, origen: rq.origen, destino: rq.destino, tipo_unidad: rq.tipo_unidad }, por,
+  });
+  pushActividad({ agente: 'SOFIA', tipo: 'NUEVA_ORDEN', mensaje: `Requerimiento ${rq.folio} recibido de ${por} — ${rq.cliente}: ${rq.origen} → ${rq.destino} (${rq.tipo_unidad}), carga ${cargaTxt}`, metadata: { folio: rq.folio } });
+
+  const r = await buscarUnidadParaOrden(lead);
+  const resumen = `Folio ${rq.folio} (${rq.cliente}): ${rq.origen} → ${rq.destino}, ${rq.tipo_unidad}. Carga ${cargaTxt}, descarga ${descargaTxt}.`;
+  if (!r || r.estado === 'error') return `Recibí el requerimiento del ${resumen} Pero tuve un problema al buscar proveedores y no contacté a nadie. Revísalo en el portal.`;
+  if (r.estado === 'pausada') return `Recibí el requerimiento del ${resumen} Estoy pausada, así que no contacté a ningún proveedor.`;
+  if (r.estado === 'sin_ruta') return `Recibí el requerimiento del ${resumen} No tengo ningún proveedor activo que cubra esa ruta en mi Base de Datos (${r.candidatos} proveedores revisados), así que no contacté a nadie. Puedes agregarles esa ruta desde la Base de Datos.`;
+  const c = colocaciones.obtener(rq.folio);
+  const contactados = Object.values(c?.proveedores || {}).map(p => p.nombre);
+  if (!contactados.length) return `Recibí el requerimiento del ${resumen} Encontré ${r.elegidos} proveedores que cubren la ruta. Ahorita estamos fuera de horario de contacto, así que empiezo a escribirles cuando abra el horario.`;
+  return `Recibí el requerimiento del ${resumen} Encontré ${r.elegidos} proveedores que cubren esa ruta. Ya les pregunté disponibilidad a los primeros ${contactados.length}: ${contactados.join(', ')}.${r.elegidos > contactados.length ? ' Si en unos minutos nadie da una oferta, sigo con los demás.' : ''} Te aviso cuando haya ofertas.`;
 }
 
 // Health check público — sin auth, sin tocar TMS/DB, para que monitoring
@@ -607,6 +642,20 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     }
     memory.addMessage(session, 'user', textoParaHistorial);
     saveMessage(session, agente, 'user', textoParaHistorial);
+    // Requerimiento con el formato del TMS enviado por alguien del equipo (número verificado):
+    // SOFIA lo lee sola y arranca la búsqueda — sin pasar por el modelo.
+    if (agente === 'sofia' && personaEquipo && texto) {
+      const rq = requerimiento.parsear(texto);
+      if (rq) {
+        let confirmacion;
+        try { confirmacion = await procesarRequerimiento(rq, personaEquipo); }
+        catch (e) { console.error('[requerimiento]', e.message); confirmacion = `Recibí el requerimiento del folio ${rq.folio}, pero tuve un error al procesarlo (${e.message}). No contacté a nadie.`; }
+        memory.addMessage(session, 'assistant', confirmacion);
+        saveMessage(session, agente, 'assistant', confirmacion);
+        for (const bloque of splitForWhatsApp(confirmacion)) await sendWhatsApp(phone, bloque, agente);
+        return;
+      }
+    }
     await humanDelay.esperar(texto); // simula tiempo de lectura/escritura humano — punto 12 del checklist
     let respuesta = '';
     await chatStream(systemPrompt, [...history, { role: 'user', content: contenidoParaClaude }], (c) => { respuesta += c; }, () => {});

@@ -114,13 +114,16 @@ function filtrarPorRuta(proveedores, origen, destino, tipoUnidad) {
 
 // ── Tipo de unidad ──────────────────────────────────────────────────────────
 const FAMILIAS_UNIDAD = {
-  seca: /seca|caja cerrada|dry/, refrigerada: /refriger|termo|reefer|frio/, plataforma: /plataforma|plana|flat/,
+  seca: /seca|caja cerrada|dry|\bcaja\b/, refrigerada: /refriger|termo|reefer|frio/, plataforma: /plataforma|plana|flat/,
   pipa: /pipa|cisterna|tanque/, tolva: /tolva|granel/, torton: /torton|rabon|3\.?5|camioneta|pickup/, cama_baja: /cama baja|low ?boy|lowboy/,
   full: /full|doble remolque|doble articulado/,
 };
 function familias(texto) {
   const t = norm(texto);
-  return new Set(Object.entries(FAMILIAS_UNIDAD).filter(([, re]) => re.test(t)).map(([k]) => k));
+  const set = new Set(Object.entries(FAMILIAS_UNIDAD).filter(([, re]) => re.test(t)).map(([k]) => k));
+  // "caja refrigerada" / "caja plataforma" no es caja seca: la palabra "caja" sola solo cuenta como seca
+  if (set.has('seca') && !/seca|cerrada|dry/.test(t) && (set.has('refrigerada') || set.has('plataforma') || set.has('pipa') || set.has('tolva'))) set.delete('seca');
+  return set;
 }
 // Proveedor con unidades capturadas: debe manejar la que pide la orden. Sin
 // unidades capturadas, o una orden cuyo tipo no reconocemos, no se descarta
