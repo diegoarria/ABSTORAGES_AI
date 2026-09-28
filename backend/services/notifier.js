@@ -308,7 +308,8 @@ const AGENTE_LABEL = { sofia: 'SOFÍA', sara: 'SARA', noa: 'NOA' };
 // IA está al teléfono. Va a Diego + Rafael, no a la lista general de NOTIF_EMAIL.
 const DIEGO_EMAIL = 'diego.arria@abstorages.com';
 const RAFAEL_EMAIL = 'rafael.arria@abstorages.com';
-const LLAMADA_INICIADA_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL];
+const GABRIEL_EMAIL = 'gabriel.diaz@abstorages.com';
+const LLAMADA_INICIADA_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL, GABRIEL_EMAIL];
 
 async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
   const label = AGENTE_LABEL[agente?.toLowerCase()] || agente?.toUpperCase() || 'Agente';
@@ -342,7 +343,7 @@ async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
 // para las notificaciones push, así no hay que duplicar la lista de eventos
 // en dos lugares. Va a Diego + Rafael, no a la lista general de NOTIF_EMAIL
 // (esa es solo para leads comerciales).
-const ALERT_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL];
+const ALERT_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL, GABRIEL_EMAIL];
 
 async function notificarAlerta({ title, body, tipo }) {
   const asunto = title || 'Alerta ABSTORAGES AI';
