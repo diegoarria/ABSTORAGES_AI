@@ -8,7 +8,7 @@
   // interfaz no muestre botones que de todas formas el servidor rechazaría.
   // Corre siempre, esté o no la barra de navegación (el portal usa data-no-bar).
   function esBoton(el) { return el.tagName === 'BUTTON' || (el.tagName === 'INPUT' && ['checkbox', 'file'].includes(el.type)); }
-  function enNav(el) { return !!el.closest('.abs-nav, .appnav, .abs-theme, .header-nav-links, #theme-toggle'); }
+  function enNav(el) { return !!el.closest('.abs-nav, .appnav, .abs-theme, .header-nav-links, #theme-toggle, .filter, .af-chip, .ptab, .tab, .agent, .combo-btn, .mode-tab, .seg, #segAg, #segF'); }
   function bloquear(raiz) {
     (raiz.matches && esBoton(raiz) ? [raiz] : []).concat([...raiz.querySelectorAll('button, input[type="checkbox"], input[type="file"]')]).forEach(el => {
       if (enNav(el) || el.dataset.lectorOk) return;
@@ -32,8 +32,9 @@
       new MutationObserver(function () { bloquear(document); }).observe(document.body, { childList: true, subtree: true });
     });
   }
-  fetch('/api/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (me) { if (me && me.role === 'lector') activarModoLector(); }).catch(function () {});
+  window.ABS_ROL_LISTO = fetch('/api/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (me) { window.ABS_ROL = me ? me.role : null; if (me && me.role === 'lector') activarModoLector(); return window.ABS_ROL; })
+    .catch(function () { return null; });
 
 
   var KEY = 'abs-theme';

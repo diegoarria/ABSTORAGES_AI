@@ -1811,7 +1811,8 @@ app.post('/api/vapi/numero/:id/assistant', soloAdmin, async (req, res) => {
 
 // Historial de llamadas (SOFIA/SARA/NOA) guardado en disco
 app.get('/api/vapi/llamadas', adminUOps, (req, res) => {
-  res.json(callLog.listar({ agente: req.query.agente, limit: Number(req.query.limit) || 200 }));
+  const agente = req.user?.role === 'lector' ? 'sofia' : req.query.agente;
+  res.json(callLog.listar({ agente, limit: Number(req.query.limit) || 200 }));
 });
 
 // Setup one-shot: aplica backend/db/schema.sql contra DATABASE_URL — idempotente
@@ -1956,7 +1957,8 @@ app.post('/api/admin/test-orden', soloAdmin, async (req, res) => {
 
 // ─── CONTACTOS (memoria compartida SARA/SOFIA/NOA) ──────────────────────────
 app.get('/api/contactos', adminUOps, async (req, res) => {
-  const agente = (req.query.agente || '').toUpperCase();
+  // Gabriel (rol "lector") solo ve lo de SOFIA — sin importar qué agente pida.
+  const agente = req.user?.role === 'lector' ? 'SOFIA' : (req.query.agente || '').toUpperCase();
   if (!['SARA', 'SOFIA', 'NOA'].includes(agente)) {
     return res.status(400).json({ error: 'agente requerido: SARA, SOFIA o NOA' });
   }
@@ -1967,6 +1969,9 @@ app.get('/api/contactos', adminUOps, async (req, res) => {
 app.get('/api/contactos/:id', adminUOps, async (req, res) => {
   const detalle = await contactos.obtenerDetalle(req.params.id);
   if (!detalle) return res.status(404).json({ error: 'Contacto no encontrado' });
+  if (req.user?.role === 'lector' && String(detalle.agente_asignado || '').toUpperCase() !== 'SOFIA') {
+    return res.status(403).json({ error: 'Solo tienes acceso a los contactos de SOFIA' });
+  }
   res.json(detalle);
 });
 
@@ -2606,6 +2611,7 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
       );
     }
 
+    if (req.user?.role === 'lector') enriquecidas = enriquecidas.filter(s => s.agente === 'sofia');
     res.json(enriquecidas.sort((a, b) => b.updatedAt - a.updatedAt));
   } catch (e) {
     console.error('[historial/sesiones]', e.message);
@@ -2617,7 +2623,13 @@ app.get('/api/historial/sesiones/:id', adminUOps, async (req, res) => {
   if (req.params.id.startsWith('2chat:')) {
     const { agente, historial } = grupoWA.historialDeConversacion(req.params.id);
     if (!historial.length) return res.status(404).json({ error: 'Conversación no encontrada o sin mensajes' });
+    // Un hilo de grupo puede mezclar varios agentes — a Gabriel solo se le
+    // muestra si es exclusivamente de SOFIA, nunca uno compartido.
+    if (req.user?.role === 'lector' && agente !== 'sofia') return res.status(403).json({ error: 'Solo tienes acceso a las conversaciones de SOFIA' });
     return res.json({ sessionId: req.params.id, agente, historial });
+  }
+  if (req.user?.role === 'lector' && detectarAgente(req.params.id) !== 'sofia') {
+    return res.status(403).json({ error: 'Solo tienes acceso a las conversaciones de SOFIA' });
   }
   const historial = memory.getFullHistory(req.params.id);
   if (!historial.length) return res.status(404).json({ error: 'Sesión no encontrada o sin mensajes' });

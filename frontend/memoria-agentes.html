@@ -53,6 +53,7 @@ const AGENTES = {
   NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--noa)",   soft: "var(--noa-soft)" },
 };
 
+let SOLO_SOFIA = false;
 let activeAgent = "SARA";
 let activeTipo = "todos";
 let activeContactId = null;
@@ -67,8 +68,9 @@ function fmtFechaHora(iso) { return iso ? new Date(iso).toLocaleString('es-MX', 
 function tipoLabel(t) { return t==='cliente' ? 'Cliente' : t==='proveedor' ? 'Proveedor' : 'Operador'; }
 function iniciales(n) { const p = String(n || '?').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?')[0] + (p.length > 1 ? p[p.length-1][0] : '')).toUpperCase(); }
 
+function agentesVisibles(){ return SOLO_SOFIA ? Object.entries(AGENTES).filter(([k]) => k === 'SOFIA') : Object.entries(AGENTES); }
 function renderTabs(){
-  document.getElementById('tabs').innerHTML = Object.entries(AGENTES).map(([key,a])=>`
+  document.getElementById('tabs').innerHTML = agentesVisibles().map(([key,a])=>`
     <button class="agent ${key===activeAgent?'active':''}" style="--ag:${a.color};--ag-soft:${a.soft}" onclick="selectAgent('${key}')" aria-pressed="${key===activeAgent}">
       <span class="agent-av">${key[0]}</span>
       <span><span class="agent-nm">${key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
@@ -198,9 +200,13 @@ document.getElementById('searchInput').addEventListener('input', (e)=>{
 document.getElementById('searchIco').innerHTML = ico('search');
 document.getElementById('updated').textContent = 'Cargado: ' + new Date().toLocaleString('es-MX', { dateStyle:'medium', timeStyle:'short' });
 
-renderTabs();
-renderFilters();
-cargarContactos();
+(window.ABS_ROL_LISTO || Promise.resolve(null)).then(rol => {
+  SOLO_SOFIA = rol === 'lector';
+  if (SOLO_SOFIA) activeAgent = 'SOFIA';
+  renderTabs();
+  renderFilters();
+  cargarContactos();
+});
 </script>
 </body>
 </html>

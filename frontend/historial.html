@@ -75,9 +75,9 @@
           <div class="filter" id="tab-llamadas" onclick="cambiarModo('llamadas')" role="tab">Llamadas</div>
         </div>
         <div class="chips-row" id="agent-filters">
-          <button class="af-chip on" data-ag="sara" onclick="toggleFiltroAgente('sara')">SARA</button>
+          <button class="af-chip on" data-ag="sara" onclick="toggleFiltroAgente('sara')" id="chip-sara">SARA</button>
           <button class="af-chip on" data-ag="sofia" onclick="toggleFiltroAgente('sofia')">SOFÍA</button>
-          <button class="af-chip on" data-ag="noa" onclick="toggleFiltroAgente('noa')">NOA</button>
+          <button class="af-chip on" data-ag="noa" onclick="toggleFiltroAgente('noa')" id="chip-noa">NOA</button>
         </div>
         <div class="search-w"><span id="searchIco"></span><input class="search" id="buscador" type="text" placeholder="Buscar por nombre, empresa o teléfono" aria-label="Buscar" oninput="MODO === 'chats' ? buscar(this.value) : buscarLlamadas(this.value)"></div>
         <div class="count" id="contador"></div>
@@ -346,8 +346,15 @@ async function borrarSesion(sessionId) {
 function matchLocal(s) { return true; } // placeholder, el filtrado real ya llegó del server
 
 document.getElementById('searchIco').innerHTML = ico('search');
-document.getElementById('main').innerHTML = vacioDetalle('chats');
-cargarSesiones();
+(window.ABS_ROL_LISTO || Promise.resolve(null)).then(rol => {
+  if (rol === 'lector') {
+    FILTRO_AGENTES = new Set(['sofia']);
+    document.getElementById('chip-sara').style.display = 'none';
+    document.getElementById('chip-noa').style.display = 'none';
+  }
+  document.getElementById('main').innerHTML = vacioDetalle('chats');
+  cargarSesiones();
+});
 </script>
 </body>
 </html>

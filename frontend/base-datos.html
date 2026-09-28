@@ -428,6 +428,7 @@ const AGENTES = {
   NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--noa)",   soft: "var(--noa-soft)" },
 };
 
+let SOLO_SOFIA = false;
 let activeAgent = "SARA";
 let activeTipo = "todos";
 let activeContactId = null;
@@ -515,8 +516,9 @@ function toggleSeleccionVisibles(){
 }
 function limpiarSeleccion(){ seleccion.clear(); renderList(); }
 
+function agentesVisibles(){ return SOLO_SOFIA ? Object.entries(AGENTES).filter(([k]) => k === 'SOFIA') : Object.entries(AGENTES); }
 function renderTabs(){
-  document.getElementById('tabs').innerHTML = Object.entries(AGENTES).map(([key,a])=>`
+  document.getElementById('tabs').innerHTML = agentesVisibles().map(([key,a])=>`
     <button class="agent ${key===activeAgent?'active':''}" style="--ag:${a.color};--ag-soft:${a.soft}" onclick="selectAgent('${key}')" aria-pressed="${key===activeAgent}">
       <span class="agent-av">${key[0]}</span>
       <span><span class="agent-nm">${key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
@@ -998,10 +1000,14 @@ document.getElementById('overlay').addEventListener('click', (e)=>{ if (e.target
 
 document.getElementById('updated').textContent = 'Cargado: ' + new Date().toLocaleString('es-MX', { dateStyle:'medium', timeStyle:'short' });
 
-renderTabs();
-renderFilters();
-renderPermitido();
-cargarContactos();
+(window.ABS_ROL_LISTO || Promise.resolve(null)).then(rol => {
+  SOLO_SOFIA = rol === 'lector';
+  if (SOLO_SOFIA) activeAgent = 'SOFIA';
+  renderTabs();
+  renderFilters();
+  renderPermitido();
+  cargarContactos();
+});
 </script>
 </body>
 </html>
