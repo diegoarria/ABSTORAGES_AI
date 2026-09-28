@@ -96,6 +96,7 @@ const sofiaOperacion = require('./backend/services/sofiaOperacion');
 const colocaciones = require('./backend/services/colocaciones');
 const kpisSofia = require('./backend/services/kpisSofia');
 const folioContexto = require('./backend/services/folioContexto');
+const { aTuteo } = require('./backend/services/tuteo');
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
@@ -236,6 +237,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
   }
   text = limpiarFormatoWhatsApp(text);
   text = await contactos.protegerDatosProveedores(text); // nunca sale el teléfono/correo de un proveedor
+  text = aTuteo(text); // nunca voseo: siempre tuteo mexicano
   if (!text) { console.log(`[WA] Mensaje vacío tras filtrar control, no se envía a ${to}`); return; }
 
   if (!WA_LIVE) {
