@@ -244,10 +244,12 @@ async function aprobar(folio, { tel, manual, precio, aprobadoPor }) {
 
 // ── Tick cada minuto ────────────────────────────────────────────────────────
 function fechaCargaDate(txt) {
-  const m = String(txt || '').match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  const m = String(txt || '').match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\D+(\d{1,2}):(\d{2}))?/);
   if (!m) return null;
   const y = Number(m[3]) < 100 ? 2000 + Number(m[3]) : Number(m[3]);
-  const d = new Date(y, Number(m[2]) - 1, Number(m[1]), 8);
+  // Con hora en la cita (p. ej. "29/09/2026 20:00") se usa esa hora; sin hora, las 8:00. Hora de Monterrey (UTC-6).
+  const hh = m[4] != null ? Number(m[4]) : 8, mm = m[5] != null ? Number(m[5]) : 0;
+  const d = new Date(Date.UTC(y, Number(m[2]) - 1, Number(m[1]), hh + 6, mm));
   return isNaN(d) ? null : d;
 }
 
