@@ -82,8 +82,11 @@ async function escanearConexionesInesperadas() {
 //    ~100 plantillas/día sin que nadie se enterara). Corre sobre la última
 //    hora, no el día completo, para avisar temprano de una ráfaga en curso
 //    en vez de esperar a que se acumule el límite diario del negocio.
-const UMBRAL_HORA_HIGH     = 15;
-const UMBRAL_HORA_CRITICAL = 30;
+// Con el tope diario de SOFIA en 100 (antes 40), 15/hora se disparaba con cada envío
+// masivo legítimo. Ahora: alerta alta a 60 contactos/hora y crítica a 100 (todo el
+// tope diario en una hora). Se ajustan por variable de entorno sin tocar código.
+const UMBRAL_HORA_HIGH     = Number(process.env.MONITOR_UMBRAL_HORA_HIGH || 60);
+const UMBRAL_HORA_CRITICAL = Number(process.env.MONITOR_UMBRAL_HORA_CRITICAL || 100);
 
 async function escanearVolumenSaliente() {
   const { rows } = await pool.query(
