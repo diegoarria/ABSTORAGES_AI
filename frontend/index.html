@@ -1052,7 +1052,9 @@
     })();
 
     // ── Nueva orden manual — cierre de venta hecho por un humano ─────────────
-    (function() {
+    // Se enlaza al terminar de cargar la página: el modal (nom-overlay) está al final del HTML,
+    // después de este script, y antes de esperar al DOM sus botones no existían todavía.
+    document.addEventListener('DOMContentLoaded', function() {
       const btn = document.getElementById('btn-nueva-orden-manual');
       if (!btn) return;
       const overlay = document.getElementById('nom-overlay');
@@ -1131,7 +1133,7 @@
           msg.textContent = 'Error: ' + e.message;
         }
       });
-    })();
+    });
 
     // ── Logout ──────────────────────────────────────────────────────────────
     document.getElementById('btn-logout')?.addEventListener('click', async () => {
