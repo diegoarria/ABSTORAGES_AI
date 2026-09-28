@@ -1,0 +1,4091 @@
+[
+ {
+  "codigo": "P1147",
+  "empresa": "EDUARDO REYES BALDERA",
+  "nombre": "EDUARDO REYES BALDERAS",
+  "telefono": "+5218122033467",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 313,
+  "rutas": [
+   "Monterrey → Monterrey",
+   "Santa Catarina → San Nicolas De Los Garza",
+   "Monterrey → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P1170",
+  "empresa": "MONTES TRUCKING",
+  "nombre": "OSAIN MONTES",
+  "telefono": "+5215519965834",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 265,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Ramos Arizpe → Tultitlan",
+   "Tecamac → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P855",
+  "empresa": "JOSE GUADALUPE LOZANO BELTRAN",
+  "nombre": "TERESA",
+  "telefono": "+5218261422369",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 191,
+  "rutas": [
+   "Ramos Arizpe → Merida",
+   "Ramos Arizpe → Cancun",
+   "Cordoba → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1012",
+  "empresa": "SERGIO GERARDO DE ROSAS GALAN",
+  "nombre": "ALEJANDRO GALAN",
+  "telefono": "+5212221522442",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 179,
+  "rutas": [
+   "Ramos Arizpe → Puebla",
+   "Ramos Arizpe → Oriental",
+   "Guadalupe → Huejoztingo"
+  ]
+ },
+ {
+  "codigo": "P1184",
+  "empresa": "JOSE ANTONIO RODRIGUEZ JUAREZ",
+  "nombre": "ANTONIO RODRIGUEZ",
+  "telefono": "+5218115319579",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 170,
+  "rutas": [
+   "Santa Catarina → San Nicolas De Los Garza",
+   "Escobedo → Guadalupe",
+   "Santa Catarina → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1509",
+  "empresa": "RITO ALBERTO CALIXTO CRUZ",
+  "nombre": "RICARDO ABRAHAM CALIXTO HERNANDEZ",
+  "telefono": "+5218112812422",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 137,
+  "rutas": [
+   "Guadalupe → Torreon",
+   "Santa Catarina → San Nicolas De Los Garza",
+   "Santa Catarina → Gomez Palacio"
+  ]
+ },
+ {
+  "codigo": "P1082",
+  "empresa": "GUSTAVO GARCIA CORTEZ",
+  "nombre": "CESAR ALAN HERNANDEZ GONZALEZ",
+  "telefono": "+5218991058078",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 125,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Ramos Arizpe → Tultitlan",
+   "Ramos Arizpe → Tepatitlan De Morelos"
+  ]
+ },
+ {
+  "codigo": "P633",
+  "empresa": "ESTEBAN NAVARRO TORRES",
+  "nombre": "ESTEBAN NAVARRO TORRES",
+  "telefono": "+5212223107760",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 120,
+  "rutas": [
+   "Santa Catarina → Puebla",
+   "Guadalupe → Tlajomulco De Zuñiga",
+   "San Nicolas De Los Garza → Tlaquepaque"
+  ]
+ },
+ {
+  "codigo": "P61",
+  "empresa": "MONICA CORONA LINARES",
+  "nombre": "OSCAR",
+  "telefono": "+5212212171454",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 120,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Santa Catarina → Puebla",
+   "Garcia → La Magdalena Tlaltelulco"
+  ]
+ },
+ {
+  "codigo": "P1122",
+  "empresa": "TRANSPORTES ESPECIALIZADOS KAMIR",
+  "nombre": "RUBEN DIAZ RODRIGUEZ",
+  "telefono": "+5215510199558",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 118,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Cordoba → Guadalupe",
+   "Toluca → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1164",
+  "empresa": "ALEJANDRO GARAY GUERRERO",
+  "nombre": "ALEJANDRO GARAY GUERRERO",
+  "telefono": "+5215570684250",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 101,
+  "rutas": [
+   "Cuautitlan Izcalli → Apodaca",
+   "Zapopan → Tecamac",
+   "Saltillo → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1431",
+  "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
+  "nombre": "EMILIANO BRIONES BARRAGAN",
+  "telefono": "+5215543799243",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 100,
+  "rutas": [
+   "Tecamac → San Nicolas De Los Garza",
+   "Ramos Arizpe → Tultitlan De Mariano Escobedo",
+   "Ramos Arizpe → Teoloyucan"
+  ]
+ },
+ {
+  "codigo": "P1052",
+  "empresa": "JLC TRANSPORTACIONES SA DE CV",
+  "nombre": "LAZARO ALANIS",
+  "telefono": "+5218261010380",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 99,
+  "rutas": [
+   "Toluca → Escobedo",
+   "Toluca → Monterrey",
+   "Toluca → Ramos Arizpe"
+  ]
+ },
+ {
+  "codigo": "P1580",
+  "empresa": "MARCOS ARZATE VILLAVICENCIO",
+  "nombre": "JOSÉ ISRAEL DÍAZ DÍAZ",
+  "telefono": "+5215527021863",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 97,
+  "rutas": [
+   "Monterrey → Tultitlan",
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Tepotzotlan → Ciudad Guzman"
+  ]
+ },
+ {
+  "codigo": "P75",
+  "empresa": "PORTEADORA DE BIENES Y SERVICIOS SA DE CV",
+  "nombre": "GERARDO",
+  "telefono": "+5212211002573",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 96,
+  "rutas": [
+   "Santa Catarina → Puebla",
+   "Huejotzingo → Guadalupe",
+   "Tlajomulco De Zuñiga → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1072",
+  "empresa": "EXPRESS GRAN TIBURON SA DE CV",
+  "nombre": "VIRGINIA LOPEZ",
+  "telefono": "+5218116395065",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 87,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Tecamac → San Nicolas De Los Garza",
+   "Tlajomulco De Zuñiga → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1464",
+  "empresa": "TRANSPORTES TACSA SA DE CV",
+  "nombre": "JOSE LUIS CAVAZOS",
+  "telefono": "+5218124242815",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 84,
+  "rutas": [
+   "Santa Catarina → Tijuana",
+   "Santa Catarina → Mexicali",
+   "Santa Catarina → San Luis Rio Colorado"
+  ]
+ },
+ {
+  "codigo": "P1434",
+  "empresa": "RISOCO LOGISTICS",
+  "nombre": "DAVID ALVAREZ",
+  "telefono": "+5218711680772",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 79,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Zapopan → San Nicolas De Los Garza",
+   "Guadalupe → Torreon"
+  ]
+ },
+ {
+  "codigo": "P1113",
+  "empresa": "TRANSPORTREZA",
+  "nombre": "IVAN MENDOZA LOPEZ",
+  "telefono": "+5215558999170",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 79,
+  "rutas": [
+   "Toluca → Escobedo",
+   "Tecamac → San Nicolas De Los Garza",
+   "Huejotzingo → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P3",
+  "empresa": "TRANSPORTES CAV GAR SA DE CV",
+  "nombre": "ADRIAN",
+  "telefono": "+5218443113527",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 78,
+  "rutas": [
+   "Ramos Arizpe → Juarez",
+   "Escobedo → Juarez"
+  ]
+ },
+ {
+  "codigo": "P1242",
+  "empresa": "AUTOTRANSPORTES PERTH SA DE CV",
+  "nombre": "MICHELL JAIR CERDA VIDALES",
+  "telefono": "+5218186545194",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 77,
+  "rutas": [
+   "Ramos Arizpe → Tultitlan",
+   "Santa Catarina → Tultitlan",
+   "Tlajomulco De Zuñiga → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P0548",
+  "empresa": "TRANSRAPIDOS VALERIO SA DE CV",
+  "nombre": "DANIEL MEDINA",
+  "telefono": "+5218182808318",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 77,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Toluca → Ramos Arizpe",
+   "Santa Catarina → Gomez Palacio"
+  ]
+ },
+ {
+  "codigo": "P1242",
+  "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
+  "nombre": "ORLANDO VAZQUEZ",
+  "telefono": "+5214495410182",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 74,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Toluca → Escobedo",
+   "Tecamac → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1467",
+  "empresa": "TSM CONNECT SA DE CV",
+  "nombre": "DARIO CEPEDA",
+  "telefono": "+5218448669341",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 73,
+  "rutas": [
+   "Ramos Arizpe → Tlajomulco De Zúñiga",
+   "Ramos Arizpe → Tepatitlan De Morelos",
+   "Ramos Arizpe → Oriental"
+  ]
+ },
+ {
+  "codigo": "P1151",
+  "empresa": "IRENE ISABEL GARZA LEAL",
+  "nombre": "IRENE ISABEL GARZA LEAL",
+  "telefono": "+5218136024336",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 72,
+  "rutas": [
+   "Santa Catarina → Mexicali",
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Santa Catarina → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1291",
+  "empresa": "MARIVEL CASTILLO IBARRA",
+  "nombre": "MARIVEL CASTILLO IBARRA",
+  "telefono": "+5217751388483",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 68,
+  "rutas": [
+   "Tultitlan → Cancun",
+   "Tlalnepantla → Escobedo",
+   "Tecamac → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P810",
+  "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
+  "nombre": "MIGUEL ANGEL OSNAYA VARGAS",
+  "telefono": "+5215544766455",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 66,
+  "rutas": [
+   "Ramos Arizpe → Tultitlan De Mariano Escobedo",
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Cuautitlan Izcalli → Ramos Arizpe"
+  ]
+ },
+ {
+  "codigo": "P1128",
+  "empresa": "RODOLFO ANGELES NAVA",
+  "nombre": "MONICA CRUZ",
+  "telefono": "+5215526644914",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 64,
+  "rutas": [
+   "Ramos Arizpe → Tultitlan",
+   "Ramos Arizpe → Teoloyucan",
+   "Tepotzotlan → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P0163",
+  "empresa": "SOLUCIONES SEVER SA DE CV",
+  "nombre": "BERNARDO GARZA",
+  "telefono": "+5218119103303",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 61,
+  "rutas": [
+   "Guadalupe → Tlajomulco De Zuñiga",
+   "Ramos Arizpe → Tlajomulco De Zúñiga",
+   "San Nicolas De Los Garza → Tlaquepaque"
+  ]
+ },
+ {
+  "codigo": "P1520",
+  "empresa": "ASESORES INTEGRALES KOTE-MAR SA DE CV",
+  "nombre": "IVAN MORALES",
+  "telefono": "+5215552529466",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 60,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Cuautitlan Izcalli → Apodaca",
+   "Tlajomulco De Zuñiga → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1479",
+  "empresa": "JOSE RAMON FLORES ALANIS",
+  "nombre": "JOSE RAMON FLORES ALANIS",
+  "telefono": "+5218110302029",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 59,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Tecamac → Monterrey",
+   "Tecamac → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P0713",
+  "empresa": "ALMA NELLY CALVA GARCIA",
+  "nombre": "ALMA NELLY",
+  "telefono": "+5217731038425",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 54,
+  "rutas": [
+   "Cuautitlan Izcalli → Guadalupe",
+   "Santa Catarina → Iztapalapa",
+   "Cuautitlán → Ramos Arizpe"
+  ]
+ },
+ {
+  "codigo": "P1279",
+  "empresa": "MARIO CABRERA GARZA",
+  "nombre": "MARIO CABRERA GARZA",
+  "telefono": "+5218182566666",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 53,
+  "rutas": [
+   "Escobedo → Guadalupe",
+   "Escobedo → Monterrey",
+   "Apodaca → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1171",
+  "empresa": "GRUPO AIR COND SA DE CV",
+  "nombre": "SEBASTIAN",
+  "telefono": "+5215547364628",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 46,
+  "rutas": [
+   "Garcia → Cuautitlan",
+   "Guadalupe → Cd Sahagun Hidalgo",
+   "Apodaca → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1112",
+  "empresa": "ANA SELENE ENRIQUEZ ROJAS",
+  "nombre": "RICARDO ENRIQUEZ ROJAS",
+  "telefono": "+5214271159763",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 45,
+  "rutas": [
+   "Ramos Arizpe → Tultitlan",
+   "Ramos Arizpe → Tultitlan De Mariano Escobedo",
+   "San Nicolas De Los Garza → Queretaro"
+  ]
+ },
+ {
+  "codigo": "P1402",
+  "empresa": "ADBLUE INTERNACIONAL SA DE CV",
+  "nombre": "JORGE GONZALEZ",
+  "telefono": "+5218116366988",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 41,
+  "rutas": [
+   "Santa Catarina → Gomez Palacio",
+   "Apodaca → Gomez Palacio",
+   "Guadalupe → Torreon"
+  ]
+ },
+ {
+  "codigo": "P484",
+  "empresa": "CARLOS ARTURO MORALES VALDEZ",
+  "nombre": "EMILIANO",
+  "telefono": "+5218129183075",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 39,
+  "rutas": [
+   "Monterrey → Cienega De Flores",
+   "Apodaca → Monterrey",
+   "Monterrey → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1587",
+  "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+  "nombre": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+  "telefono": "+5215541758627",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 38,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Cuautitlan Izcalli → Ramos Arizpe",
+   "Tecamac → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P451",
+  "empresa": "LILIAN BELEN CEDILLO CORNEJO",
+  "nombre": "LILIAN BELEN CEDILLO",
+  "telefono": "+5215572702628",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 38,
+  "rutas": [
+   "Cuautitlan Izcalli → Monterrey",
+   "Apodaca → Toluca",
+   "Toluca → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1411",
+  "empresa": "GRUPO TRANSPORTISTA HIDALGO SA DE CV",
+  "nombre": "LUIS FRANCISCO GUTIERREZ TAPIA",
+  "telefono": "+5217721058599",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 37,
+  "rutas": [
+   "Ramos Arizpe → Tultitlan De Mariano Escobedo",
+   "Ramos Arizpe → Tultitlan",
+   "Monterrey → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1121",
+  "empresa": "MARIA DEL CARMEN CAVAZOS IBARRA",
+  "nombre": "ANTONIO CAVAZOS",
+  "telefono": "+5218182717459",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 35,
+  "rutas": [
+   "Santa Catarina → Mexicali",
+   "Santa Catarina → Tijuana",
+   "Guadalupe → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1557",
+  "empresa": "LOGISTICA ESPECIALIZADA VR72",
+  "nombre": "JUAN PABLO VEGA",
+  "telefono": "+5215587261409",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 34,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Monterrey → Cuautitlan Izcalli",
+   "Monterrey → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P102",
+  "empresa": "TRANSPORTADORA LECIA SA DE CV",
+  "nombre": "SANTA ROMERO",
+  "telefono": "+5215559899174",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 34,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Guadalupe → Tultitlan",
+   "Ramos Arizpe → Tultitlan De Mariano Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1074",
+  "empresa": "AUTO EXPRESS MONARCA SA DE CV",
+  "nombre": "KARINA",
+  "telefono": "+5218116297458",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 34,
+  "rutas": [
+   "Guadalupe → Monterrey",
+   "Guadalupe → Cd Victoria",
+   "Guadalupe → Salinas Victoria"
+  ]
+ },
+ {
+  "codigo": "P1161",
+  "empresa": "PEDRO ANTONIO MEJIA VALENZUELA",
+  "nombre": "PEDRO ANTONIO MEJIA VALENZUELA",
+  "telefono": "+5214426353971",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 33,
+  "rutas": [
+   "San Nicolas De Los Garza → Queretaro",
+   "Santa Catarina → Tultitlan",
+   "Tlajomulco De Zuñiga → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1265",
+  "empresa": "COMERCIALIZADORA TREVSA S DE RL",
+  "nombre": "EMILIANO TREVIÑO",
+  "telefono": "+5218121906660",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 33,
+  "rutas": [
+   "Escobedo → Guadalupe",
+   "Escobedo → Cienega De Flores",
+   "Ramos Arizpe → Chihuahua"
+  ]
+ },
+ {
+  "codigo": "P1560",
+  "empresa": "LOGISTICA VECAM",
+  "nombre": "MARIA DEL CARMEN VEGA GONZALEZ",
+  "telefono": "+5214426515771",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 32,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Tecamac → San Nicolas De Los Garza",
+   "Tlajomulco De Zuñiga → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1396",
+  "empresa": "TRISKEL LOGISTICS SA DE CV",
+  "nombre": "ROCIO",
+  "telefono": "+5218261289323",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 32,
+  "rutas": [
+   "Guadalupe → Cd Valles",
+   "Ramos Arizpe → Tamuin",
+   "Ramos Arizpe → Altamira"
+  ]
+ },
+ {
+  "codigo": "P1500",
+  "empresa": "DEFROA",
+  "nombre": "ALEJANDRO SANTOS",
+  "telefono": "+5215610720643",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 29,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Santa Catarina → Tultitlan",
+   "Azcapotzalco → Saltillo"
+  ]
+ },
+ {
+  "codigo": "P1485",
+  "empresa": "EDEER JAIME CASTILLO VILLARREAL",
+  "nombre": "EDEER VILLAREAL",
+  "telefono": "+5218123320391",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 28,
+  "rutas": [
+   "Guadalupe → Torreon",
+   "Santa Catarina → Hermosillo",
+   "Guadalupe → Hermosillo"
+  ]
+ },
+ {
+  "codigo": "P272",
+  "empresa": "RUPERTO PEÑA SALAZAR",
+  "nombre": "RUPERTO PEÑA SALAZAR",
+  "telefono": "+5218112392809",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 25,
+  "rutas": [
+   "San Nicolas De Los Garza → Cancun",
+   "Escobedo → Cancun",
+   "Monterrey → Cheuman Yucatan"
+  ]
+ },
+ {
+  "codigo": "P1481",
+  "empresa": "TRANSPORTES SIETE ANGELES",
+  "nombre": "PABLO ESPINOSA",
+  "telefono": "+5218115350612",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 24,
+  "rutas": [
+   "Santa Catarina → San Nicolas De Los Garza",
+   "Santa Catarina → Santa Catarina",
+   "Gral Escobedo → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1513",
+  "empresa": "IMOX IMPULSORA PROFESIONAL SA DE CV",
+  "nombre": "SILVIA BRENTON",
+  "telefono": "+5218117251060",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 23,
+  "rutas": [
+   "Ramos Arizpe → Apodaca",
+   "Guadalupe → Torreon",
+   "Ramos Arizpe → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P1534",
+  "empresa": "ROJAS TRAILERS",
+  "nombre": "DIEGO ROJAS",
+  "telefono": "+5218182094019",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 23,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Santa Catarina → Tultitlan",
+   "Tlajomulco De Zuñiga → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1554",
+  "empresa": "TRANSPORTES REVIARYA",
+  "nombre": "MONSERRAT JIMENEZ",
+  "telefono": "+5217731366218",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 23,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Monterrey → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P940",
+  "empresa": "DAVID VARGAS RODRIGUEZ",
+  "nombre": "DAVID VARGAS",
+  "telefono": "+5215541172011",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 23,
+  "rutas": [
+   "Tlalnepantla → Salinas Victoria",
+   "Cuautitlan Izcalli → Apodaca",
+   "Apodaca → Azcapotzalco"
+  ]
+ },
+ {
+  "codigo": "P283",
+  "empresa": "LOGISTICA TNA SA DE CV",
+  "nombre": "JAVIER",
+  "telefono": "+5217226318566",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 22,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Monterrey → Pedro Escobedo",
+   "Cuautitlan Izcalli → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1581",
+  "empresa": "TRANSPORTES ECOLOGICOS ZERG SA DE CV",
+  "nombre": "RICARDO MARTINEZ TELLO",
+  "telefono": "+5214491866655",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 22,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Tlajomulco De Zuñiga → Monterrey",
+   "Santa Catarina → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1101",
+  "empresa": "NANCY YAZMIN GOMEZ GOMEZ",
+  "nombre": "OCTAVIO CARMONA",
+  "telefono": "+5217225703730",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 22,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "San Nicolas De Los Garza → Tlaquepaque",
+   "Saltillo → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1319",
+  "empresa": "FERNANDO PEREZ RIVERA",
+  "nombre": "ROBERTO HERNANDEZ",
+  "telefono": "+5218661693889",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 22,
+  "rutas": [
+   "Tlalnepantla → Escobedo",
+   "Guadalupe → Tultitlan",
+   "Apodaca → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1061",
+  "empresa": "CARLOS EDUARDO GARDUÑO ROMERO",
+  "nombre": "MARYLIN",
+  "telefono": "+5218717818819",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 21,
+  "rutas": [
+   "Toluca → Escobedo",
+   "Toluca → Ramos Arizpe",
+   "García → Durango"
+  ]
+ },
+ {
+  "codigo": "P996",
+  "empresa": "DELFINO ADELAIDO JUAREZ OLIVERA",
+  "nombre": "LUCIA QUEVEDO",
+  "telefono": "+5215569610092",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 21,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Zuazua → Toluca"
+  ]
+ },
+ {
+  "codigo": "P1042",
+  "empresa": "LOGISTICA DE GRAN PESO SA DE CV",
+  "nombre": "ELIAS",
+  "telefono": "+5214778542852",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 21,
+  "rutas": [
+   "Guadalupe → Guadalupe",
+   "San Nicolas De Los Garza → Queretaro",
+   "Queretaro → Mexicali"
+  ]
+ },
+ {
+  "codigo": "P1558",
+  "empresa": "TRANSPORTADORA GEOS",
+  "nombre": "GABRIELA ORTEGA",
+  "telefono": "+5216121089197",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 20,
+  "rutas": [
+   "Tecamac → Zapopan",
+   "Toluca → Escobedo",
+   "Santa Catarina → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1519",
+  "empresa": "JOSE AARON DE LA GARZA BOTELLO",
+  "nombre": "JOSE VERDIGO",
+  "telefono": "+5218132690690",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 20,
+  "rutas": [
+   "Guadalupe → Reynosa",
+   "Guadalupe → Matamoros",
+   "Monterrey → Reynosa"
+  ]
+ },
+ {
+  "codigo": "P222",
+  "empresa": "AUTOLINEAS VIFE",
+  "nombre": "MAXIMILIANO VILLARREAL",
+  "telefono": "+5218116366118",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 19,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Zapopan → Santa Catarina",
+   "Tlajomulco De Zuñiga → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1459",
+  "empresa": "JUAN CARLOS DE LA GARZA VALADEZ",
+  "nombre": "JUAN CARLOS DE LA GARZA VALADEZ",
+  "telefono": "+5218182577605",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 18,
+  "rutas": [
+   "Monterrey → Ixtapaluca",
+   "Tecamac → Saltillo",
+   "Tecamac → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1075",
+  "empresa": "ELWIN ROMEO JAIR LASTRA CARDENAS",
+  "nombre": "ELWIN ROMEO",
+  "telefono": "+5218261699010",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 18,
+  "rutas": [
+   "Apodaca → Cd Cuauhtemoc",
+   "San Nicolas De Los Garza → Merida",
+   "Cordoba → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1101",
+  "empresa": "OMAR ROSAS TREJO",
+  "nombre": "OMAR ROSAS TREJO",
+  "telefono": "+5212225042891",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 17,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Ramos Arizpe → Tultitlan De Mariano Escobedo",
+   "Apodaca → Morelia"
+  ]
+ },
+ {
+  "codigo": "P1366",
+  "empresa": "CARLOS EDUARDO BARBA RODRIGUEZ",
+  "nombre": "CARLOS EDUARDO BARBA RODRIGUEZ",
+  "telefono": "+5218121465043",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 17,
+  "rutas": [
+   "Guadalupe → Torreon",
+   "Santa Catarina → Santa Catarina",
+   "Santa Catarina → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1425",
+  "empresa": "NESTOR ARRIETA FLORES",
+  "nombre": "ALONDRA MENDOZA",
+  "telefono": "+5218448430563",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 17,
+  "rutas": [
+   "Toluca → Ramos Arizpe",
+   "Ocoyoacac → Ramos Arizpe",
+   "Tecamac → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1460",
+  "empresa": "JUAN MANUEL PALACIOS GARCÍA",
+  "nombre": "LUIS CARLOS PÉREZ ROBLES",
+  "telefono": "+5218120326763",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 17,
+  "rutas": [
+   "Monterrey → Monterrey",
+   "Guadalupe → Torreon",
+   "Monterrey → Gomez Palacio"
+  ]
+ },
+ {
+  "codigo": "P1397",
+  "empresa": "DIRAC LOGISTICA EXPERTS S DE RL DE CV",
+  "nombre": "MAURICIO HERNANDEZ REYES",
+  "telefono": "+5215660098989",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 17,
+  "rutas": [
+   "Ramos Arizpe → Tultitlan",
+   "Ramos Arizpe → Teoloyucan",
+   "Tecamac → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1585",
+  "empresa": "SKYBRIDGE LOGISTICS",
+  "nombre": "JOSUE RODRIGUEZ",
+  "telefono": "+5218140055654",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 16,
+  "rutas": [
+   "Santa Catarina → Hermosillo",
+   "Santa Catarina → Mexicali",
+   "Ramos Arizpe → Navojoa"
+  ]
+ },
+ {
+  "codigo": "P1550",
+  "empresa": "WHITE STAR EVOLUTION SA DE CV",
+  "nombre": "DANIEL GUERRERO",
+  "telefono": "+5217775107903",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 16,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Tlajomulco De Zuñiga → Guadalupe",
+   "Guadalupe → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P0349",
+  "empresa": "JUAN DE DIOS ANDRADE MARTINEZ",
+  "nombre": "JUAN ANDRADE",
+  "telefono": "+5218114663760",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 16,
+  "rutas": [
+   "Ramos Arizpe → Allende",
+   "Ramos Arizpe → Montemorelos",
+   "San Nicolas De Los Garza → Allende"
+  ]
+ },
+ {
+  "codigo": "P858",
+  "empresa": "GRUPO MULTILIN LOGISTICS SA DE CV",
+  "nombre": "GERARDO ZAVALA",
+  "telefono": "+5218117366620",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 16,
+  "rutas": [
+   "Tepotzotlan → Monterrey",
+   "Tecamac → Ramos Arizpe",
+   "Tecamac → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1404",
+  "empresa": "ALGO EXPRESS LOGISTICS SA DE CV",
+  "nombre": "FERNANDO ALCALÁ ORTIZ",
+  "telefono": "+5218127482989",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 15,
+  "rutas": [
+   "Santa Catarina → Tijuana",
+   "Guadalupe → Tlajomulco De Zuñiga",
+   "Santa Catarina → Mexicali"
+  ]
+ },
+ {
+  "codigo": "P1454",
+  "empresa": "JOSE TELLO HERNANDEZ",
+  "nombre": "JOSE TELLO HERNANDEZ",
+  "telefono": "+5215591859416",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 15,
+  "rutas": [
+   "Tecamac → Monterrey",
+   "Tecamac → Escobedo",
+   "Cuautitlan Izcalli → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1241",
+  "empresa": "TRANSPORTADORA GRIJALVA SA DE CV",
+  "nombre": "GEMA",
+  "telefono": "+5216181581843",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 15,
+  "rutas": [
+   "Ramos Arizpe → Juarez",
+   "Guadalupe → Torreon",
+   "Santa Catarina → Gomez Palacio"
+  ]
+ },
+ {
+  "codigo": "P1265",
+  "empresa": "JUAN PABLO GORDILLO BENITEZ",
+  "nombre": "JUAN PABLO GORDILLO",
+  "telefono": "+5212224290560",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 15,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "García → Toluca",
+   "Cienega De Flores → Tepeji Del Rio"
+  ]
+ },
+ {
+  "codigo": "P1091",
+  "empresa": "LOGÍSTICA Y TRANSPORTE PVR",
+  "nombre": "VICTOR AREVALO",
+  "telefono": "+5212291127631",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 15,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Apodaca → Boca Del Rio",
+   "Apodaca → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P110",
+  "empresa": "JUAN RICARDO SERRANO GARCIA",
+  "nombre": "JUAN RICARDO SERRANO GARCIA",
+  "telefono": "+5218180883857",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 15,
+  "rutas": [
+   "Santa Catarina → Chihuahua",
+   "San Nicolas De Los Garza → Naonilco",
+   "General Escobedo → Jimenez"
+  ]
+ },
+ {
+  "codigo": "P1542",
+  "empresa": "YULIANA ESCALONA CARMONA",
+  "nombre": "OCTAVIO",
+  "telefono": "+5217225703730",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 14,
+  "rutas": [
+   "Tepotzotlan → Ciudad Guzman",
+   "Tecamac → Zapopan",
+   "Tecamac → El Salto"
+  ]
+ },
+ {
+  "codigo": "P1561",
+  "empresa": "LOGISTICA VALOR Y EXITO",
+  "nombre": "FRANCISCO FAVIO ESPINOZA MONTOYA",
+  "telefono": "+5216681328696",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 14,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Santa Catarina → El Salto",
+   "Santa Catarina → Hermosillo"
+  ]
+ },
+ {
+  "codigo": "P387",
+  "empresa": "BENJAMIN REYES RODRIGUEZ",
+  "nombre": "BENJAMIN REYES",
+  "telefono": "+5212226515726",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 14,
+  "rutas": [
+   "Santa Catarina → Puebla",
+   "García → Cuautlancingo",
+   "Garcia → La Magdalena Tlaltelulco"
+  ]
+ },
+ {
+  "codigo": "P1511",
+  "empresa": "TRANSPORTES CAVAZOS ARREDONDO SA DE CV",
+  "nombre": "HECTOR A. GARCIA MARTINEZ",
+  "telefono": "+5218266880331",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 14,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Tlajomulco De Zuñiga → Guadalupe",
+   "Tlajomulco De Zuñiga → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1378",
+  "empresa": "HORACIO BAUTISTA JIMENEZ",
+  "nombre": "GERARDO",
+  "telefono": "+5217731584414",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 14,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Saltillo → Cuautitlan",
+   "Monterrey → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1579",
+  "empresa": "SIGMA LOGISTICS JH",
+  "nombre": "JORDAN AVILA RODRIGUEZ",
+  "telefono": "+5218443114341",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 14,
+  "rutas": [
+   "Guadalupe → Torreon",
+   "Ramos Arizpe → Apodaca",
+   "Tecamac → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1277",
+  "empresa": "GUADALUPE EUSTOLIA SANCHEZ MORA",
+  "nombre": "GUADALUPE EUSTOLIA",
+  "telefono": "+5217151737940",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 14,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Santa Catarina → Chalco De Covarrubias",
+   "Apodaca → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P97",
+  "empresa": "SUPER EXPRESS SAN PEDRO SA DE CV",
+  "nombre": "EDUARDO SILVA",
+  "telefono": "+5218110246596",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 14,
+  "rutas": [
+   "Guadalupe → Hermosillo",
+   "Ramos Arizpe → Chihuahua",
+   "Guadalupe → Mexicali"
+  ]
+ },
+ {
+  "codigo": "P1195",
+  "empresa": "TRANSPORTES AB BARRON S DE RL DE CV",
+  "nombre": "Claudia Santiago",
+  "telefono": "+5216567509253",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 14,
+  "rutas": [
+   "Monterrey → Cuauhtemoc",
+   "Zapopan → Santa Catarina",
+   "Santa Catarina → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1289",
+  "empresa": "SALVADOR VAZQUEZ ROJO",
+  "nombre": "LIZBETH",
+  "telefono": "+18054013120",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 13,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Guadalajara → Leon De Los Aldama",
+   "Tepotzotlan → Ciudad Guzman"
+  ]
+ },
+ {
+  "codigo": "P1501",
+  "empresa": "BAHNSEN G",
+  "nombre": "JOEL VERVER MARTINEZ",
+  "telefono": "+5215610596620",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 13,
+  "rutas": [
+   "Tepotzotlan → Ciudad Guzman",
+   "Zapopan → Santa Catarina",
+   "Monterrey → Ixtapaluca"
+  ]
+ },
+ {
+  "codigo": "P844",
+  "empresa": "JUAN LOZA CARRILLO",
+  "nombre": "OSMAR LOZA",
+  "telefono": "+5213310258217",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 13,
+  "rutas": [
+   "San Nicolas De Los Garza → Tlaquepaque",
+   "Tecamac → El Salto",
+   "Mexico → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1529",
+  "empresa": "WOF TRUCKS",
+  "nombre": "LIZETH SALAS",
+  "telefono": "+5218135934085",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 13,
+  "rutas": [
+   "Guadalupe → Torreon",
+   "Santa Catarina → Gomez Palacio",
+   "Santa Catarina → Ramos Arizpe"
+  ]
+ },
+ {
+  "codigo": "P1395",
+  "empresa": "CYNTHIA GABRIELA CANTU TREVIÑO",
+  "nombre": "VICTOR USCANGA",
+  "telefono": "+5217821456776",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 13,
+  "rutas": [
+   "Santa Catarina → San Nicolas De Los Garza",
+   "Escobedo → Guadalupe",
+   "Santa Catarina → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1526",
+  "empresa": "GUSTAVO FABIAN RODRIGUEZ MARROQUIN",
+  "nombre": "FABIAN RODRIGUEZ",
+  "telefono": "+5218261718577",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 12,
+  "rutas": [
+   "Santa Catarina → Tijuana",
+   "Santa Catarina → Mexicali",
+   "Ramos Arizpe → Mexicali"
+  ]
+ },
+ {
+  "codigo": "P1567",
+  "empresa": "SALVADOR SALAS LAZCANO",
+  "nombre": "SALVADOR LAZCANO",
+  "telefono": "+5218113697082",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 12,
+  "rutas": [
+   "Santa Catarina → Mexicali",
+   "Santa Catarina → Tijuana",
+   "Apodaca → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1524",
+  "empresa": "OSCAR GUILLERMO JURAIDINI SILVA",
+  "nombre": "JOSÉ GUADALUPE RIVERA QUINTERO",
+  "telefono": "+5218180754868",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 12,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Tecamac → Monterrey",
+   "Toluca → Saltillo"
+  ]
+ },
+ {
+  "codigo": "P1407",
+  "empresa": "EFRAIN RIVERA MACIAS",
+  "nombre": "MONICA ARACELI MARTINEZ RIVERA",
+  "telefono": "+5217713592703",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 12,
+  "rutas": [
+   "Tecamac → San Nicolas De Los Garza",
+   "Tecamac → Monterrey",
+   "Tepotzotlan → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1128",
+  "empresa": "CARLOS IVAN TORRES GARCIA",
+  "nombre": "CARLOS IVAN",
+  "telefono": "+5217299590004",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 11,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Tecamac → Saltillo",
+   "Monterrey → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1057",
+  "empresa": "ERICK JAVIER ORTIZ CHAVEZ",
+  "nombre": "ERICK JAVIER",
+  "telefono": "+5218110398290",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 11,
+  "rutas": [
+   "Santa Catarina → Acapulco",
+   "Guadalupe → Monterrey",
+   "Santa Catarina → Xochimilco"
+  ]
+ },
+ {
+  "codigo": "P1191",
+  "empresa": "JOSÉ ANGEL GARCÍA HERRERA",
+  "nombre": "JOSE ANGEL GARCIA HERRERA",
+  "telefono": "+5217121599991",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 11,
+  "rutas": [
+   "Monterrey → Chalco",
+   "Monterrey → Iztapalapa",
+   "Monterrey → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1574",
+  "empresa": "TRACTO LINEAS MEXICANAS",
+  "nombre": "MARCO ANTONIO SYDE DEL REAL",
+  "telefono": "+5218120009266",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 10,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Guadalupe → Monclova",
+   "Tecamac → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1421",
+  "empresa": "ADRIAN ANGELES GARCIA",
+  "nombre": "ADRIAN ANGELES GARCIA",
+  "telefono": "+5214423318023",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 10,
+  "rutas": [
+   "Queretaro → San Nicolas De Los Garza",
+   "Queretaro → Santa Catarina",
+   "Queretaro → Alcaldia Azcapotzalco"
+  ]
+ },
+ {
+  "codigo": "P1414",
+  "empresa": "HOMERO ARRIETA FLORES",
+  "nombre": "HOMERO ARRIETA FLORES",
+  "telefono": "+5218442772413",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 10,
+  "rutas": [
+   "Ramos Arizpe → Allende",
+   "Monterrey → Cd Madero",
+   "Santa Catarina → Chihuahua"
+  ]
+ },
+ {
+  "codigo": "P150",
+  "empresa": "THERCA EXPRESS SA DE CV",
+  "nombre": "MARIO CANTU",
+  "telefono": "+5218116787878",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 10,
+  "rutas": [
+   "Guadalupe → Hermosillo",
+   "Santa Catarina → Tijuana",
+   "Guadalupe → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1031",
+  "empresa": "JESSICA GUADALUPE VENTURA MOCTEZUMA",
+  "nombre": "JESSICA VENTURA",
+  "telefono": "+5215521800574",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 10,
+  "rutas": [
+   "Tecamac → Guadalupe",
+   "Queretaro → Apodaca",
+   "Santa Catarina → Chalco"
+  ]
+ },
+ {
+  "codigo": "P1450",
+  "empresa": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
+  "nombre": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
+  "telefono": "+5214771178050",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 9,
+  "rutas": [
+   "Cuautla → Aguascalientes",
+   "Cuautla → Ameca",
+   "Santa Catarina → El Salto"
+  ]
+ },
+ {
+  "codigo": "P1591",
+  "empresa": "HEBERTO JAVIER RODRIGUEZ PERALES",
+  "nombre": "HEBERTO JAVIER RODRIGUEZ PERALES",
+  "telefono": "+5218661122432",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 9,
+  "rutas": [
+   "Cuautitlan Izcalli → Ramos Arizpe",
+   "Santa Catarina → Tultitlan",
+   "Tlajomulco De Zuñiga → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1417",
+  "empresa": "NESTOR TOMAS CABRERA MEDINA",
+  "nombre": "NESTOR TOMAS CABRERA MEDINA",
+  "telefono": "+5214443224284",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 9,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Tecamac → San Nicolas De Los Garza",
+   "Queretaro → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1309",
+  "empresa": "EDGAR BONIFACIO AGUIRRE TAMEZ",
+  "nombre": "JONATHAN",
+  "telefono": "+5218261265810",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 9,
+  "rutas": [
+   "Santa Catarina → Tijuana",
+   "Santa Catarina → Mexicali",
+   "Zapopan → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1270",
+  "empresa": "PROLOGIC CUSTOM SERVICES AND FORWARDING",
+  "nombre": "WENDY ANICA",
+  "telefono": "+5218713506633",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 9,
+  "rutas": [
+   "Monterrey → Gomez Palacio",
+   "Santa Catarina → Gomez Palacio",
+   "Guadalupe → Torreon"
+  ]
+ },
+ {
+  "codigo": "P1452",
+  "empresa": "SERVANDO RODRIGUEZ ZERTUCHE",
+  "nombre": "SERVANDO RODRIGUEZ",
+  "telefono": "+5218180908937",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 9,
+  "rutas": [
+   "Santa Catarina → Santa Catarina",
+   "Escobedo → Escobedo",
+   "Guadalupe → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P826",
+  "empresa": "FEDERICO JOAQUIN LOPEZ COVARRUBIAS",
+  "nombre": "FEDERICO JOAQUIN",
+  "telefono": "+5218182542927",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 9,
+  "rutas": [
+   "Guadalupe → Escobedo",
+   "Guadalupe → Guadalupe",
+   "San Nicolas De Los Garza → Ramos Arizpe"
+  ]
+ },
+ {
+  "codigo": "P0333",
+  "empresa": "ROBERTO CARLOS BAHENA BENAVIDES",
+  "nombre": "ROBERTO BAHENA",
+  "telefono": "+5214424456345",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 9,
+  "rutas": [
+   "San Nicolas De Los Garza → Queretaro",
+   "Ramos Arizpe → Villagran",
+   "Santa Catarina → Queretaro"
+  ]
+ },
+ {
+  "codigo": "P0876",
+  "empresa": "HECTOR OBED BORGEL FLORES",
+  "nombre": "HECTOR BORGUEL",
+  "telefono": "+5218112276899",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 8,
+  "rutas": [
+   "Chihuahua → Ciudad Juarez",
+   "Ramos Arizpe → Ciudad Juarez",
+   "Saltillo → Nuevo Laredo"
+  ]
+ },
+ {
+  "codigo": "P1240",
+  "empresa": "TRANSPORTES LOPEZ VILLARREAL",
+  "nombre": "ALFREDO GARCIA",
+  "telefono": "+5218140050900",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 8,
+  "rutas": [
+   "San Nicolas De Los Garza → Escobedo",
+   "Santa Catarina → Tijuana",
+   "Apodaca → Hermosillo"
+  ]
+ },
+ {
+  "codigo": "P1539",
+  "empresa": "DIANA KAREN RAMOS ZACARIAS",
+  "nombre": "DIANA KAREN RAMOS ZACARIAS",
+  "telefono": "+5218119076088",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 7,
+  "rutas": [
+   "Monterrey → Monterrey",
+   "San Nicolas De Los Garza → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P102",
+  "empresa": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
+  "nombre": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
+  "telefono": "+5217225909520",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 7,
+  "rutas": [
+   "Saltillo → Cuautitlan",
+   "Guadalupe → Tecamac",
+   "Santa Catarina → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1308",
+  "empresa": "MIRIAM ELIDETH MOLINA MALDONADO",
+  "nombre": "WILIAM",
+  "telefono": "+5215534612594",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 7,
+  "rutas": [
+   "San Nicolas De Los Garza → Tlaquepaque",
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Acatlan De Juarez → Santa Cruz Atizapan"
+  ]
+ },
+ {
+  "codigo": "P1262",
+  "empresa": "YADO MOVIL COMPANY SA DE CV",
+  "nombre": "FRANCISCO FAVIO ESPINOZA MONTOYA",
+  "telefono": "+5216681765751",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 7,
+  "rutas": [
+   "Guadalupe → Mochis",
+   "Santa Catarina → Mexicali",
+   "Escobedo → Lopez Mateos"
+  ]
+ },
+ {
+  "codigo": "P1085",
+  "empresa": "MARIO MATA MONRROY",
+  "nombre": "MARIO MATA",
+  "telefono": "+5215615137624",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 7,
+  "rutas": [
+   "Cuautitlan Izcalli → Escobedo",
+   "Santa Catarina → Chihuahua",
+   "Guadalupe → Torreon"
+  ]
+ },
+ {
+  "codigo": "P807",
+  "empresa": "ANA MARIA OLVERA TORRES",
+  "nombre": "ABNER",
+  "telefono": "+5214424671985",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 7,
+  "rutas": [
+   "Tlalnepantla → Mexicali",
+   "Tlalnepantla De Baz → Tijuana",
+   "Ecatepec → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P0277",
+  "empresa": "SOLUCIONES EXPRESS CARDENAS S DE RL DE CV",
+  "nombre": "FLOR MARTINEZ",
+  "telefono": "+5214445220295",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 7,
+  "rutas": [
+   "Guadalupe → Dr Arroyo",
+   "San Nicolas De Los Garza → Sauzalito",
+   "Santa Catarina → San Isidro Mazatepec"
+  ]
+ },
+ {
+  "codigo": "P1492",
+  "empresa": "HUGO CESAR CEPEDA GONZALEZ",
+  "nombre": "HUGO CESAR CEPEDA MUÑIZ",
+  "telefono": "+5218118022746",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 6,
+  "rutas": [
+   "Escobedo → Guadalupe",
+   "Gral Escobedo → Santa Catarina",
+   "Santa Catarina → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P1439",
+  "empresa": "MARIA DEL PILAR AVILA LOPEZ",
+  "nombre": "MARIA DEL PILAR AVILA LOPEZ",
+  "telefono": "+5215549671388",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 6,
+  "rutas": [
+   "Monterrey → Tultitlan",
+   "Monterrey → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1525",
+  "empresa": "EMMANUEL AGUILAR GARCIA",
+  "nombre": "HECTOR RODEA FLORES",
+  "telefono": "+5217291748598",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 6,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "San Nicolas De Los Garza → Alcaldia Azcapotzalco",
+   "Monterrey → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1398",
+  "empresa": "GERARDO ZAMBRANO FLORES",
+  "nombre": "GERARDO ZAMBRANO FLORES",
+  "telefono": "+5218134470003",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 6,
+  "rutas": [
+   "Santa Catarina → San Nicolas De Los Garza",
+   "Santa Catarina → Monterrey",
+   "Santa Catarina → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1555",
+  "empresa": "FLORENCIO GARZA CARDENAS",
+  "nombre": "FLORENCIO GARZA CARDENAS",
+  "telefono": "+5218119907617",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 6,
+  "rutas": [
+   "Santa Catarina → Irapuato",
+   "Santa Catarina → Leon De Los Aldama"
+  ]
+ },
+ {
+  "codigo": "P1423",
+  "empresa": "JULIO CESAR LUGO VEGA",
+  "nombre": "JULIO CESAR LUGO VEGA",
+  "telefono": "+5214421267540",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 6,
+  "rutas": [
+   "Queretaro → San Nicolas De Los Garza",
+   "Queretaro → Monterrey",
+   "Queretaro → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1569",
+  "empresa": "TR SERVICIOS LOGÍSTICOS DE LA LAGUNA SA DE CV",
+  "nombre": "MARLEN SALAZAR",
+  "telefono": "+5218715119051",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 5,
+  "rutas": [
+   "Guadalupe → Torreon",
+   "Santa Catarina → Gomez Palacio",
+   "Escobedo → Torreon"
+  ]
+ },
+ {
+  "codigo": "P1593",
+  "empresa": "MIGUEL ALEJANDRO ESCAMILLA SOLIS",
+  "nombre": "KARLA ESCAMILLA",
+  "telefono": "+5215591808647",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 5,
+  "rutas": [
+   "Santa Catarina → Tultitlan",
+   "Apodaca → Tonala",
+   "Monterrey → Azcapotzalco"
+  ]
+ },
+ {
+  "codigo": "P1588",
+  "empresa": "YANEISI ARELI CAVAZOS LEAL",
+  "nombre": "SALVADOR ALMAGUER HERNANDEZ",
+  "telefono": "+5218184659685",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 5,
+  "rutas": [
+   "Apodaca → Tijuana",
+   "Tultitlan → Cancun",
+   "Santa Catarina → San Luis Rio Colorado"
+  ]
+ },
+ {
+  "codigo": "P1290",
+  "empresa": "JUST IN TIME EXPRESS MTY SA DE CV",
+  "nombre": "ANTONIO CANTU",
+  "telefono": "+5218115774616",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 5,
+  "rutas": [
+   "Apodaca → Monterrey",
+   "San Nicolas De Los Garza → General Escobedo",
+   "Escobedo → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1327",
+  "empresa": "PABLO CERDA GARCIA",
+  "nombre": "ESTEBAN ALBERTO ARMENDARIZ VEGA",
+  "telefono": "+5215621805424",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 5,
+  "rutas": [
+   "Cuautitlan Izcalli → Apodaca",
+   "Santa Catarina → Irapuato",
+   "Santa Catarina → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1200",
+  "empresa": "LUCIA GLADIS DEL SOCORRO SANCHEZ AGUILAR",
+  "nombre": "ANDREA ITZEL PRUNEDA SANCHEZ",
+  "telefono": "+5215558784104",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 5,
+  "rutas": [
+   "Santa Catarina → Irapuato",
+   "García → Silao",
+   "Apodaca → Queretaro"
+  ]
+ },
+ {
+  "codigo": "P1100",
+  "empresa": "MIGUEL ANGEL MATA MONRROY",
+  "nombre": "MIGUEL ANGEL MATA MONRROY",
+  "telefono": "+5215560989713",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 5,
+  "rutas": [
+   "Apodaca → Azcapotzalco",
+   "Santa Catarina → Chalco De Covarrubias",
+   "San Nicolas De Los Garza → Queretaro"
+  ]
+ },
+ {
+  "codigo": "P158",
+  "empresa": "TRANSPORTES HLCNS AYEF S DE RL DE CV",
+  "nombre": "IVAN MEDINA",
+  "telefono": "+5217224925529",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 5,
+  "rutas": [
+   "Guadalajara → Santiago De Queretaro",
+   "Guadalupe → Tultitlan",
+   "Santa Catarina → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P1604",
+  "empresa": "OSCAR HUITZIL TEPALE",
+  "nombre": "OSCAR HUITZIL TEPALE",
+  "telefono": "+5212212171454",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 4,
+  "rutas": [
+   "Santa Catarina → Tizayuca",
+   "Santa Catarina → Puebla",
+   "Ramos Arizpe → Cuautlancingo"
+  ]
+ },
+ {
+  "codigo": "P1601",
+  "empresa": "AUTOLINEAS SAN JOSE SA DE CV",
+  "nombre": "JOSE LUIS CAVAZOS SALAZAR",
+  "telefono": "+5218124242815",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 4,
+  "rutas": [
+   "Santa Catarina → Tijuana",
+   "Santa Catarina → Gomez Palacio",
+   "Apodaca → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1503",
+  "empresa": "LUIS ANGEL PARAS SALAZAR",
+  "nombre": "LUIS ANGEL PARAS SALAZAR",
+  "telefono": "+5218261154303",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 4,
+  "rutas": [
+   "Escobedo → Tampico",
+   "Apodaca → Tampico",
+   "Ramos Arizpe → Tamuin"
+  ]
+ },
+ {
+  "codigo": "P1263",
+  "empresa": "HEBERTO JAVIER RODRIGUEZ V. HARTZ",
+  "nombre": "HEBERTO JAVIER RODRIGUEZ PERALES",
+  "telefono": "+5218661122432",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 4,
+  "rutas": [
+   "Santa Catarina → Santa Catarina",
+   "San Nicolas De Los Garza → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1333",
+  "empresa": "DANIELA GUZMAN SALAZAR",
+  "nombre": "DANIELA GUZMAN SALAZAR",
+  "telefono": "+5218181798145",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 4,
+  "rutas": [
+   "Santa Catarina → Mexicali",
+   "Santa Catarina → Obregon",
+   "Santa Catarina → Irapuato"
+  ]
+ },
+ {
+  "codigo": "P1518",
+  "empresa": "JUAN GABRIEL MENDEZ VILLARREAL",
+  "nombre": "JUAN GABRIEL MENDEZ VILLARREAL",
+  "telefono": "+5218666976087",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 4,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Guadalupe → Tlajomulco De Zuñiga",
+   "Ramos Arizpe → Tlajomulco De Zuñiga"
+  ]
+ },
+ {
+  "codigo": "P1461",
+  "empresa": "SERVICIOS Y SUMINISTROS JOFI S DE RL DE CV",
+  "nombre": "NANCY MONRROY LEYVA",
+  "telefono": "+5215621169898",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 4,
+  "rutas": [
+   "Ramos Arizpe → Tlajomulco De Zuñiga",
+   "Ramos Arizpe → Tepatitlan De Morelos",
+   "Guadalupe → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1256",
+  "empresa": "JOSE GERARDO GONZALEZ MONTEMAYOR",
+  "nombre": "JOSE GERARDO GONZALEZ",
+  "telefono": "+5218182541385",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 4,
+  "rutas": [
+   "Salinas Victoria → Saltillo",
+   "Salinas Victoria → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P0019",
+  "empresa": "OPERADORA DE CARGA JF SA DE CV",
+  "nombre": "OPERADORA DE CARGA JF SA DE CV",
+  "telefono": "+5218111207197",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 4,
+  "rutas": [
+   "Escobedo → Altamira"
+  ]
+ },
+ {
+  "codigo": "P1235",
+  "empresa": "CHAVOLLA EXPORTS",
+  "nombre": "SERGIO DIAZ CHAVOLLA",
+  "telefono": "+5217225042304",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 4,
+  "rutas": [
+   "Saltillo → Cuautitlan Izcalli",
+   "Toluca → Guadalupe",
+   "Toluca → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1081",
+  "empresa": "TRANSPORTES SKI SA DE CV",
+  "nombre": "MARIO GUTIERREZ",
+  "telefono": "+5218118127038",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 4,
+  "rutas": [
+   "San Nicolas De Los Garza → Apodaca",
+   "Monterrey → San Nicolas",
+   "San Nicolas De Los Garza → Ramos Arizpe"
+  ]
+ },
+ {
+  "codigo": "P1107",
+  "empresa": "NUGAHAS SA DE CV",
+  "nombre": "EMMANUEL",
+  "telefono": "+5212221741453",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 4,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Guadalajara → Pesqueria"
+  ]
+ },
+ {
+  "codigo": "P1505",
+  "empresa": "ERICK DANIEL RENDON ROBLES",
+  "nombre": "Erick Daniel Rendón Robles",
+  "telefono": "+5212271535732",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 3,
+  "rutas": [
+   "Guadalupe → Tlajomulco De Zuñiga",
+   "Tlajomulco De Zuñiga → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1543",
+  "empresa": "ENRIQUE BRIONES VILLELA",
+  "nombre": "ENRIQUE BRIONES VILLELA",
+  "telefono": "+5214448013810",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 3,
+  "rutas": [
+   "Santa Catarina → San Luis Potosi",
+   "Cuautla → Matehuala",
+   "Tepotzotlan → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1493",
+  "empresa": "REMOLQUES MOVIL SA DE CV",
+  "nombre": "DANIEL MONTEMAYOR",
+  "telefono": "+5218112059083",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 3,
+  "rutas": [
+   "García → Guadalupe",
+   "Salinas Victoria → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1453",
+  "empresa": "TRANSPORTADORA RHA SA DE CV",
+  "nombre": "JOSÉ ISAAC HERNÁNDEZ AYALA",
+  "telefono": "+5215543239977",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 3,
+  "rutas": [
+   "Santa Maria Totoltepec → Atlacomulco",
+   "Hidalgo → Cuauhtemoc",
+   "Azcapotzalco → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P1403",
+  "empresa": "EMILIANO HURTADO VELASQUEZ",
+  "nombre": "EMILIANO HURTADO VELASQUEZ",
+  "telefono": "+5217791244000",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 3,
+  "rutas": [
+   "Apodaca → Ramos Arizpe",
+   "Tultitlan → Tultitlan",
+   "Tultitlan → Tlalnepantla De Baz"
+  ]
+ },
+ {
+  "codigo": "P1422",
+  "empresa": "SERGIO MARTINEZ BASTIDA",
+  "nombre": "SERGIO MARTINEZ BASTIDA",
+  "telefono": "+5215614275342",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 3,
+  "rutas": [
+   "Tepotzotlan → San Nicolas De Los Garza",
+   "Saltillo → Cuautitlan"
+  ]
+ },
+ {
+  "codigo": "P1405",
+  "empresa": "JONATHAN CAMACHO MARES",
+  "nombre": "JONATHAN CAMACHO MARES",
+  "telefono": "+5218122095562",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 3,
+  "rutas": [
+   "Apodaca → San Nicolas De Los Garza",
+   "Gral Escobedo → Santa Catarina",
+   "Santa Catarina → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P987",
+  "empresa": "VICTOR MANUEL MONJARAZ MORALES",
+  "nombre": "VICTOR MONJARAZ",
+  "telefono": "",
+  "telefono_incompleto": "556479932",
+  "estatus_catalogo": "No asignado",
+  "servicios": 3,
+  "rutas": [
+   "Tepotzotlan → Monterrey",
+   "Cuautitlan Izcalli → Escobedo",
+   "Santa Catarina → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1080",
+  "empresa": "ALBERTO RAMIREZ VALENZUELA",
+  "nombre": "ALBERTO RAMIREZ VALENZUELA",
+  "telefono": "+5216621661588",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 3,
+  "rutas": [
+   "Ramos Arizpe → Ciudad Juarez",
+   "Santa Catarina → Chihuahua",
+   "Ramos Arizpe → Juarez"
+  ]
+ },
+ {
+  "codigo": "P995",
+  "empresa": "ERIC USCANGA PEREZ",
+  "nombre": "ERIC USCANGA PEREZ",
+  "telefono": "+5219931012739",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 3,
+  "rutas": [
+   "Santa Catarina → San Nicolas De Los Garza",
+   "Santa Catarina → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1286",
+  "empresa": "MAQ Y SIST INDUSTRIALES ERCAM S DE RL DE CV",
+  "nombre": "CAMILA",
+  "telefono": "+19158082981",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 3,
+  "rutas": [
+   "Cienega De Flores → Cuahutemoc",
+   "Zapopan → Santa Catarina",
+   "Santa Catarina → Obregon"
+  ]
+ },
+ {
+  "codigo": "P1070",
+  "empresa": "BENDO-WA SA DE CV",
+  "nombre": "ARTURO J RUANO",
+  "telefono": "+5215582915842",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 3,
+  "rutas": [
+   "Tultitlan → Cuauhtemoc",
+   "Querétaro → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1076",
+  "empresa": "OCTAVIO ANTONIO HERNANDEZ OROZCO",
+  "nombre": "OCTAVIO ANTONIO HERNANDEZ OROZCO",
+  "telefono": "+5215584094340",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 3,
+  "rutas": [
+   "Apodaca → Cuautitlan Izcalli",
+   "Guadalupe → Zacatecas",
+   "Tultitlan → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1605",
+  "empresa": "ALEJANDRA ADELINA SOBERANES RUIZ",
+  "nombre": "ALEJANDRA ADELINA SOBERANES RUIZ",
+  "telefono": "+5215532592937",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 2,
+  "rutas": [
+   "Azcapotzalco → Saltillo",
+   "Santa Catarina → Puebla"
+  ]
+ },
+ {
+  "codigo": "P1589",
+  "empresa": "360 Logistics",
+  "nombre": "JOSE GERARDO REYES",
+  "telefono": "+5218119170117",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 2,
+  "rutas": [
+   "Garcia → Tlalpan",
+   "Tecamac → Zapopan"
+  ]
+ },
+ {
+  "codigo": "P1522",
+  "empresa": "MIGUEL ANGEL FRANCO AGUIRRE",
+  "nombre": "ANGEL DAVID FRANCO MENDEZ",
+  "telefono": "+5218445863518",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 2,
+  "rutas": [
+   "Santa Catarina → Mexicali",
+   "Apodaca → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1577",
+  "empresa": "DISTRIBUIDORA JEYAPA",
+  "nombre": "ELIAS HERNANDEZ",
+  "telefono": "+5213310086988",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 2,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo",
+   "Guadalupe → Tlajomulco De Zuñiga"
+  ]
+ },
+ {
+  "codigo": "P1390",
+  "empresa": "AUTO LINEAS VERDES DE MONTERREY",
+  "nombre": "HARI HERNANDEZ GONZALEZ",
+  "telefono": "+5218116409226",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "Santa Catarina → Santa Catarina",
+   "Monterrey → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1536",
+  "empresa": "JUAN CARLOS LOPEZ PEREZ",
+  "nombre": "JUAN CARLOS LOPEZ",
+  "telefono": "+5218115792037",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "Santa Catarina → Santa Catarina",
+   "Gral Escobedo → Santa Catarina"
+  ]
+ },
+ {
+  "codigo": "P1507",
+  "empresa": "TRANSPORTE Y LOGISTICA INTEGRAL MEXSUR",
+  "nombre": "GUILLERMO DE ALBA",
+  "telefono": "+5215566792886",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "Tecamac → Escobedo",
+   "Tecamac → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1141",
+  "empresa": "KARIME PAMELA CAMPOS RAMON",
+  "nombre": "KARIME PAMELA CAMPOS RAMON",
+  "telefono": "+5218444550515",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "Monterrey → Navojoa"
+  ]
+ },
+ {
+  "codigo": "P1257",
+  "empresa": "CESAR ALONSO CASTILLO",
+  "nombre": "FERNANDO VILLEGAS",
+  "telefono": "+5215611508559",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "García → Toluca",
+   "Cuautitlan Izcalli → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1325",
+  "empresa": "KHERSON SERRANO OLMEDO",
+  "nombre": "KHERSON SERRANO",
+  "telefono": "+5218130989909",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 2,
+  "rutas": [
+   "Huejotzingo → Guadalupe",
+   "Ramos Arizpe → Puebla"
+  ]
+ },
+ {
+  "codigo": "P1228",
+  "empresa": "JOSE ALFREDO MUNGUIA VELAZCO",
+  "nombre": "JOSE ALFREDO MUNGUIA VELAZCO",
+  "telefono": "+5214425268637",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 2,
+  "rutas": [
+   "Garcia → Parral",
+   "Santa Catarina → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1212",
+  "empresa": "JOSE ANTONIO TREJO MATA",
+  "nombre": "JOSE ANTONIO TREJO MATA",
+  "telefono": "+5214622100984",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "Guadalupe → Tlajomulco De Zuñiga",
+   "Queretaro → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1172",
+  "empresa": "JOSE LUIS MANJARREZ CAMARILLO",
+  "nombre": "JOSE LUIS MANJARREZ CAMARILLO",
+  "telefono": "+5215561073043",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 2,
+  "rutas": [
+   "Santa Catarina → Hermosillo",
+   "Toluca → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P177",
+  "empresa": "SHERYL JAYNE PLETT KORNELSEN",
+  "nombre": "GEORGE",
+  "telefono": "+5216255942927",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "Santa Catarina → Chihuahua"
+  ]
+ },
+ {
+  "codigo": "P1249",
+  "empresa": "TRANSPORTES 4GR SA DE CV",
+  "nombre": "GUILLERMO ANTONIO GONZALEZ GUERRERO",
+  "telefono": "+5218124685470",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 2,
+  "rutas": [
+   "Santa Catarina → Cienega De Flores",
+   "Escobedo → Monterrey"
+  ]
+ },
+ {
+  "codigo": "P1088",
+  "empresa": "SANDRA ELIZABETH RAMOS",
+  "nombre": "JOSE ANDRES ORMEJUSTE RAMOS",
+  "telefono": "+5218442063352",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 2,
+  "rutas": [
+   "Saltillo → Nuevo Laredo",
+   "San Nicolas De Los Garza → Queretaro"
+  ]
+ },
+ {
+  "codigo": "P1156",
+  "empresa": "TRANSPORTES SINERGIA A.R",
+  "nombre": "OBED ELISEO ALONSO JUAREZ",
+  "telefono": "+5218113262604",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": []
+ },
+ {
+  "codigo": "P1115",
+  "empresa": "LILIANA MARLEN ORTIZ MACIAS",
+  "nombre": "LILIANA MARLEN ORTIZ MACIAS",
+  "telefono": "+5218123480861",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 2,
+  "rutas": [
+   "Guadalupe → Garcia",
+   "Apodaca → Hacienda San Jose"
+  ]
+ },
+ {
+  "codigo": "P1030",
+  "empresa": "LAURA ESTHER FUENTES ALANIS",
+  "nombre": "AGUSTIN",
+  "telefono": "+5218112198109",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 2,
+  "rutas": [
+   "Guadalupe → Zacatecas"
+  ]
+ },
+ {
+  "codigo": "P1600",
+  "empresa": "GONFER LOGISTIC SA DE CV",
+  "nombre": "HUMBERTO GONZALEZ",
+  "telefono": "+5218261234525",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Escobedo → Cd Juarez"
+  ]
+ },
+ {
+  "codigo": "P1551",
+  "empresa": "ALEJANDRO CESAR ESPINOSA",
+  "nombre": "MÓNICA / ALEJANDRO CESAR",
+  "telefono": "+5218442117347",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Garcia → San Luis De La Paz"
+  ]
+ },
+ {
+  "codigo": "P1531",
+  "empresa": "CARLOS ALBERTO DAVILA IRACHETA",
+  "nombre": "ISRAEL SAMANIEGO",
+  "telefono": "+5218116075140",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1562",
+  "empresa": "TRANSPORTES REFRIGERADOS OSG S.A DE C.V.",
+  "nombre": "OSCAR LUIS SALAZAR SALAZAR",
+  "telefono": "+5218117362016",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Santa Catarina → Hermosillo"
+  ]
+ },
+ {
+  "codigo": "P1597",
+  "empresa": "LIBRANDO SALINAS LOZANO",
+  "nombre": "LIBRADO SALINAS LOZANO",
+  "telefono": "+5216672939864",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Escobedo → Aguascalientes"
+  ]
+ },
+ {
+  "codigo": "P1572",
+  "empresa": "MARIA VICTORIA RODRIGUEZ CONTRERAS",
+  "nombre": "GABRIEL SANTANA",
+  "telefono": "+5214491655596",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Tlajomulco De Zuñiga → Escobedo"
+  ]
+ },
+ {
+  "codigo": "P1564",
+  "empresa": "MARIA FERNANDA ROSAS RODRIGUEZ",
+  "nombre": "MARIA FERNANDA ROSAS RODRIGUEZ",
+  "telefono": "+5214424345091",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Queretaro → San Nicolas De Los Garza"
+  ]
+ },
+ {
+  "codigo": "P1541",
+  "empresa": "TRANSPORTES Y MUDANZAS QUALITY SA DE CV",
+  "nombre": "JOSUE MENDEZ",
+  "telefono": "+5219999701892",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Monterrey → Chalco"
+  ]
+ },
+ {
+  "codigo": "P1538",
+  "empresa": "BENJAMIN LIMON RODRIGUEZ",
+  "nombre": "BENJAMIN LIMON RODRIGUEZ",
+  "telefono": "+5214492413808",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 1,
+  "rutas": [
+   "Santa Catarina → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P630",
+  "empresa": "ANA VICTORIA RAMOS FALCON",
+  "nombre": "ANA VICTORIA RAMOS FALCON",
+  "telefono": "+5218113868904",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Ramos Arizpe → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P1515",
+  "empresa": "REGIO CARRIERS SOLUCIONES, S.A. DE C.V.",
+  "nombre": "JOSÉ JIMENEZ",
+  "telefono": "+5218117055193",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 1,
+  "rutas": [
+   "Salinas Victoria → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1447",
+  "empresa": "ORDELQUIX SA DE CV",
+  "nombre": "IVAN MORALES",
+  "telefono": "+5215552529466",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Santa Maria Totoltepec → Atlacomulco"
+  ]
+ },
+ {
+  "codigo": "P1392",
+  "empresa": "CHAPEL 3PL SA DE CV",
+  "nombre": "MIGUEL CHAPA",
+  "telefono": "+5218114135395",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Cuautitlan Izcalli → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1451",
+  "empresa": "JUAN LESCAS ZARATE",
+  "nombre": "JUAN LESCAS",
+  "telefono": "+5217293728874",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Toluca → Ramos Arizpe"
+  ]
+ },
+ {
+  "codigo": "P1245",
+  "empresa": "RIGOBERTO CORONADO BALDERAS",
+  "nombre": "RIGOBERTO CORONADO BALDERAS",
+  "telefono": "+5218994261748",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Reynosa → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1382",
+  "empresa": "FEMASA SERVICIOS DE LOGISTICA Y PROVEEDURIA INDUSTRIAL SA DE CV",
+  "nombre": "NESTOR FERNANDO ROMO GUAJARDO",
+  "telefono": "+5218666301896",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Ramos Arizpe → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1219",
+  "empresa": "MARIA FELIX HERNANDEZ",
+  "nombre": "MARIA FELIX HERNANDEZ",
+  "telefono": "+5214271769411",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Queretaro → Tijuana"
+  ]
+ },
+ {
+  "codigo": "P1130",
+  "empresa": "SALVADOR ZAMORA MATA",
+  "nombre": "SALVADOR",
+  "telefono": "+5218331443496",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Huejotzingo → Guadalupe"
+  ]
+ },
+ {
+  "codigo": "P1211",
+  "empresa": "LILIANA ELIZABETH SUAREZ HERNANDEZ",
+  "nombre": "CARLOS SOTO",
+  "telefono": "+5218127585805",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Guadalupe → Allende"
+  ]
+ },
+ {
+  "codigo": "P0426",
+  "empresa": "IGNACIO DELGADILLO GARCIA",
+  "nombre": "IGNACIO DELGADILLO",
+  "telefono": "+5215523031455",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 1,
+  "rutas": [
+   "Guadalupe → Tultitlan"
+  ]
+ },
+ {
+  "codigo": "P1167",
+  "empresa": "NIDIA VALDEZ HERNANDEZ",
+  "nombre": "NIDIA VALDEZ HERNANDEZ",
+  "telefono": "+5215538933213",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": [
+   "Apodaca → Cuautitlan Izcalli"
+  ]
+ },
+ {
+  "codigo": "P0652",
+  "empresa": "GRUPO JIT C&T SA DE CV",
+  "nombre": "EMMANUEL RAMIREZ",
+  "telefono": "+5218116084628",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 1,
+  "rutas": [
+   "San Nicolas De Los Garza → San Blas"
+  ]
+ },
+ {
+  "codigo": "P0476",
+  "empresa": "FRANCISCO JAVIER CANTU GUERRA",
+  "nombre": "Gudelia Rodriguez",
+  "telefono": "+5218281085344",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 1,
+  "rutas": [
+   "Santa Catarina → Monclova"
+  ]
+ },
+ {
+  "codigo": "P1124",
+  "empresa": "JAIME JAVIER VÁZQUEZ CORTÉS",
+  "nombre": "JAIME JAVIER VAZQUEZ CORTES",
+  "telefono": "+5214448447305",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 1,
+  "rutas": []
+ },
+ {
+  "codigo": "P0937",
+  "empresa": "ASIGMA LOGISTIC SAS",
+  "nombre": "LIZ MENDOZA",
+  "telefono": "+5214433616115",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Queretaro → Cienega De Flores"
+  ]
+ },
+ {
+  "codigo": "P1109",
+  "empresa": "ABMUSS INTERNATIONAL LOGISTICS SA DE CV",
+  "nombre": "ABMUSS INTERNATIONAL LOGISTICS SA DE CV",
+  "telefono": "+5216563013594",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Mexico → Apodaca"
+  ]
+ },
+ {
+  "codigo": "P1004",
+  "empresa": "SPEED.AGM.",
+  "nombre": "ENRIQUE",
+  "telefono": "+5215554772861",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 1,
+  "rutas": [
+   "Santa Catarina → Cuauhtemoc"
+  ]
+ },
+ {
+  "codigo": "P1394",
+  "empresa": "JORGE DANIEL ALDAPE BARBOSA",
+  "nombre": "JORGE ALDAPA",
+  "telefono": "+5218118264633",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 1,
+  "rutas": []
+ },
+ {
+  "codigo": "P1016",
+  "empresa": "VICTORICO ESPAÑA JARDINEZ",
+  "nombre": "DULCE ESPAÑA",
+  "telefono": "+5215542163354",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1446",
+  "empresa": "TRANSHERS SOLUTIONS SA DE CV",
+  "nombre": "ANDREA MARTINEZ",
+  "telefono": "+5214491127621",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1455",
+  "empresa": "XOCHITL YANETH AGUIRRE GUERRA",
+  "nombre": "ADRIAN ALFONSO LOZANO AGUIRRE",
+  "telefono": "+5218261009211",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1512",
+  "empresa": "ABRAHAM RAMIREZ BETANCOURT",
+  "nombre": "JUAN FRANCISCO SEPULVEDA",
+  "telefono": "+5218180859530",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1528",
+  "empresa": "FRANCISCO ADRIAN VIVAS VIVAS",
+  "nombre": "JOCELYNE LOPEZ",
+  "telefono": "+5213317698031",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1583",
+  "empresa": "NORMA MARGARITA FARIAS VILLALPANDO",
+  "nombre": "MIGUEL FARIAS",
+  "telefono": "+5214611402774",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1535",
+  "empresa": "LOGISTICA DE CARGA TERRESTRE NACIONAL EXPRESS SALTILLO SA DE CV",
+  "nombre": "BRUNO MONTIEL",
+  "telefono": "+5218112274397",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1222",
+  "empresa": "YESICA DEL CARMEN RADILLO ORTEGA",
+  "nombre": "YESICA DEL CARMEN RADILLO ORTEGA",
+  "telefono": "+5213311757979",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1578",
+  "empresa": "TRANSPORTES HRS",
+  "nombre": "DEVANY ARELY NAJERA CISNEROS",
+  "telefono": "+5218186789793",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1251",
+  "empresa": "PAOLA JAQUELINE MARTINEZ NAVARRO",
+  "nombre": "PAOLA JAQUELINE MARTINEZ NAVARRO",
+  "telefono": "+5213333736252",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1552",
+  "empresa": "VICTOR ARMANDO CAMACHO ALMARAZ",
+  "nombre": "VICTOR ARMANDO CAMACHO ALMARAZ",
+  "telefono": "+5214272725140",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1575",
+  "empresa": "IVETH MARTINEZ MEJIA",
+  "nombre": "IVETH MARTINEZ",
+  "telefono": "+5214426135169",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1573",
+  "empresa": "ANGEL RICARDO VAZQUEZ RUIZ",
+  "nombre": "ANGEL RICARDO VAZQUEZ RUIZ",
+  "telefono": "+5218117618895",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1571",
+  "empresa": "DAC EURO TRANSPORTES",
+  "nombre": "ELIZABETH GARCIA",
+  "telefono": "+5213331396860",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1393",
+  "empresa": "ALFONSO ANTONIO CASTRO LARA",
+  "nombre": "Ing. Alfonso Antonio Castro Lara",
+  "telefono": "+5214423556188",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1514",
+  "empresa": "POLI TRANSPORTES, S.A. DE C.V.",
+  "nombre": "DANIEL MARTINEZ",
+  "telefono": "+5218180987011",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1432",
+  "empresa": "CESAR SALVADOR FRANCO LECHUGA",
+  "nombre": "JESSICA AGUILAR FRANCO",
+  "telefono": "+5214492611413",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1433",
+  "empresa": "REBECA MYKAEL ARELLANO MADRIGAL",
+  "nombre": "REBECA MYKAEL ARELLANO MADRIGAL",
+  "telefono": "+5213311448970",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1599",
+  "empresa": "EMMANUEL MALVAEZ GONZALEZ",
+  "nombre": "LILIANA MONTOYA GONZALEZ",
+  "telefono": "+5215648406985",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1419",
+  "empresa": "SET LOGÍSTICA",
+  "nombre": "GABRIELA GUZMAN",
+  "telefono": "+5213343943021",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P384",
+  "empresa": "FRANCISCO CHARGOY ACOSTA",
+  "nombre": "FRANCISCO CHARGOY ACOSTA",
+  "telefono": "+5215538177116",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1150",
+  "empresa": "GALI901024GY",
+  "nombre": "IRENE ISABEL GARZA LEAL",
+  "telefono": "+5218136024336",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1444",
+  "empresa": "MAYRA ALEJANDRA ANDRADE MONTES",
+  "nombre": "JUAN RODRIGUEZ VELAZQUEZ",
+  "telefono": "+5216564290567",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1473",
+  "empresa": "JORGE ENRIQUE PEART LOZANO",
+  "nombre": "JORGE PEART",
+  "telefono": "+5218110600128",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1489",
+  "empresa": "JUAN MANUEL LOPEZ BASURTO",
+  "nombre": "JUAN MANUEL BASURTO",
+  "telefono": "+5215559910471",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1226",
+  "empresa": "ROSA ARIANNA ARANDA",
+  "nombre": "DAVID ZAPATA ESPINOZA",
+  "telefono": "+5214444155062",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1438",
+  "empresa": "ORLANDO ERNESTO MARTINEZ SALAZAR",
+  "nombre": "PALOMA MILAGROS PEREZ",
+  "telefono": "+5218130552790",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1435",
+  "empresa": "VALERY FERNANDA GONZÁLEZ GARZA",
+  "nombre": "ROMAN ROMERO",
+  "telefono": "+5218119840586",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1258",
+  "empresa": "SUSANA SANCHEZ ORDUÑA",
+  "nombre": "MARTIN B GONZALEZ",
+  "telefono": "+5215560556673",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1545",
+  "empresa": "TRUCKDEL S DE RL DE CV",
+  "nombre": "SERGIO DE LEON",
+  "telefono": "+5218441606920",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P408",
+  "empresa": "SERVICIOS DE ENTREGA DE PAQUETERIA SAPI DE CV",
+  "nombre": "ERASMO SAAVEDRA",
+  "telefono": "+5213330402270",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1463",
+  "empresa": "JESUS ELIANA RODRIGUEZ JIMENEZ",
+  "nombre": "JAVIER RODRIGUEZ",
+  "telefono": "+5218123215918",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1430",
+  "empresa": "MONICA MEDINA RUIZ",
+  "nombre": "MARIO ALBERTO MARRUFO MEDINA",
+  "telefono": "+5218119659966",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1496",
+  "empresa": "AUTO-TRANSPORTES ARLEN S DE RL DE CV",
+  "nombre": "IVÁN SALAZAR PURECO",
+  "telefono": "+5213511572160",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1409",
+  "empresa": "JOSE LUIS PONCE RECENDIZ",
+  "nombre": "JOSE LUIS PONCE RECENDIZ",
+  "telefono": "+5215568662336",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1401",
+  "empresa": "JESSIKA DANAE GARCIA REYNOSO",
+  "nombre": "JESSIKA DANAE GARCIA REYNOSO",
+  "telefono": "+5216271312306",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1216",
+  "empresa": "CARLOS ALEXIS CASTAÑOS MENDOZA",
+  "nombre": "CARLOS ALEXIS CASTAÑOS MENDOZA",
+  "telefono": "+5216675179064",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1314",
+  "empresa": "YOLVA KORINA FLORES HERNANDEZ",
+  "nombre": "ERNESTO GUZMAN",
+  "telefono": "+5213921173243",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1462",
+  "empresa": "HUGO ENRIQUE MORENO FUERTE",
+  "nombre": "HUGO ENRIQUE MORENO FUERTE",
+  "telefono": "+5215541129054",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1209",
+  "empresa": "CARLOS RAMIREZ MEJIA",
+  "nombre": "CARLOS RAMIREZ MEJIA",
+  "telefono": "+5214271087761",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P67",
+  "empresa": "REYNOL SERNA MORENO",
+  "nombre": "REYNOL SERNA MORENO",
+  "telefono": "+5218116545854",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1037",
+  "empresa": "VICTOR ROSENDO ELIZONDO GUAJARDO",
+  "nombre": "VICTOR ELIZONDO",
+  "telefono": "+5218112742023",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P906",
+  "empresa": "ELVIS CORDOVA ARREDONDO",
+  "nombre": "ELVIS CORONA ARREDONDO",
+  "telefono": "+5215513794282",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1230",
+  "empresa": "ISAIAS PIMENTEL MONTERRUBIO",
+  "nombre": "ISAIAS PIMENTEL MONTERRUBIO",
+  "telefono": "+5217713014444",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1236",
+  "empresa": "GISELA PATRICIA ANGULO CABRERA",
+  "nombre": "SILVIA GONZALEZ ANCHONDO",
+  "telefono": "+5216141847751",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1469",
+  "empresa": "SAMUEL ROMO ROMO",
+  "nombre": "SAMUEL ROMO ROMO",
+  "telefono": "+5214311017045",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1408",
+  "empresa": "TRANSPORTES FERCO",
+  "nombre": "EDGAR CORTES",
+  "telefono": "+5218118220254",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1592",
+  "empresa": "ADAN FLORES CARBAJAL",
+  "nombre": "ADRIAN FLORES",
+  "telefono": "+5213921050375",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1054",
+  "empresa": "JOSE EFRAIN AYALA DIAZ",
+  "nombre": "JOSE EFRAIN",
+  "telefono": "+5215527665835",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1570",
+  "empresa": "TRANSPORTES GONZALEZ GAR SA DE CV",
+  "nombre": "JOSE LUIS GONZALEZ PERALES",
+  "telefono": "+5218120327955",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1468",
+  "empresa": "NANCY BERNAL FRAGOZA",
+  "nombre": "NANCY BERNAL FRAGOZA",
+  "telefono": "+5217441957989",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1480",
+  "empresa": "LESLY ELIZABETH OLALDE MARTINEZ",
+  "nombre": "LUIS DANIEL MEDONZA",
+  "telefono": "+5215548019714",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P109",
+  "empresa": "LOGISTICA Y TRANSPORTE ASTUR SA DE CV",
+  "nombre": "LOGISTICA Y TRANSPORTE ASTUR SA DE CV",
+  "telefono": "+5214424718553",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1478",
+  "empresa": "INFINITE 5TA RUEDA",
+  "nombre": "ULISES NOE",
+  "telefono": "+5215543904159",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1441",
+  "empresa": "ISRAEL ZACARIAS VELAZQUEZ ORTIZ",
+  "nombre": "ISRAEL ZACARIAS VELAZQUEZ ORTIZ",
+  "telefono": "+19562829162",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1471",
+  "empresa": "DIEGO ANCER GOMEZ",
+  "nombre": "DIEGO ANCER",
+  "telefono": "+5218119658409",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1595",
+  "empresa": "TRANSPORTE JUÁREZ FRONTERIZO SA DE CV",
+  "nombre": "LUCIA VALENCIA",
+  "telefono": "+5216562689444",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1457",
+  "empresa": "SILVIA HERNANDEZ HERNANDEZ",
+  "nombre": "LIZBETH MONTES",
+  "telefono": "+5213324803754",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1466",
+  "empresa": "MARIA DE LOURDES CHAVARRIA ISLAS",
+  "nombre": "JOCELIN ORTIZ",
+  "telefono": "+5215648739974",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1418",
+  "empresa": "TRANSPORTES ESPECIALIZADOS MORENAL",
+  "nombre": "JOSE ANTONIO MORENO OCHOA",
+  "telefono": "+5218281187853",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1491",
+  "empresa": "YONI ESPINOZA ALVAREZ",
+  "nombre": "YONI ESPINOZA ALVAREZ",
+  "telefono": "+5218132433420",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1412",
+  "empresa": "LOGISTICA EN TRANSPORTEATEPOXCO",
+  "nombre": "JAVIER ALONSO CASTAÑEDA BAZAN",
+  "telefono": "+5215578645189",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1594",
+  "empresa": "JACHE LOGISTICA",
+  "nombre": "LILIANA HERNANDEZ",
+  "telefono": "+5214495398218",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1497",
+  "empresa": "LOGISTICA Y TRANSPORTE GR S DE RL DE CV",
+  "nombre": "MARLEM GARCIA",
+  "telefono": "+5214423856034",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1540",
+  "empresa": "JULIO CESAR ARANGO MEJIA",
+  "nombre": "JULIO CESAR ARANGO MEJIA",
+  "telefono": "+5214491063519",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1499",
+  "empresa": "TRANSPORTISTA KAMU",
+  "nombre": "ANGEL GARIBAY",
+  "telefono": "+16197070817",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1533",
+  "empresa": "LGS LOGISTICA GONZALEZ SILVA",
+  "nombre": "Roberto Gonzalez",
+  "telefono": "+5218123191040",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1532",
+  "empresa": "DOMINGO ORTEGA HERNANDEZ",
+  "nombre": "NILDA SANTOS",
+  "telefono": "+5217757079606",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1584",
+  "empresa": "PEDRO ALBERTO RODRIGUEZ VIESCA",
+  "nombre": "PEDRO ALBERTO RODRIGUEZ VIESCA",
+  "telefono": "+5218712114144",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1271",
+  "empresa": "SERGIO ARTURO RUIZ PEREZ",
+  "nombre": "SERGIO ARTURO RUIZ PEREZ",
+  "telefono": "+5218143882898",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1590",
+  "empresa": "ERICA ESTHER GOMEZ ALEJANDRO",
+  "nombre": "ERICA ESTHER GOMEZ ALEJANDRO",
+  "telefono": "+5218180200702",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1443",
+  "empresa": "CARLOS FARID FAYAD",
+  "nombre": "CARLOS FARID FAYAD",
+  "telefono": "+5218711835278",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1527",
+  "empresa": "FRABA CONTAINER",
+  "nombre": "FERNANDO BARAJAS HERNANDEZ",
+  "telefono": "+5213317508447",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1172",
+  "empresa": "JOSE DE JESUS TOSCANO MORENO",
+  "nombre": "JOSE DE JESUS TOSCANO MORENO",
+  "telefono": "+5213131133066",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1586",
+  "empresa": "FRANCISCO JAVIER MALDONADO TORRES",
+  "nombre": "JOSE LUIS BALDERAS",
+  "telefono": "+5218126564615",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1566",
+  "empresa": "ECOLOGIA AMBIENTAL EN MOVIMIENTO",
+  "nombre": "RUBEN DIAZ",
+  "telefono": "+5215666687965",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1201",
+  "empresa": "JACIEL ALFREDO TORRES",
+  "nombre": "JACIEL ALFREDO TORRES RAMOS",
+  "telefono": "+5218116588084",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P929",
+  "empresa": "JOSE GUADALUPE VAZQUEZ HERNANDEZ",
+  "nombre": "JOSE GUADALUPE",
+  "telefono": "+5218443345137",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1175",
+  "empresa": "TRADIS DEL DESIERTO",
+  "nombre": "CHRISTIAN HUMBERTO GRIJALVA ROMERO",
+  "telefono": "+5216621422129",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1179",
+  "empresa": "LORENZA BARRAZA GUERRERO",
+  "nombre": "SAUL MARTINEZ",
+  "telefono": "+5213340568072",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1544",
+  "empresa": "EXPRESS 3 HERMANOS SALAZAR SA DE CV.",
+  "nombre": "RAMON ALEJANDRO",
+  "telefono": "+5218126246456",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1602",
+  "empresa": "ALEJANDRO JAVIER CAVAZOS ALMAGUER",
+  "nombre": "ALEJANDRO JAVIER CAVAZOS ALMAGUER",
+  "telefono": "+5218111795686",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1486",
+  "empresa": "MARIA CRISTINA ALMAGUER TREVIÑO",
+  "nombre": "RENATO OCHOA",
+  "telefono": "+5218123799194",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1553",
+  "empresa": "TRANSPORTES Y SERVICIOS INDUSTRIALES ASB",
+  "nombre": "GIOVANNI ISMAEL BECERRA MORENO",
+  "telefono": "+5214495558003",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1568",
+  "empresa": "GRUPO LGG SA DE CV",
+  "nombre": "GUSTAVO GARCIA CORTEZ",
+  "telefono": "+5218187998781",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0013",
+  "empresa": "TRANSPORTES ALBECAR SA DE CV",
+  "nombre": "TRANSPORTES ALBECAR SA DE CV",
+  "telefono": "+5218110293094",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0632",
+  "empresa": "ARGELIO GARZA RODRIGUEZ",
+  "nombre": "ARGELIO GARZA RODRIGUEZ",
+  "telefono": "+5218661321533",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1607",
+  "empresa": "AMAXPAQ SA DE CV",
+  "nombre": "ALEXIS EDEN HERNANDEZ VELA",
+  "telefono": "+5218115398531",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1576",
+  "empresa": "MEXTRANS ENTREGA Y TRANSPORTACION SA DE CV",
+  "nombre": "CELINA SANTOYO ADAME",
+  "telefono": "+5215540449973",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1603",
+  "empresa": "ISAAC JAIR RIVERA ESCOBAR",
+  "nombre": "ISAAC JAIR RIVERA ESCOBAR",
+  "telefono": "+5212213408252",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0006",
+  "empresa": "TRANSPORTES KUBIKA SA DE CV",
+  "nombre": "JORDAN AVILA",
+  "telefono": "+5218443442085",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1598",
+  "empresa": "FLASHER SUPPLY CHAIN SAS DE CV",
+  "nombre": "CARLOS MARTINEZ MONTOYA",
+  "telefono": "+5215577097178",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1482",
+  "empresa": "DANIEL LOPEZ CARDENAS",
+  "nombre": "DANIEL LOPEZ CARDENAS",
+  "telefono": "+5217228452261",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1549",
+  "empresa": "TRANSPORTES JEPA SA DE CV",
+  "nombre": "BIANETH ABIGAIL SALAZAR CARRASCO",
+  "telefono": "+5218120658049",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0256",
+  "empresa": "FLETES REFRIGERADOS GARZA SA DE CV",
+  "nombre": "JUAN GIL",
+  "telefono": "+5218661321533",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0011",
+  "empresa": "OTHON GUILLERMO PEREZ GALINDO",
+  "nombre": "OTHON GUILLERMO PEREZ GALINDO",
+  "telefono": "+5218117997542",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1406",
+  "empresa": "INTEGRADORA DE AUTOTRANSPORTES DE CARGA DE CORDOBA SA DE CV",
+  "nombre": "MANUEL ALVIZAR VARGAS",
+  "telefono": "+5212711666854",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1436",
+  "empresa": "OLE EXPRESS SA DE CV",
+  "nombre": "ELIZABETH SOSA HERNANDEZ",
+  "telefono": "+5214443791925",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1445",
+  "empresa": "MARIO ALEJANDRO LOPEZ SALCEDO",
+  "nombre": "MARIO ALEJANDRO LOPEZ SALCEDO",
+  "telefono": "+5214491486209",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1380",
+  "empresa": "SAMUEL ELIAS MORALES HERNANDEZ",
+  "nombre": "SAMUEL ELIAS MORALES HERNANDEZ",
+  "telefono": "+5218446928264",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1387",
+  "empresa": "ROBERTO MORALES ORTIZ",
+  "nombre": "ROBERTO MORALES ORTIZ",
+  "telefono": "+5213315491724",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0416",
+  "empresa": "MG TRANSPORTES DE CARGA SA DE CV",
+  "nombre": "EVERARDO MELENDEZ",
+  "telefono": "+5218080882251",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Recurrente",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0027",
+  "empresa": "MARCELINO DE LA GARZA CARDENAS",
+  "nombre": "MARCELINO DE LA GARZA CARDENAS",
+  "telefono": "+5214775404731",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Intermitente",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1239",
+  "empresa": "JOSE ANGEL ALANIS ROCHA",
+  "nombre": "VIVALDI DE LA GARZA",
+  "telefono": "+5218116072827",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1400",
+  "empresa": "COMERCIALIZADORA RIZANT S DE RL DE CV",
+  "nombre": "JOSE EDUARDO RIZO MURILLO",
+  "telefono": "+5213318718137",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1548",
+  "empresa": "LUIS ALBERTO GONZALEZ GONZALEZ",
+  "nombre": "GABRIEL NAVARRO",
+  "telefono": "+5213345489315",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P21",
+  "empresa": "GRUPO TRANSPORTISTA RO-MEX SA DE CV",
+  "nombre": "GUSTAVO PEREZ GARZA",
+  "telefono": "+5218444432475",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1521",
+  "empresa": "ROBERTO OCHOA BARBA",
+  "nombre": "JAIME OCHOA COVARRUBIAS",
+  "telefono": "+5213315850507",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1490",
+  "empresa": "COMUNICACION GLOBAL S.A DE C.V.",
+  "nombre": "JORGE MONARREZ VOTA",
+  "telefono": "+5218116602087",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1563",
+  "empresa": "FG COMPAÑÍA DE GRUAS Y SERVICIOS INDUSTRIALES SA DE CV",
+  "nombre": "JOSE BERNAL RIVERA",
+  "telefono": "+5218116786456",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1530",
+  "empresa": "GTN LOGISTICS SAPI DE CV",
+  "nombre": "PABLO ELIAS GARZA LOPEZ",
+  "telefono": "+5214442010180",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1606",
+  "empresa": "RICARDO SALAZAR ALANIS",
+  "nombre": "RICARDO SALAZAR ALANIS",
+  "telefono": "+5218119840143",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1510",
+  "empresa": "JOSE ANTONIO MENDOZA CAZARES",
+  "nombre": "SUSANA EDIT",
+  "telefono": "+5216181220370",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P1502",
+  "empresa": "DAVID RODRIGUEZ GONZALEZ",
+  "nombre": "DAVID RODRIGUEZ",
+  "telefono": "",
+  "telefono_incompleto": "811205428",
+  "estatus_catalogo": "Potencial",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P323",
+  "empresa": "LOGISTICA Y TRANSPORTES FEUER SA DE CV",
+  "nombre": "RAUL GUTIERREZ",
+  "telefono": "+5212224550861",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0001",
+  "empresa": "MARIA LUISA CAVAZOS MEJORADO",
+  "nombre": "MARIA LUISA CAVAZOS MEJORADO",
+  "telefono": "+5214775404731",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Sin estatus",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0002",
+  "empresa": "NORMA JAUREGUI REYES",
+  "nombre": "NORMA JAUREGUI REYES",
+  "telefono": "+5214775404731",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0025",
+  "empresa": "ROBERTO MUÑIZ MOLINA",
+  "nombre": "ROBERTO MUÑIZ",
+  "telefono": "+5216565546945",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Sin estatus",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0028",
+  "empresa": "TRANSPORTES DRALLAG SA DE CV",
+  "nombre": "TRANSPORTES DRALLAG SA DE CV",
+  "telefono": "+5214442862469",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Sin estatus",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0032",
+  "empresa": "AUTOTRANSPORTE ARGIO S DE RL DE CV",
+  "nombre": "SERGIO ARGIO",
+  "telefono": "+5216563096788",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Sin estatus",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P0190",
+  "empresa": "MEGALOGISTICS TRANSPORTES Y SERVICIOS SA DE CV",
+  "nombre": "MEGALOGISTICS TRANSPORTES Y SERVICIOS SA DE CV",
+  "telefono": "+5218126942447",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "Sin estatus",
+  "servicios": 0,
+  "rutas": []
+ },
+ {
+  "codigo": "P455",
+  "empresa": "ERNESTO VALDES ECHEVERRIA",
+  "nombre": "ERNESTO VALDES",
+  "telefono": "+5217222030896",
+  "telefono_incompleto": null,
+  "estatus_catalogo": "No asignado",
+  "servicios": 0,
+  "rutas": []
+ }
+]

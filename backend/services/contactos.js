@@ -324,6 +324,60 @@ async function cargarCatalogoRuta({ archivo, ruta, flag }) {
   if (nuevos || fusionados) console.log(`[Contactos] ${ruta}: ${nuevos} proveedores nuevos, ${fusionados} existentes actualizados`);
 }
 
+// Completa SOLO los campos que el contacto todavía no tiene (nunca pisa lo que ya hay)
+async function rellenarSiVacio(id, campos) {
+  const permitidos = ['empresa', 'notas', 'rutas', 'unidades']; // lista blanca: el nombre de columna nunca viene de fuera
+  const entradas = Object.entries(campos || {}).filter(([k, v]) => permitidos.includes(k) && v);
+  if (!entradas.length) return false;
+  if (USA_DB) {
+    try {
+      await db.asegurarColumnasContactos();
+      const sets = entradas.map(([k], i) => `${k} = COALESCE(NULLIF(${k}, ''), $${i + 1})`).join(', ');
+      await db.query(`UPDATE contactos SET ${sets} WHERE id = $${entradas.length + 1}`, [...entradas.map(([, v]) => v), id]);
+      return true;
+    } catch (e) { console.error('[Contactos] Postgres falló al completar campos, cae a archivo:', e.message); }
+  }
+  const c = cache.find(x => x.id === id);
+  if (!c) return false;
+  for (const [k, v] of entradas) if (!c[k]) c[k] = v;
+  guardarDisco();
+  return true;
+}
+
+// ── Directorio completo de proveedores (PDF de AppSheet, 27-sep-2026) ───────
+// Clave, proveedor, contacto, teléfono, unidades (caja seca 53) y sus 3 rutas
+// principales. Proveedor nuevo (por teléfono) → se crea completo. Proveedor que
+// ya existía → SOLO se le completa lo que le falte (empresa, clave, unidades,
+// rutas); nada de lo que ya tiene se sobreescribe. Sin rutas en el catálogo (nunca
+// tuvieron servicios) = se guardan sin ruta y SOFIA no los contacta sola.
+async function cargarDirectorio({ archivo, flag }) {
+  if (leerFlags()[flag]) return;
+  let lista;
+  try { lista = require('../data/' + archivo); } catch { return; }
+  let nuevos = 0, completados = 0, fallos = 0;
+  for (const p of lista) {
+    try {
+      const notasNuevas = `Clave: ${p.codigo} · Estatus en catálogo: ${p.estatus_catalogo}` + (p.telefono_incompleto ? ` · Teléfono incompleto en catálogo: ${p.telefono_incompleto}` : '');
+      let c = null;
+      if (p.telefono) c = await buscarPorTelefono(p.telefono, 'sofia');
+      else c = (await listarPorAgente('SOFIA', { tipo: 'proveedor', q: p.empresa })).find(x => (x.empresa || '') === p.empresa) || null;
+      if (!c) {
+        await upsertContacto({
+          agente: 'sofia', tipo: 'proveedor', nombre_completo: p.nombre, empresa: p.empresa, telefono: p.telefono || undefined,
+          notas: notasNuevas, rutas: p.rutas.length ? p.rutas.join(', ') : undefined, unidades: UNIDAD_DEFAULT,
+          resumen_interaccion: 'Alta desde el directorio de proveedores con teléfono', canal: 'permanente',
+        });
+        nuevos++;
+      } else {
+        const ok = await rellenarSiVacio(c.id, { empresa: p.empresa, notas: notasNuevas, unidades: UNIDAD_DEFAULT, rutas: p.rutas.join(', ') });
+        if (ok) completados++;
+      }
+    } catch (e) { fallos++; console.error(`[Contactos] Error cargando ${p.codigo} del directorio:`, e.message); }
+  }
+  if (!fallos) marcarFlag(flag);
+  console.log(`[Contactos] Directorio: ${nuevos} proveedores nuevos, ${completados} existentes completados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
+}
+
 // Unidad por defecto para todo proveedor de SOFIA que no tenga nada capturado (una sola vez)
 async function unidadPorDefectoProveedores() {
   const flag = 'unidad-default-caja-seca-53';
@@ -340,6 +394,7 @@ async function unidadPorDefectoProveedores() {
 async function sembrarCatalogos() {
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-gomez-palacio.json', ruta: 'Monterrey-Gómez Palacio', flag: 'catalogo-mty-gp-2026-09-27' });
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-guadalajara.json', ruta: 'Monterrey-Guadalajara', flag: 'catalogo-mty-gdl-2026-09-27' });
+  await cargarDirectorio({ archivo: 'proveedores-directorio.json', flag: 'directorio-proveedores-2026-09-27' });
   await unidadPorDefectoProveedores();
 }
 
