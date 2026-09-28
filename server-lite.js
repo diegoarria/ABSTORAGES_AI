@@ -165,6 +165,7 @@ const actividadHistorial = [];
 const ACTIVIDAD_MAX = 100;
 const callsEnVivoNotificadas = new Set(); // callId ya avisado como "en llamada"
 
+const _ultimoEmailRespuesta = new Map(); // teléfono → ts del último email "alguien le contestó a SOFIA"
 const _ultimoAvisoRespuesta = new Map(); // teléfono → ts del último push "un proveedor contestó" (1 cada 30 min)
 
 function pushActividad(evento) {
@@ -621,6 +622,16 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
         const corto = t => String(t || '').replace(/\s+/g, ' ').trim().slice(0, 160);
         const A = agente.toUpperCase();
         pushActividad({ agente: A, tipo: 'CONVERSACION_WA', mensaje: `${quien}: "${corto(texto)}" → ${A}: "${corto(limpiarControlParaCliente(respuesta))}"`, sessionId: session, metadata: { telefono: phone, tipoContacto: conocido?.tipo || null } });
+
+        // Email a Diego y Rafael cuando alguien le contesta a SOFIA (máx. 1 cada 10 min por persona,
+        // para que una conversación de varios mensajes no llene el correo)
+        if (agente === 'sofia') {
+          const ahoraMs = Date.now();
+          if (ahoraMs - (_ultimoEmailRespuesta.get(phone) || 0) > 10 * 60 * 1000) {
+            _ultimoEmailRespuesta.set(phone, ahoraMs);
+            notifier.notificarRespuestaSofia({ quien: conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo', tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), respuestaSofia: limpiarControlParaCliente(respuesta).slice(0, 800) }).catch(() => {});
+          }
+        }
 
         if (agente === 'sofia' && conocido?.tipo === 'proveedor') {
           if (Date.now() - (_ultimoAvisoRespuesta.get(phone) || 0) > 30 * 60 * 1000) {

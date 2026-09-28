@@ -443,4 +443,29 @@ async function notificarKPIsSofia({ asunto, texto }) {
   console.log(`[Gmail] ✅ KPIs de SOFIA enviados a ${ALERT_EMAILS.join(', ')}`);
 }
 
-module.exports = { notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad };
+// Alguien le contestó a SOFIA por WhatsApp — Diego + Rafael
+async function notificarRespuestaSofia({ quien, tipo, telefono, texto, respuestaSofia }) {
+  const asunto = `SOFIA — ${quien} le contestó por WhatsApp`;
+  const hora = new Date().toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey' });
+  const bloque = (titulo, t) => `<div style="margin:0 0 14px;"><div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">${esc(titulo)}</div><div style="font-size:14px;color:#111;white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">${esc(t)}</div></div>`;
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:18px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">SOFIA · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Respuesta por WhatsApp · ${esc(hora)}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#111;"><strong>${esc(quien)}</strong>${tipo ? ` (${esc(tipo)})` : ''}${telefono ? ` · ${esc(telefono)}` : ''} le contestó a SOFIA.</p>
+      ${bloque('Lo que escribió', texto || '(mensaje sin texto — posible imagen o audio)')}
+      ${respuestaSofia ? bloque('Lo que respondió SOFIA', respuestaSofia) : ''}
+      <p style="margin:0;font-size:12px;color:#6b7280;">Puedes ver la conversación completa en Historial.</p>
+    </div>
+  </div>`;
+  if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
+  try {
+    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de respuesta a SOFIA enviado a ${ALERT_EMAILS.join(', ')}`);
+  } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a SOFIA:', e.message); }
+}
+
+module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad };
