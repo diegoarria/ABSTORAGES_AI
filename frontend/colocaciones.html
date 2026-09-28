@@ -63,6 +63,7 @@ tr.rec td:first-child { border-radius:10px 0 0 10px; } tr.rec td:last-child { bo
       <div class="filter on" data-f="buscando">En búsqueda</div>
       <div class="filter" data-f="colocado">Colocados</div>
       <div class="filter" data-f="sin_unidad">Sin unidad</div>
+      <div class="filter" data-f="disp">Disponibilidades</div>
       <div class="filter" data-f="ranking">Ranking</div>
       <div class="filter" data-f="kpis">KPIs</div>
     </div>
@@ -106,6 +107,12 @@ function tarjeta(c) {
 async function render() {
   const cont = document.getElementById('cont');
   try {
+    if (filtro === 'disp') {
+      const ds = await api('/api/disponibilidades');
+      const fmt = iso => { const [y, m, d] = iso.split('-').map(Number); return new Intl.DateTimeFormat('es-MX', { weekday:'long', day:'numeric', month:'long', timeZone:'UTC' }).format(new Date(Date.UTC(y, m - 1, d, 12))); };
+      cont.innerHTML = ds.length ? `<div class="card"><h3>Disponibilidades prometidas</h3><div class="sub">Proveedores que dijeron que tendrán unidad otro día. SOFIA les escribe ese día por la mañana (plantilla aprobada) para confirmar.</div><div class="tbl-w"><table><tr><th>Día</th><th>Proveedor</th><th>Ruta</th><th>Unidad</th><th>Estado</th><th></th></tr>${ds.map(d => `<tr><td><b>${esc(fmt(d.fecha))}</b></td><td>${esc(d.nombre || d.telefono)}</td><td>${esc(d.ruta || '—')}</td><td>${esc(d.unidad || '—')}${d.detalle ? `<div class="sub">${esc(d.detalle)}</div>` : ''}</td><td>${d.estado === 'recordada' ? 'Ya se le escribió hoy' : 'Pendiente'}</td><td>${d.estado === 'pendiente' ? `<button class="btn btn-secondary btn-sm" onclick="cancelarDisp('${esc(d.id)}')">Cancelar</button>` : ''}</td></tr>`).join('')}</table></div></div>` : '<div class="empty-msg">No hay disponibilidades prometidas por ahora.</div>';
+      return;
+    }
     if (filtro === 'ranking') {
       const r = await api('/api/proveedores/ranking');
       cont.innerHTML = r.length ? `<div class="card"><div class="tbl-w"><table><tr><th>#</th><th>Proveedor</th><th>Puntaje</th><th>Contactado</th><th>Respondió</th><th>Tiempo típico</th><th>Aceptó</th><th>Colocado</th><th>Retrasos</th></tr>${r.map((p, i) => `<tr><td>${i+1}</td><td><b>${esc(p.nombre)}</b></td><td>${(p.puntaje*100).toFixed(0)}</td><td>${p.contactado}</td><td>${p.respondio}</td><td>${p.medianaMin != null ? p.medianaMin + ' min' : '—'}</td><td>${p.acepto}</td><td>${p.colocado}</td><td>${p.retraso}</td></tr>`).join('')}</table></div><div class="line">Puntaje 0–100: 40% respuesta, 20% rapidez, 20% aceptación, 20% cumplimiento. Un proveedor sin historial arranca en 50.</div></div>` : '<div class="empty-msg">Aún no hay historial de proveedores.</div>';
@@ -150,6 +157,10 @@ async function manual(folio) {
   if (!confirm(`¿Marcar el folio ${folio} como colocado con ${nombre}? (No se le manda ningún mensaje.)`)) return;
   try { await api('/api/colocaciones/' + encodeURIComponent(folio) + '/aprobar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ manual: nombre }) }); render(); }
   catch (e) { alert('No se pudo: ' + e.message); }
+}
+async function cancelarDisp(id) {
+  if (!confirm('¿Cancelar este seguimiento? SOFIA ya no le escribirá ese día.')) return;
+  try { await api('/api/disponibilidades/' + encodeURIComponent(id) + '/cancelar', { method:'POST' }); render(); } catch (e) { alert('No se pudo: ' + e.message); }
 }
 async function enviarKpis() {
   if (!confirm('¿Enviar los KPIs de hoy por email a Diego y Rafael?')) return;

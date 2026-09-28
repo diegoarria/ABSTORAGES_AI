@@ -147,6 +147,12 @@ function procesarSenales({ telefono, nombre, respuesta }) {
       }
     }
 
+    const df = json(respuesta, 'DISPONIBILIDAD_FUTURA');
+    if (df) {
+      const d = colocaciones.agregarDisponibilidad({ telefono, nombre, fecha: df.fecha, ruta: df.ruta, unidad: df.unidad, detalle: df.detalle });
+      if (d) feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible el ${textoFecha(d.fecha)}${d.ruta ? ' (' + d.ruta + ')' : ''} — SOFIA le escribirá ese día para confirmar`, metadata: { id: d.id } });
+    }
+
     const rp = json(respuesta, 'RECLAMO_PAGO');
     if (rp) escalarReclamoPago({ telefono, nombre, resumen: rp.resumen });
 
@@ -175,6 +181,29 @@ function escalarReclamoPago({ telefono, nombre, resumen }) {
     .catch(e => console.error('[sofiaOperacion] Error avisando reclamo de pago:', e.message));
   contactosSvc.buscarPorTelefono(telefono, 'sofia').then(c => c && contactosSvc.upsertContacto({ agente: 'sofia', tipo: c.tipo, nombre_completo: c.nombre_completo, telefono: c.telefono, resumen_interaccion: `Reclamo de pago: ${detalle} — escalado a Manuel y Rafael`, canal: 'whatsapp' }))
     .catch(() => {});
+}
+
+// ── Disponibilidades prometidas: recordatorio la mañana del día ─────────────
+function textoFecha(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d, 12)));
+}
+const primerNombre = n => String(n || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
+function tickDisponibilidades() {
+  const hoy = colocaciones.fechaMTY();
+  for (const d of colocaciones.disponibilidades()) {
+    if (d.estado !== 'pendiente') continue;
+    if (d.fecha < hoy) { colocaciones.actualizarDisponibilidad(d.id, { estado: 'vencida' }); continue; }
+    if (d.fecha !== hoy) continue;
+    if (!horario.permitido(false)) continue; // dentro de horario de contacto
+    colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
+    const fechaTxt = textoFecha(d.fecha);
+    whatsappProactivo.enviarSeguimientoDisponibilidad(primerNombre(d.nombre), d.telefono, fechaTxt, d.ruta)
+      .then(r => { if (!r) push({ title: `Hoy es el día que ${d.nombre || 'un proveedor'} prometió unidad`, body: `Sin plantilla de seguimiento configurada: escríbele tú${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true }); })
+      .catch(e => console.error('[sofiaOperacion] Error en seguimiento de disponibilidad:', e.message));
+    feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `Hoy es el día: SOFIA le escribió a ${d.nombre || 'un proveedor'} para confirmar la unidad prometida${d.ruta ? ' (' + d.ruta + ')' : ''}` });
+    push({ title: `Hoy tienes unidad prometida — ${d.nombre || 'proveedor'}`, body: `${d.nombre || 'Un proveedor'} dijo que hoy tendría unidad${d.ruta ? ' ' + d.ruta : ''}${d.unidad ? ' (' + d.unidad + ')' : ''}. SOFIA le pidió confirmar.`, tag: 'disp-hoy-' + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD' });
+  }
 }
 
 // ── Aprobación humana → SOFIA cierra ────────────────────────────────────────
@@ -304,6 +333,7 @@ function tickSeguimiento(c) {
 
 function tick() {
   if (agentPause.estaPausado('sofia')) return;
+  try { tickDisponibilidades(); } catch (e) { console.error('[sofiaOperacion] Error en disponibilidades:', e.message); }
   for (const c of colocaciones.todas()) {
     try {
       if (c.estado === 'buscando') tickBusqueda(c);

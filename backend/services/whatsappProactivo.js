@@ -66,6 +66,7 @@ const CONTENT_SID_DISPONIBILIDAD = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD
 const CONTENT_SID_AVISO_EQUIPO   = process.env.TWILIO_CONTENT_SID_AVISO_EQUIPO   || null;
 const CONTENT_SID_ESTATUS_FOLIO  = process.env.TWILIO_CONTENT_SID_ESTATUS_FOLIO  || null;
 const CONTENT_SID_RECLAMO_PAGO   = process.env.TWILIO_CONTENT_SID_RECLAMO_PAGO   || null;
+const CONTENT_SID_SEGUIMIENTO_DISP = process.env.TWILIO_CONTENT_SID_SEGUIMIENTO_DISPONIBILIDAD || null;
 
 function telefonoValido(t) {
   return t && t !== '—' && /\d{8,}/.test(String(t));
@@ -172,6 +173,19 @@ async function avisarReclamoPago(agente, destinatariosClaves, proveedor, detalle
   return resultados;
 }
 
+// ── 2c. Seguimiento de una disponibilidad prometida ─────────────────────────
+// Plantilla sofia_seguimiento_disponibilidad: "Hola {{1}}, me comentaste que
+// tendrías unidad disponible el {{2}} para {{3}}. ¿Sigue en pie? ..."
+// Devuelve null si su ContentSid aún no está configurado (el aviso al equipo sale igual).
+async function enviarSeguimientoDisponibilidad(nombre, telefono, fechaTexto, ruta) {
+  if (!CONTENT_SID_SEGUIMIENTO_DISP) { console.warn('[whatsappProactivo] Plantilla de seguimiento de disponibilidad aún no configurada — se omite'); return null; }
+  if (!telefonoValido(telefono)) return null;
+  const rutaTxt = ruta || 'tus rutas';
+  const r = await enviarPlantilla('sofia', telefono, CONTENT_SID_SEGUIMIENTO_DISP, { '1': nombre || 'ahí', '2': fechaTexto, '3': rutaTxt });
+  registrarEnMemoria('sofia', telefono, `Hola ${nombre || ''}, me comentaste que tendrías unidad disponible el ${fechaTexto} para ${rutaTxt}. ¿Sigue en pie? Cuéntame por este medio. — SOFIA, ABSTORAGES Logistics Solutions`);
+  return r;
+}
+
 // ── 3. Estatus de folio — SARA/SOFIA a cliente o proveedor ────────────────
 async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   if (!CONTENT_SID_ESTATUS_FOLIO) { console.warn('[whatsappProactivo] Plantilla de estatus de folio aún no aprobada — se omite'); return null; }
@@ -185,4 +199,4 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   return resultado;
 }
 
-module.exports = { enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
+module.exports = { enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };

@@ -228,6 +228,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/ESTATUS_UNIDAD\s*:[\s\S]*$/gi, '')
     .replace(/OPERADOR_UNIDAD\s*:[\s\S]*$/gi, '')
     .replace(/RECLAMO_PAGO\s*:[\s\S]*$/gi, '')
+    .replace(/DISPONIBILIDAD_FUTURA\s*:[\s\S]*$/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
@@ -498,6 +499,8 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Reconocimiento del equipo interno por número — nunca tratarlos como
     // cliente/proveedor/prospecto, sin importar el canal.
     const personaEquipo = staffDirectory.buscarPorTelefono(phone);
+    // Fecha de hoy: SOFIA necesita saberla para convertir "el miércoles" en una fecha real
+    systemPrompt += `\n\nHoy es ${new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeZone: 'America/Monterrey' }).format(new Date())} (hora de Monterrey). Fecha en formato AAAA-MM-DD: ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())}.`;
     if (personaEquipo) {
       systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
       if (agente === 'sofia') systemPrompt += await contactos.bloqueDirectorioProveedores();
@@ -1828,6 +1831,16 @@ app.post('/api/admin/nueva-orden-manual', soloAdmin, async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// ── Disponibilidades prometidas por proveedores (recordatorio automático) ──
+app.get('/api/disponibilidades', adminUOps, (req, res) => {
+  res.json(colocaciones.disponibilidades().filter(d => d.estado === 'pendiente' || d.estado === 'recordada').sort((a, b) => a.fecha.localeCompare(b.fecha)));
+});
+app.post('/api/disponibilidades/:id/cancelar', soloAdmin, (req, res) => {
+  const d = colocaciones.actualizarDisponibilidad(req.params.id, { estado: 'cancelada' });
+  if (!d) return res.status(404).json({ error: 'No encontrada' });
+  res.json({ ok: true });
 });
 
 // ── Contexto del folio: notas e imágenes que SARA, SOFIA y NOA ven ──────────
@@ -3452,7 +3465,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'SUGERENCIA_PROVEEDOR:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3468,6 +3481,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/ESTATUS_UNIDAD:\s*\{[\s\S]*?\}/gi, '')
     .replace(/OPERADOR_UNIDAD:\s*\{[\s\S]*?\}/gi, '')
     .replace(/RECLAMO_PAGO:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/DISPONIBILIDAD_FUTURA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')

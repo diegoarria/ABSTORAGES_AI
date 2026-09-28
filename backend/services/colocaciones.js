@@ -14,7 +14,7 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, '../../data');
 const FILE = path.join(DATA_DIR, 'sofia-operacion.json');
 
-let db = { colocaciones: {}, sugerencias: [], kpi: {} };
+let db = { colocaciones: {}, sugerencias: [], kpi: {}, disponibilidades: [] };
 try {
   if (fs.existsSync(FILE)) db = { ...db, ...JSON.parse(fs.readFileSync(FILE, 'utf8')) };
 } catch (e) { console.error('[colocaciones] No se pudo leer el archivo, se arranca vacío:', e.message); }
@@ -224,6 +224,21 @@ function agregarSugerencia({ telefono, nombre, tipo, valor }) {
 const sugerencias = (estado = 'pendiente') => db.sugerencias.filter(s => !estado || s.estado === estado);
 function resolverSugerencia(id, estado) { const s = db.sugerencias.find(x => x.id === id); if (!s) return null; s.estado = estado; s.resueltaEn = ahora(); guardar(); return s; }
 
+// ── Disponibilidad futura prometida por un proveedor ("el miércoles tengo unidad") ──
+// SOFIA la guarda y, la mañana de ese día, le manda una plantilla aprobada de
+// seguimiento (fuera de la ventana de 24 h de WhatsApp solo se pueden plantillas).
+function agregarDisponibilidad({ telefono, nombre, fecha, ruta, unidad, detalle }) {
+  if (!telefono || !/^\d{4}-\d{2}-\d{2}$/.test(String(fecha || ''))) return null;
+  if (fecha < fechaMTY()) return null; // ya pasó — no es una promesa a futuro
+  const dup = db.disponibilidades.find(d => d.estado === 'pendiente' && tel10(d.telefono) === tel10(telefono) && d.fecha === fecha && (d.ruta || '') === (ruta || ''));
+  if (dup) return dup;
+  const d = { id: 'DP-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(), telefono, nombre: nombre || '', fecha, ruta: ruta ? String(ruta).slice(0, 120) : '', unidad: unidad ? String(unidad).slice(0, 80) : '', detalle: detalle ? String(detalle).slice(0, 200) : '', creada: ahora(), estado: 'pendiente', recordatorioEn: null };
+  db.disponibilidades.push(d); db.disponibilidades = db.disponibilidades.slice(-500); guardar();
+  return d;
+}
+const disponibilidades = () => db.disponibilidades.slice();
+function actualizarDisponibilidad(id, parche) { const d = db.disponibilidades.find(x => x.id === id); if (!d) return null; Object.assign(d, parche); guardar(); return d; }
+
 // ── Base de los KPIs ────────────────────────────────────────────────────────
 function kpiBase(fecha = fechaMTY()) {
   const mes = fecha.slice(0, 7);
@@ -241,5 +256,6 @@ module.exports = {
   fechaMTY, tel10, crear, obtener, todas, abiertas, marcarContactado, porTelefono, registrarRespuesta, registrarOferta, registrarOfertaVapi,
   HITOS, hitoAlcanzado, marcarHito, registrarRetraso, guardarOperador, marcarChequeo, marcarAlertaSeg,
   asignar, cambiarEstado, marcarAviso, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
+  agregarDisponibilidad, disponibilidades, actualizarDisponibilidad,
   agregarSugerencia, sugerencias, resolverSugerencia, kpiBase, kpiMeta, kpiGuardar,
 };
