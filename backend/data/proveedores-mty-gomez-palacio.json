@@ -1,0 +1,182 @@
+[
+  {
+    "codigo": "P1402",
+    "empresa": "ADBLUE INTERNACIONAL SA DE CV",
+    "nombre": "JORGE GONZALEZ",
+    "telefono": "+5218116366988",
+    "servicios": 30,
+    "costo_promedio": 14683,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P0548",
+    "empresa": "TRANSRAPIDOS VALERIO SA DE CV",
+    "nombre": "DANIEL MEDINA",
+    "telefono": "+5218182808318",
+    "servicios": 10,
+    "costo_promedio": 13111,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1270",
+    "empresa": "PROLOGIC CUSTOM SERVICES AND FORWARDING",
+    "nombre": "WENDY ANICA",
+    "telefono": "+5218713506633",
+    "servicios": 8,
+    "costo_promedio": 13275,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P0035",
+    "empresa": "SERVICIO Y TRANSPORTACION CONFIABLE SA DE CV",
+    "nombre": "SERVICIO Y TRANSPORTACION CONFIABLE SA DE CV",
+    "telefono": "",
+    "servicios": 8,
+    "costo_promedio": 11625,
+    "estatus_catalogo": "Intermitente"
+  },
+  {
+    "codigo": "P1509",
+    "empresa": "RITO ALBERTO CALIXTO CRUZ",
+    "nombre": "RICARDO ABRAHAM CALIXTO",
+    "telefono": "+5218112812422",
+    "servicios": 6,
+    "costo_promedio": 15833,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1529",
+    "empresa": "WOF TRUCKS",
+    "nombre": "LIZETH SALAS",
+    "telefono": "+5218135934085",
+    "servicios": 4,
+    "costo_promedio": 13000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P486",
+    "empresa": "JORGE ALEJANDRO MONTELONGO MORENO",
+    "nombre": "VALERIA",
+    "telefono": "+5218115996804",
+    "servicios": 3,
+    "costo_promedio": 13000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1460",
+    "empresa": "JUAN MANUEL PALACIOS GARCÍA",
+    "nombre": "LUIS CARLOS PÉREZ ROBLES",
+    "telefono": "+5218120326763",
+    "servicios": 3,
+    "costo_promedio": 13333,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1434",
+    "empresa": "RISOCO LOGISTICS",
+    "nombre": "DAVID ALVAREZ",
+    "telefono": "+5218711680772",
+    "servicios": 2,
+    "costo_promedio": 15000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1241",
+    "empresa": "TRANSPORTADORA GRIJALVA SA DE CV",
+    "nombre": "GEMA",
+    "telefono": "+5216181581843",
+    "servicios": 2,
+    "costo_promedio": 14500,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1165",
+    "empresa": "ARTEMIO BUSTAMANTE NORIEGA",
+    "nombre": "ARTEMIO BUSTAMANTE",
+    "telefono": "+5218120007388",
+    "servicios": 2,
+    "costo_promedio": 15000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1601",
+    "empresa": "AUTOLINEAS SAN JOSE SA DE CV",
+    "nombre": "JOSE LUIS CAVAZOS SALAZAR",
+    "telefono": "+5218124242815",
+    "servicios": 1,
+    "costo_promedio": 18000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1574",
+    "empresa": "TRACTO LINEAS MEXICANAS",
+    "nombre": "MARCO ANTONIO SYDE DEL REAL",
+    "telefono": "+5218120009266",
+    "servicios": 1,
+    "costo_promedio": 15000,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1569",
+    "empresa": "TR SERVICIOS LOGÍSTICOS DE LA LAGUNA SA DE CV",
+    "nombre": "MARLEN SALAZAR",
+    "telefono": "+5218715119051",
+    "servicios": 1,
+    "costo_promedio": 14000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1242",
+    "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
+    "nombre": "ORLANDO VAZQUEZ",
+    "telefono": "+5214495410182",
+    "servicios": 1,
+    "costo_promedio": 15500,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1479",
+    "empresa": "JOSE RAMON FLORES ALANIS",
+    "nombre": "JOSE RAMON FLORES ALANIS",
+    "telefono": "+5218110302029",
+    "servicios": 1,
+    "costo_promedio": 17500,
+    "estatus_catalogo": "Recurrente"
+  },
+  {
+    "codigo": "P1396",
+    "empresa": "TRISKEL LOGISTICS SA DE CV",
+    "nombre": "ROCIO",
+    "telefono": "+5218261289323",
+    "servicios": 1,
+    "costo_promedio": 13000,
+    "estatus_catalogo": "No asignado"
+  },
+  {
+    "codigo": "P1186",
+    "empresa": "MG STEEL AND SERVICE SA DE CV",
+    "nombre": "YOLANDA SALAS",
+    "telefono": "+5218116897282",
+    "servicios": 1,
+    "costo_promedio": 15000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1079",
+    "empresa": "BRENTON MULTIOPERADORA Y SERVICIOS SA DE CV",
+    "nombre": "SILVIA",
+    "telefono": "+5218117251060",
+    "servicios": 1,
+    "costo_promedio": 24000,
+    "estatus_catalogo": "Baja"
+  },
+  {
+    "codigo": "P1061",
+    "empresa": "CARLOS EDUARDO GARDUÑO ROMERO",
+    "nombre": "MARYLIN",
+    "telefono": "+5218717818819",
+    "servicios": 1,
+    "costo_promedio": 11000,
+    "estatus_catalogo": "No asignado"
+  }
+]

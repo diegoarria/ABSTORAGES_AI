@@ -155,7 +155,7 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
 let columnasContactos = null;
 function asegurarColumnasContactos() {
   if (!columnasContactos) {
-    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT')
+    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT, ADD COLUMN IF NOT EXISTS tarifas TEXT')
       .catch(e => { columnasContactos = null; throw e; });
   }
   return columnasContactos;

@@ -554,6 +554,7 @@ async function renderDetail(){
         <div id="desempeno-box"><div class="empty-msg">Cargando…</div></div>
       </section>` : ''}
 
+      ${esProv && data.tarifas ? `<section><div class="sec-title">Tarifas históricas</div><div class="notes">${esc(data.tarifas)}</div></section>` : ''}
       ${data.notas ? `<section><div class="sec-title">Notas</div><div class="notes">${esc(data.notas)}</div></section>` : ''}
 
       <section>

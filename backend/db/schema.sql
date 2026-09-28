@@ -219,6 +219,7 @@ CREATE TABLE IF NOT EXISTS contactos (
 
 ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT;
 ALTER TABLE contactos ADD COLUMN IF NOT EXISTS unidades TEXT;
+ALTER TABLE contactos ADD COLUMN IF NOT EXISTS tarifas TEXT;
 
 -- ─── INTERACCIONES (bitácora por contacto, puede haber de varios agentes) ────
 CREATE TABLE IF NOT EXISTS interacciones (

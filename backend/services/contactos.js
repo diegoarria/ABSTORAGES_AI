@@ -61,7 +61,7 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
     contacto = existente;
   } else {
     contacto = {
-      id: `CT-${Date.now().toString(36).toUpperCase()}`,
+      id: `CT-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`, // el sufijo evita choques cuando se crean varios en el mismo milisegundo
       agente_asignado: AGENTE, tipo: tipo || null,
       nombre_completo: nombre_completo || 'Sin nombre', puesto: puesto || null, telefono: telefono || null,
       email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null, rutas: rutas || null, unidades: unidades || null,
@@ -135,7 +135,7 @@ async function protegerDatosProveedores(texto) {
 
 // Edita solo las rutas de un proveedor (permite vaciarlas, cosa que el upsert no hace)
 async function actualizarCampoProveedor(id, campo, texto) {
-  if (!['rutas', 'unidades'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
+  if (!['rutas', 'unidades', 'tarifas'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
   const valor = String(texto || '').trim().slice(0, 500) || null;
   if (USA_DB) {
     try {
@@ -275,6 +275,40 @@ async function sembrarRutasIniciales() {
   }
 }
 
+// Proveedores de la ruta Monterrey ⇄ Gómez Palacio (catálogo AppSheet, 27-sep-2026).
+// Se cargan solos al arrancar, una sola vez por proveedor (se buscan por teléfono, o
+// por nombre+empresa si no tienen). Los dados de Baja en el catálogo se guardan pero
+// SIN la ruta, para que SOFIA no los contacte por su cuenta. Los costos van en el
+// campo "tarifas" (no en notas): notas sí pueden llegarle a SOFIA en una conversación
+// con ese proveedor y el costo nunca debe salir hacia él.
+const RUTA_MTY_GP = 'Monterrey-Gómez Palacio';
+async function sembrarProveedoresRutaMtyGp() {
+  let lista;
+  try { lista = require('../data/proveedores-mty-gomez-palacio.json'); } catch { return; }
+  let nuevos = 0;
+  for (const p of lista) {
+    try {
+      const existente = p.telefono
+        ? await buscarPorTelefono(p.telefono, 'sofia')
+        : (await listarPorAgente('SOFIA', { tipo: 'proveedor', q: p.empresa })).find(c => (c.empresa || '') === p.empresa || c.nombre_completo === p.nombre);
+      const baja = p.estatus_catalogo === 'Baja';
+      const tarifas = `${RUTA_MTY_GP}: $${Number(p.costo_promedio).toLocaleString('es-MX')} promedio · ${p.servicios} servicio(s) en la ruta`;
+      let c = existente;
+      if (!c) {
+        c = await upsertContacto({
+          agente: 'sofia', tipo: 'proveedor', nombre_completo: p.nombre, empresa: p.empresa, telefono: p.telefono || undefined,
+          notas: `Clave: ${p.codigo} · Estatus en catálogo: ${p.estatus_catalogo}`,
+          rutas: baja ? undefined : RUTA_MTY_GP,
+          resumen_interaccion: 'Alta desde el catálogo de proveedores (ruta Monterrey–Gómez Palacio)', canal: 'permanente',
+        });
+        nuevos++;
+      }
+      if (c && !String(c.tarifas || '').trim()) await actualizarCampoProveedor(c.id, 'tarifas', tarifas);
+    } catch (e) { console.error(`[Contactos] Error cargando proveedor ${p.codigo}:`, e.message); }
+  }
+  if (nuevos) console.log(`[Contactos] Cargados ${nuevos} proveedores de la ruta Monterrey–Gómez Palacio`);
+}
+
 async function sembrarContactosPermanentes() {
   for (const c of CONTACTOS_PERMANENTES) {
     try {
@@ -291,6 +325,6 @@ async function sembrarContactosPermanentes() {
     }
   }
 }
-sembrarContactosPermanentes().then(sembrarRutasIniciales);
+sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarProveedoresRutaMtyGp);
 
 module.exports = { bloqueDirectorioProveedores, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
