@@ -258,6 +258,20 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
 .mm-omit { max-height:120px; overflow:auto; font-size:12.5px; color:var(--tx2); margin-top:6px; }
 .mm-prog { height:8px; background:var(--surface-3); border-radius:6px; overflow:hidden; margin-top:10px; }
 .mm-prog > div { height:100%; background:var(--acc); transition:width .4s; }
+
+.combo { position:relative; flex:1; min-width:0; }
+.combo-btn { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--surface-2); border:1px solid var(--bd); border-radius:9px; padding:9px 10px; color:var(--tx); font-size:12.5px; font-family:inherit; cursor:pointer; text-align:left; }
+.combo-btn:focus-visible { outline:none; border-color:var(--acc); box-shadow:var(--focus); }
+.combo-btn > span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.combo-chev { width:8px; height:8px; border-right:2px solid var(--tx3); border-bottom:2px solid var(--tx3); transform:rotate(45deg) translateY(-2px); flex-shrink:0; }
+.combo-pop { display:none; position:absolute; top:calc(100% + 6px); right:0; width:min(380px, 92vw); background:var(--surface); border:1px solid var(--bd-strong); border-radius:12px; box-shadow:var(--shadow-2); padding:10px; z-index:80; }
+.combo.open .combo-pop { display:block; }
+.combo-list { max-height:300px; overflow-y:auto; margin-top:8px; }
+.combo-op { display:flex; justify-content:space-between; gap:10px; padding:8px 10px; border-radius:8px; font-size:13px; cursor:pointer; }
+.combo-op:hover, .combo-op.hl { background:var(--acc-soft); }
+.combo-op.on { font-weight:700; color:var(--acc-tx); }
+.combo-op .n { color:var(--tx3); font-size:12px; flex-shrink:0; }
+.combo-vacio { padding:14px 10px; text-align:center; color:var(--tx3); font-size:12.5px; }
 </style>
 <link rel="stylesheet" href="/css/shell.css">
 <script src="/js/shell.js"></script>
@@ -296,7 +310,13 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
             <option value="menos">Menos rutas primero</option>
             <option value="nombre">Nombre A–Z</option>
           </select>
-          <select id="rutaSel" aria-label="Filtrar por ruta" onchange="cambiarRuta(this.value)"></select>
+          <div class="combo" id="rutaCombo">
+            <button type="button" class="combo-btn" id="rutaBtn" onclick="toggleRutaPop()" aria-haspopup="listbox" aria-expanded="false"><span id="rutaTxt">Todas las rutas</span><span class="combo-chev"></span></button>
+            <div class="combo-pop" id="rutaPop">
+              <div class="search-w"><span id="rutaSearchIco"></span><input class="search" id="rutaBuscar" placeholder="Buscar ruta o ciudad…" autocomplete="off" aria-label="Buscar ruta" oninput="pintarRutas()" onkeydown="teclaRuta(event)"></div>
+              <div class="combo-list" id="rutaLista" role="listbox"></div>
+            </div>
+          </div>
         </div>
         <div class="sel-row"><span id="selInfo"></span><button id="selTodos" onclick="toggleSeleccionVisibles()">Seleccionar los visibles</button></div>
       </div>
@@ -400,6 +420,7 @@ function ico(n){ return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'
 
 document.getElementById('btnNuevo').innerHTML = ico('plus') + ' Nuevo contacto';
 document.getElementById('searchIco').innerHTML = ico('search');
+document.getElementById('rutaSearchIco').innerHTML = ico('search');
 
 const AGENTES = {
   SARA:  { role: "Ventas · Clientes",                              color: "var(--sara)",  soft: "var(--sara-soft)" },
@@ -431,13 +452,39 @@ function recalcularRutas(){
   const m = new Map();
   for (const c of contactosCache) for (const r of partes(c.rutas)) m.set(r, (m.get(r) || 0) + 1);
   rutasConocidas = m;
-  const sel = document.getElementById('rutaSel');
-  const orden = [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
-  sel.innerHTML = '<option value="todas">Todas las rutas</option><option value="__sin">Sin rutas capturadas</option>' +
-    orden.map(([r, n]) => `<option value="${esc(r)}">${esc(r)} (${n})</option>`).join('');
   if (filtroRuta !== 'todas' && filtroRuta !== '__sin' && !m.has(filtroRuta)) filtroRuta = 'todas';
-  sel.value = filtroRuta;
+  pintarRutas();
 }
+
+// ── Selector de ruta con buscador ───────────────────────────────────────────
+const sinAcentos = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function etiquetaRuta(){ return filtroRuta === 'todas' ? 'Todas las rutas' : filtroRuta === '__sin' ? 'Sin rutas capturadas' : filtroRuta; }
+function pintarRutas(){
+  const q = sinAcentos(document.getElementById('rutaBuscar')?.value).trim();
+  document.getElementById('rutaTxt').textContent = etiquetaRuta();
+  const lista = document.getElementById('rutaLista');
+  const fijas = [['todas', 'Todas las rutas', null], ['__sin', 'Sin rutas capturadas', null]].filter(([, t]) => !q || sinAcentos(t).includes(q));
+  const rutas = [...rutasConocidas.entries()].filter(([r]) => !q || sinAcentos(r).includes(q)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+  const MAX = 120;
+  const op = ([v, t, n]) => `<div class="combo-op ${v === filtroRuta ? 'on' : ''}" role="option" data-v="${esc(v)}" onclick="elegirRuta(this.dataset.v)"><span>${esc(t)}</span>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
+  const items = [...fijas.map(f => op(f)), ...rutas.slice(0, MAX).map(([r, n]) => op([r, r, n]))];
+  lista.innerHTML = items.length ? items.join('') + (rutas.length > MAX ? `<div class="combo-vacio">Mostrando ${MAX} de ${rutas.length}. Escribe para acotar.</div>` : '') : '<div class="combo-vacio">Ninguna ruta coincide.</div>';
+  const primero = lista.querySelector('.combo-op'); if (primero && q) primero.classList.add('hl');
+}
+function toggleRutaPop(forzar){
+  const combo = document.getElementById('rutaCombo');
+  const abrir = forzar === undefined ? !combo.classList.contains('open') : forzar;
+  combo.classList.toggle('open', abrir);
+  document.getElementById('rutaBtn').setAttribute('aria-expanded', abrir);
+  if (abrir) { const i = document.getElementById('rutaBuscar'); i.value = ''; pintarRutas(); setTimeout(() => i.focus(), 20); }
+}
+function elegirRuta(v){ toggleRutaPop(false); cambiarRuta(v); }
+function teclaRuta(e){
+  if (e.key === 'Escape') { toggleRutaPop(false); document.getElementById('rutaBtn').focus(); }
+  else if (e.key === 'Enter') { const hl = document.querySelector('#rutaLista .combo-op.hl') || document.querySelector('#rutaLista .combo-op'); if (hl) elegirRuta(hl.dataset.v); }
+}
+document.addEventListener('click', e => { const c = document.getElementById('rutaCombo'); if (c && !c.contains(e.target)) c.classList.remove('open'); });
+
 function vistaLista(){
   let l = contactosCache.slice();
   if (filtroRuta === '__sin') l = l.filter(c => !partes(c.rutas).length);
@@ -449,7 +496,7 @@ function vistaLista(){
   return l;
 }
 function cambiarOrden(v){ sortModo = v; renderList(); }
-function cambiarRuta(v){ filtroRuta = v; renderList(); }
+function cambiarRuta(v){ filtroRuta = v; pintarRutas(); renderList(); }
 function actualizarSeleccionUI(){
   const n = seleccion.size, vis = vistaLista();
   document.getElementById('selInfo').textContent = n ? `${n} seleccionado${n === 1 ? '' : 's'}` : `${vis.length} contacto${vis.length === 1 ? '' : 's'}`;
