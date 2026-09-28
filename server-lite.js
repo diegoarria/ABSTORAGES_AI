@@ -610,8 +610,16 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Reclamo de pago de un proveedor: SOFIA no dice nada más que la frase acordada
     // (aunque el modelo agregue algo, aquí se fuerza el texto exacto).
     const FRASE_RECLAMO_PAGO = 'Enseguida lo revisaré con el equipo de administración, ellos podrán resolverte este tema lo antes posible.';
-    const textoSalida = (agente === 'sofia' && !personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO : limpiarControlParaCliente(respuesta);
-    const bloques = splitForWhatsApp(textoSalida);
+    // Proveedor sin unidades: solo agradece y pide aviso — nada de "¿algo más en lo que te ayude?"
+    const FRASE_SIN_UNIDADES = 'Muchas gracias, avísame cuando cuentes con disponibilidad.';
+    const dijoSinUnidades = /OFERTA_PROVEEDOR\s*:\s*\{[^}]*"disponible"\s*:\s*false/i.test(respuesta);
+    const textoSalida = (agente === 'sofia' && !personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO
+      : (agente === 'sofia' && !personaEquipo && dijoSinUnidades) ? FRASE_SIN_UNIDADES
+      : limpiarControlParaCliente(respuesta);
+    // Red de seguridad: nunca cerrar con la muletilla de servicio al cliente
+    const MULETILLA = /[¿]?\s*(?:hay\s+)?(?:algo|alguna cosa)\s+m[aá]s\s+en\s+(?:lo\s+)?(?:que|qué)\s+(?:te\s+)?(?:pueda|podamos|puedo)\s+ayud(?:arte|ar)[^.?!]*[?.!]?/gi;
+    const textoLimpio = (agente === 'sofia' && !personaEquipo) ? (textoSalida.replace(MULETILLA, '').replace(/\s{2,}/g, ' ').trim() || textoSalida) : textoSalida;
+    const bloques = splitForWhatsApp(textoLimpio);
     for (const bloque of bloques) await sendWhatsApp(phone, bloque, agente);
 
     // ── Monitoreo en vivo: conversación, respuesta de proveedor y resultado ──
