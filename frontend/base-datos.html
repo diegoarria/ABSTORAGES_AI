@@ -239,6 +239,25 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
   .tpl-fields, .modal .frow2 { grid-template-columns:1fr; }
 }
 @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+
+.tb-row { display:flex; gap:8px; }
+.tb-row select { flex:1; min-width:0; background:var(--surface-2); border:1px solid var(--bd); border-radius:9px; padding:9px 10px; color:var(--tx); font-size:12.5px; font-family:inherit; }
+.tb-row select:focus { outline:none; border-color:var(--acc); box-shadow:var(--focus); }
+.sel-row { display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:var(--tx2); }
+.sel-row button { background:none; border:none; color:var(--acc-tx); font-weight:600; font-size:12.5px; cursor:pointer; font-family:inherit; padding:2px 0; }
+.sel-row button:hover { text-decoration:underline; }
+.chk { width:18px; height:18px; accent-color:var(--acc); cursor:pointer; flex-shrink:0; margin-top:11px; }
+.bulkbar { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:90; display:none; align-items:center; gap:14px; background:var(--navy); color:#fff; border-radius:14px; padding:12px 14px 12px 20px; box-shadow:var(--shadow-2); font-size:14px; font-weight:600; }
+.bulkbar.on { display:flex; }
+.bulkbar .btn-secondary { background:transparent; color:#fff; border-color:rgba(255,255,255,.35); }
+.bulkbar .btn-secondary:hover { background:rgba(255,255,255,.12); }
+.mm-box { border:1px solid var(--bd); background:var(--surface-2); border-radius:12px; padding:14px 16px; margin-top:14px; font-size:13.5px; line-height:1.6; }
+.mm-box b { font-weight:700; }
+.mm-warn { color:var(--warn); background:var(--warn-soft); border-radius:9px; padding:9px 12px; margin-top:10px; font-size:13px; }
+.mm-ej { white-space:pre-wrap; background:var(--surface); border:1px dashed var(--bd-strong); border-radius:10px; padding:12px 14px; margin-top:8px; }
+.mm-omit { max-height:120px; overflow:auto; font-size:12.5px; color:var(--tx2); margin-top:6px; }
+.mm-prog { height:8px; background:var(--surface-3); border-radius:6px; overflow:hidden; margin-top:10px; }
+.mm-prog > div { height:100%; background:var(--acc); transition:width .4s; }
 </style>
 <link rel="stylesheet" href="/css/shell.css">
 <script src="/js/shell.js"></script>
@@ -270,12 +289,36 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
           <div class="filter" data-tipo="proveedor" id="f-proveedor">Proveedores</div>
           <div class="filter" data-tipo="operador" id="f-operador">Operadores</div>
         </div>
+        <div class="tb-row">
+          <select id="sortSel" aria-label="Ordenar" onchange="cambiarOrden(this.value)">
+            <option value="reciente">Orden: más recientes</option>
+            <option value="mas">Más rutas primero</option>
+            <option value="menos">Menos rutas primero</option>
+            <option value="nombre">Nombre A–Z</option>
+          </select>
+          <select id="rutaSel" aria-label="Filtrar por ruta" onchange="cambiarRuta(this.value)"></select>
+        </div>
+        <div class="sel-row"><span id="selInfo"></span><button id="selTodos" onclick="toggleSeleccionVisibles()">Seleccionar los visibles</button></div>
       </div>
       <div class="list" id="list"></div>
     </section>
     <section class="panel detail" id="detail"></section>
   </div>
 </main>
+
+<div class="bulkbar" id="bulkbar">
+  <span id="bulkTxt"></span>
+  <button class="btn btn-primary btn-sm" onclick="abrirMasivo()">Enviar plantilla a la selección</button>
+  <button class="btn btn-secondary btn-sm" onclick="limpiarSeleccion()">Limpiar</button>
+</div>
+
+<div class="overlay" id="overlayMasivo">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mmTitulo">
+    <div class="modal-h"><h2 id="mmTitulo">Enviar plantilla a varios contactos</h2><div class="sub" id="mmSub"></div></div>
+    <div class="modal-b" id="mmBody"></div>
+    <div class="modal-actions" id="mmAcciones"></div>
+  </div>
+</div>
 
 <!-- ── Modal nuevo contacto ─────────────────────────────────────────────── -->
 <div class="overlay" id="overlay">
@@ -380,6 +423,51 @@ function tipoLabel(t) { return t==='cliente' ? 'Cliente' : t==='proveedor' ? 'Pr
 function iniciales(n) { const p = String(n || '?').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?')[0] + (p.length > 1 ? p[p.length-1][0] : '')).toUpperCase(); }
 function partes(t) { return String(t || '').split(/[,;\n]+/).map(x => x.trim()).filter(Boolean); }
 
+let sortModo = 'reciente', filtroRuta = 'todas';
+const seleccion = new Set();
+let rutasConocidas = new Map(); // ruta → cuántos contactos la tienen
+
+function recalcularRutas(){
+  const m = new Map();
+  for (const c of contactosCache) for (const r of partes(c.rutas)) m.set(r, (m.get(r) || 0) + 1);
+  rutasConocidas = m;
+  const sel = document.getElementById('rutaSel');
+  const orden = [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+  sel.innerHTML = '<option value="todas">Todas las rutas</option><option value="__sin">Sin rutas capturadas</option>' +
+    orden.map(([r, n]) => `<option value="${esc(r)}">${esc(r)} (${n})</option>`).join('');
+  if (filtroRuta !== 'todas' && filtroRuta !== '__sin' && !m.has(filtroRuta)) filtroRuta = 'todas';
+  sel.value = filtroRuta;
+}
+function vistaLista(){
+  let l = contactosCache.slice();
+  if (filtroRuta === '__sin') l = l.filter(c => !partes(c.rutas).length);
+  else if (filtroRuta !== 'todas') l = l.filter(c => partes(c.rutas).some(r => r.toLowerCase() === filtroRuta.toLowerCase()));
+  const n = c => partes(c.rutas).length;
+  if (sortModo === 'mas') l.sort((a, b) => n(b) - n(a) || a.nombre_completo.localeCompare(b.nombre_completo, 'es'));
+  else if (sortModo === 'menos') l.sort((a, b) => n(a) - n(b) || a.nombre_completo.localeCompare(b.nombre_completo, 'es'));
+  else if (sortModo === 'nombre') l.sort((a, b) => a.nombre_completo.localeCompare(b.nombre_completo, 'es'));
+  return l;
+}
+function cambiarOrden(v){ sortModo = v; renderList(); }
+function cambiarRuta(v){ filtroRuta = v; renderList(); }
+function actualizarSeleccionUI(){
+  const n = seleccion.size, vis = vistaLista();
+  document.getElementById('selInfo').textContent = n ? `${n} seleccionado${n === 1 ? '' : 's'}` : `${vis.length} contacto${vis.length === 1 ? '' : 's'}`;
+  const todos = vis.length && vis.every(c => seleccion.has(c.id));
+  document.getElementById('selTodos').textContent = todos ? 'Quitar los visibles' : 'Seleccionar los visibles';
+  const bar = document.getElementById('bulkbar');
+  bar.classList.toggle('on', n > 0);
+  document.getElementById('bulkTxt').textContent = `${n} seleccionado${n === 1 ? '' : 's'}`;
+}
+function toggleSel(id, ev){ ev.stopPropagation(); if (seleccion.has(id)) seleccion.delete(id); else seleccion.add(id); actualizarSeleccionUI(); }
+function toggleSeleccionVisibles(){
+  const vis = vistaLista();
+  const todos = vis.length && vis.every(c => seleccion.has(c.id));
+  vis.forEach(c => todos ? seleccion.delete(c.id) : seleccion.add(c.id));
+  renderList();
+}
+function limpiarSeleccion(){ seleccion.clear(); renderList(); }
+
 function renderTabs(){
   document.getElementById('tabs').innerHTML = Object.entries(AGENTES).map(([key,a])=>`
     <button class="agent ${key===activeAgent?'active':''}" style="--ag:${a.color};--ag-soft:${a.soft}" onclick="selectAgent('${key}')" aria-pressed="${key===activeAgent}">
@@ -411,7 +499,7 @@ async function renderPermitido(){
 }
 
 async function selectAgent(key){
-  activeAgent = key; activeTipo = "todos"; activeContactId = null; searchQuery = "";
+  activeAgent = key; activeTipo = "todos"; activeContactId = null; searchQuery = ""; seleccion.clear(); filtroRuta = 'todas';
   document.getElementById('searchInput').value = "";
   renderTabs(); renderFilters();
   await renderPermitido();
@@ -439,6 +527,7 @@ async function cargarContactos() {
     counts[activeAgent] = contactosCache.length;
     document.getElementById('updated').textContent = 'Actualizado a las ' + new Date().toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
     renderTabs();
+    recalcularRutas();
     renderList();
   } catch (e) {
     list.innerHTML = '<div class="empty-msg">No se pudo cargar (' + esc(e.message) + ')</div>';
@@ -447,14 +536,17 @@ async function cargarContactos() {
 
 function renderList(){
   const list = document.getElementById('list');
-  if (contactosCache.length === 0) {
+  const lista = vistaLista();
+  actualizarSeleccionUI();
+  if (lista.length === 0) {
     list.innerHTML = '<div class="empty-msg">Sin resultados para este filtro.<br>Usa “Nuevo contacto” para agregar uno.</div>';
     document.getElementById('detail').innerHTML = '';
     return;
   }
-  if (!activeContactId || !contactosCache.find(c=>c.id===activeContactId)) activeContactId = contactosCache[0].id;
-  list.innerHTML = contactosCache.map(c=>`
+  if (!activeContactId || !lista.find(c=>c.id===activeContactId)) activeContactId = lista[0].id;
+  list.innerHTML = lista.map(c=>`
     <div class="row ${c.id===activeContactId?'sel':''}" onclick="selectContacto('${c.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')selectContacto('${c.id}')">
+      <input type="checkbox" class="chk" ${seleccion.has(c.id) ? 'checked' : ''} onclick="toggleSel('${c.id}', event)" aria-label="Seleccionar ${esc(c.nombre_completo)}">
       <div class="av av-${c.tipo}">${esc(iniciales(c.nombre_completo))}</div>
       <div class="row-main">
         <div class="row-top"><div class="nombre">${esc(c.nombre_completo)}</div><div class="fecha">${fmtFecha(c.fecha_ultimo_contacto)}</div></div>
@@ -569,6 +661,82 @@ async function renderDetail(){
     </div>
   `;
   if (esProv) cargarDesempeno(data);
+}
+
+// ── Envío masivo de plantillas aprobadas ───────────────────────────────────
+let mmPrev = null, mmPoll = null;
+function cerrarMasivo(){ document.getElementById('overlayMasivo').classList.remove('open'); clearInterval(mmPoll); }
+function abrirMasivo(){
+  if (!plantillasCache.length) { alert('Este agente no tiene plantillas aprobadas.'); return; }
+  mmPrev = null;
+  document.getElementById('mmSub').innerHTML = `Se enviará a <b>${seleccion.size}</b> contacto${seleccion.size === 1 ? '' : 's'} seleccionado${seleccion.size === 1 ? '' : 's'}, cada uno con su nombre. Solo plantillas aprobadas por Meta.`;
+  document.getElementById('mmBody').innerHTML = `
+    <div class="frow"><label for="mmPlantilla">Plantilla</label><select id="mmPlantilla" onchange="mmCampos()">${plantillasCache.map(p => `<option value="${p.sid}">${esc(p.nombre)}</option>`).join('')}</select></div>
+    <div id="mmCampos"></div>
+    <div class="frow"><label for="mmModo">Cómo saludar</label><select id="mmModo"><option value="primero">Por su primer nombre (Jorge)</option><option value="completo">Por su nombre completo (Jorge González)</option></select><div class="help">Si un contacto tiene un trato acordado (por ejemplo "Sr. Marco"), se usa ese.</div></div>
+    <div id="mmResultado"></div>`;
+  mmCampos();
+  mmAcciones('prev');
+  document.getElementById('overlayMasivo').classList.add('open');
+}
+function mmCampos(){
+  const p = plantillasCache.find(x => x.sid === document.getElementById('mmPlantilla').value);
+  const extra = (p?.campos || []).filter(c => !/^nombre/i.test(c.label));
+  document.getElementById('mmCampos').innerHTML = extra.length
+    ? `<div class="frow frow2">${extra.map(c => `<div><label>${esc(c.label)}</label><input data-k="${c.key}" placeholder="${esc(c.label)}" oninput="mmPrev=null;mmAcciones('prev')"></div>`).join('')}</div>`
+    : '<div class="help" style="margin-bottom:10px">Esta plantilla solo lleva el nombre: se llena sola para cada contacto.</div>';
+  mmPrev = null; document.getElementById('mmResultado').innerHTML = ''; mmAcciones('prev');
+}
+function mmAcciones(modo){
+  const box = document.getElementById('mmAcciones');
+  if (modo === 'prev') box.innerHTML = `<button class="btn-cancel" onclick="cerrarMasivo()">Cancelar</button><button class="btn-save" onclick="mmPrevisualizar()">Ver vista previa</button>`;
+  else if (modo === 'conf') box.innerHTML = `<button class="btn-cancel" onclick="cerrarMasivo()">Cancelar</button><button class="btn-save" id="mmEnviar" disabled onclick="mmEnviar()">Enviar</button>`;
+  else box.innerHTML = `<button class="btn-cancel" onclick="cerrarMasivo()">Cerrar</button>`;
+}
+function mmPayload(){
+  const variables = {}; document.querySelectorAll('#mmCampos input[data-k]').forEach(i => { variables[i.dataset.k] = i.value.trim(); });
+  return { agente: activeAgent.toLowerCase(), ids: [...seleccion], contentSid: document.getElementById('mmPlantilla').value, variables, modoNombre: document.getElementById('mmModo').value };
+}
+async function mmPrevisualizar(){
+  const out = document.getElementById('mmResultado'); out.innerHTML = '<div class="mm-box">Calculando…</div>';
+  try {
+    const r = await fetch('/api/contactos/masivo/previsualizar', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(mmPayload()) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    mmPrev = d;
+    const avisos = [];
+    if (d.pausado) avisos.push('El agente está pausado: no se puede enviar.');
+    if (d.excedeMaximo) avisos.push(`Máximo ${d.maximo} destinatarios por envío.`);
+    if (d.quedaranSinEnviar > 0) avisos.push(`Hoy solo quedan ${d.restanteHoy} mensajes del tope diario (${d.limiteDiario}). Se enviarán los primeros ${d.restanteHoy} y el resto quedará sin enviar.`);
+    out.innerHTML = `<div class="mm-box">
+      <div><b>${d.enviables}</b> contacto${d.enviables === 1 ? '' : 's'} recibirá${d.enviables === 1 ? '' : 'n'} “${esc(d.plantilla)}”.${d.omitidos.length ? ` <b>${d.omitidos.length}</b> se omite${d.omitidos.length === 1 ? '' : 'n'}.` : ''}</div>
+      ${d.ejemplo ? `<div style="margin-top:10px;font-size:12px;color:var(--tx3)">Así le llegará a ${esc(d.ejemplo.para)}:</div><div class="mm-ej">${esc(d.ejemplo.texto)}</div>` : ''}
+      ${d.omitidos.length ? `<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;font-weight:600">Ver quiénes se omiten</summary><div class="mm-omit">${d.omitidos.map(o => `${esc(o.nombre)} — ${esc(o.motivo)}`).join('<br>')}</div></details>` : ''}
+      ${avisos.map(a => `<div class="mm-warn">${esc(a)}</div>`).join('')}
+      ${d.enviables && !d.pausado && !d.excedeMaximo ? `<div class="frow" style="margin-top:14px"><label for="mmConf">Para confirmar, escribe el número de destinatarios (${d.enviables})</label><input id="mmConf" inputmode="numeric" oninput="document.getElementById('mmEnviar').disabled = Number(this.value) !== mmPrev.enviables"></div>` : ''}
+    </div>`;
+    mmAcciones(d.enviables && !d.pausado && !d.excedeMaximo ? 'conf' : 'fin');
+  } catch (e) { out.innerHTML = `<div class="mm-warn">${esc(e.message)}</div>`; }
+}
+async function mmEnviar(){
+  const body = { ...mmPayload(), confirmar: Number(document.getElementById('mmConf').value) };
+  const out = document.getElementById('mmResultado');
+  try {
+    const r = await fetch('/api/contactos/masivo/enviar', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    mmAcciones('fin');
+    const pintar = t => {
+      const hecho = t.enviados + t.fallidos.length + (t.omitidosPorTope || 0);
+      out.innerHTML = `<div class="mm-box"><div><b>${t.enviados}</b> enviados de ${t.total}${t.fallidos.length ? ` · <b>${t.fallidos.length}</b> con error` : ''}${t.terminado ? ' · <b>terminado</b>' : ' · enviando…'}</div>
+        <div class="mm-prog"><div style="width:${Math.min(100, Math.round(hecho / Math.max(1, t.total) * 100))}%"></div></div>
+        ${t.detenidoPor ? `<div class="mm-warn">Se detuvo porque ${esc(t.detenidoPor)}. Quedaron ${t.omitidosPorTope} sin enviar.</div>` : ''}
+        ${t.fallidos.length ? `<div class="mm-omit">${t.fallidos.map(f => `${esc(f.nombre)} — ${esc(f.error)}`).join('<br>')}</div>` : ''}</div>`;
+    };
+    clearInterval(mmPoll);
+    mmPoll = setInterval(async () => {
+      try { const t = await (await fetch('/api/contactos/masivo/' + d.id, { credentials:'include' })).json(); pintar(t); if (t.terminado) { clearInterval(mmPoll); seleccion.clear(); cargarContactos(); } } catch {}
+    }, 2000);
+    pintar({ enviados: 0, fallidos: [], total: d.total, terminado: false });
+  } catch (e) { out.insertAdjacentHTML('beforeend', `<div class="mm-warn">${esc(e.message)}</div>`); }
 }
 
 function togglePlantilla(){

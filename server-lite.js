@@ -1981,6 +1981,28 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
   }
 });
 
+// ── Envío masivo de plantillas aprobadas (ver services/envioMasivo.js) ─────
+const envioMasivo = require('./backend/services/envioMasivo');
+app.post('/api/contactos/masivo/previsualizar', soloAdmin, async (req, res) => {
+  try {
+    const { agente, ids, contentSid, variables, modoNombre } = req.body || {};
+    if (!['sara', 'sofia', 'noa'].includes(String(agente || '').toLowerCase())) return res.status(400).json({ error: 'agente requerido' });
+    res.json(await envioMasivo.previsualizar({ agente: agente.toLowerCase(), ids, contentSid, variables, modoNombre }));
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+app.post('/api/contactos/masivo/enviar', soloAdmin, async (req, res) => {
+  try {
+    const { agente, ids, contentSid, variables, modoNombre, confirmar } = req.body || {};
+    if (!['sara', 'sofia', 'noa'].includes(String(agente || '').toLowerCase())) return res.status(400).json({ error: 'agente requerido' });
+    res.json(await envioMasivo.iniciar({ agente: agente.toLowerCase(), ids, contentSid, variables, modoNombre, confirmar, por: req.user?.nombre || req.user?.email }));
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+app.get('/api/contactos/masivo/:id', soloAdmin, (req, res) => {
+  const t = envioMasivo.estado(req.params.id);
+  if (!t) return res.status(404).json({ error: 'Envío no encontrado' });
+  res.json(t);
+});
+
 // Dispara una llamada real (Vapi) a un contacto guardado.
 app.post('/api/contactos/:id/llamar', soloAdmin, async (req, res) => {
   try {
