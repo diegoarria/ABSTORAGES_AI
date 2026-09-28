@@ -667,6 +667,7 @@ async function renderDetail(){
 let mmPrev = null, mmPoll = null;
 function cerrarMasivo(){ document.getElementById('overlayMasivo').classList.remove('open'); clearInterval(mmPoll); }
 function abrirMasivo(){
+  mmInvertir = false;
   if (!plantillasCache.length) { alert('Este agente no tiene plantillas aprobadas.'); return; }
   mmPrev = null;
   document.getElementById('mmSub').innerHTML = `Se enviará a <b>${seleccion.size}</b> contacto${seleccion.size === 1 ? '' : 's'} seleccionado${seleccion.size === 1 ? '' : 's'}, cada uno con su nombre. Solo plantillas aprobadas por Meta.`;
@@ -679,12 +680,29 @@ function abrirMasivo(){
   mmAcciones('prev');
   document.getElementById('overlayMasivo').classList.add('open');
 }
+// Si hay una ruta elegida en el filtro, la plantilla ya sabe origen y destino: no se vuelven a pedir.
+let mmInvertir = false;
+function rutaDelFiltro(){
+  if (filtroRuta === 'todas' || filtroRuta === '__sin') return null;
+  const desde = filtroRuta.match(/^(?:desde|salidas? de|sale de)\s+(.+)$/i);
+  if (desde) return { origen: desde[1].trim(), destino: null };
+  const par = filtroRuta.split(/\s*(?:<->|->|→|↔|–|—|-)\s*/).map(x => x.trim()).filter(Boolean);
+  if (par.length === 2) return mmInvertir ? { origen: par[1], destino: par[0] } : { origen: par[0], destino: par[1] };
+  return null;
+}
+const esOrigen = c => /^origen/i.test(c.label), esDestino = c => /^destino/i.test(c.label);
+function mmInvertirSentido(v){ mmInvertir = !!v; mmCampos(); }
 function mmCampos(){
   const p = plantillasCache.find(x => x.sid === document.getElementById('mmPlantilla').value);
-  const extra = (p?.campos || []).filter(c => !/^nombre/i.test(c.label));
+  const rf = rutaDelFiltro();
+  const tieneOD = (p?.campos || []).some(esOrigen) && (p?.campos || []).some(esDestino);
+  const extra = (p?.campos || []).filter(c => !/^nombre/i.test(c.label) && !(rf && esOrigen(c)) && !(rf && rf.destino && esDestino(c)));
   document.getElementById('mmCampos').innerHTML = extra.length
     ? `<div class="frow frow2">${extra.map(c => `<div><label>${esc(c.label)}</label><input data-k="${c.key}" placeholder="${esc(c.label)}" oninput="mmPrev=null;mmAcciones('prev')"></div>`).join('')}</div>`
     : '<div class="help" style="margin-bottom:10px">Esta plantilla solo lleva el nombre: se llena sola para cada contacto.</div>';
+  if (rf && tieneOD) {
+    document.getElementById('mmCampos').insertAdjacentHTML('afterbegin', `<div class="mm-box" style="margin:0 0 12px"><div style="font-size:12px;color:var(--tx3)">Ruta tomada del filtro</div><b>${esc(rf.origen)} → ${esc(rf.destino || '(falta el destino)')}</b>${rf.destino ? `<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12.5px;font-weight:500;cursor:pointer"><input type="checkbox" style="width:auto;flex-shrink:0" ${mmInvertir ? "checked" : ""} onchange="mmInvertirSentido(this.checked)"> Invertir el sentido (${esc(rf.destino)} → ${esc(rf.origen)})</label>` : ''}</div>`);
+  }
   mmPrev = null; document.getElementById('mmResultado').innerHTML = ''; mmAcciones('prev');
 }
 function mmAcciones(modo){
@@ -695,6 +713,11 @@ function mmAcciones(modo){
 }
 function mmPayload(){
   const variables = {}; document.querySelectorAll('#mmCampos input[data-k]').forEach(i => { variables[i.dataset.k] = i.value.trim(); });
+  const rf = rutaDelFiltro();
+  if (rf) {
+    const p = plantillasCache.find(x => x.sid === document.getElementById('mmPlantilla').value);
+    for (const c of p?.campos || []) { if (esOrigen(c)) variables[c.key] = rf.origen; else if (rf.destino && esDestino(c)) variables[c.key] = rf.destino; }
+  }
   return { agente: activeAgent.toLowerCase(), ids: [...seleccion], contentSid: document.getElementById('mmPlantilla').value, variables, modoNombre: document.getElementById('mmModo').value };
 }
 async function mmPrevisualizar(){
