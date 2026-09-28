@@ -84,7 +84,9 @@ function lineaHitos(c) {
     ? `<div class="line"><b>Operador:</b> ${esc(c.operador.nombre || '—')} · <b>Placas:</b> ${esc(c.operador.placas || '—')} · <b>Tel.:</b> ${esc(c.operador.telefono || '—')}</div>`
     : '<div class="line" style="color:var(--warn)">Aún sin datos del operador y la unidad.</div>';
   const ret = (c.retrasos || []).length ? `<div class="line" style="color:var(--crit)"><b>Retrasos:</b> ${c.retrasos.map(r => esc(r.detalle || 'sin detalle') + ' (' + hora(r.en) + ')').join(' · ')}</div>` : '';
-  return `<div class="hitos">${chips}</div>${op}${ret}`;
+  const ck = c.checklist_estado || [];
+  const ckHtml = ck.length ? `<div class="line" style="margin-top:14px"><b>Checklist de carga:</b> ${ck.filter(i => i.recibido).length}/${ck.length}${ck.every(i => i.recibido) ? ' — <span style="color:var(--ok);font-weight:700">completo, listo para autorizar la carga</span>' : ''}</div><div class="hitos" style="margin-top:8px">${ck.map(i => `<span class="hito ${i.recibido ? 'ok' : ''}" title="${esc(i.label)}${i.detalle ? ' — ' + esc(i.detalle) : ''}">${esc(i.label.split(' (')[0])}</span>`).join('')}</div>` : '';
+  return `<div class="hitos">${chips}</div>${ckHtml}${op}${ret}`;
 }
 
 async function api(url, opt) { const r = await fetch(url, { credentials:'include', ...opt }); const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status)); return d; }

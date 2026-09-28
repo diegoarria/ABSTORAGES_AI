@@ -137,6 +137,19 @@ function procesarSenales({ telefono, nombre, respuesta }) {
       }
     }
 
+    // Checklist de control de calidad antes de cargar: SOFIA marca cada punto cuando el proveedor manda la evidencia
+    const ck = json(respuesta, 'CHECKLIST_CARGA');
+    if (ck && colocaciones.CHECKLIST.some(i => i.clave === ck.item)) {
+      const c = servicioActivo();
+      if (c) {
+        colocaciones.marcarChecklist(c.folio, ck.item, ck.detalle);
+        const est = colocaciones.estadoChecklist(colocaciones.obtener(c.folio));
+        const item = est.find(i => i.clave === ck.item);
+        feed({ tipo: 'CHECKLIST', mensaje: `Folio ${c.folio}: ${quien} mandó ${item.label.toLowerCase()} (${est.filter(i => i.recibido).length}/${est.length} del checklist)` });
+        if (est.every(i => i.recibido)) push({ title: `Checklist completo — folio ${c.folio}`, body: `${quien} mandó todas las evidencias de la unidad. Ya puedes autorizar la carga.`, tag: 'checklist-' + c.folio, url: '/colocaciones.html', tipo: 'CHECKLIST' });
+      }
+    }
+
     // Datos del operador y la unidad — se guardan solo para el equipo, nunca se repiten
     const op = json(respuesta, 'OPERADOR_UNIDAD');
     if (op && (op.operador || op.placas || op.telefono)) {
@@ -297,6 +310,10 @@ const CHEQUEOS = [
   { clave: 'previo',  hito: 'unidad_confirmada', etiqueta: 'confirmación de unidad y operador',
     cuando: c => Math.max(citaCarga(c).getTime() - 12 * H, new Date(c.colocadoEn).getTime() + H),
     texto: 'confirma por favor la unidad y el operador que va a cargar (nombre del operador, placas y su teléfono)' },
+  { clave: 'evidencias', hito: 'cargado', etiqueta: 'evidencias de la unidad (checklist de carga)',
+    omitir: c => colocaciones.checklistCompleto(c),
+    cuando: c => citaCarga(c).getTime() - 3 * H,
+    texto: 'cuando llegue la unidad a carga mándame por aquí las fotos o video de la unidad, el video de las llantas, la foto del GPS activo, el equipo de seguridad del operador y la bitácora de mantenimiento' },
   { clave: 'carga',   hito: 'cargado', etiqueta: 'llegada y salida de carga',
     cuando: c => citaCarga(c).getTime() + 2 * H,
     texto: 'confirma por favor si la unidad ya llegó a carga y ya salió' },
@@ -313,7 +330,7 @@ function tickSeguimiento(c) {
   if (colocaciones.hitoAlcanzado(c, 'entregado')) return;
   const ahora = Date.now();
   for (const k of CHEQUEOS) {
-    if (colocaciones.hitoAlcanzado(c, k.hito)) continue;
+    if (colocaciones.hitoAlcanzado(c, k.hito) || (k.omitir && k.omitir(c))) continue;
     const enviado = c.chequeos?.[k.clave];
     if (!enviado) {
       const cuando = k.cuando(c);
@@ -331,13 +348,35 @@ function tickSeguimiento(c) {
   }
 }
 
+// Aviso urgente si se acerca la hora de carga y el checklist sigue incompleto
+function tickChecklist(c) {
+  if (c.estado !== 'colocado' || colocaciones.hitoAlcanzado(c, 'cargado') || colocaciones.checklistCompleto(c)) return;
+  const cita = citaCarga(c).getTime();
+  const faltan = colocaciones.estadoChecklist(c).filter(i => !i.recibido);
+  for (const [clave, umbral, texto] of [['ckl2h', cita - 2 * H, 'faltan menos de 2 horas para la carga'], ['cklHora', cita, 'ya es la hora de la carga']]) {
+    if (Date.now() < umbral || c.alertasSeg?.[clave]) continue;
+    colocaciones.marcarAlertaSeg(c.folio, clave);
+    feed({ tipo: 'CHECKLIST', mensaje: `Folio ${c.folio}: ${texto} y faltan ${faltan.length} punto(s) del checklist: ${faltan.map(i => i.clave).join(', ')}` });
+    push({ title: `Checklist incompleto — folio ${c.folio}`, body: `${texto}. Faltan: ${faltan.map(i => i.label).join('; ')}.`, tag: 'ckl-' + c.folio + clave, url: '/colocaciones.html', tipo: 'CHECKLIST', urgente: true });
+  }
+}
+
+// Texto para la instrucción de SOFIA cuando habla con el proveedor de un servicio ya colocado
+function bloqueChecklist(telefono) {
+  const c = colocaciones.todas().filter(x => x.estado === 'colocado' && x.ganador && colocaciones.tel10(x.ganador.tel) === colocaciones.tel10(telefono) && !colocaciones.hitoAlcanzado(x, 'cargado'))
+    .sort((a, b) => new Date(b.colocadoEn) - new Date(a.colocadoEn))[0];
+  if (!c) return '';
+  const est = colocaciones.estadoChecklist(c);
+  return `\n\n---\n## CHECKLIST DE CARGA DEL FOLIO ${c.folio} (estado actual)\nYa recibidos: ${est.filter(i => i.recibido).map(i => i.clave).join(', ') || 'ninguno'}.\nPendientes: ${est.filter(i => !i.recibido).map(i => `${i.clave} (${i.label})`).join('; ') || 'ninguno — checklist completo'}.\nPide solo lo pendiente. Marca cada punto con la señal CHECKLIST_CARGA únicamente cuando el proveedor u operador ya mandó esa evidencia real.\n---\n`;
+}
+
 function tick() {
   if (agentPause.estaPausado('sofia')) return;
   try { tickDisponibilidades(); } catch (e) { console.error('[sofiaOperacion] Error en disponibilidades:', e.message); }
   for (const c of colocaciones.todas()) {
     try {
       if (c.estado === 'buscando') tickBusqueda(c);
-      else if (c.estado === 'colocado') tickSeguimiento(c);
+      else if (c.estado === 'colocado') { tickSeguimiento(c); tickChecklist(c); }
     } catch (e) { console.error('[sofiaOperacion] Error en tick de', c.folio, e.message); }
   }
 }
@@ -348,4 +387,4 @@ function iniciar({ sendPush: sp } = {}) {
   console.log(`[sofiaOperacion] Activo — escalera de ${OLA_TAM}, horario ${horario.INICIO}:00–${horario.FIN}:00`);
 }
 
-module.exports = { iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, tick };
+module.exports = { bloqueChecklist, iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, tick };

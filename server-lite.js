@@ -230,6 +230,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/OPERADOR_UNIDAD\s*:[\s\S]*$/gi, '')
     .replace(/RECLAMO_PAGO\s*:[\s\S]*$/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA\s*:[\s\S]*$/gi, '')
+    .replace(/CHECKLIST_CARGA\s*:[\s\S]*$/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
@@ -544,6 +545,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       // Proveedor o cliente: solo el folio en el que participa
       const foliosPersona = [...folioContexto.foliosPorTelefono(phone), ...(agente === 'sofia' ? colocaciones.porTelefono(phone, false).map(c => c.folio) : [])];
       if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
+      if (agente === 'sofia') systemPrompt += sofiaOperacion.bloqueChecklist(phone);
       // No es equipo interno — ¿ya es un contacto conocido (proveedor/cliente
       // con quien ya se cerró algo antes)? Si sí, se le da continuidad real.
       const contactoConocido = await contactos.buscarPorTelefono(phone, agente);
@@ -1998,7 +2000,7 @@ app.put('/api/contactos/:id/unidades', soloAdmin, async (req, res) => {
 // ─── Colocaciones de SOFIA: ofertas, aprobación, ranking, sugerencias, KPIs ───
 app.get('/api/colocaciones', adminUOps, (req, res) => {
   const lista = colocaciones.todas().sort((a, b) => new Date(b.creada) - new Date(a.creada)).slice(0, 100)
-    .map(c => ({ ...c, comparativo: colocaciones.comparativo(c) }));
+    .map(c => ({ ...c, comparativo: colocaciones.comparativo(c), checklist_estado: c.estado === 'colocado' ? colocaciones.estadoChecklist(c) : [] }));
   res.json(lista);
 });
 app.post('/api/colocaciones/:folio/aprobar', soloAdmin, async (req, res) => {
@@ -3514,7 +3516,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'SUGERENCIA_PROVEEDOR:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'CHECKLIST_CARGA:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3531,6 +3533,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/OPERADOR_UNIDAD:\s*\{[\s\S]*?\}/gi, '')
     .replace(/RECLAMO_PAGO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/CHECKLIST_CARGA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')

@@ -117,7 +117,7 @@ function asignar(folio, { tel, nombre, precio, aprobadoPor }) {
   c.ganador = { tel: tel || null, nombre: nombre || p?.nombre || 'Proveedor', precio: precio ?? p?.oferta?.precio ?? null, aprobadoPor: aprobadoPor || null, en: ahora() };
   c.estado = 'colocado'; c.colocadoEn = ahora(); c.pendientes = [];
   c.seguimiento = { estado: 'asignado' };
-  c.hitos = { asignado: { en: ahora(), detalle: null } }; c.chequeos = {}; c.alertasSeg = {}; c.retrasos = [];
+  c.hitos = { asignado: { en: ahora(), detalle: null } }; c.chequeos = {}; c.alertasSeg = {}; c.retrasos = []; c.checklist = {};
   guardar();
   return c;
 }
@@ -137,6 +137,26 @@ function marcarHito(folio, hito, detalle) {
   c.seguimiento = { ...c.seguimiento, estado: hito, actualizadoEn: ahora() };
   guardar(); return c;
 }
+// ── Checklist de control de calidad para autorizar la carga ─────────────────
+const CHECKLIST = [
+  { clave: 'unidad',    label: 'Fotos o video de la unidad (interior y exterior)' },
+  { clave: 'llantas',   label: 'Video del estado de las llantas' },
+  { clave: 'gps',       label: 'Foto del GPS activo (pantalla encendida con señal)' },
+  { clave: 'seguridad', label: 'Equipo de seguridad (casco, chaleco, zapatos)' },
+  { clave: 'bitacora',  label: 'Bitácora de mantenimiento' },
+];
+function estadoChecklist(c) {
+  const rec = c.checklist || {};
+  return CHECKLIST.map(i => ({ ...i, recibido: !!rec[i.clave], en: rec[i.clave]?.en || null, detalle: rec[i.clave]?.detalle || null }));
+}
+const checklistCompleto = c => estadoChecklist(c).every(i => i.recibido);
+function marcarChecklist(folio, clave, detalle) {
+  const c = obtener(folio); if (!c || !CHECKLIST.some(i => i.clave === clave)) return null;
+  c.checklist = c.checklist || {};
+  if (!c.checklist[clave]) c.checklist[clave] = { en: ahora(), detalle: detalle ? String(detalle).slice(0, 160) : null };
+  guardar(); return c;
+}
+
 function registrarRetraso(folio, detalle) {
   const c = obtener(folio); if (!c) return null;
   (c.retrasos = c.retrasos || []).push({ en: ahora(), detalle: detalle ? String(detalle).slice(0, 200) : null });
@@ -254,6 +274,7 @@ function kpiGuardar(parche) { db.kpi = { ...db.kpi, ...parche }; guardar(); }
 
 module.exports = {
   fechaMTY, tel10, crear, obtener, todas, abiertas, marcarContactado, porTelefono, registrarRespuesta, registrarOferta, registrarOfertaVapi,
+  CHECKLIST, estadoChecklist, checklistCompleto, marcarChecklist,
   HITOS, hitoAlcanzado, marcarHito, registrarRetraso, guardarOperador, marcarChequeo, marcarAlertaSeg,
   asignar, cambiarEstado, marcarAviso, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
   agregarDisponibilidad, disponibilidades, actualizarDisponibilidad,
