@@ -3,6 +3,39 @@
 //  1) aplica el tema guardado ANTES de pintar (sin parpadeo)
 //  2) al cargar el DOM, inserta la barra de navegación al inicio del body
 (function () {
+  // ── Rol "lector" — solo lectura en toda la plataforma ──────────────────────
+  // El candado real vive en el servidor (server-lite.js); esto es para que la
+  // interfaz no muestre botones que de todas formas el servidor rechazaría.
+  // Corre siempre, esté o no la barra de navegación (el portal usa data-no-bar).
+  function esBoton(el) { return el.tagName === 'BUTTON' || (el.tagName === 'INPUT' && ['checkbox', 'file'].includes(el.type)); }
+  function enNav(el) { return !!el.closest('.abs-nav, .appnav, .abs-theme, .header-nav-links, #theme-toggle'); }
+  function bloquear(raiz) {
+    (raiz.matches && esBoton(raiz) ? [raiz] : []).concat([...raiz.querySelectorAll('button, input[type="checkbox"], input[type="file"]')]).forEach(el => {
+      if (enNav(el) || el.dataset.lectorOk) return;
+      el.disabled = true;
+      el.setAttribute('aria-disabled', 'true');
+      el.title = 'Acceso de solo lectura';
+    });
+  }
+  function activarModoLector() {
+    document.documentElement.setAttribute('data-lector', '1');
+    function conCuerpo(fn) {
+      if (document.body) return fn();
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    }
+    conCuerpo(function () {
+      var banner = document.createElement('div');
+      banner.id = 'abs-lector-banner';
+      banner.textContent = 'Acceso de solo lectura — puedes ver todo, pero no puedes enviar mensajes, llamar, aprobar ni hacer cambios.';
+      document.body.insertBefore(banner, document.body.firstChild);
+      bloquear(document);
+      new MutationObserver(function () { bloquear(document); }).observe(document.body, { childList: true, subtree: true });
+    });
+  }
+  fetch('/api/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (me) { if (me && me.role === 'lector') activarModoLector(); }).catch(function () {});
+
+
   var KEY = 'abs-theme';
   var root = document.documentElement;
   var saved = null;

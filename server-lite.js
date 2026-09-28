@@ -1592,6 +1592,20 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 app.use(auth);
+
+// ── Rol "lector" — acceso a toda la plataforma, pero SOLO de lectura ────────
+// Candado real en el servidor, no solo en la pantalla: bloquea cualquier
+// método que escriba o dispare una acción (POST/PUT/PATCH/DELETE), sin
+// importar si esa ruta en particular tiene su propio soloAdmin/adminUOps o
+// no. Se necesitó porque varias rutas (chat de los agentes, GPS, etc.) no
+// tenían ningún candado de rol — con este usuario nunca ejecuta nada real.
+app.use((req, res, next) => {
+  if (req.user?.role === 'lector' && !['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    return res.status(403).json({ error: 'Tu acceso es solo de lectura — puedes ver todo, pero no puedes ejecutar ninguna acción.' });
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 app.get('/api/me', (req, res) => {
@@ -3284,7 +3298,7 @@ function soloAdmin(req, res, next) {
   res.status(403).json({ error: 'Acceso restringido' });
 }
 function adminUOps(req, res, next) {
-  if (req.user?.role === 'admin' || req.user?.role === 'operaciones') return next();
+  if (['admin', 'operaciones', 'lector'].includes(req.user?.role)) return next();
   res.status(403).json({ error: 'Acceso restringido' });
 }
 // ─── APAGADO DE EMERGENCIA — switch manual, sin necesitar redeploy ──────────
