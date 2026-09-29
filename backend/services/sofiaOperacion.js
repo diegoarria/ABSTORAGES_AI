@@ -234,6 +234,16 @@ function tickDisponibilidades() {
   }
 }
 
+// ── El equipo avisa que ya consiguió unidad por su cuenta ───────────────────
+function detenerBusquedaPorEquipo(folio, quien) {
+  const antes = colocaciones.obtener(folio);
+  if (!antes) return { ok: false, motivo: 'no_existe' };
+  if (antes.estado !== 'buscando') return { ok: false, motivo: 'no_estaba_buscando', estado: antes.estado };
+  colocaciones.detenerBusqueda(folio, `${quien || 'el equipo'} avisó que ya consiguieron unidad`);
+  feed({ tipo: 'BUSQUEDA_DETENIDA', mensaje: `Folio ${folio}: ${quien || 'el equipo'} avisó que ya consiguieron unidad por su cuenta — SOFIA dejó de contactar proveedores y no manda más plantillas para este folio` });
+  return { ok: true };
+}
+
 // ── Aprobación humana → SOFIA cierra ────────────────────────────────────────
 async function aprobar(folio, { tel, manual, precio, aprobadoPor }) {
   const c = colocaciones.obtener(folio);
@@ -413,4 +423,4 @@ function iniciar({ sendPush: sp } = {}) {
   console.log(`[sofiaOperacion] Activo — escalera de ${OLA_TAM}, horario ${horario.INICIO}:00–${horario.FIN}:00`);
 }
 
-module.exports = { bloqueChecklist, iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, tick };
+module.exports = { detenerBusquedaPorEquipo, bloqueChecklist, iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, tick };

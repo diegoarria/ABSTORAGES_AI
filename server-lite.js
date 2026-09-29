@@ -232,6 +232,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/DISPONIBILIDAD_FUTURA\s*:[\s\S]*$/gi, '')
     .replace(/CHECKLIST_CARGA\s*:[\s\S]*$/gi, '')
     .replace(/REVISION_PENDIENTE\s*:[\s\S]*$/gi, '')
+    .replace(/DETENER_BUSQUEDA\s*:[\s\S]*$/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
@@ -678,6 +679,16 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const textoLimpio = (agente === 'sofia' && !personaEquipo) ? (textoSalida.replace(MULETILLA, '').replace(/\s{2,}/g, ' ').trim() || textoSalida) : textoSalida;
     const bloques = splitForWhatsApp(textoLimpio);
     for (const bloque of bloques) await sendWhatsApp(phone, bloque, agente);
+
+    // El equipo (número verificado) avisa que ya consiguió unidad por su cuenta
+    // para un folio — se detiene toda búsqueda activa de proveedores para ese folio.
+    if (agente === 'sofia' && personaEquipo) {
+      const dm = respuesta.match(/DETENER_BUSQUEDA\s*:\s*(\{[^\n]+\})/i);
+      if (dm) {
+        let d = {}; try { d = JSON.parse(dm[1]); } catch {}
+        if (d.folio) sofiaOperacion.detenerBusquedaPorEquipo(String(d.folio).toUpperCase(), personaEquipo.nombre);
+      }
+    }
 
     // ── Monitoreo en vivo: conversación, respuesta de proveedor y resultado ──
     if ((agente === 'sofia' || agente === 'sara') && !personaEquipo) {
@@ -3551,7 +3562,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'SUGERENCIA_PROVEEDOR:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'DETENER_BUSQUEDA:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3570,6 +3581,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/DISPONIBILIDAD_FUTURA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CHECKLIST_CARGA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/REVISION_PENDIENTE:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/DETENER_BUSQUEDA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')

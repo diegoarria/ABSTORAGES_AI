@@ -171,6 +171,21 @@ function guardarOperador(folio, { nombre, placas, telefono }) {
 function marcarChequeo(folio, clave) { const c = obtener(folio); if (!c) return; (c.chequeos = c.chequeos || {})[clave] = ahora(); guardar(); }
 function marcarAlertaSeg(folio, clave) { const c = obtener(folio); if (!c) return; (c.alertasSeg = c.alertasSeg || {})[clave] = ahora(); guardar(); }
 
+// El equipo consiguió unidad por su cuenta, fuera del sistema — se detiene la
+// búsqueda activa: no se contacta a más proveedores ni se manda ninguna
+// plantilla más para este folio. Distinto de "sin_unidad" (nadie tenía
+// disponibilidad): aquí SÍ se resolvió, solo que no fue por este medio.
+function detenerBusqueda(folio, motivo) {
+  const c = obtener(folio); if (!c) return null;
+  if (c.estado !== 'buscando') return c; // ya no estaba en búsqueda activa — nada que detener
+  c.estado = 'detenido_equipo';
+  c.pendientes = [];
+  c.motivoDetenido = motivo || null;
+  c.detenidoEn = ahora();
+  guardar();
+  return c;
+}
+
 function cambiarEstado(folio, estado) { const c = obtener(folio); if (!c) return null; c.estado = estado; guardar(); return c; }
 function marcarAviso(folio, clave) { const c = obtener(folio); if (!c) return; c.avisos[clave] = ahora(); guardar(); }
 function actualizarSeguimiento(folio, parche) {
@@ -276,7 +291,7 @@ module.exports = {
   fechaMTY, tel10, crear, obtener, todas, abiertas, marcarContactado, porTelefono, registrarRespuesta, registrarOferta, registrarOfertaVapi,
   CHECKLIST, estadoChecklist, checklistCompleto, marcarChecklist,
   HITOS, hitoAlcanzado, marcarHito, registrarRetraso, guardarOperador, marcarChequeo, marcarAlertaSeg,
-  asignar, cambiarEstado, marcarAviso, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
+  detenerBusqueda, asignar, cambiarEstado, marcarAviso, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
   agregarDisponibilidad, disponibilidades, actualizarDisponibilidad,
   agregarSugerencia, sugerencias, resolverSugerencia, kpiBase, kpiMeta, kpiGuardar,
 };
