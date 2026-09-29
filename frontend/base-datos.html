@@ -797,11 +797,13 @@ async function mmEnviar(){
     const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
     mmAcciones('fin');
     const pintar = t => {
-      const hecho = t.enviados + t.fallidos.length + (t.omitidosPorTope || 0);
-      out.innerHTML = `<div class="mm-box"><div><b>${t.enviados}</b> enviados de ${t.total}${t.fallidos.length ? ` · <b>${t.fallidos.length}</b> con error` : ''}${t.terminado ? ' · <b>terminado</b>' : ' · enviando…'}</div>
+      const dup = t.duplicados || [];
+      const hecho = t.enviados + t.fallidos.length + dup.length + (t.omitidosPorTope || 0);
+      out.innerHTML = `<div class="mm-box"><div><b>${t.enviados}</b> enviados de ${t.total}${t.fallidos.length ? ` · <b>${t.fallidos.length}</b> con error` : ''}${dup.length ? ` · <b>${dup.length}</b> ya la habían recibido hace poco (se saltaron)` : ''}${t.terminado ? ' · <b>terminado</b>' : ' · enviando…'}</div>
         <div class="mm-prog"><div style="width:${Math.min(100, Math.round(hecho / Math.max(1, t.total) * 100))}%"></div></div>
         ${t.detenidoPor ? `<div class="mm-warn">Se detuvo porque ${esc(t.detenidoPor)}. Quedaron ${t.omitidosPorTope} sin enviar.</div>` : ''}
-        ${t.fallidos.length ? `<div class="mm-omit">${t.fallidos.map(f => `${esc(f.nombre)} — ${esc(f.error)}`).join('<br>')}</div>` : ''}</div>`;
+        ${t.fallidos.length ? `<div class="mm-omit">${t.fallidos.map(f => `${esc(f.nombre)} — ${esc(f.error)}`).join('<br>')}</div>` : ''}
+        ${dup.length ? `<div class="mm-omit">Ya la tenían: ${dup.map(esc).join(', ')}</div>` : ''}</div>`;
     };
     clearInterval(mmPoll);
     mmPoll = setInterval(async () => {

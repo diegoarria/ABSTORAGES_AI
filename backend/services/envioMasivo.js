@@ -92,7 +92,7 @@ async function iniciar({ agente, ids, contentSid, variables, modoNombre, confirm
   const plantilla = plantillas.buscarPlantilla(agente, contentSid);
   const lista = (await cargarContactos(ids)).filter(c => !motivoOmision(c, agente, contentSid));
   const id = 'EM-' + Date.now().toString(36).toUpperCase();
-  const t = { id, plantilla: plantilla.nombre, total: lista.length, enviados: 0, fallidos: [], omitidosPorTope: 0, terminado: false, inicio: new Date().toISOString(), por: por || null };
+  const t = { id, plantilla: plantilla.nombre, total: lista.length, enviados: 0, fallidos: [], duplicados: [], omitidosPorTope: 0, terminado: false, inicio: new Date().toISOString(), por: por || null };
   trabajos.set(id, t);
   actividadBus.emitir({ agente: agente.toUpperCase(), tipo: 'CONTACTO_SALIENTE', mensaje: `Envío masivo iniciado por ${por || 'el equipo'}: plantilla "${plantilla.nombre}" a ${lista.length} contactos` });
 
@@ -102,8 +102,9 @@ async function iniciar({ agente, ids, contentSid, variables, modoNombre, confirm
       const v = armarVariables(plantilla, c, variables, modoNombre);
       try {
         const r = await whatsapp.enviarPlantilla(agente, c.telefono, contentSid, v);
-        if (r?.status === 'rate_limited') { t.omitidosPorTope = lista.length - t.enviados - t.fallidos.length; t.detenidoPor = 'se alcanzó el tope diario de mensajes'; break; }
-        if (r?.status === 'paused') { t.detenidoPor = 'el agente fue pausado'; t.omitidosPorTope = lista.length - t.enviados - t.fallidos.length; break; }
+        if (r?.status === 'rate_limited') { t.omitidosPorTope = lista.length - t.enviados - t.fallidos.length - t.duplicados.length; t.detenidoPor = 'se alcanzó el tope diario de mensajes'; break; }
+        if (r?.status === 'paused') { t.detenidoPor = 'el agente fue pausado'; t.omitidosPorTope = lista.length - t.enviados - t.fallidos.length - t.duplicados.length; break; }
+        if (r?.status === 'duplicado') { t.duplicados.push(c.nombre_completo); continue; } // ya le mandaron esta plantilla hace poco por otra vía — no se cuenta como error, se salta
         t.enviados++;
         enviadasHoy.set(`${c.id}|${contentSid}|${fechaMTY()}`, true);
         whatsapp.registrarEnMemoria(agente, c.telefono, textoDe(plantilla, v));
