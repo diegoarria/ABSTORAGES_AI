@@ -862,7 +862,8 @@ async function enviarPlantilla(contactoId){
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
-    msg.textContent = '✅ Enviado'; msg.className = 'tpl-msg ok';
+    msg.textContent = data.yaSeHabiaEnviado ? '✅ Enviado — ya se le había mandado esta plantilla antes; SOFIA no la iba a repetir sola, pero como la pediste a mano, se envió.' : '✅ Enviado';
+    msg.className = 'tpl-msg ok';
     await renderDetail();
   } catch (e) {
     msg.textContent = '❌ ' + e.message; msg.className = 'tpl-msg err';

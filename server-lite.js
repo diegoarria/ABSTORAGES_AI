@@ -2087,6 +2087,11 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
       return res.status(403).json({ error: 'Esa plantilla no está aprobada para este agente — no se puede enviar.' });
     }
 
+    // Ya se le había mandado esta plantilla antes por algún camino — aquí SÍ se
+    // permite repetirla, porque este botón es exactamente "el equipo la pide a
+    // mano". Solo se avisa, para que quien la manda lo sepa.
+    const yaSeHabiaEnviado = whatsappProactivo.yaSeEnvio(agente, contacto.telefono, contentSid);
+
     const from = WA_NUMBERS[agente] || TWILIO_WA_FROM;
     if (!TWILIO_SID || !TWILIO_TOKEN || !from) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
     const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
@@ -2119,8 +2124,11 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
       resumen_interaccion: `Plantilla "${plantilla.nombre}" enviada manualmente desde Base de Datos`,
       canal: 'whatsapp-plantilla',
     });
+    // Queda registrada en el mismo candado que usa el envío automático — así
+    // SOFIA/SARA/NOA nunca la repiten por su cuenta después de esta.
+    whatsappProactivo.marcarComoEnviada(agente, contacto.telefono, contentSid);
 
-    res.json({ ok: true, twilio: JSON.parse(resp) });
+    res.json({ ok: true, twilio: JSON.parse(resp), yaSeHabiaEnviado });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

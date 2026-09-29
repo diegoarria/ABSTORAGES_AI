@@ -75,35 +75,38 @@ function telefonoValido(t) {
   return t && t !== '—' && /\d{8,}/.test(String(t));
 }
 
-// ── Candado contra plantillas repetidas al mismo número ─────────────────────
-// Encontrado el 29-sep-2026: varios caminos independientes pueden intentar
-// mandarle una plantilla a la misma persona (escalera por olas, recordatorio,
-// seguimiento de "reviso", requerimientos nuevos que la vuelven a elegir,
-// órdenes manuales) — cada uno cree que es el primer mensaje. Este candado
-// vive en el punto más bajo por el que TODO envío de plantilla pasa, así que
-// protege sin importar qué parte del sistema lo dispare. Memoria + disco,
-// mismo patrón que outboundRateLimit.js — sobrevive un redeploy.
-const COOLDOWN_MS = Number(process.env.TWILIO_PLANTILLA_COOLDOWN_MIN || 90) * 60 * 1000;
-const COOLDOWN_FILE = path.join(__dirname, '../../data/plantilla-cooldown.json');
-let ultimoEnvio = {};
-try { if (fs.existsSync(COOLDOWN_FILE)) ultimoEnvio = JSON.parse(fs.readFileSync(COOLDOWN_FILE, 'utf8')); } catch (e) { console.error('[whatsappProactivo] No se pudo leer el candado de plantillas:', e.message); }
+// ── Candado contra plantillas repetidas al mismo número — PERMANENTE ───────
+// Pedido explícito del usuario (29-sep-2026): si una plantilla ya se le
+// mandó a un contacto, el sistema JAMÁS se la vuelve a mandar por su cuenta
+// — sin importar cuánto tiempo pase. Cubre TODOS los caminos automáticos
+// (escalera por olas, recordatorio, seguimiento de "reviso", requerimientos
+// nuevos que lo vuelven a elegir, la ronda diaria, avisos al equipo) porque
+// todos pasan por esta misma función. La ÚNICA forma de repetirla es que el
+// equipo la mande a propósito, a mano, desde Base de Datos con el botón
+// "Enviar plantilla" de un contacto — ese camino no pasa por aquí, manda
+// directo por Twilio (ver server-lite.js), así que nunca queda bloqueado.
+// Memoria + disco — mismo patrón que outboundRateLimit.js, sobrevive un redeploy.
+const CANDADO_FILE = path.join(__dirname, '../../data/plantilla-enviada.json');
+let plantillasEnviadas = {};
+try { if (fs.existsSync(CANDADO_FILE)) plantillasEnviadas = JSON.parse(fs.readFileSync(CANDADO_FILE, 'utf8')); } catch (e) { console.error('[whatsappProactivo] No se pudo leer el candado de plantillas:', e.message); }
 let guardarTimer = null;
-function guardarCooldown() {
+function guardarCandado() {
   clearTimeout(guardarTimer);
   guardarTimer = setTimeout(() => {
-    try { fs.mkdirSync(path.dirname(COOLDOWN_FILE), { recursive: true }); fs.writeFileSync(COOLDOWN_FILE, JSON.stringify(ultimoEnvio)); }
+    try { fs.mkdirSync(path.dirname(CANDADO_FILE), { recursive: true }); fs.writeFileSync(CANDADO_FILE, JSON.stringify(plantillasEnviadas)); }
     catch (e) { console.error('[whatsappProactivo] Error guardando el candado de plantillas:', e.message); }
   }, 300);
 }
-function claveCooldown(agente, to, contentSid) { return `${agente}|${(to || '').replace(/\D/g, '').slice(-10)}|${contentSid}`; }
+function claveCandado(agente, to, contentSid) { return `${agente}|${(to || '').replace(/\D/g, '').slice(-10)}|${contentSid}`; }
+function yaSeEnvio(agente, to, contentSid) { return !!plantillasEnviadas[claveCandado(agente, to, contentSid)]; }
+// Para que un envío hecho por fuera de esta función (el botón manual de Base de
+// Datos, que manda directo por Twilio) también quede registrado en el mismo candado.
+function marcarComoEnviada(agente, to, contentSid) { plantillasEnviadas[claveCandado(agente, to, contentSid)] = Date.now(); guardarCandado(); }
 
 async function enviarPlantilla(agente, to, contentSid, variables) {
-  const claveDup = claveCooldown(agente, to, contentSid);
-  const desde = ultimoEnvio[claveDup];
-  if (desde && Date.now() - desde < COOLDOWN_MS) {
-    const minRestantes = Math.ceil((COOLDOWN_MS - (Date.now() - desde)) / 60000);
-    console.warn(`[whatsappProactivo] 🔁 Plantilla repetida bloqueada — ${agente} ya le mandó esta misma plantilla a ${to} hace poco (faltan ${minRestantes} min para poder repetirla)`);
-    return { status: 'duplicado', to, minRestantes };
+  if (yaSeEnvio(agente, to, contentSid)) {
+    console.warn(`[whatsappProactivo] 🔁 Plantilla repetida bloqueada para siempre — ${agente} ya le mandó esta plantilla a ${to} antes. Solo se repite si el equipo la manda a mano desde Base de Datos.`);
+    return { status: 'duplicado', to };
   }
   if (agentPause.estaPausado(agente)) {
     console.warn(`[whatsappProactivo] ${agente?.toUpperCase()} pausado — se omite plantilla a ${to}`);
@@ -121,7 +124,7 @@ async function enviarPlantilla(agente, to, contentSid, variables) {
     console.log(`[whatsappProactivo STUB] ${agente} → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
     return { status: 'stub', to };
   }
-  ultimoEnvio[claveDup] = Date.now(); guardarCooldown(); // se marca ANTES del fetch — dos envíos casi simultáneos no se cuelan los dos
+  marcarComoEnviada(agente, to, contentSid); // se marca ANTES del fetch — dos envíos casi simultáneos no se cuelan los dos
   const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
   const body = new URLSearchParams({
     From: `whatsapp:${from}`,
@@ -244,4 +247,4 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   return resultado;
 }
 
-module.exports = { enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
+module.exports = { yaSeEnvio, marcarComoEnviada, enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
