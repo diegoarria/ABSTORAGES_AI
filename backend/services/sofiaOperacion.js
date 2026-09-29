@@ -23,6 +23,7 @@ const notifier = require('./notifier');
 const OLA_TAM         = Number(process.env.SOFIA_ESCALERA_TAMANO || 3);
 const ESPERA_OLA_MIN  = Number(process.env.SOFIA_ESCALERA_ESPERA_MIN || 20);
 const RECORD_MIN      = Number(process.env.SOFIA_RECORDATORIO_MIN || 45);
+const REVISION_MIN    = Number(process.env.SOFIA_SEGUIMIENTO_REVISION_MIN || 75); // cuánto esperar tras un "déjame reviso" antes de preguntar de nuevo, con tono amable
 const SIN_RESP_MIN    = Number(process.env.SOFIA_SIN_RESPUESTA_MIN || 90);
 const AVISO_OFERTA_MIN = Number(process.env.SOFIA_AVISO_OFERTA_MIN || 30);
 const SEG_HORAS       = Number(process.env.SOFIA_SEGUIMIENTO_HORAS || 24);   // si no hay fecha de carga legible
@@ -166,6 +167,20 @@ function procesarSenales({ telefono, nombre, respuesta }) {
       if (d) feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible el ${textoFecha(d.fecha)}${d.ruta ? ' (' + d.ruta + ')' : ''} — SOFIA le escribirá ese día para confirmar`, metadata: { id: d.id } });
     }
 
+    const rv = json(respuesta, 'REVISION_PENDIENTE');
+    if (rv) {
+      const c = colocaciones.todas().find(x => x.estado === 'buscando' && x.proveedores[colocaciones.tel10(telefono)]);
+      if (c) {
+        const p = c.proveedores[colocaciones.tel10(telefono)];
+        if (!['acepto', 'rechazo'].includes(p.estado)) {
+          p.marcoRevisando = new Date().toISOString();
+          delete p.seguimientoRevisionEn;
+          colocaciones.guardarCambios();
+          feed({ tipo: 'OFERTA', mensaje: `Folio ${c.folio}: ${quien} va a checar disponibilidad — SOFIA le pregunta en un rato` });
+        }
+      }
+    }
+
     const rp = json(respuesta, 'RECLAMO_PAGO');
     if (rp) escalarReclamoPago({ telefono, nombre, resumen: rp.resumen });
 
@@ -271,11 +286,20 @@ function tickBusqueda(c) {
 
   const provs = Object.values(c.proveedores);
   for (const p of provs) {
+    // Dijo "déjame reviso" — un solo seguimiento amable, en vez del recordatorio genérico
+    if (p.marcoRevisando && !p.seguimientoRevisionEn && !['acepto', 'rechazo'].includes(p.estado) && minDesde(p.marcoRevisando) >= REVISION_MIN) {
+      p.seguimientoRevisionEn = new Date().toISOString(); colocaciones.guardarCambios();
+      whatsappProactivo.enviarSeguimientoRevision(p.nombre, p.tel, ruta(c)).catch(e => console.error('[sofiaOperacion] Error en seguimiento de revisión:', e.message));
+      feed({ tipo: 'OFERTA', mensaje: `Folio ${c.folio}: SOFIA le preguntó a ${p.nombre} si ya encontró algo` });
+      continue;
+    }
     if (p.estado !== 'esperando') continue;
     const edad = minDesde(p.contactadoEn);
     if (edad >= SIN_RESP_MIN) {
       p.estado = 'sin_respuesta'; colocaciones.guardarCambios();
       feed({ tipo: 'SIN_RESPUESTA', mensaje: `Folio ${c.folio}: ${p.nombre} no respondió` });
+    } else if (p.marcoRevisando) {
+      continue; // ya tiene su propio seguimiento amable — no se le manda el recordatorio genérico
     } else if (edad >= RECORD_MIN && !p.recordatorioEn) {
       p.recordatorioEn = new Date().toISOString(); colocaciones.guardarCambios();
       whatsappProactivo.preguntarDisponibilidad({ nombre: p.nombre, telefono: p.tel }, ordenDe(c)).catch(e => console.error('[sofiaOperacion] Error en recordatorio:', e.message));

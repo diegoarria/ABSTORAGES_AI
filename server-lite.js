@@ -231,6 +231,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/RECLAMO_PAGO\s*:[\s\S]*$/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA\s*:[\s\S]*$/gi, '')
     .replace(/CHECKLIST_CARGA\s*:[\s\S]*$/gi, '')
+    .replace(/REVISION_PENDIENTE\s*:[\s\S]*$/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
@@ -3542,7 +3543,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'CHECKLIST_CARGA:', 'SUGERENCIA_PROVEEDOR:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3560,6 +3561,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/RECLAMO_PAGO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CHECKLIST_CARGA:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/REVISION_PENDIENTE:\s*\{[\s\S]*?\}/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')

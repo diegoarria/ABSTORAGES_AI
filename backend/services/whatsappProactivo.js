@@ -67,6 +67,7 @@ const CONTENT_SID_AVISO_EQUIPO   = process.env.TWILIO_CONTENT_SID_AVISO_EQUIPO  
 const CONTENT_SID_ESTATUS_FOLIO  = process.env.TWILIO_CONTENT_SID_ESTATUS_FOLIO  || null;
 const CONTENT_SID_RECLAMO_PAGO   = process.env.TWILIO_CONTENT_SID_RECLAMO_PAGO   || null;
 const CONTENT_SID_SEGUIMIENTO_DISP = process.env.TWILIO_CONTENT_SID_SEGUIMIENTO_DISPONIBILIDAD || null;
+const CONTENT_SID_SEGUIMIENTO_REVISION = process.env.TWILIO_CONTENT_SID_SEGUIMIENTO_REVISION || null;
 
 function telefonoValido(t) {
   return t && t !== '—' && /\d{8,}/.test(String(t));
@@ -186,6 +187,18 @@ async function enviarSeguimientoDisponibilidad(nombre, telefono, fechaTexto, rut
   return r;
 }
 
+// ── 2d. Seguimiento cuando el proveedor dijo "déjame reviso" ────────────────
+// Plantilla sofia_seguimiento_revision: tono amable, sin presionar. Se manda
+// una sola vez, un rato después de que el proveedor dijo que iba a checar.
+async function enviarSeguimientoRevision(nombre, telefono, ruta) {
+  if (!CONTENT_SID_SEGUIMIENTO_REVISION) { console.warn('[whatsappProactivo] Plantilla de seguimiento de revisión aún no configurada — se omite'); return null; }
+  if (!telefonoValido(telefono)) return null;
+  const rutaTxt = ruta || 'la carga que platicamos';
+  const r = await enviarPlantilla('sofia', telefono, CONTENT_SID_SEGUIMIENTO_REVISION, { '1': nombre || 'ahí', '2': rutaTxt });
+  registrarEnMemoria('sofia', telefono, `Hola ${nombre || ''}, ¿cómo vas? Nomás para ver si ya pudiste checar si tienes unidad para ${rutaTxt}. Cualquier cosa me avisas por aquí, no hay bronca. — SOFIA, ABSTORAGES Logistics Solutions`);
+  return r;
+}
+
 // ── 3. Estatus de folio — SARA/SOFIA a cliente o proveedor ────────────────
 async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   if (!CONTENT_SID_ESTATUS_FOLIO) { console.warn('[whatsappProactivo] Plantilla de estatus de folio aún no aprobada — se omite'); return null; }
@@ -199,4 +212,4 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   return resultado;
 }
 
-module.exports = { enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
+module.exports = { enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };

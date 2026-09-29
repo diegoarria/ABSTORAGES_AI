@@ -126,6 +126,7 @@ const PATRONES = [
   /RECLAMO_PAGO\s*:/i,
   /DISPONIBILIDAD_FUTURA\s*:/i,
   /CHECKLIST_CARGA\s*:/i,
+  /REVISION_PENDIENTE\s*:/i,
   /SUGERENCIA_PROVEEDOR\s*:/i,
 
   // Base64 / codificación como vector para colar instrucciones
