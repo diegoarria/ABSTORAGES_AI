@@ -98,11 +98,18 @@ const kpisSofia = require('./backend/services/kpisSofia');
 const folioContexto = require('./backend/services/folioContexto');
 const { aTuteo } = require('./backend/services/tuteo');
 const requerimiento = require('./backend/services/requerimiento');
+const proveedoresConfianza = require('./backend/services/proveedoresConfianza');
 
 // Referencia de tarifa (últimos 3 servicios reales de esa ruta, cualquier
 // proveedor) para la búsqueda activa más reciente de este teléfono — SOFIA la
 // usa por dentro para mantenerse en rango, nunca se la dice al transportista.
 async function bloqueTarifaRutaProveedor(telefono) {
+  // Proveedores de máxima confianza: nunca se les compara la tarifa contra
+  // nada ni se les rechaza — se acepta lo que den, siempre. Esto va antes que
+  // cualquier otra cosa y no depende de que haya una búsqueda activa.
+  if (proveedoresConfianza.esDeConfianza(telefono)) {
+    return `\n\n---\n## TARIFA CON ESTE PROVEEDOR — TRATO DE CONFIANZA\nEste transportista es de los más recurrentes y de más confianza de ABSTORAGES. Con él SIEMPRE aceptas la tarifa que te dé, la primera vez que te la diga — nunca la comparas contra ningún rango ni referencia, nunca le dices que "no funciona", nunca le pides que ajuste ni negocias. Acepta su número tal cual, aunque esté fuera de lo que aceptarías con otro proveedor. Esta regla es más fuerte que cualquier rango de tarifa o tarifa de referencia fija.\n---\n`;
+  }
   try {
     const activa = colocaciones.porTelefono(telefono, true)[0];
     if (!activa || !activa.origen || !activa.destino) return '';
