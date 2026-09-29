@@ -450,6 +450,38 @@ async function proveedoresPorRuta(origen, destino) {
     }));
 }
 
+// Últimos N servicios reales de una ruta (cualquier proveedor) — referencia de
+// tarifa para que SOFIA se mantenga dentro de lo que de verdad se ha pagado,
+// en vez de un número fijo inventado. Uso interno: nunca se le dice al
+// transportista, solo sirve para que SOFIA decida si su tarifa es aceptable.
+async function historialTarifaRuta(origen, destino, limite = 3) {
+  if (!origen || !destino) return null;
+  const filtros = { 'Cuidad Origen': { contiene: origen.toUpperCase() }, 'Cuidad destino': { contiene: destino.toUpperCase() } };
+  let r;
+  try {
+    r = await query('detalle_servicios', {
+      pagina: 1, limite: 60, desde: haceDias(365), filtros,
+      campos: ['Folio de servicio', 'Fecha de Servicio', 'Proveedor', 'Cuidad Origen', 'Cuidad destino', 'Costo', 'Estatus Operaciones'],
+    });
+  } catch (e) { console.error('[TMS] Error consultando historial de tarifa de ruta:', e.message); return null; }
+  if (!r?.datos?.length) return null;
+
+  const servicios = r.datos
+    .filter(s => s['Costo'] && Number(s['Costo']) > 0 && s['Fecha de Servicio'])
+    .sort((a, b) => (b['Fecha de Servicio'] || '').localeCompare(a['Fecha de Servicio'] || ''))
+    .slice(0, limite)
+    .map(s => ({ costo: Number(s['Costo']), fecha: (s['Fecha de Servicio'] || '').slice(0, 10), proveedor: s['Proveedor'] || null, folio: s['Folio de servicio'] || null }));
+  if (!servicios.length) return null;
+
+  const costos = servicios.map(s => s.costo);
+  return {
+    servicios,
+    minimo: Math.min(...costos),
+    maximo: Math.max(...costos),
+    promedio: Math.round(costos.reduce((a, b) => a + b, 0) / costos.length),
+  };
+}
+
 // Abreviaciones comunes de ciudad (código de aeropuerto/uso coloquial) — sin
 // esto, "proveedores de MTY a GDL" nunca encontraba nada: el detector de
 // ciudades solo reconoce palabras tipo "Monterrey" (mayúscula+minúsculas),
@@ -814,7 +846,7 @@ module.exports = {
   // SARA
   buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
   // SOFIA
-  listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, getContextoSOFIA, proveedoresParaVapi, foliosPorAsignar,
+  listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, historialTarifaRuta, getContextoSOFIA, proveedoresParaVapi, foliosPorAsignar,
   // NOA
   buscarFolioNOA, foliosActivosNOA, getContextoNOA,
   // Core

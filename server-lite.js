@@ -98,6 +98,20 @@ const kpisSofia = require('./backend/services/kpisSofia');
 const folioContexto = require('./backend/services/folioContexto');
 const { aTuteo } = require('./backend/services/tuteo');
 const requerimiento = require('./backend/services/requerimiento');
+
+// Referencia de tarifa (últimos 3 servicios reales de esa ruta, cualquier
+// proveedor) para la búsqueda activa más reciente de este teléfono — SOFIA la
+// usa por dentro para mantenerse en rango, nunca se la dice al transportista.
+async function bloqueTarifaRutaProveedor(telefono) {
+  try {
+    const activa = colocaciones.porTelefono(telefono, true)[0];
+    if (!activa || !activa.origen || !activa.destino) return '';
+    const h = await tms.historialTarifaRuta(activa.origen, activa.destino, 3);
+    if (!h) return '';
+    const lista = h.servicios.map(s => `$${s.costo.toLocaleString('es-MX')} (${s.fecha}${s.proveedor ? ', ' + s.proveedor : ''})`).join(', ');
+    return `\n\n---\n## REFERENCIA INTERNA DE TARIFA — ${activa.origen} → ${activa.destino} (NUNCA se la dices al transportista)\nÚltimos ${h.servicios.length} servicios reales de esta ruta: ${lista}.\nRango de referencia: $${h.minimo.toLocaleString('es-MX')}–$${h.maximo.toLocaleString('es-MX')} (promedio $${h.promedio.toLocaleString('es-MX')}). Usa este rango, no un número fijo, para decidir si la tarifa que te dé el transportista es aceptable — mantente dentro de él. Si no cae en el rango, sigue la regla de negociación normal.\n---\n`;
+  } catch (e) { console.error('[bloqueTarifaRutaProveedor]', e.message); return ''; }
+}
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const twochat = require('./backend/services/twochat');
@@ -547,6 +561,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       // Proveedor o cliente: solo el folio en el que participa
       const foliosPersona = [...folioContexto.foliosPorTelefono(phone), ...(agente === 'sofia' ? colocaciones.porTelefono(phone, false).map(c => c.folio) : [])];
       if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
+      if (agente === 'sofia') systemPrompt += await bloqueTarifaRutaProveedor(phone);
       if (agente === 'sofia') systemPrompt += sofiaOperacion.bloqueChecklist(phone);
       // No es equipo interno — ¿ya es un contacto conocido (proveedor/cliente
       // con quien ya se cerró algo antes)? Si sí, se le da continuidad real.
@@ -1109,6 +1124,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       else if (!esGrupo) {
         const foliosPersona = [...folioContexto.foliosPorTelefono(remitentePhone), ...(agente === 'sofia' ? colocaciones.porTelefono(remitentePhone, false).map(c => c.folio) : [])];
         if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
+        if (agente === 'sofia') systemPrompt += await bloqueTarifaRutaProveedor(remitentePhone);
       }
       if (!esGrupo && !personaEquipo) {
         const contactoConocido = await contactos.buscarPorTelefono(remitentePhone, agente);
