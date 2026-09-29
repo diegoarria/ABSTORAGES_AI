@@ -103,7 +103,16 @@ const proveedoresConfianza = require('./backend/services/proveedoresConfianza');
 // Referencia de tarifa (últimos 3 servicios reales de esa ruta, cualquier
 // proveedor) para la búsqueda activa más reciente de este teléfono — SOFIA la
 // usa por dentro para mantenerse en rango, nunca se la dice al transportista.
+// Interruptor temporal (pedido 29-sep-2026): mientras esté en false, SOFIA no
+// negocia ninguna tarifa con nadie — responde la frase fija y avisa al equipo.
+// Se reactiva la negociación normal poniendo SOFIA_NEGOCIA_TARIFA=true en Railway,
+// sin tocar código.
+const SOFIA_NEGOCIA_TARIFA = process.env.SOFIA_NEGOCIA_TARIFA === 'true';
+
 async function bloqueTarifaRutaProveedor(telefono) {
+  if (!SOFIA_NEGOCIA_TARIFA) {
+    return '\n\n---\n## TARIFA — CONGELADO POR AHORA\nRecuerda: no negocias tarifas con nadie ahorita. Si sale el tema, responde la frase fija que ya tienes indicada.\n---\n';
+  }
   // Proveedores de máxima confianza: nunca se les compara la tarifa contra
   // nada ni se les rechaza — se acepta lo que den, siempre. Esto va antes que
   // cualquier otra cosa y no depende de que haya una búsqueda activa.
@@ -254,6 +263,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/CHECKLIST_CARGA\s*:[\s\S]*$/gi, '')
     .replace(/REVISION_PENDIENTE\s*:[\s\S]*$/gi, '')
     .replace(/DETENER_BUSQUEDA\s*:[\s\S]*$/gi, '')
+    .replace(/TARIFA_MENCIONADA\s*:[\s\S]*$/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR\s*:[\s\S]*$/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')
@@ -690,10 +700,14 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Reclamo de pago de un proveedor: SOFIA no dice nada más que la frase acordada
     // (aunque el modelo agregue algo, aquí se fuerza el texto exacto).
     const FRASE_RECLAMO_PAGO = 'Enseguida lo revisaré con el equipo de administración, ellos podrán resolverte este tema lo antes posible.';
+    // Tarifas congeladas por ahora — respuesta fija, sin importar lo que diga el modelo alrededor
+    const FRASE_TARIFA = 'Lo consultaré con mi equipo de ABSTORAGES.';
+    const mencionoTarifa = !SOFIA_NEGOCIA_TARIFA && /TARIFA_MENCIONADA\s*:/i.test(respuesta);
     // Proveedor sin unidades: solo agradece y pide aviso — nada de "¿algo más en lo que te ayude?"
     const FRASE_SIN_UNIDADES = 'Muchas gracias, avísame cuando cuentes con disponibilidad.';
     const dijoSinUnidades = /OFERTA_PROVEEDOR\s*:\s*\{[^}]*"disponible"\s*:\s*false/i.test(respuesta);
     const textoSalida = (agente === 'sofia' && !personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO
+      : (agente === 'sofia' && !personaEquipo && mencionoTarifa) ? FRASE_TARIFA
       : (agente === 'sofia' && !personaEquipo && dijoSinUnidades) ? FRASE_SIN_UNIDADES
       : limpiarControlParaCliente(respuesta);
     // Red de seguridad: nunca cerrar con la muletilla de servicio al cliente
@@ -3585,7 +3599,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'DETENER_BUSQUEDA:', 'SUGERENCIA_PROVEEDOR:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'DETENER_BUSQUEDA:', 'TARIFA_MENCIONADA:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3605,6 +3619,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/CHECKLIST_CARGA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/REVISION_PENDIENTE:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DETENER_BUSQUEDA:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/TARIFA_MENCIONADA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/SUGERENCIA_PROVEEDOR:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CERRAR_CHAT/gi, '')
     .replace(/ESCALAR_HUMANO/gi, '')

@@ -19,6 +19,7 @@ const actividadBus = require('./actividadBus');
 const whatsappProactivo = require('./whatsappProactivo');
 const vapi = require('./vapi');
 const notifier = require('./notifier');
+let _ultimoAvisoTarifa = new Map(); // teléfono → ts, evita mandar 5 correos si el proveedor insiste en varios mensajes seguidos
 
 const OLA_TAM         = Number(process.env.SOFIA_ESCALERA_TAMANO || 3);
 const ESPERA_OLA_MIN  = Number(process.env.SOFIA_ESCALERA_ESPERA_MIN || 20);
@@ -165,6 +166,18 @@ function procesarSenales({ telefono, nombre, respuesta }) {
     if (df) {
       const d = colocaciones.agregarDisponibilidad({ telefono, nombre, fecha: df.fecha, ruta: df.ruta, unidad: df.unidad, detalle: df.detalle });
       if (d) feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible el ${textoFecha(d.fecha)}${d.ruta ? ' (' + d.ruta + ')' : ''} — SOFIA le escribirá ese día para confirmar`, metadata: { id: d.id } });
+    }
+
+    const tf = json(respuesta, 'TARIFA_MENCIONADA');
+    if (tf) {
+      const k = colocaciones.tel10(telefono);
+      if (Date.now() - (_ultimoAvisoTarifa.get(k) || 0) > 15 * 60 * 1000) {
+        _ultimoAvisoTarifa.set(k, Date.now());
+        const detalle = String(tf.resumen || 'sin detalle').replace(/\s+/g, ' ').slice(0, 220);
+        feed({ tipo: 'TARIFA_MENCIONADA', mensaje: `${quien} tocó el tema de tarifa: ${detalle} — SOFIA no negocia por ahora, se lo avisó al equipo` });
+        push({ title: `Tema de tarifa — ${quien}`, body: detalle, tag: 'tarifa-' + k, url: '/actividad.html', tipo: 'TARIFA_MENCIONADA' });
+        notifier.notificarAlerta({ title: `SOFIA — ${quien} tocó el tema de tarifa`, body: `${detalle}\n\nSOFIA le respondió que lo consultará con el equipo y no negoció nada. Revísalo cuando puedas.`, tipo: 'TARIFA_MENCIONADA' }).catch(e => console.error('[sofiaOperacion] Error avisando tarifa mencionada:', e.message));
+      }
     }
 
     const rv = json(respuesta, 'REVISION_PENDIENTE');
