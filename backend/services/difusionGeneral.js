@@ -20,7 +20,11 @@ const HORA   = Number(process.env.SOFIA_DIFUSION_GENERAL_HORA || 5);
 const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 45);
 const TOP_N  = Number(process.env.SOFIA_DIFUSION_GENERAL_N || 50);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
-const CONTENT_SID = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL || null;
+const CONTENT_SID_GENERAL  = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL || null;
+// Mientras la plantilla dedicada no esté aprobada, cae a la de disponibilidad
+// que ya existe y está aprobada — con valores genéricos, porque esta difusión
+// no es de una ruta ni una carga específica.
+const CONTENT_SID_FALLBACK = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD || null;
 const CHEQUEO_MS = 15 * 60 * 1000;
 
 let ultimaFechaEnviada = null; // 'YYYY-MM-DD' Monterrey — evita doble corrida el mismo día
@@ -64,7 +68,9 @@ const feed = e => actividadBus.emitir({ agente: 'SOFIA', ...e });
 async function correrSiToca(pushActividad) {
   if (!HABILITADO) return;
   if (agentPause.estaPausado('sofia')) return;
-  if (!CONTENT_SID) { console.warn('[difusionGeneral] Plantilla de disponibilidad general aún no configurada (TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL) — se omite'); return; }
+  const usaGeneral = !!CONTENT_SID_GENERAL;
+  const CONTENT_SID = CONTENT_SID_GENERAL || CONTENT_SID_FALLBACK;
+  if (!CONTENT_SID) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada (ni la general ni la de siempre) — se omite'); return; }
 
   const { fecha, minutosDelDia } = horaYFechaMTY();
   if (minutosDelDia < HORA * 60 + MINUTO) return;
@@ -80,11 +86,17 @@ async function correrSiToca(pushActividad) {
   let enviados = 0, sinCredito = 0, fallidos = 0;
   for (const p of lista) {
     try {
-      const r = await whatsappProactivo.enviarPlantillaSinCandado('sofia', p.telefono, CONTENT_SID, { '1': titulo(p.nombre) });
+      const variables = usaGeneral
+        ? { '1': titulo(p.nombre) }
+        : { '1': titulo(p.nombre), '2': 'cualquier tipo de unidad', '3': 'cualquier origen', '4': 'cualquier destino', '5': 'hoy' };
+      const r = await whatsappProactivo.enviarPlantillaSinCandado('sofia', p.telefono, CONTENT_SID, variables);
       if (r?.status === 'rate_limited') { sinCredito = lista.length - enviados - fallidos; break; }
       if (r?.status === 'paused') break;
       enviados++;
-      whatsappProactivo.registrarEnMemoria?.('sofia', p.telefono, `Hola ${titulo(p.nombre)}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.`);
+      const textoEnviado = usaGeneral
+        ? `Hola ${titulo(p.nombre)}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.`
+        : `Hola ${titulo(p.nombre)}, buscamos unidad para cualquier ruta hoy. ¿Tienes disponibilidad? Cuéntame qué unidad y para dónde.`;
+      whatsappProactivo.registrarEnMemoria?.('sofia', p.telefono, textoEnviado);
       contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: 'Difusión general de disponibilidad (ronda diaria 5:45 AM)', canal: 'whatsapp-plantilla' }).catch(() => {});
     } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
