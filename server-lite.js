@@ -2106,6 +2106,11 @@ app.post('/api/sugerencias-proveedor/:id/resolver', soloAdmin, async (req, res) 
 app.get('/api/kpis/sofia', adminUOps, async (req, res) => { try { res.json(await kpisSofia.vista()); } catch (e) { res.status(500).json({ error: e.message }); } });
 app.post('/api/kpis/sofia/enviar', soloAdmin, async (req, res) => { try { res.json(await kpisSofia.enviar()); } catch (e) { res.status(500).json({ error: e.message }); } });
 
+// Manda el reporte de disponibilidad ahora mismo, con datos reales — para
+// probarlo sin tener que esperar a las 7:00 AM o a las 19:05.
+app.get('/api/reporte-disponibilidad', adminUOps, async (req, res) => { try { res.json(reporteDisponibilidad.listaDisponibles()); } catch (e) { res.status(500).json({ error: e.message }); } });
+app.post('/api/reporte-disponibilidad/enviar', soloAdmin, async (req, res) => { try { res.json(await reporteDisponibilidad.enviar()); } catch (e) { res.status(500).json({ error: e.message }); } });
+
 // Lista de plantillas aprobadas por Meta que un agente tiene permitido usar —
 // única fuente de verdad, la misma que valida /api/contactos/:id/plantilla.
 app.get('/api/plantillas-aprobadas', adminUOps, (req, res) => {
