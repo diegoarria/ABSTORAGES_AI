@@ -100,6 +100,7 @@ const folioContexto = require('./backend/services/folioContexto');
 const { aTuteo } = require('./backend/services/tuteo');
 const requerimiento = require('./backend/services/requerimiento');
 const proveedoresConfianza = require('./backend/services/proveedoresConfianza');
+const chatViewTokens = require('./backend/services/chatViewTokens');
 
 // Referencia de tarifa (últimos 3 servicios reales de esa ruta, cualquier
 // proveedor) para la búsqueda activa más reciente de este teléfono — SOFIA la
@@ -2673,6 +2674,27 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
     res.json(enriquecidas.sort((a, b) => b.updatedAt - a.updatedAt));
   } catch (e) {
     console.error('[historial/sesiones]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Público (sin login) — el token en la URL es lo único que autoriza, y solo
+// da lectura a la conversación exacta a la que fue emitido, ver chatViewTokens.js.
+app.get('/api/chat-publico/:token', async (req, res) => {
+  try {
+    const info = chatViewTokens.resolver(req.params.token);
+    if (!info) return res.status(404).json({ error: 'Link no válido o vencido' });
+    const { sessionId, nombre, telefono } = info;
+    if (sessionId.startsWith('2chat:')) {
+      const { agente, historial } = grupoWA.historialDeConversacion(sessionId);
+      if (!historial.length) return res.status(404).json({ error: 'Conversación no encontrada o sin mensajes' });
+      return res.json({ agente, historial, nombre, telefono });
+    }
+    const historial = memory.getFullHistory(sessionId);
+    if (!historial.length) return res.status(404).json({ error: 'Conversación no encontrada o sin mensajes' });
+    res.json({ agente: detectarAgente(sessionId), historial, nombre, telefono });
+  } catch (e) {
+    console.error('[chat-publico]', e.message);
     res.status(500).json({ error: e.message });
   }
 });

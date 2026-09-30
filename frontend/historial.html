@@ -54,11 +54,6 @@
 .msg-time { font-size:11.5px; color:var(--tx3); margin-top:5px; }
 .transcript { background:var(--surface-2); border:1px solid var(--bd); border-radius:12px; padding:18px 20px; font-size:13.5px; line-height:1.8; color:var(--tx2); white-space:pre-wrap; word-break:break-word; }
 @media (max-width:1100px) { .board { grid-template-columns:1fr; } .list-panel { max-height:460px; position:static; } .msg { max-width:92%; } }
-.board.solo-obs { grid-template-columns:minmax(0,1fr); }
-.obs-banner { display:flex; align-items:center; gap:10px; background:var(--sofia-soft); color:var(--sofia); border:1px solid var(--sofia); border-radius:10px; padding:10px 16px; margin-bottom:14px; font-size:13px; font-weight:600; }
-.obs-banner .dot-live { width:8px; height:8px; border-radius:50%; background:var(--sofia); animation:pulse 1.8s infinite; }
-@keyframes pulse { 70% { box-shadow:0 0 0 6px rgba(0,0,0,0); } }
-.obs-banner a { margin-left:auto; color:inherit; text-decoration:underline; font-weight:700; }
 </style>
 </head>
 <body data-shell-title="Historial de conversaciones">
@@ -72,8 +67,8 @@
     </div>
   </div>
 
-  <div class="board" id="board">
-    <section class="panel list-panel" id="list-panel">
+  <div class="board">
+    <section class="panel list-panel">
       <div class="toolbar">
         <div class="seg" role="tablist">
           <div class="filter on" id="tab-chats" onclick="cambiarModo('chats')" role="tab">Chats</div>
@@ -95,10 +90,6 @@
 </main>
 
 <script>
-const _params = new URLSearchParams(location.search);
-const SESION_PARAM = _params.get('sesion');
-const MODO_OBSERVADOR = !!SESION_PARAM && _params.get('ver') === '1';
-
 let TODAS = [];
 let sesionActual = null;
 let _debounce = null;
@@ -304,11 +295,7 @@ async function abrir(sessionId) {
       ? info.participantes.map(p => p.nombre && p.nombre !== p.telefono ? `${p.nombre} (${p.telefono})` : (p.telefono || p.nombre)).join(', ')
       : (info.telefono || '');
 
-    const huboMensajesAntes = _ultimoConteoMsjs;
-    _ultimoConteoMsjs = data.historial.length;
-
     main.innerHTML = `
-      ${MODO_OBSERVADOR ? `<div class="obs-banner"><span class="dot-live"></span> Modo observador — solo lectura, se actualiza sola <a href="/historial.html">Ver historial completo →</a></div>` : ''}
       <div class="d-head">
         <div class="av av-ag-${data.agente} d-av">${esc(iniciales(info.nombre || info.empresa || sessionId))}</div>
         <div class="d-id">
@@ -320,7 +307,7 @@ async function abrir(sessionId) {
             ${data.ip ? `<span class="pill pill-neutral">IP ${esc(data.ip)}</span>` : ''}
           </div>
         </div>
-        ${MODO_OBSERVADOR ? '' : `<div class="actions"><button class="btn btn-secondary btn-danger-o" onclick="borrarSesion('${sessionId.replace(/'/g,"\\'")}')">${ico('trash')} Borrar conversación</button></div>`}
+        <div class="actions"><button class="btn btn-secondary btn-danger-o" onclick="borrarSesion('${sessionId.replace(/'/g,"\\'")}')">${ico('trash')} Borrar conversación</button></div>
       </div>
       <div class="d-body"><div class="thread" id="msgs"></div></div>
     `;
@@ -332,14 +319,10 @@ async function abrir(sessionId) {
         <div class="msg-time">${fmtFecha(m.ts)}</div>
       </div>
     `).join('');
-    if (MODO_OBSERVADOR && data.historial.length > huboMensajesAntes) {
-      msgs.scrollIntoView({ block: 'end' });
-    }
   } catch (e) {
     main.innerHTML = '<div class="empty-msg">No se pudo cargar la conversación (' + e.message + ')</div>';
   }
 }
-let _ultimoConteoMsjs = 0;
 
 async function borrarSesion(sessionId) {
   const s = TODAS.find(x => x.sessionId === sessionId);
@@ -369,18 +352,6 @@ document.getElementById('searchIco').innerHTML = ico('search');
     document.getElementById('chip-sara').style.display = 'none';
     document.getElementById('chip-noa').style.display = 'none';
   }
-
-  if (MODO_OBSERVADOR) {
-    // Enlace desde el email de SOFIA: solo esa conversación, solo lectura,
-    // sin lista de otros chats ni acciones — y se refresca sola cada 5s.
-    document.getElementById('list-panel').style.display = 'none';
-    document.getElementById('board').classList.add('solo-obs');
-    document.querySelector('.page-head p').textContent = 'Estás viendo una sola conversación en modo observador.';
-    cargarSesiones().then(() => abrir(SESION_PARAM));
-    setInterval(() => abrir(SESION_PARAM), 5000);
-    return;
-  }
-
   document.getElementById('main').innerHTML = vacioDetalle('chats');
   cargarSesiones();
 });

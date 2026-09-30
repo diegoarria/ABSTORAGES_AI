@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chat en vivo — ABSTORAGES</title>
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#f5f6f8; --surface:#fff; --bd:#e5e7eb; --tx:#111827; --tx2:#374151; --tx3:#6b7280; --acc:#0f1d4a; --sofia:#0ea5e9; --sofia-soft:#eff9ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--tx); }
+  .wrap { max-width:720px; margin:0 auto; padding:20px 16px 60px; }
+  .banner { display:flex; align-items:center; gap:10px; background:var(--sofia-soft); color:#0369a1; border:1px solid #bae6fd; border-radius:10px; padding:10px 16px; margin-bottom:16px; font-size:13px; font-weight:600; }
+  .dot-live { width:8px; height:8px; border-radius:50%; background:var(--sofia); flex:none; animation:pulse 1.8s infinite; }
+  @keyframes pulse { 70% { box-shadow:0 0 0 6px rgba(14,165,233,0); } }
+  .head { background:var(--acc); color:#fff; border-radius:14px 14px 0 0; padding:18px 20px; }
+  .head .tag { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#93c5fd; font-weight:700; }
+  .head .nombre { font-size:17px; font-weight:700; margin-top:4px; }
+  .head .tel { font-size:12.5px; color:#c7d2fe; margin-top:2px; }
+  .body { background:var(--surface); border:1px solid var(--bd); border-top:none; border-radius:0 0 14px 14px; padding:20px; min-height:200px; }
+  .msg { display:flex; flex-direction:column; max-width:85%; margin-bottom:16px; }
+  .msg.user { align-items:flex-start; }
+  .msg.assistant { align-items:flex-end; margin-left:auto; }
+  .msg-who { font-size:10.5px; font-weight:700; color:var(--tx3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+  .msg-bubble { padding:11px 15px; border-radius:13px; font-size:14px; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
+  .msg.user .msg-bubble { background:#f3f4f6; border-bottom-left-radius:4px; }
+  .msg.assistant .msg-bubble { background:var(--sofia-soft); border:1px solid #bae6fd; border-bottom-right-radius:4px; }
+  .msg-time { font-size:10.5px; color:var(--tx3); margin-top:4px; }
+  .empty, .error { text-align:center; color:var(--tx3); padding:40px 20px; font-size:14px; }
+  .error { color:#b91c1c; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="banner"><span class="dot-live"></span> Modo observador — solo lectura, se actualiza sola</div>
+  <div class="head">
+    <div class="tag" id="tag">SOFIA · ABSTORAGES</div>
+    <div class="nombre" id="nombre">Cargando…</div>
+    <div class="tel" id="tel"></div>
+  </div>
+  <div class="body" id="body"><div class="empty">Cargando conversación…</div></div>
+</div>
+
+<script>
+const TOKEN = new URLSearchParams(location.search).get('token');
+const LABEL = { sara: 'SARA', sofia: 'SOFIA', noa: 'NOA' };
+let ultimoConteo = 0;
+
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(ts) { if (!ts) return ''; return new Date(ts).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }); }
+
+async function cargar() {
+  if (!TOKEN) { document.getElementById('body').innerHTML = '<div class="error">Link incompleto.</div>'; return; }
+  try {
+    const r = await fetch('/api/chat-publico/' + encodeURIComponent(TOKEN));
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      document.getElementById('body').innerHTML = `<div class="error">${esc(d.error || 'No se pudo cargar la conversación')}</div>`;
+      return;
+    }
+    const data = await r.json();
+    const label = LABEL[data.agente] || (data.agente || '').toUpperCase() || 'Agente';
+    document.getElementById('tag').textContent = label + ' · ABSTORAGES';
+    document.getElementById('nombre').textContent = data.nombre || data.telefono || 'Conversación';
+    document.getElementById('tel').textContent = (data.nombre && data.telefono) ? data.telefono : '';
+
+    const huboNuevos = data.historial.length > ultimoConteo;
+    ultimoConteo = data.historial.length;
+
+    document.getElementById('body').innerHTML = data.historial.map(m => `
+      <div class="msg ${m.role === 'user' ? 'user' : 'assistant'}">
+        <div class="msg-who">${m.role === 'user' ? 'Contacto' : label}</div>
+        <div class="msg-bubble">${esc(m.content)}</div>
+        <div class="msg-time">${fmt(m.ts)}</div>
+      </div>
+    `).join('') || '<div class="empty">Sin mensajes todavía.</div>';
+
+    if (huboNuevos) window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  } catch (e) {
+    document.getElementById('body').innerHTML = `<div class="error">No se pudo cargar la conversación (${esc(e.message)})</div>`;
+  }
+}
+
+cargar();
+setInterval(cargar, 5000);
+</script>
+</body>
+</html>

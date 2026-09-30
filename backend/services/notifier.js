@@ -13,6 +13,7 @@ const TEAM_EMAIL   = (process.env.NOTIF_EMAIL || '').split(',').map(e => e.trim(
 const FROM_EMAIL   = process.env.NOTIF_FROM_EMAIL || 'SARA <onboarding@resend.dev>';
 const TEAM_WA      = process.env.NOTIF_WA_NUMBER;
 const PORTAL_URL   = process.env.PORTAL_URL || 'https://abstoragesai-production.up.railway.app';
+const chatViewTokens = require('./chatViewTokens');
 const WEBHOOK_URL  = process.env.LEAD_WEBHOOK_URL;
 
 const WA_KEY  = process.env.WHATSAPP_API_KEY;
@@ -450,7 +451,7 @@ async function notificarRespuestaSofia({ quien, tipo, telefono, texto, respuesta
   const asunto = `SOFIA — ${quien} le contestó por WhatsApp`;
   const hora = new Date().toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey' });
   const bloque = (titulo, t) => `<div style="margin:0 0 14px;"><div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">${esc(titulo)}</div><div style="font-size:14px;color:#111;white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">${esc(t)}</div></div>`;
-  const linkChat = sessionId ? `${PORTAL_URL}/historial.html?sesion=${encodeURIComponent(sessionId)}&ver=1` : null;
+  const linkChat = sessionId ? `${PORTAL_URL}/ver-chat.html?token=${chatViewTokens.crear(sessionId, { nombre: quien, telefono })}` : null;
   const html = `
   <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
     <div style="background:#0f1d4a;padding:18px 24px;">

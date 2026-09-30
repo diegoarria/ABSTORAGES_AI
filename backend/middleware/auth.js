@@ -1,6 +1,10 @@
 const sessions = require('../services/sessions');
 
 const PUBLIC_PATHS = ['/login', '/api/login', '/api/login/pin', '/api/logout', '/webhook/whatsapp', '/favicon.ico'];
+// Prefijos públicos: el link de "Ver chat en tiempo real" del email de SOFIA
+// no requiere sesión — el propio token en la URL es lo que autoriza, y solo
+// da acceso de lectura a esa única conversación (ver chatViewTokens.js).
+const PUBLIC_PREFIXES = ['/ver-chat.html', '/api/chat-publico/'];
 
 function parseCookie(header, name) {
   if (!header) return null;
@@ -10,6 +14,7 @@ function parseCookie(header, name) {
 
 function auth(req, res, next) {
   if (PUBLIC_PATHS.some(p => req.path === p || req.path.startsWith(p + '?'))) return next();
+  if (PUBLIC_PREFIXES.some(p => req.path.startsWith(p))) return next();
 
   const sessionId = parseCookie(req.headers.cookie, 'abs_session');
   const user = sessions.get(sessionId);
