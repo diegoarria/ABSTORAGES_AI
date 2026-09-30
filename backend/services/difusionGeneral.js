@@ -26,8 +26,22 @@ const CONTENT_SID_GENERAL  = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENER
 // no es de una ruta ni una carga específica.
 const CONTENT_SID_FALLBACK = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD || null;
 const CHEQUEO_MS = 15 * 60 * 1000;
+// Ventana de tolerancia tras la hora programada — solo dentro de este rango se
+// considera "toca mandar hoy". Sin esto, prender la función (o que el server
+// se reinicie) a cualquier hora del día dispara el envío de inmediato en vez
+// de esperar al día siguiente — esto fue un incidente real (29-sep-2026).
+const VENTANA_MIN = Number(process.env.SOFIA_DIFUSION_GENERAL_VENTANA_MIN || 90);
 
-let ultimaFechaEnviada = null; // 'YYYY-MM-DD' Monterrey — evita doble corrida el mismo día
+const ESTADO_FILE = path.join(__dirname, '../../data/difusion-general-estado.json');
+function leerUltimaFecha() {
+  try { return JSON.parse(fs.readFileSync(ESTADO_FILE, 'utf8')).ultimaFechaEnviada || null; } catch { return null; }
+}
+function guardarUltimaFecha(fecha) {
+  try { fs.mkdirSync(path.dirname(ESTADO_FILE), { recursive: true }); fs.writeFileSync(ESTADO_FILE, JSON.stringify({ ultimaFechaEnviada: fecha })); } catch (e) { console.error('[difusionGeneral] no se pudo guardar el estado:', e.message); }
+}
+// 'YYYY-MM-DD' Monterrey — evita doble corrida el mismo día, incluso si el
+// servidor se reinicia (persistido en disco, no solo en memoria).
+let ultimaFechaEnviada = leerUltimaFecha();
 
 function horaYFechaMTY() {
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
@@ -73,9 +87,11 @@ async function correrSiToca(pushActividad) {
   if (!CONTENT_SID) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada (ni la general ni la de siempre) — se omite'); return; }
 
   const { fecha, minutosDelDia } = horaYFechaMTY();
-  if (minutosDelDia < HORA * 60 + MINUTO) return;
+  const inicioMin = HORA * 60 + MINUTO;
+  if (minutosDelDia < inicioMin || minutosDelDia > inicioMin + VENTANA_MIN) return;
   if (ultimaFechaEnviada === fecha) return;
   ultimaFechaEnviada = fecha; // se marca antes de correr — un fallo a medias no la reintenta en bucle
+  guardarUltimaFecha(fecha);
 
   let lista;
   try { lista = await topProveedores(TOP_N); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return; }
