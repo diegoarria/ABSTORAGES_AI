@@ -347,6 +347,20 @@ async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
 // (esa es solo para leads comerciales).
 const ALERT_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL, GABRIEL_EMAIL];
 
+// Equipo de operaciones — pedido explícito del usuario (29-sep-2026): solo
+// reciben dos tipos de aviso, cuando alguien le contesta a SOFIA por WhatsApp
+// y el reporte de proveedores con unidad disponible (7:00 AM y 19:05). Nada
+// de KPIs ni ninguna otra alerta.
+const EQUIPO_OPS_EMAILS = [
+  'jazmin.ruiz@abstorages.com',
+  'abigail.dianzo@abstorages.com',
+  'braian.gonzalez@abstorages.com',
+  'maria.rosas@abstorages.com',
+  'yamilet.gamez@abstorages.com',
+];
+const RESPUESTA_SOFIA_EMAILS = [...ALERT_EMAILS, ...EQUIPO_OPS_EMAILS];
+const DISPONIBILIDAD_LISTA_EMAILS = [...ALERT_EMAILS, ...EQUIPO_OPS_EMAILS];
+
 async function notificarAlerta({ title, body, tipo }) {
   const asunto = title || 'Alerta ABSTORAGES AI';
   const html = `
@@ -472,8 +486,8 @@ async function notificarRespuestaSofia({ quien, tipo, telefono, texto, respuesta
   </div>`;
   if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
   try {
-    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, html });
-    console.log(`[Gmail] ✅ Aviso de respuesta a SOFIA enviado a ${ALERT_EMAILS.join(', ')}`);
+    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: RESPUESTA_SOFIA_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de respuesta a SOFIA enviado a ${RESPUESTA_SOFIA_EMAILS.join(', ')}`);
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a SOFIA:', e.message); }
 }
 
@@ -524,8 +538,8 @@ async function notificarListaDisponibilidad(lista) {
 
   if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
   try {
-    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, html });
-    console.log(`[Gmail] ✅ Lista de disponibilidad enviada a ${ALERT_EMAILS.join(', ')} (${lista.length} proveedores)`);
+    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: DISPONIBILIDAD_LISTA_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Lista de disponibilidad enviada a ${DISPONIBILIDAD_LISTA_EMAILS.join(', ')} (${lista.length} proveedores)`);
   } catch (e) { console.error('[Gmail] ❌ Error enviando lista de disponibilidad:', e.message); }
 }
 
