@@ -21,6 +21,8 @@ const PLANTILLAS = {
       campos: [{ key: '1', label: 'Nombre' }, { key: '2', label: 'Tipo de unidad' }, { key: '3', label: 'Origen' }, { key: '4', label: 'Destino' }, { key: '5', label: 'Fecha de salida' }] },
     { sid: 'HX18bea3252df319e388e9fe33bd568350', nombre: 'Estatus de folio', texto: "Hola {{1}}, este es un estatus de tu envío. Folio {{2}}: {{3}} — ABSTORAGES Logistics Solutions",
       campos: [{ key: '1', label: 'Nombre' }, { key: '2', label: 'Folio' }, { key: '3', label: 'Resumen del estatus' }] },
+    { sid: process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL || 'PENDIENTE_APROBACION', nombre: 'Disponibilidad general (difusión diaria)', texto: "Hola {{1}}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.",
+      campos: [{ key: '1', label: 'Nombre' }] },
     { sid: 'HX098ade5f03dfa87b2b294ba40b060a21', nombre: 'Presentación SOFIA a proveedores', texto: "¡Hola {{1}}! Soy SOFIA Novak, de ABSTORAGES Logistics Solutions. Te escribo para presentarme — a partir de ahora voy a ser quien coordine contigo las cargas y el seguimiento de cada viaje. Cualquier duda sobre disponibilidad, rutas o un servicio en curso, escríbeme directo por aquí.",
       campos: [{ key: '1', label: 'Nombre del proveedor' }] },
   ],

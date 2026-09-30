@@ -247,4 +247,25 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
   return resultado;
 }
 
-module.exports = { yaSeEnvio, marcarComoEnviada, enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
+// Igual que enviarPlantilla, pero SIN el candado permanente — para campañas
+// que se repiten a propósito todos los días (difusión general de disponibilidad).
+// Nunca toca el candado de las demás plantillas: no lo lee ni lo marca, así
+// que no choca con el "nunca se repite sola" de las plantillas normales, ni
+// bloquea que una orden real le vuelva a preguntar disponibilidad después.
+async function enviarPlantillaSinCandado(agente, to, contentSid, variables) {
+  if (agentPause.estaPausado(agente)) return { status: 'paused', to };
+  const limite = outboundRateLimit.registrarYVerificar(agente);
+  if (!limite.permitido) return { status: 'rate_limited', to };
+  monitoringControl.reportarContactoSaliente({ agente, canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
+  const from = TWILIO_WA_FROM[agente];
+  const live = !!(TWILIO_SID && TWILIO_TOKEN && from);
+  if (!live) { console.log(`[whatsappProactivo STUB] ${agente} → ${to}: ${contentSid} ${JSON.stringify(variables)}`); return { status: 'stub', to }; }
+  const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
+  const body = new URLSearchParams({ From: `whatsapp:${from}`, To: `whatsapp:${to.replace(/^whatsapp:/, '')}`, ContentSid: contentSid, ContentVariables: JSON.stringify(variables) });
+  const r2 = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: `Basic ${auth}` }, body });
+  const resp = await r2.text();
+  if (!r2.ok) throw new Error(`Twilio ${r2.status}: ${resp.slice(0, 300)}`);
+  return JSON.parse(resp);
+}
+
+module.exports = { enviarPlantillaSinCandado, yaSeEnvio, marcarComoEnviada, enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };

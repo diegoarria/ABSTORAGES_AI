@@ -85,6 +85,7 @@ const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
 const sofiaScheduler = require('./backend/services/sofiaScheduler');
+const difusionGeneral = require('./backend/services/difusionGeneral');
 const db          = require('./backend/db/db');
 const tms         = require('./backend/services/tms');
 const { limpiarFormatoWhatsApp } = require('./backend/services/formatoWA');
@@ -3735,6 +3736,7 @@ app.listen(PORT, async () => {
   await monitoringControl.iniciar();
   noaScheduler.iniciar(pushActividad);
   sofiaScheduler.iniciar(pushActividad);
+  difusionGeneral.iniciar(pushActividad);
   sofiaOperacion.iniciar({ sendPush });
   kpisSofia.iniciar();
   tms.iniciarPrewarmNOA();
