@@ -742,7 +742,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
           const ahoraMs = Date.now();
           if (ahoraMs - (_ultimoEmailRespuesta.get(phone) || 0) > 10 * 60 * 1000) {
             _ultimoEmailRespuesta.set(phone, ahoraMs);
-            notifier.notificarRespuestaSofia({ quien: conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo', tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), respuestaSofia: limpiarControlParaCliente(respuesta).slice(0, 800) }).catch(() => {});
+            notifier.notificarRespuestaSofia({ quien: conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo', tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), respuestaSofia: limpiarControlParaCliente(respuesta).slice(0, 800), sessionId: session }).catch(() => {});
           }
         }
 
