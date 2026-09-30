@@ -96,6 +96,7 @@ const rutasProveedor = require('./backend/services/rutasProveedor');
 const sofiaOperacion = require('./backend/services/sofiaOperacion');
 const colocaciones = require('./backend/services/colocaciones');
 const kpisSofia = require('./backend/services/kpisSofia');
+const reporteDisponibilidad = require('./backend/services/reporteDisponibilidad');
 const folioContexto = require('./backend/services/folioContexto');
 const { aTuteo } = require('./backend/services/tuteo');
 const requerimiento = require('./backend/services/requerimiento');
@@ -3761,6 +3762,7 @@ app.listen(PORT, async () => {
   difusionGeneral.iniciar(pushActividad);
   sofiaOperacion.iniciar({ sendPush });
   kpisSofia.iniciar();
+  reporteDisponibilidad.iniciar();
   tms.iniciarPrewarmNOA();
   setInterval(revisarLeadsSinRespuesta, 30 * 60 * 1000);
 });

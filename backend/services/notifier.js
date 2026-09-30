@@ -477,4 +477,56 @@ async function notificarRespuestaSofia({ quien, tipo, telefono, texto, respuesta
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a SOFIA:', e.message); }
 }
 
-module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad };
+// Lista completa de proveedores con unidades disponibles — fecha, ruta,
+// nombre y teléfono. Se manda dos veces al día (7:00 AM y 19:05, ver
+// reporteDisponibilidad.js) a Diego, Rafael y Gabriel.
+function textoFechaCorta(iso) {
+  const [y, m, d] = String(iso || '').split('-').map(Number);
+  if (!y) return iso || '—';
+  return new Intl.DateTimeFormat('es-MX', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d, 12)));
+}
+
+async function notificarListaDisponibilidad(lista) {
+  const hora = new Date().toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey' });
+  const asunto = `SOFIA — Proveedores con unidad disponible (${lista.length})`;
+
+  const filas = lista.map(d => `
+    <tr>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;font-weight:600;">${esc(d.nombre || '—')}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.telefono || '—')}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(textoFechaCorta(d.fecha))}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.ruta || '—')}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.unidad || '—')}</td>
+    </tr>`).join('');
+
+  const tabla = lista.length ? `
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f8fafc;">
+          <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Proveedor</th>
+          <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Teléfono</th>
+          <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Fecha</th>
+          <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Ruta</th>
+          <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Unidad</th>
+        </tr>
+      </thead>
+      <tbody>${filas}</tbody>
+    </table>` : `<p style="margin:0;font-size:14px;color:#6b7280;">Ningún proveedor tiene unidad disponible registrada en este momento.</p>`;
+
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:640px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:18px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">SOFIA · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Proveedores con unidad disponible · ${esc(hora)}</div>
+    </div>
+    <div style="padding:20px 24px;">${tabla}</div>
+  </div>`;
+
+  if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
+  try {
+    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Lista de disponibilidad enviada a ${ALERT_EMAILS.join(', ')} (${lista.length} proveedores)`);
+  } catch (e) { console.error('[Gmail] ❌ Error enviando lista de disponibilidad:', e.message); }
+}
+
+module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad };
