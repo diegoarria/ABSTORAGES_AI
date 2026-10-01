@@ -103,7 +103,37 @@ function yaSeEnvio(agente, to, contentSid) { return !!plantillasEnviadas[claveCa
 // Datos, que manda directo por Twilio) también quede registrado en el mismo candado.
 function marcarComoEnviada(agente, to, contentSid) { plantillasEnviadas[claveCandado(agente, to, contentSid)] = Date.now(); guardarCandado(); }
 
+// ── Candado de "máximo 1 contacto por proveedor por día" ───────────────────
+// Pedido explícito del usuario (01-oct-2026): sin importar el motivo (oferta
+// de una orden, difusión general de disponibilidad, seguimiento de una
+// promesa, aviso al equipo), a un mismo número no se le inicia más de un
+// contacto proactivo el mismo día — se siente como spam. Cubre AMBAS rutas de
+// envío (con y sin candado de plantilla repetida) porque las dos pasan por
+// el mismo chequeo. Solo cuenta lo que SOFIA inicia; cuando el proveedor
+// contesta algo, eso es su respuesta, no un nuevo contacto de SOFIA.
+const CONTACTO_DIARIO_FILE = path.join(__dirname, '../../data/contacto-diario.json');
+let contactoDiario = {};
+try { if (fs.existsSync(CONTACTO_DIARIO_FILE)) contactoDiario = JSON.parse(fs.readFileSync(CONTACTO_DIARIO_FILE, 'utf8')); } catch (e) { console.error('[whatsappProactivo] No se pudo leer el candado diario:', e.message); }
+let guardarDiarioTimer = null;
+function fechaMTY() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date()); }
+function guardarContactoDiario() {
+  clearTimeout(guardarDiarioTimer);
+  guardarDiarioTimer = setTimeout(() => {
+    const hoy = fechaMTY();
+    for (const k of Object.keys(contactoDiario)) if (!k.endsWith('|' + hoy)) delete contactoDiario[k]; // solo se conserva el día de hoy
+    try { fs.mkdirSync(path.dirname(CONTACTO_DIARIO_FILE), { recursive: true }); fs.writeFileSync(CONTACTO_DIARIO_FILE, JSON.stringify(contactoDiario)); }
+    catch (e) { console.error('[whatsappProactivo] Error guardando el candado diario:', e.message); }
+  }, 300);
+}
+function claveContactoDiario(agente, to) { return `${agente}|${(to || '').replace(/\D/g, '').slice(-10)}|${fechaMTY()}`; }
+function yaContactadoHoy(agente, to) { return !!contactoDiario[claveContactoDiario(agente, to)]; }
+function marcarContactadoHoy(agente, to) { contactoDiario[claveContactoDiario(agente, to)] = Date.now(); guardarContactoDiario(); }
+
 async function enviarPlantilla(agente, to, contentSid, variables) {
+  if (yaContactadoHoy(agente, to)) {
+    console.warn(`[whatsappProactivo] 🔁 ${agente} ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
+    return { status: 'ya_contactado_hoy', to };
+  }
   if (yaSeEnvio(agente, to, contentSid)) {
     console.warn(`[whatsappProactivo] 🔁 Plantilla repetida bloqueada para siempre — ${agente} ya le mandó esta plantilla a ${to} antes. Solo se repite si el equipo la manda a mano desde Base de Datos.`);
     return { status: 'duplicado', to };
@@ -125,6 +155,7 @@ async function enviarPlantilla(agente, to, contentSid, variables) {
     return { status: 'stub', to };
   }
   marcarComoEnviada(agente, to, contentSid); // se marca ANTES del fetch — dos envíos casi simultáneos no se cuelan los dos
+  marcarContactadoHoy(agente, to);
   const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
   const body = new URLSearchParams({
     From: `whatsapp:${from}`,
@@ -257,6 +288,10 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
 // que no choca con el "nunca se repite sola" de las plantillas normales, ni
 // bloquea que una orden real le vuelva a preguntar disponibilidad después.
 async function enviarPlantillaSinCandado(agente, to, contentSid, variables) {
+  if (yaContactadoHoy(agente, to)) {
+    console.warn(`[whatsappProactivo] 🔁 ${agente} ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
+    return { status: 'ya_contactado_hoy', to };
+  }
   if (agentPause.estaPausado(agente)) return { status: 'paused', to };
   const limite = outboundRateLimit.registrarYVerificar(agente);
   if (!limite.permitido) return { status: 'rate_limited', to };
@@ -264,6 +299,7 @@ async function enviarPlantillaSinCandado(agente, to, contentSid, variables) {
   const from = TWILIO_WA_FROM[agente];
   const live = !!(TWILIO_SID && TWILIO_TOKEN && from);
   if (!live) { console.log(`[whatsappProactivo STUB] ${agente} → ${to}: ${contentSid} ${JSON.stringify(variables)}`); return { status: 'stub', to }; }
+  marcarContactadoHoy(agente, to);
   const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
   const body = new URLSearchParams({ From: `whatsapp:${from}`, To: `whatsapp:${to.replace(/^whatsapp:/, '')}`, ContentSid: contentSid, ContentVariables: JSON.stringify(variables) });
   const r2 = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: `Basic ${auth}` }, body });
