@@ -102,6 +102,7 @@ const { aTuteo } = require('./backend/services/tuteo');
 const requerimiento = require('./backend/services/requerimiento');
 const proveedoresConfianza = require('./backend/services/proveedoresConfianza');
 const chatViewTokens = require('./backend/services/chatViewTokens');
+const candidatosProveedor = require('./backend/services/candidatosProveedor');
 
 // Referencia de tarifa (últimos 3 servicios reales de esa ruta, cualquier
 // proveedor) para la búsqueda activa más reciente de este teléfono — SOFIA la
@@ -264,6 +265,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     .replace(/RECLAMO_PAGO\s*:[\s\S]*$/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA\s*:[\s\S]*$/gi, '')
     .replace(/DISPONIBILIDAD_RUTA\s*:[\s\S]*$/gi, '')
+    .replace(/PROVEEDOR_NUEVO\s*:[\s\S]*$/gi, '')
     .replace(/CHECKLIST_CARGA\s*:[\s\S]*$/gi, '')
     .replace(/REVISION_PENDIENTE\s*:[\s\S]*$/gi, '')
     .replace(/DETENER_BUSQUEDA\s*:[\s\S]*$/gi, '')
@@ -766,6 +768,24 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
                 sendPush({ title: `${etiquetas[r.resultado]} — SOFIA`, body: `${quien}${detalleR}`, tag: 'resultado-contacto', url: '/actividad.html', tipo: 'RESULTADO_CONTACTO', urgente: r.resultado === 'acuerdo' }).catch(() => {});
               }
             }
+          }
+        }
+
+        // Proveedor NUEVO (no está en la Base de Datos) que se presenta por
+        // su cuenta — pensado para el CTA del anuncio de Meta. Nunca se da de
+        // alta solo: queda como candidato pendiente de aprobación humana.
+        if (agente === 'sofia' && !conocido) {
+          const pn = respuesta.match(/PROVEEDOR_NUEVO:\s*(\{[^\n]+\})/);
+          if (pn) {
+            try {
+              const d = JSON.parse(pn[1]);
+              const c = candidatosProveedor.agregar({ nombre: d.nombre, telefono: phone, empresa: d.empresa, unidades: d.unidades, rutas: d.rutas, resumen: d.resumen });
+              if (c) {
+                pushActividad({ agente: 'SOFIA', tipo: 'PROVEEDOR_NUEVO', mensaje: `Candidato nuevo por el anuncio: ${c.nombre || phone}${c.rutas ? ' — ' + c.rutas : ''} — pendiente de aprobación en Base de Datos`, sessionId: session, metadata: { id: c.id } });
+                sendPush({ title: '🆕 Proveedor nuevo pendiente de aprobar', body: `${c.nombre || phone}${c.unidades ? ' — ' + c.unidades : ''}${c.rutas ? ' (' + c.rutas + ')' : ''}`, tag: 'candidato-' + c.id, url: '/base-datos.html', tipo: 'PROVEEDOR_NUEVO' }).catch(() => {});
+                notifier.notificarAlerta({ title: `SOFIA — Proveedor nuevo pendiente de aprobar: ${c.nombre || phone}`, body: `Teléfono: ${phone}\nEmpresa: ${c.empresa || '—'}\nUnidad: ${c.unidades || '—'}\nRutas: ${c.rutas || '—'}\n\n${c.resumen || ''}\n\nRevísalo y apruébalo en Base de Datos para que entre al directorio.`, tipo: 'PROVEEDOR_NUEVO' }).catch(() => {});
+              }
+            } catch (e) { console.error('[PROVEEDOR_NUEVO] inválido:', e.message); }
           }
         }
       } catch (e) { console.error('[monitoreo en vivo]', e.message); }
@@ -2102,6 +2122,19 @@ app.post('/api/colocaciones/:folio/aprobar', soloAdmin, async (req, res) => {
 });
 app.get('/api/proveedores/ranking', adminUOps, (req, res) => res.json(colocaciones.ranking()));
 app.get('/api/proveedores/:telefono/desempeno', adminUOps, (req, res) => res.json(colocaciones.estadisticas(req.params.telefono)));
+
+app.get('/api/candidatos-proveedor', adminUOps, (req, res) => res.json(candidatosProveedor.listar(req.query.estado === 'todas' ? null : 'pendiente')));
+app.post('/api/candidatos-proveedor/:id/resolver', soloAdmin, async (req, res) => {
+  try {
+    const c = candidatosProveedor.obtener(req.params.id);
+    if (!c || c.estado !== 'pendiente') return res.status(404).json({ error: 'Candidato no encontrado o ya resuelto' });
+    if (req.body?.aprobar) {
+      await contactos.upsertContacto({ agente: 'sofia', tipo: 'proveedor', nombre_completo: c.nombre || c.telefono, telefono: c.telefono, empresa: c.empresa || null, rutas: c.rutas || '', unidades: c.unidades || '', resumen_interaccion: c.resumen || 'Alta vía anuncio — aprobado por el equipo', canal: 'whatsapp' });
+    }
+    candidatosProveedor.resolver(c.id, req.body?.aprobar ? 'aprobado' : 'rechazado');
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 
 app.get('/api/sugerencias-proveedor', adminUOps, (req, res) => res.json(colocaciones.sugerencias(req.query.estado === 'todas' ? null : 'pendiente')));
 app.post('/api/sugerencias-proveedor/:id/resolver', soloAdmin, async (req, res) => {
@@ -3650,7 +3683,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'DISPONIBILIDAD_RUTA:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'DETENER_BUSQUEDA:', 'TARIFA_MENCIONADA:', 'SUGERENCIA_PROVEEDOR:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'DISPONIBILIDAD_RUTA:', 'PROVEEDOR_NUEVO:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'DETENER_BUSQUEDA:', 'TARIFA_MENCIONADA:', 'SUGERENCIA_PROVEEDOR:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -3668,6 +3701,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/RECLAMO_PAGO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DISPONIBILIDAD_RUTA:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/PROVEEDOR_NUEVO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CHECKLIST_CARGA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/REVISION_PENDIENTE:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DETENER_BUSQUEDA:\s*\{[\s\S]*?\}/gi, '')

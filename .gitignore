@@ -11,3 +11,10 @@ monitoring/data/*.json
 monitoring/admin-panel/dist/
 dist/
 data/sofia-operacion.json
+data/chat-view-tokens.json
+data/seed-flags.json
+data/candidatos-proveedor.json
+data/difusion-general-estado.json
+data/reporte-disponibilidad-estado.json
+data/plantilla-enviada.json
+data/contacto-diario.json
