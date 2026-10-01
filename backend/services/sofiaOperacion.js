@@ -224,26 +224,43 @@ function escalarReclamoPago({ telefono, nombre, resumen }) {
     .catch(() => {});
 }
 
-// ── Disponibilidades prometidas: recordatorio la mañana del día ─────────────
+// ── Disponibilidades prometidas: recordatorio 1 día antes y el día de la fecha ──
+// Pedido explícito del usuario (30-sep-2026): a los proveedores que prometieron
+// unidad para una fecha, SOFIA les da seguimiento dos veces — la víspera y el
+// propio día — usando la misma plantilla de seguimiento (su texto ya es neutro,
+// sirve igual preguntando "¿sigue en pie?" un día antes o el mismo día).
 function textoFecha(iso) {
   const [y, m, d] = iso.split('-').map(Number);
   return new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d, 12)));
 }
 const primerNombre = n => String(n || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
+
+function enviarRecordatorioDisponibilidad(d, { previa }) {
+  const fechaTxt = textoFecha(d.fecha);
+  whatsappProactivo.enviarSeguimientoDisponibilidad(primerNombre(d.nombre), d.telefono, fechaTxt, d.ruta)
+    .then(r => { if (!r) push({ title: `${previa ? 'Mañana' : 'Hoy'} ${d.nombre || 'un proveedor'} prometió unidad`, body: `Sin plantilla de seguimiento configurada: escríbele tú${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id + (previa ? '-previa' : ''), url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true }); })
+    .catch(e => console.error('[sofiaOperacion] Error en seguimiento de disponibilidad:', e.message));
+  feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${previa ? 'Un día antes' : 'Hoy es el día'}: SOFIA le escribió a ${d.nombre || 'un proveedor'} para confirmar la unidad prometida del ${fechaTxt}${d.ruta ? ' (' + d.ruta + ')' : ''}` });
+  push({ title: `${previa ? 'Mañana tienes' : 'Hoy tienes'} unidad prometida — ${d.nombre || 'proveedor'}`, body: `${d.nombre || 'Un proveedor'} dijo que ${previa ? 'mañana' : 'hoy'} tendría unidad${d.ruta ? ' ' + d.ruta : ''}${d.unidad ? ' (' + d.unidad + ')' : ''}. SOFIA le pidió confirmar.`, tag: 'disp-' + (previa ? 'previa-' : 'hoy-') + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD' });
+}
+
 function tickDisponibilidades() {
   const hoy = colocaciones.fechaMTY();
+  const mañana = colocaciones.fechaMTY(Date.now() + 24 * 60 * 60 * 1000);
   for (const d of colocaciones.disponibilidades()) {
     if (d.estado !== 'pendiente') continue;
     if (d.fecha < hoy) { colocaciones.actualizarDisponibilidad(d.id, { estado: 'vencida' }); continue; }
+
+    if (d.fecha === mañana && !d.recordatorioPreviaEn && horario.permitido(false)) {
+      colocaciones.actualizarDisponibilidad(d.id, { recordatorioPreviaEn: new Date().toISOString() });
+      enviarRecordatorioDisponibilidad(d, { previa: true });
+      continue;
+    }
+
     if (d.fecha !== hoy) continue;
     if (!horario.permitido(false)) continue; // dentro de horario de contacto
     colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
-    const fechaTxt = textoFecha(d.fecha);
-    whatsappProactivo.enviarSeguimientoDisponibilidad(primerNombre(d.nombre), d.telefono, fechaTxt, d.ruta)
-      .then(r => { if (!r) push({ title: `Hoy es el día que ${d.nombre || 'un proveedor'} prometió unidad`, body: `Sin plantilla de seguimiento configurada: escríbele tú${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true }); })
-      .catch(e => console.error('[sofiaOperacion] Error en seguimiento de disponibilidad:', e.message));
-    feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `Hoy es el día: SOFIA le escribió a ${d.nombre || 'un proveedor'} para confirmar la unidad prometida${d.ruta ? ' (' + d.ruta + ')' : ''}` });
-    push({ title: `Hoy tienes unidad prometida — ${d.nombre || 'proveedor'}`, body: `${d.nombre || 'Un proveedor'} dijo que hoy tendría unidad${d.ruta ? ' ' + d.ruta : ''}${d.unidad ? ' (' + d.unidad + ')' : ''}. SOFIA le pidió confirmar.`, tag: 'disp-hoy-' + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD' });
+    enviarRecordatorioDisponibilidad(d, { previa: false });
   }
 }
 

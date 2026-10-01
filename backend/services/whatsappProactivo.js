@@ -213,11 +213,15 @@ async function avisarReclamoPago(agente, destinatariosClaves, proveedor, detalle
 // Plantilla sofia_seguimiento_disponibilidad: "Hola {{1}}, me comentaste que
 // tendrías unidad disponible el {{2}} para {{3}}. ¿Sigue en pie? ..."
 // Devuelve null si su ContentSid aún no está configurado (el aviso al equipo sale igual).
+// Usa SinCandado a propósito: a un mismo proveedor se le manda esta misma
+// plantilla un día antes Y el día de la fecha prometida (pedido explícito del
+// usuario, 30-sep-2026) — con el candado normal, el segundo envío se bloquearía
+// como "ya se le mandó esta plantilla antes" y el seguimiento del día nunca saldría.
 async function enviarSeguimientoDisponibilidad(nombre, telefono, fechaTexto, ruta) {
   if (!CONTENT_SID_SEGUIMIENTO_DISP) { console.warn('[whatsappProactivo] Plantilla de seguimiento de disponibilidad aún no configurada — se omite'); return null; }
   if (!telefonoValido(telefono)) return null;
   const rutaTxt = ruta || 'tus rutas';
-  const r = await enviarPlantilla('sofia', telefono, CONTENT_SID_SEGUIMIENTO_DISP, { '1': nombre || 'ahí', '2': fechaTexto, '3': rutaTxt });
+  const r = await enviarPlantillaSinCandado('sofia', telefono, CONTENT_SID_SEGUIMIENTO_DISP, { '1': nombre || 'ahí', '2': fechaTexto, '3': rutaTxt });
   registrarEnMemoria('sofia', telefono, `Hola ${nombre || ''}, me comentaste que tendrías unidad disponible el ${fechaTexto} para ${rutaTxt}. ¿Sigue en pie? Cuéntame por este medio. — SOFIA, ABSTORAGES Logistics Solutions`);
   return r;
 }
