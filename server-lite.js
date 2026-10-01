@@ -782,7 +782,6 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
               const c = candidatosProveedor.agregar({ nombre: d.nombre, telefono: phone, empresa: d.empresa, unidades: d.unidades, rutas: d.rutas, resumen: d.resumen });
               if (c) {
                 pushActividad({ agente: 'SOFIA', tipo: 'PROVEEDOR_NUEVO', mensaje: `Candidato nuevo por el anuncio: ${c.nombre || phone}${c.rutas ? ' — ' + c.rutas : ''} — pendiente de aprobación en Base de Datos`, sessionId: session, metadata: { id: c.id } });
-                sendPush({ title: '🆕 Proveedor nuevo pendiente de aprobar', body: `${c.nombre || phone}${c.unidades ? ' — ' + c.unidades : ''}${c.rutas ? ' (' + c.rutas + ')' : ''}`, tag: 'candidato-' + c.id, url: '/base-datos.html', tipo: 'PROVEEDOR_NUEVO' }).catch(() => {});
                 notifier.notificarAlerta({ title: `SOFIA — Proveedor nuevo pendiente de aprobar: ${c.nombre || phone}`, body: `Teléfono: ${phone}\nEmpresa: ${c.empresa || '—'}\nUnidad: ${c.unidades || '—'}\nRutas: ${c.rutas || '—'}\n\n${c.resumen || ''}\n\nRevísalo y apruébalo en Base de Datos para que entre al directorio.`, tipo: 'PROVEEDOR_NUEVO' }).catch(() => {});
               }
             } catch (e) { console.error('[PROVEEDOR_NUEVO] inválido:', e.message); }
