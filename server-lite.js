@@ -1169,10 +1169,19 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         const tmsCtx = await tms.getContextoSARA(texto);
         if (tmsCtx) systemPrompt += tmsCtx;
       }
-      const historial = grupoWA.contextoGrupo(canalUuid, 20).map(m => ({
-        role: m.direction === 'outgoing' ? 'assistant' : 'user',
-        content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
-      }));
+      // 1:1 por 2Chat usa la MISMA sesión de memoria que Twilio (wa_<agente>_<tel>)
+      // en vez de su propio historial aislado por canalUuid — así, sin importar
+      // por cuál de los dos números le escriban a la misma persona, SOFIA/SARA
+      // tienen la conversación completa, no dos hilos separados que se quedan
+      // viejos el uno respecto al otro. El grupo sigue aparte (ahí no hay un
+      // solo "contacto" al que mapear una sesión 1:1).
+      const session2Chat1a1 = !esGrupo ? (agente === 'noa' ? `wa_${remitentePhone}` : `wa_${agente}_${remitentePhone}`) : null;
+      const historial = esGrupo
+        ? grupoWA.contextoGrupo(canalUuid, 20).map(m => ({
+            role: m.direction === 'outgoing' ? 'assistant' : 'user',
+            content: m.direction === 'outgoing' ? m.message_text : `${m.sender_name}: ${m.message_text}`,
+          }))
+        : memory.buildContext(session2Chat1a1).history;
 
       // Imagen/PDF adjunto (evidencia de caja, carta porte, etc.) — se
       // descarga y se manda como bloque multimodal; 2Chat sirve sus media
@@ -1186,6 +1195,10 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // Sin límite bajo de tokens — una respuesta cortada a medias (ej. una
       // lista de folios truncada) es peor que tardar unos segundos más.
       const respuesta = await chat(systemPrompt, [...historial, { role: 'user', content: contenidoParaClaude }]);
+      if (session2Chat1a1) {
+        memory.addMessage(session2Chat1a1, 'user', texto);
+        saveMessage(session2Chat1a1, agente, 'user', texto);
+      }
 
       // Tokens de control — igual que en los demás canales (chat/WhatsApp/
       // llamada), se detectan y se limpian del texto antes de mandarlo al
@@ -1229,6 +1242,11 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         .replace(/AVISO_EQUIPO_WA:\s*\{[^\n]+\}/g, '')
         .replace(/ESTATUS_FOLIO_WA:\s*\{[^\n]+\}/g, '')
         .trim();
+
+      if (session2Chat1a1) {
+        memory.addMessage(session2Chat1a1, 'assistant', respuesta);
+        saveMessage(session2Chat1a1, agente, 'assistant', respuesta);
+      }
 
       for (const m of avisoEquipoMatches) {
         try {
@@ -2656,15 +2674,18 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
       };
     });
 
-    // Conversaciones de WhatsApp vía 2Chat (grupo + 1:1) — viven en su propio
-    // store (no en `memory`), se fusionan aquí para que aparezcan en el mismo
-    // historial en vez de necesitar una pantalla aparte.
+    // Conversaciones de WhatsApp vía 2Chat — solo las de GRUPO viven en su
+    // propio store (no en `memory`) y se fusionan aquí. Las 1:1 ya NO se
+    // listan desde aquí: desde que unificamos su memoria con la misma sesión
+    // de Twilio (wa_<agente>_<tel>), ya aparecen arriba junto con `enriquecidas`
+    // — listarlas también aquí duplicaría el mismo hilo dos veces.
     const nombresGrupos = await obtenerNombresGruposWA().catch(() => ({}));
-    const conversacionesWA = grupoWA.listarConversaciones().map(c => {
-      if (c.agente !== 'grupo') return c;
-      const canalUuid = c.sessionId.replace(/^2chat:/, '');
-      return { ...c, nombre: nombresGrupos[canalUuid] || c.nombre };
-    });
+    const conversacionesWA = grupoWA.listarConversaciones()
+      .filter(c => c.agente === 'grupo')
+      .map(c => {
+        const canalUuid = c.sessionId.replace(/^2chat:/, '');
+        return { ...c, nombre: nombresGrupos[canalUuid] || c.nombre };
+      });
     enriquecidas = enriquecidas.concat(conversacionesWA);
 
     if (q) {
