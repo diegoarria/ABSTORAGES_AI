@@ -574,4 +574,40 @@ async function notificarDisponibilidadRuta({ nombre, telefono, ruta, unidad, fec
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de ruta ofrecida:', e.message); }
 }
 
-module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta };
+// Proveedor nuevo (ej. llegó por el CTA del anuncio de Meta) pendiente de
+// aprobación humana — correo con todos sus datos para decidir sin tener que
+// entrar primero al portal. Va a Diego, Rafael y Gabriel (son quienes
+// aprueban desde Base de Datos).
+async function notificarProveedorNuevo({ nombre, telefono, empresa, unidades, rutas, resumen }) {
+  const hora = new Date().toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey' });
+  const asunto = `SOFIA — Proveedor nuevo pendiente de aprobar: ${nombre || telefono}`;
+  const row = (label, val) => val ? `<tr><td style="padding:6px 16px 6px 0;color:#6b7280;font-size:13px;white-space:nowrap;">${esc(label)}</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#111;">${esc(val)}</td></tr>` : '';
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:18px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">SOFIA · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Proveedor nuevo pendiente de aprobar · ${esc(hora)}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <table style="width:100%;border-collapse:collapse;">
+        ${row('Nombre', nombre || '—')}
+        ${row('Teléfono', telefono)}
+        ${row('Empresa', empresa)}
+        ${row('Unidad', unidades)}
+        ${row('Rutas', rutas)}
+      </table>
+      ${resumen ? `<div style="margin-top:14px;font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.05em;text-transform:uppercase;">Lo que platicaron</div><div style="margin-top:4px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;font-size:13px;color:#111;white-space:pre-wrap;">${esc(resumen)}</div>` : ''}
+      <p style="margin:16px 0 0;font-size:12px;color:#6b7280;">Entra a Base de Datos para aprobarlo o rechazarlo — mientras no lo apruebes, no entra al directorio de proveedores.</p>
+    </div>
+    <div style="padding:16px 24px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center;">
+      <a href="${PORTAL_URL}/base-datos.html" style="background:#0f1d4a;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">Revisar en Base de Datos →</a>
+    </div>
+  </div>`;
+  if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
+  try {
+    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: ALERT_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de proveedor nuevo enviado a ${ALERT_EMAILS.join(', ')}`);
+  } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de proveedor nuevo:', e.message); }
+}
+
+module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta, notificarProveedorNuevo };
