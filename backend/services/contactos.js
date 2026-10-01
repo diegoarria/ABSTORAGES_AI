@@ -213,6 +213,17 @@ const TRATO_PROVEEDOR_BD =
   `Tampoco le pidas datos personales (nombre, teléfono, correo, RFC, empresa, documentos, etc.): ya los tienes registrados y volver a pedirlos es tedioso — nunca lo hagas. ` +
   `Si solo saluda, agradece o platica, contesta de igual a igual y ya; no lo redirijas al trabajo.\n`;
 
+// Trato especial para clientes guardados en la Base de Datos — pedido
+// explícito del usuario (01-oct-2026): a diferencia del trato de amigos con
+// proveedores, con un cliente se mantiene el registro formal/profesional de
+// ejecutiva comercial, pero como alguien que ya conoce, no como un prospecto
+// nuevo — ni fría/de formulario, ni casual como con un proveedor de confianza.
+const TRATO_CLIENTE_BD =
+  `\n\n## 🤝 TRATO CON ESTE CLIENTE — YA TIENE RELACIÓN COMERCIAL CON ABSTORAGES\n` +
+  `Mantén tu registro profesional de ejecutiva comercial — formal, no de amigos — pero trátalo como a alguien que ya conoces, no como un prospecto nuevo. ` +
+  `Salúdalo por su nombre, da continuidad natural a lo que ya han hablado o cotizado antes, y no repitas el proceso de calificación inicial ni le pidas otra vez datos que ya tienes. ` +
+  `No suene a primer contacto ni a formulario — suena a alguien que se acuerda de la relación comercial, con la calidez de un trato ya establecido, sin perder la formalidad.\n`;
+
 function bloqueContactoConocido(contacto) {
   const interacciones = (contacto.interacciones || []).slice(0, 5)
     .map(i => `- ${new Date(i.fecha).toLocaleDateString('es-MX')} (${i.canal || 'otro'}): ${i.resumen || 'sin detalle'}`)
@@ -221,7 +232,7 @@ function bloqueContactoConocido(contacto) {
     `\n\n---\n\n## 🧠 CONTACTO CONOCIDO — YA TIENES HISTORIAL CON ESTA PERSONA\n` +
     `**${contacto.nombre_completo}**${contacto.empresa ? ` — ${contacto.empresa}` : ''} (${contacto.tipo || 'contacto'}). ` +
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
-    (contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : '') +
+    (contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : contacto.tipo === 'cliente' ? TRATO_CLIENTE_BD : '') +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
     (interacciones ? `Interacciones previas relevantes:\n${interacciones}\n\n` : '\n') +
     `IMPORTANTE: esta persona YA está registrada en la Base de Datos de ABSTORAGES — NO le pidas nombre completo, teléfono ni correo, y NO apliques la regla de "PRIMER MENSAJE" con ella (esa regla es solo para desconocidos). Si te saluda, salúdala por su nombre y sigue la conversación normal.\n` +
