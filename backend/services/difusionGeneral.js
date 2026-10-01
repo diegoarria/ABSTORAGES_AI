@@ -17,7 +17,7 @@ const notifier = require('./notifier');
 
 const HABILITADO = process.env.SOFIA_DIFUSION_GENERAL === 'true';
 const HORA   = Number(process.env.SOFIA_DIFUSION_GENERAL_HORA || 5);
-const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 45);
+const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
 const TOP_N  = Number(process.env.SOFIA_DIFUSION_GENERAL_N || 50);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
 const CONTENT_SID_GENERAL  = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL || null;
