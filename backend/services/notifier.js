@@ -543,4 +543,35 @@ async function notificarListaDisponibilidad(lista) {
   } catch (e) { console.error('[Gmail] ❌ Error enviando lista de disponibilidad:', e.message); }
 }
 
-module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad };
+// Un proveedor ofrece una ruta por su cuenta — correo inmediato (a diferencia
+// del reporte de 2 veces al día, que es un resumen). Mismos destinatarios que
+// ese reporte: Diego, Rafael, Gabriel + equipo de operaciones.
+async function notificarDisponibilidadRuta({ nombre, telefono, ruta, unidad, fecha }) {
+  const hora = new Date().toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey' });
+  const fechaTxt = !fecha || fecha === 'hoy' ? 'Hoy' : textoFechaCorta(fecha);
+  const asunto = `SOFIA — ${nombre || 'Un proveedor'} ofrece ruta ${ruta}`;
+  const row = (label, val) => val ? `<tr><td style="padding:6px 16px 6px 0;color:#6b7280;font-size:13px;white-space:nowrap;">${esc(label)}</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#111;">${esc(val)}</td></tr>` : '';
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:18px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">SOFIA · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Proveedor ofrece ruta · ${esc(hora)}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <table style="width:100%;border-collapse:collapse;">
+        ${row('Proveedor', nombre)}
+        ${row('Teléfono', telefono)}
+        ${row('Ruta', ruta)}
+        ${row('Unidad', unidad)}
+        ${row('Fecha', fechaTxt)}
+      </table>
+    </div>
+  </div>`;
+  if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
+  try {
+    await gmailTransport.sendMail({ from: `SOFIA ABSTORAGES <${GMAIL_USER}>`, to: DISPONIBILIDAD_LISTA_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de ruta ofrecida enviado a ${DISPONIBILIDAD_LISTA_EMAILS.join(', ')}`);
+  } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de ruta ofrecida:', e.message); }
+}
+
+module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta };

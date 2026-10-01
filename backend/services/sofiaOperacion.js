@@ -168,6 +168,16 @@ function procesarSenales({ telefono, nombre, respuesta }) {
       if (d) feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible el ${textoFecha(d.fecha)}${d.ruta ? ' (' + d.ruta + ')' : ''} — SOFIA le escribirá ese día para confirmar`, metadata: { id: d.id } });
     }
 
+    // Un proveedor ofrece una ruta por su cuenta (con o sin orden activa con
+    // él) — a diferencia del reporte de 2 veces al día, este correo sale de
+    // inmediato. Pedido explícito del usuario (01-oct-2026).
+    const dr = json(respuesta, 'DISPONIBILIDAD_RUTA');
+    if (dr && dr.ruta) {
+      feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} ofrece ruta ${dr.ruta}${dr.fecha && dr.fecha !== 'hoy' ? ' el ' + textoFecha(dr.fecha) : ' (hoy)'}${dr.unidad ? ' — ' + dr.unidad : ''} — se avisó al equipo por correo` });
+      notifier.notificarDisponibilidadRuta({ nombre: quien, telefono, ruta: dr.ruta, unidad: dr.unidad, fecha: dr.fecha })
+        .catch(e => console.error('[sofiaOperacion] Error avisando disponibilidad de ruta:', e.message));
+    }
+
     const tf = json(respuesta, 'TARIFA_MENCIONADA');
     if (tf) {
       const k = colocaciones.tel10(telefono);
