@@ -15,7 +15,14 @@ const agentPause = require('./agentPause');
 const actividadBus = require('./actividadBus');
 const notifier = require('./notifier');
 
-const HABILITADO = process.env.SOFIA_DIFUSION_GENERAL === 'true';
+// 🛑 Pedido explícito del usuario (05-oct-2026): detener la difusión general
+// mientras él no la vuelva a pedir — a propósito NO es a través de la env var
+// (que sigue en Railway en 'true'), para que nadie la reactive sin querer
+// cambiando esa variable por otra razón. Solo se quita poniendo esto en false
+// cuando el usuario lo ordene de vuelta. No afecta nada más de SOFIA — ni
+// respuestas, ni seguimientos, ni otras plantillas.
+const PARO_DIFUSION_GENERAL = true;
+const HABILITADO = !PARO_DIFUSION_GENERAL && process.env.SOFIA_DIFUSION_GENERAL === 'true';
 const HORA   = Number(process.env.SOFIA_DIFUSION_GENERAL_HORA || 5);
 const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
 const TOP_N  = Number(process.env.SOFIA_DIFUSION_GENERAL_N || 100);
