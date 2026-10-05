@@ -12,7 +12,7 @@ const auth = 'Basic ' + Buffer.from(`${SID}:${TOKEN}`).toString('base64');
 
 const VARIANTES = [
   { n: 1, nombre: 'sofia_disponibilidad_general_1', cuerpo: 'Hola {{1}}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.' },
-  { n: 2, nombre: 'sofia_disponibilidad_general_2', cuerpo: 'Buenos días {{1}}, soy SOFIA de ABSTORAGES. ¿Cómo andas de unidad hoy? Si tienes algo libre, cuéntame en qué ruta y qué tipo de caja, para avisarte en cuanto tengamos algo para ti.' },
+  { n: 2, nombre: 'sofia_disponibilidad_general_2', cuerpo: 'Buenos días {{1}}, soy SOFIA de ABSTORAGES. ¿Tendrás unidad disponible hoy? Si tienes algo libre, cuéntame en qué ruta y qué tipo de caja, para avisarte en cuanto tengamos algo para ti.' },
   { n: 3, nombre: 'sofia_disponibilidad_general_3', cuerpo: '{{1}}, buen día — habla SOFIA de ABSTORAGES. ¿Hoy cuentas con unidad disponible? Si es así, dime la ruta y el tipo de caja para tenerte en mente.' },
   { n: 4, nombre: 'sofia_disponibilidad_general_4', cuerpo: 'Hola {{1}}, ¿qué tal? Soy SOFIA de ABSTORAGES Logistics. Te escribo para ver si tienes unidad libre hoy — compárteme ruta y tipo de caja para tomarte en cuenta en lo que tengamos disponible.' },
 ];
