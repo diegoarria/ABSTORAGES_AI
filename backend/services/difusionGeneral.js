@@ -27,8 +27,25 @@ const HORA   = Number(process.env.SOFIA_DIFUSION_GENERAL_HORA || 5);
 const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
 const TOP_N  = Number(process.env.SOFIA_DIFUSION_GENERAL_N || 100);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
-const CONTENT_SID_GENERAL  = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL || null;
-// Mientras la plantilla dedicada no esté aprobada, cae a la de disponibilidad
+// 4 variaciones de texto en vez de una sola plantilla fija — pedido explícito
+// del usuario (05-oct-2026): si siempre es el mismo mensaje, se nota que es un
+// bot y se pierde confianza. Se rota una por proveedor (round-robin), cada una
+// con su propio Content SID aprobado por Meta por separado. Solo se usan las
+// que ya tengan SID configurado — las que falten simplemente no entran a la
+// rotación todavía.
+const TEXTO_VARIANTE = [
+  'Hola {nombre}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.',
+  'Buenos días {nombre}, soy SOFIA de ABSTORAGES. ¿Cómo andas de unidad hoy? Si tienes algo libre, cuéntame en qué ruta y qué tipo de caja, para avisarte en cuanto tengamos algo para ti.',
+  '{nombre}, buen día — habla SOFIA de ABSTORAGES. ¿Hoy cuentas con unidad disponible? Si es así, dime la ruta y el tipo de caja para tenerte en mente.',
+  'Hola {nombre}, ¿qué tal? Soy SOFIA de ABSTORAGES Logistics. Te escribo para ver si tienes unidad libre hoy — compárteme ruta y tipo de caja para tomarte en cuenta en lo que tengamos disponible.',
+];
+const VARIANTES = [1, 2, 3, 4]
+  .map(n => ({
+    sid: process.env[`TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL_${n}`] || (n === 1 ? process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL : null) || null,
+    texto: TEXTO_VARIANTE[n - 1],
+  }))
+  .filter(v => v.sid);
+// Mientras ninguna plantilla dedicada esté aprobada, cae a la de disponibilidad
 // que ya existe y está aprobada — con valores genéricos, porque esta difusión
 // no es de una ruta ni una carga específica.
 const CONTENT_SID_FALLBACK = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD || null;
@@ -89,9 +106,8 @@ const feed = e => actividadBus.emitir({ agente: 'SOFIA', ...e });
 async function correrSiToca(pushActividad) {
   if (!HABILITADO) return;
   if (agentPause.estaPausado('sofia')) return;
-  const usaGeneral = !!CONTENT_SID_GENERAL;
-  const CONTENT_SID = CONTENT_SID_GENERAL || CONTENT_SID_FALLBACK;
-  if (!CONTENT_SID) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada (ni la general ni la de siempre) — se omite'); return; }
+  const usaVariantes = VARIANTES.length > 0;
+  if (!usaVariantes && !CONTENT_SID_FALLBACK) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada (ni variantes ni la de siempre) — se omite'); return; }
 
   const { fecha, minutosDelDia } = horaYFechaMTY();
   const inicioMin = HORA * 60 + MINUTO;
@@ -107,17 +123,21 @@ async function correrSiToca(pushActividad) {
   feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad — empezando con ${lista.length} proveedores, uno tras otro` });
 
   let enviados = 0, sinCredito = 0, fallidos = 0;
+  let i = 0;
   for (const p of lista) {
     try {
-      const variables = usaGeneral
+      const variante = usaVariantes ? VARIANTES[i % VARIANTES.length] : null;
+      const CONTENT_SID = variante ? variante.sid : CONTENT_SID_FALLBACK;
+      const variables = variante
         ? { '1': titulo(p.nombre) }
         : { '1': titulo(p.nombre), '2': 'cualquier tipo de unidad', '3': 'cualquier origen', '4': 'cualquier destino', '5': 'hoy' };
       const r = await whatsappProactivo.enviarPlantillaSinCandado('sofia', p.telefono, CONTENT_SID, variables);
+      i++;
       if (r?.status === 'rate_limited') { sinCredito = lista.length - enviados - fallidos; break; }
       if (r?.status === 'paused') break;
       enviados++;
-      const textoEnviado = usaGeneral
-        ? `Hola ${titulo(p.nombre)}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.`
+      const textoEnviado = variante
+        ? variante.texto.replace('{nombre}', titulo(p.nombre))
         : `Hola ${titulo(p.nombre)}, buscamos unidad para cualquier ruta hoy. ¿Tienes disponibilidad? Cuéntame qué unidad y para dónde.`;
       whatsappProactivo.registrarEnMemoria?.('sofia', p.telefono, textoEnviado);
       contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: 'Difusión general de disponibilidad (ronda diaria 5:45 AM)', canal: 'whatsapp-plantilla' }).catch(() => {});
