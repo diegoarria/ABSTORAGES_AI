@@ -19,6 +19,9 @@ const actividadBus = require('./actividadBus');
 const whatsappProactivo = require('./whatsappProactivo');
 const vapi = require('./vapi');
 const notifier = require('./notifier');
+const ordersStore = require('./ordersStore');
+const saraProactivo = require('./saraProactivo');
+const folioContexto = require('./folioContexto');
 let _ultimoAvisoTarifa = new Map(); // teléfono → ts, evita mandar 5 correos si el proveedor insiste en varios mensajes seguidos
 
 const OLA_TAM         = Number(process.env.SOFIA_ESCALERA_TAMANO || 3);
@@ -91,6 +94,24 @@ function avisarOferta(folio, quien) {
   const rec = comp.find(f => f.recomendado);
   feed({ tipo: 'OFERTA', mensaje: `Folio ${folio}: ${quien} tiene unidad${comp.find(f => f.nombre === quien)?.precio ? ` a ${pesos(comp.find(f => f.nombre === quien).precio)}` : ''} · ${comp.length} oferta(s) en total${rec ? ` · recomendado: ${rec.nombre} (${pesos(rec.precio)})` : ''}`, metadata: { folio } });
   push({ title: `📊 Oferta para el folio ${folio}`, body: `${comp.length} oferta(s)${rec ? ` · recomendado: ${rec.nombre} ${pesos(rec.precio)}` : ''} — entra a aprobar`, tag: 'oferta-' + folio, url: '/colocaciones.html', tipo: 'OFERTA', urgente: comp.length === 1 });
+
+  // Primera oferta usable del folio → se le avisa a SARA/cliente de inmediato
+  // (pedido explícito del usuario, 06-oct-2026). Solo una vez por folio.
+  if (rec && !c.avisos.clienteAvisado) avisarClientePrimeraOferta(c, rec).catch(e => console.error('[sofiaOperacion] Error avisando al cliente:', e.message));
+}
+
+async function avisarClientePrimeraOferta(c, rec) {
+  colocaciones.marcarAviso(c.folio, 'clienteAvisado'); // marca antes de await — nunca duplicar el aviso
+  let orden;
+  try { orden = await ordersStore.obtenerOrdenPorFolio(c.folio); } catch { orden = null; }
+  const telefono = orden?.telefono;
+  if (!telefono || telefono === '—') return;
+  await saraProactivo.enviarUnidadConfirmada(telefono, orden.nombre, c.folio, rec.nombre, rec.precio);
+  folioContexto.registrar(c.folio, {
+    resumen: { telefono, empresa: c.empresa, origen: c.origen, destino: c.destino, tipo_unidad: c.tipo_unidad },
+    notas: `SOFIA ya tiene unidad confirmada con ${rec.nombre}${rec.precio ? ` a ${pesos(rec.precio)}` : ''}. Le avisamos al cliente y está esperando que confirme si la sigue necesitando. Si el cliente confirma que sí (urgencia, "la necesito ya", "va", etc.), emite CONFIRMAR_UNIDAD_URGENTE: {"folio":"${c.folio}"} para que operaciones cierre con ese proveedor de inmediato.`,
+    por: 'SOFIA (automático)',
+  });
 }
 
 function ofertaPorLlamada(folio, proveedorId, datos) {
@@ -307,6 +328,32 @@ async function aprobar(folio, { tel, manual, precio, aprobadoPor }) {
   return { ok: true, folio, ganador: g, mensajeAlGanador: mensaje };
 }
 
+// ── El cliente le confirmó a SARA que sigue necesitando la unidad con urgencia ──
+// Pedido explícito del usuario (06-oct-2026): si ya hay oferta recomendada,
+// se cierra con ese proveedor automático, sin esperar aprobación humana (caso
+// distinto al de colocaciones.html, donde sí la pide). Si todavía no hay
+// ninguna oferta, se marca el folio urgente para que la escalera de contacto
+// salte la ventana de horario normal y se avisa al equipo.
+async function confirmarUrgentePorCliente(folio) {
+  const f = String(folio || '').toUpperCase();
+  const c = colocaciones.obtener(f);
+  if (!c) return { ok: false, motivo: 'no_existe' };
+  if (c.estado === 'colocado') return { ok: true, ya_colocado: true, ganador: c.ganador };
+
+  const comp = colocaciones.comparativo(c);
+  const top = comp.find(x => x.recomendado) || comp[0];
+  if (top) {
+    const r = await aprobar(f, { tel: top.tel, precio: top.precio, aprobadoPor: 'Cliente (confirmó urgencia por WhatsApp con SARA)' });
+    feed({ tipo: 'URGENCIA_CLIENTE', mensaje: `Folio ${f}: el cliente confirmó que necesita la unidad ya — se cerró automático con ${top.nombre}` });
+    return { ok: true, ...r };
+  }
+
+  colocaciones.marcarUrgente(f);
+  feed({ tipo: 'URGENCIA_CLIENTE', mensaje: `Folio ${f} (${ruta(c)}): el cliente confirmó urgencia pero aún no hay ninguna oferta — se priorizó el folio` });
+  push({ title: `🔴 Cliente urgente sin unidad — folio ${f}`, body: `${ruta(c)} · el cliente ya confirmó que la necesita ya. Revisa de cerca este folio.`, tag: 'urgente-' + f, url: '/colocaciones.html', tipo: 'URGENCIA_CLIENTE', urgente: true });
+  return { ok: true, sin_oferta_aun: true };
+}
+
 // ── Tick cada minuto ────────────────────────────────────────────────────────
 function fechaCargaDate(txt) {
   const m = String(txt || '').match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\D+(\d{1,2}):(\d{2}))?/);
@@ -463,4 +510,4 @@ function iniciar({ sendPush: sp } = {}) {
   console.log(`[sofiaOperacion] Activo — escalera de ${OLA_TAM}, horario ${horario.INICIO}:00–${horario.FIN}:00`);
 }
 
-module.exports = { detenerBusquedaPorEquipo, bloqueChecklist, iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, tick };
+module.exports = { detenerBusquedaPorEquipo, bloqueChecklist, iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, confirmarUrgentePorCliente, tick };

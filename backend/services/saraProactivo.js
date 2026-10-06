@@ -51,6 +51,12 @@ const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 const CONTENT_SID_SEGUIMIENTO_LEAD = 'HXd4594e8561e81c02c8d8f59a635ffdf8';
 const CONTENT_SID_COTIZACION       = 'HXffc1ba05d5857ff12a3cf56aa9730adf';
 const CONTENT_SID_VENTA_CERRADA    = 'HXf43876d80588e3323741f01ec3f90f61';
+// ⚠️ PENDIENTE: esta plantilla todavía no existe en Twilio/Meta — hay que
+// crearla y someterla a aprobación igual que las 3 de arriba (mismo proceso,
+// ver encabezado del archivo) antes de que enviarUnidadConfirmada() mande
+// algo real. Mientras tanto, con WA_LIVE queda en modo STUB (solo log).
+// Variables sugeridas: '1' nombre, '2' folio, '3' proveedor, '4' precio.
+const CONTENT_SID_UNIDAD_CONFIRMADA = 'HX__PENDIENTE_DE_CREAR__';
 
 async function enviarPlantilla(to, contentSid, variables) {
   if (agentPause.estaPausado('sara')) {
@@ -111,6 +117,24 @@ async function enviarCotizacion(telefono, nombre, ruta, precio) {
   return resultado;
 }
 
+// Mensaje proactivo: SOFIA ya encontró proveedor para el folio — SARA le
+// avisa al cliente y le pregunta si lo sigue necesitando con esa urgencia.
+// Si el cliente contesta que sí, SARA emite CONFIRMAR_UNIDAD_URGENTE y el
+// backend cierra automático con ese proveedor (ver sofiaOperacion.js).
+async function enviarUnidadConfirmada(telefono, nombre, folio, proveedorNombre, precio) {
+  if (!telefonoValido(telefono)) return null;
+  if (CONTENT_SID_UNIDAD_CONFIRMADA.includes('PENDIENTE')) {
+    console.warn(`[saraProactivo] enviarUnidadConfirmada: plantilla aún no creada en Twilio/Meta — no se manda nada a ${telefono} (folio ${folio})`);
+    return { status: 'sin_plantilla', to: telefono };
+  }
+  console.log(`[saraProactivo] Unidad confirmada → ${telefono} — folio ${folio}`);
+  const p = precio ? `$${Number(precio).toLocaleString('es-MX')} MXN` : 'tarifa pactada';
+  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy SARA de ABSTORAGES. Ya tenemos unidad confirmada para tu folio ${folio} con ${proveedorNombre || 'un transportista'} (${p}). ¿La sigues necesitando?`);
+  return enviarPlantilla(telefono, CONTENT_SID_UNIDAD_CONFIRMADA, {
+    '1': nombre || 'ahí', '2': folio || '—', '3': proveedorNombre || 'nuestro transportista', '4': p,
+  });
+}
+
 async function enviarConfirmacionVenta(telefono, nombre, folio) {
   if (!telefonoValido(telefono)) return null;
   console.log(`[saraProactivo] Confirmación de venta → ${telefono} — folio ${folio}`);
@@ -121,4 +145,4 @@ async function enviarConfirmacionVenta(telefono, nombre, folio) {
   });
 }
 
-module.exports = { enviarSeguimientoLead, enviarCotizacion, enviarConfirmacionVenta };
+module.exports = { enviarSeguimientoLead, enviarCotizacion, enviarConfirmacionVenta, enviarUnidadConfirmada };

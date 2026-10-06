@@ -188,6 +188,9 @@ function detenerBusqueda(folio, motivo) {
 
 function cambiarEstado(folio, estado) { const c = obtener(folio); if (!c) return null; c.estado = estado; guardar(); return c; }
 function marcarAviso(folio, clave) { const c = obtener(folio); if (!c) return; c.avisos[clave] = ahora(); guardar(); }
+// El cliente confirmó que lo necesita con urgencia — salta la ventana de
+// horario normal para las siguientes olas de contacto a proveedores.
+function marcarUrgente(folio) { const c = obtener(folio); if (!c) return null; c.urgente = true; guardar(); return c; }
 function actualizarSeguimiento(folio, parche) {
   const c = obtener(folio); if (!c) return null;
   c.seguimiento = { ...c.seguimiento, ...parche, actualizadoEn: ahora() }; guardar(); return c;
@@ -291,7 +294,7 @@ module.exports = {
   fechaMTY, tel10, crear, obtener, todas, abiertas, marcarContactado, porTelefono, registrarRespuesta, registrarOferta, registrarOfertaVapi,
   CHECKLIST, estadoChecklist, checklistCompleto, marcarChecklist,
   HITOS, hitoAlcanzado, marcarHito, registrarRetraso, guardarOperador, marcarChequeo, marcarAlertaSeg,
-  detenerBusqueda, asignar, cambiarEstado, marcarAviso, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
+  detenerBusqueda, asignar, cambiarEstado, marcarAviso, marcarUrgente, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
   agregarDisponibilidad, disponibilidades, actualizarDisponibilidad,
   agregarSugerencia, sugerencias, resolverSugerencia, kpiBase, kpiMeta, kpiGuardar,
 };
