@@ -1,0 +1,352 @@
+[
+  {
+    "rank": 1,
+    "ruta": "Santa Catarina - Tultitlan",
+    "empresa": "NUEVO CEDIS TULTITLAN - MEGA ALIMENTOS",
+    "ciudad": "Tultitlán",
+    "estado": "México"
+  },
+  {
+    "rank": 2,
+    "ruta": "Tlajomulco de Zuñiga - Escobedo",
+    "empresa": "CCM ESCOBEDO - BONAFONT",
+    "ciudad": "Escobedo",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 3,
+    "ruta": "Guadalupe - Torreon",
+    "empresa": "MB TORREON - MAS BODEGA Y LOGISTICA",
+    "ciudad": "Torreón",
+    "estado": "Coahuila de Zaragoza"
+  },
+  {
+    "rank": 4,
+    "ruta": "Ramos Arizpe - Tultitlan de Mariano Escobedo",
+    "empresa": "DIKEN INTERNATIONAL SUC CENTRO",
+    "ciudad": "Tultitlán de Mariano Escobedo",
+    "estado": "México"
+  },
+  {
+    "rank": 5,
+    "ruta": "Cuautitlan Izcalli - Ramos Arizpe",
+    "empresa": "OXXO RAMOS ARIZPE - CADENA COMERCIAL OXXO",
+    "ciudad": "Ramos Arizpe",
+    "estado": "Coahuila de Zaragoza"
+  },
+  {
+    "rank": 6,
+    "ruta": "Tecamac - San Nicolas de los Garza",
+    "empresa": "HUB MTY - PEÑAFIEL BEBIDAS",
+    "ciudad": "San Nicolás de los Garza",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 7,
+    "ruta": "Tlajomulco de Zuñiga - Escobedo",
+    "empresa": "CEDIS BONAFONT",
+    "ciudad": "Escobedo",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 8,
+    "ruta": "Tecamac - Monterrey",
+    "empresa": "MODERNA - PROVEEDORA DE EMBARQUES",
+    "ciudad": "Monterrey",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 9,
+    "ruta": "Santa Catarina - Gomez Palacio",
+    "empresa": "OMEGA PROVEEDORA DE ALIMENTOS",
+    "ciudad": "Gómez Palacio",
+    "estado": "Durango"
+  },
+  {
+    "rank": 10,
+    "ruta": "Tepotzotlan - Ciudad Guzman",
+    "empresa": "DAYMAC - JUAN JOSE SHUGERT VARELA",
+    "ciudad": "Ciudad Guzmán",
+    "estado": "Jalisco"
+  },
+  {
+    "rank": 11,
+    "ruta": "Santa Catarina - Puebla",
+    "empresa": "INDUSTRIALIZADORA DE CARNICOS STRATTEGA",
+    "ciudad": "Puebla",
+    "estado": "Puebla"
+  },
+  {
+    "rank": 12,
+    "ruta": "Santa Catarina - Tijuana",
+    "empresa": "CEDIS TIJUANA - MEGA ALIMENTOS",
+    "ciudad": "Tijuana",
+    "estado": "Baja California"
+  },
+  {
+    "rank": 13,
+    "ruta": "Tecamac - San Nicolas de los Garza",
+    "empresa": "CPR SAN NICOLAS - PEÑAFIEL BEBIDAS",
+    "ciudad": "San Nicolás de los Garza",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 14,
+    "ruta": "Guadalupe - Tlajomulco de Zuñiga",
+    "empresa": "CEDIS TLAJOMULCO - MAS BODEGA Y LOGISTICA",
+    "ciudad": "Tlajomulco de Zúñiga",
+    "estado": "Jalisco"
+  },
+  {
+    "rank": 15,
+    "ruta": "Toluca - Escobedo",
+    "empresa": "HEB ESCOBEDO",
+    "ciudad": "Escobedo",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 16,
+    "ruta": "Santa Catarina - Mexicali",
+    "empresa": "DISTRIBUCIONES REMBAO - MEGA ALIMENTOS",
+    "ciudad": "Mexicali",
+    "estado": "Baja California"
+  },
+  {
+    "rank": 17,
+    "ruta": "Cuautitlan Izcalli - Apodaca",
+    "empresa": "BUNZL DE MEXICO",
+    "ciudad": "Apodaca",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 18,
+    "ruta": "Ramos Arizpe - Teoloyucan",
+    "empresa": "CEDIS CHEDRAUI TEOLOYUCAN - TIENDAS CHEDRAUI",
+    "ciudad": "Teoloyucan",
+    "estado": "México"
+  },
+  {
+    "rank": 19,
+    "ruta": "Monterrey - Tultitlan",
+    "empresa": "CEDIS SODIMAC TULTITLAN - GONHERRPLAST",
+    "ciudad": "Tultitlán",
+    "estado": "México"
+  },
+  {
+    "rank": 20,
+    "ruta": "Tultitlan - Cancun",
+    "empresa": "MAS BODEGA CANCUN - MAS BODEGA Y LOGISTICA",
+    "ciudad": "Cancún",
+    "estado": "Quintana Roo"
+  },
+  {
+    "rank": 21,
+    "ruta": "Ramos Arizpe - Tultitlan de Mariano Escobedo",
+    "empresa": "CEDIS CITY CLUB TULTITLAN - TIENDAS SORIANA",
+    "ciudad": "Tultitlán de Mariano Escobedo",
+    "estado": "México"
+  },
+  {
+    "rank": 22,
+    "ruta": "Santa Catarina - Tultitlan",
+    "empresa": "NUEVO CEDIS TULTITLAN - MEGA ALIMENTOS",
+    "ciudad": "Tultitlán",
+    "estado": "México"
+  },
+  {
+    "rank": 23,
+    "ruta": "Santa Catarina - San Luis Rio Colorado",
+    "empresa": "FRUTERIA WELTON - MEGA ALIMENTOS",
+    "ciudad": "San Luis Río Colorado",
+    "estado": "Sonora"
+  },
+  {
+    "rank": 24,
+    "ruta": "Monterrey - Cuautitlan Izcalli",
+    "empresa": "SAMS CLUB CUAUTITLAN - GONHERRPLAST",
+    "ciudad": "Cuautitlán Izcalli",
+    "estado": "México"
+  },
+  {
+    "rank": 25,
+    "ruta": "Guadalupe - Tultitlan",
+    "empresa": "MAS BODEGA Y LOGISTICA",
+    "ciudad": "Tultitlán",
+    "estado": "México"
+  },
+  {
+    "rank": 26,
+    "ruta": "Toluca - Saltillo",
+    "empresa": "DISTRIBUIDORA FORKAMINOS SALTILLO",
+    "ciudad": "Saltillo",
+    "estado": "Coahuila de Zaragoza"
+  },
+  {
+    "rank": 27,
+    "ruta": "Tecamac - Zapopan",
+    "empresa": "INTER PACKGING PARTNERSHIP - PROVEEDORA DE EMBARQUES",
+    "ciudad": "Zapopan",
+    "estado": "Jalisco"
+  },
+  {
+    "rank": 28,
+    "ruta": "Ramos Arizpe - Oriental",
+    "empresa": "REALI",
+    "ciudad": "Oriental",
+    "estado": "Puebla"
+  },
+  {
+    "rank": 29,
+    "ruta": "Santa Catarina - Irapuato",
+    "empresa": "CEDIS IRAPUATO NUEVO - MEGA ALIMENTOS",
+    "ciudad": "Irapuato",
+    "estado": "Guanajuato"
+  },
+  {
+    "rank": 30,
+    "ruta": "Santa Catarina - Puebla",
+    "empresa": "OPERADORA AVICOLA SAN MIGUEL - MEGA ALIMENTOS",
+    "ciudad": "Puebla",
+    "estado": "Puebla"
+  },
+  {
+    "rank": 31,
+    "ruta": "Santa Catarina - El Salto",
+    "empresa": "CEDIS GUADALAJARA - MEGA ALIMENTOS",
+    "ciudad": "El Salto",
+    "estado": "Jalisco"
+  },
+  {
+    "rank": 32,
+    "ruta": "Tlajomulco de Zuñiga - Guadalupe",
+    "empresa": "MAS BODEGA Y LOGISTICA",
+    "ciudad": "Guadalupe",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 33,
+    "ruta": "Tlajomulco de Zuñiga - Monterrey",
+    "empresa": "OXXO MTY - BONAFONT",
+    "ciudad": "Monterrey",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 34,
+    "ruta": "Santa Catarina - Mexicali",
+    "empresa": "CEDIS OXXO MEXICALI - MEGA ALIMENTOS",
+    "ciudad": "Mexicali",
+    "estado": "Baja California"
+  },
+  {
+    "rank": 35,
+    "ruta": "Ramos Arizpe - Tultitlan de Mariano Escobedo",
+    "empresa": "MAS BODEGA Y LOGISTICA CEDIS TULTITLAN",
+    "ciudad": "Tultitlán de Mariano Escobedo",
+    "estado": "México"
+  },
+  {
+    "rank": 36,
+    "ruta": "Tecamac - El Salto",
+    "empresa": "METAPEL",
+    "ciudad": "El Salto",
+    "estado": "Jalisco"
+  },
+  {
+    "rank": 37,
+    "ruta": "Tlajomulco de Zuñiga - Guadalupe",
+    "empresa": "OXXO GPE",
+    "ciudad": "Guadalupe",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 38,
+    "ruta": "Santa Catarina - Gomez Palacio",
+    "empresa": "OMEGA PROV DE ALIMENTOS - MEGA ALIMENTOS",
+    "ciudad": "Gómez Palacio",
+    "estado": "Durango"
+  },
+  {
+    "rank": 39,
+    "ruta": "Santa Catarina - Santa Catarina",
+    "empresa": "ALEN SANTA CATARINA - ALEN DEL NORTE",
+    "ciudad": "Santa Catarina",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 40,
+    "ruta": "Monterrey - Chalco",
+    "empresa": "CEDIS SAMS CHALCO - NUEVA WAL MART DE MEXICO",
+    "ciudad": "Chalco",
+    "estado": "México"
+  },
+  {
+    "rank": 41,
+    "ruta": "Tepotzotlan - San Nicolas de los Garza",
+    "empresa": "ESSITY ZONA 5 - JUAN JOSE SHUGERT VARELA",
+    "ciudad": "San Nicolás de los Garza",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 42,
+    "ruta": "Monterrey - Tultitlan",
+    "empresa": "SODIMAC CEDIS - GONHERRPLAST",
+    "ciudad": "Tultitlán",
+    "estado": "México"
+  },
+  {
+    "rank": 43,
+    "ruta": "Santa Catarina - Mexicali",
+    "empresa": "JOSE PEREDA REYES - MEGA ALIMENTOS",
+    "ciudad": "Mexicali",
+    "estado": "Baja California"
+  },
+  {
+    "rank": 44,
+    "ruta": "Monterrey - Tultitlan",
+    "empresa": "CEDIS SORIANA TULTITLAN - GONHERRPLAST",
+    "ciudad": "Tultitlán",
+    "estado": "México"
+  },
+  {
+    "rank": 45,
+    "ruta": "Monterrey - Queretaro",
+    "empresa": "SORIANA QUERETARO - GONHERRPLAST",
+    "ciudad": "Querétaro",
+    "estado": "Querétaro"
+  },
+  {
+    "rank": 46,
+    "ruta": "Ramos Arizpe - Cienega de Flores",
+    "empresa": "CEDIS WAL-MART - NUEVA WALMART DE MEXICO",
+    "ciudad": "Ciénega de Flores",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 47,
+    "ruta": "Ocoyoacac - Ramos Arizpe",
+    "empresa": "CORPORATIVO DIKEN INTERNATIONAL - DIKEN INTERNATIONAL",
+    "ciudad": "Ramos Arizpe",
+    "estado": "Coahuila de Zaragoza"
+  },
+  {
+    "rank": 48,
+    "ruta": "Santa Catarina - Tizayuca",
+    "empresa": "TMLL - COGONMAR",
+    "ciudad": "Tizayuca",
+    "estado": "Hidalgo"
+  },
+  {
+    "rank": 49,
+    "ruta": "Escobedo - Guadalupe",
+    "empresa": "MAS BODEGA Y LOGISTICA",
+    "ciudad": "Guadalupe",
+    "estado": "Nuevo León"
+  },
+  {
+    "rank": 50,
+    "ruta": "Santa Catarina - Cuautitlan Izcalli",
+    "empresa": "GRUPO ZORRO - CEDIS SAN MARTIN OBISPO - MEGA ALIMENTOS",
+    "ciudad": "Cuautitlán Izcalli",
+    "estado": "México"
+  }
+]

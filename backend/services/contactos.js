@@ -402,6 +402,39 @@ async function cargarTop50Rutas({ archivo = 'proveedores-top50-rutas.json', flag
   console.log(`[Contactos] Top 50 Rutas: ${nuevos} proveedores nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
 }
 
+// ── Clientes (destino) del Top 50 de rutas ──────────────────────────────────
+// backend/data/clientes-top50-rutas.json: la empresa/CEDIS que RECIBE la carga
+// en cada una de las 50 rutas (columna "Cliente / Destino" del PDF, distinta
+// del transportista que mueve la carga). No trae teléfono ni contacto — se
+// identifica por nombre de empresa, no por teléfono como los proveedores.
+async function cargarClientesTop50Rutas({ archivo = 'clientes-top50-rutas.json', flag = 'clientes-top50-rutas-oct-2026' } = {}) {
+  if (leerFlags()[flag]) return;
+  let clientes;
+  try { clientes = require('../data/' + archivo); } catch { return; }
+  let nuevos = 0, actualizados = 0, fallos = 0;
+  for (const cl of clientes) {
+    try {
+      const notaUbicacion = `CEDIS/cliente destino en ${cl.ciudad}, ${cl.estado} (Top 50 Rutas ene-sep 2026)`;
+      let c = (await listarPorAgente('SOFIA', { tipo: 'cliente', q: cl.empresa })).find(x => (x.empresa || '') === cl.empresa) || null;
+
+      if (!c) {
+        await upsertContacto({
+          agente: 'sofia', tipo: 'cliente', nombre_completo: cl.empresa, empresa: cl.empresa,
+          notas: notaUbicacion, rutas: cl.ruta,
+          resumen_interaccion: `Alta desde Top 50 Rutas (${cl.ruta})`, canal: 'permanente',
+        });
+        nuevos++;
+      } else {
+        await actualizarCampoProveedor(c.id, 'rutas', uneLista(c.rutas, cl.ruta));
+        await rellenarSiVacio(c.id, { notas: notaUbicacion });
+        actualizados++;
+      }
+    } catch (e) { fallos++; console.error(`[Contactos] Error cargando cliente ${cl.empresa} (ruta ${cl.ruta}):`, e.message); }
+  }
+  if (!fallos) marcarFlag(flag);
+  console.log(`[Contactos] Clientes Top 50 Rutas: ${nuevos} clientes nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
+}
+
 // ── Directorio completo de proveedores (PDF de AppSheet, 27-sep-2026) ───────
 // Clave, proveedor, contacto, teléfono, unidades (caja seca 53) y sus 3 rutas
 // principales. Proveedor nuevo (por teléfono) → se crea completo. Proveedor que
@@ -454,6 +487,7 @@ async function sembrarCatalogos() {
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-guadalajara.json', ruta: 'Monterrey-Guadalajara', flag: 'catalogo-mty-gdl-2026-09-27' });
   await cargarDirectorio({ archivo: 'proveedores-directorio.json', flag: 'directorio-proveedores-2026-09-27' });
   await cargarTop50Rutas();
+  await cargarClientesTop50Rutas();
   await unidadPorDefectoProveedores();
 }
 

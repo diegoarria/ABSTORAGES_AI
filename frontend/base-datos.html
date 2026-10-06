@@ -605,6 +605,7 @@ function renderList(){
         <div class="row-meta">
           <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
           ${c.tipo === 'proveedor' ? (c.rutas ? `<span class="pill pill-ok">${ico('pin')} ${partes(c.rutas).length} ruta${partes(c.rutas).length === 1 ? '' : 's'}</span>` : `<span class="pill pill-warn">${ico('pin')} Sin rutas</span>`) : ''}
+          ${c.tipo === 'cliente' && c.rutas ? `<span class="pill pill-ok">${ico('pin')} ${partes(c.rutas).length} ruta${partes(c.rutas).length === 1 ? '' : 's'}</span>` : ''}
           <span class="tel">${esc(c.telefono || '—')}</span>
         </div>
       </div>
@@ -695,7 +696,16 @@ async function renderDetail(){
       <section>
         <div class="sec-title">Desempeño con SOFIA</div>
         <div id="desempeno-box"><div class="empty-msg">Cargando…</div></div>
-      </section>` : ''}
+      </section>` : (data.tipo === 'cliente' ? `
+      <section>
+        <div class="sec-title">Cobertura operativa</div>
+        <div class="cover">
+          <div class="cover-card">
+            <div class="cover-h"><span>${ico('pin')} Rutas en las que recibe carga</span><button class="btn btn-ghost btn-sm" onclick="editarRutas('${data.id}')">${ico('edit')} Editar</button></div>
+            ${rutas.length ? `<div class="tags">${rutas.map(r => `<span class="tagc">${esc(r)}</span>`).join('')}</div>` : '<div class="hint">Sin rutas capturadas.</div>'}
+          </div>
+        </div>
+      </section>` : '')}
 
       ${esProv && data.tarifas ? `<section><div class="sec-title">Tarifas históricas</div><div class="notes">${esc(data.tarifas)}</div></section>` : ''}
       ${data.notas ? `<section><div class="sec-title">Notas</div><div class="notes">${esc(data.notas)}</div></section>` : ''}
