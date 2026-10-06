@@ -1,8 +1,11 @@
-// ── Difusión general de disponibilidad — 5:45 AM hora de Monterrey ──────────
-// Pedido explícito del usuario (29-sep-2026): todos los días a partir de esa
-// hora, SOFIA le manda a los proveedores más importantes (por número de
-// servicios reales históricos) la plantilla de disponibilidad general, uno
-// tras otro, sin esperar respuesta de nadie antes de seguir con el siguiente.
+// ── Difusión general de disponibilidad — 5:30 AM hora de Monterrey ──────────
+// Pedido explícito del usuario (06-oct-2026): todos los días a partir de esa
+// hora, SOFIA le manda la plantilla de disponibilidad general SOLO a los
+// proveedores que cubren alguna de las 50 rutas más importantes de la Base
+// de Datos (backend/data/proveedores-top50-rutas.json) — uno tras otro, sin
+// esperar respuesta de nadie antes de seguir con el siguiente. Si un
+// proveedor cubre varias de esas 50 rutas, le llega UN solo mensaje, nunca
+// uno por ruta (la lista ya sale deduplicada por teléfono).
 //
 // Apagado por default — requiere SOFIA_DIFUSION_GENERAL=true en el entorno,
 // mismo criterio que sofiaScheduler.js/noaScheduler.js: un envío masivo diario
@@ -15,17 +18,11 @@ const agentPause = require('./agentPause');
 const actividadBus = require('./actividadBus');
 const notifier = require('./notifier');
 
-// 🛑 Pedido explícito del usuario (05-oct-2026): detener la difusión general
-// mientras él no la vuelva a pedir — a propósito NO es a través de la env var
-// (que sigue en Railway en 'true'), para que nadie la reactive sin querer
-// cambiando esa variable por otra razón. Solo se quita poniendo esto en false
-// cuando el usuario lo ordene de vuelta. No afecta nada más de SOFIA — ni
-// respuestas, ni seguimientos, ni otras plantillas.
-const PARO_DIFUSION_GENERAL = true;
-const HABILITADO = !PARO_DIFUSION_GENERAL && process.env.SOFIA_DIFUSION_GENERAL === 'true';
+// Reactivada a pedido explícito del usuario (06-oct-2026) — ya no se detiene
+// aquí; el único apagador real es SOFIA_DIFUSION_GENERAL en el entorno.
+const HABILITADO = process.env.SOFIA_DIFUSION_GENERAL === 'true';
 const HORA   = Number(process.env.SOFIA_DIFUSION_GENERAL_HORA || 5);
 const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
-const TOP_N  = Number(process.env.SOFIA_DIFUSION_GENERAL_N || 100);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
 // 4 variaciones de texto en vez de una sola plantilla fija — pedido explícito
 // del usuario (05-oct-2026): si siempre es el mismo mensaje, se nota que es un
@@ -73,31 +70,26 @@ function horaYFechaMTY() {
   return { fecha: `${p.year}-${p.month}-${p.day}`, minutosDelDia: Number(p.hour) * 60 + Number(p.minute) };
 }
 
-// Junta los 3 catálogos cargados (directorio general + las 2 rutas MTY) y se
-// queda con el mayor número de servicios visto por teléfono — es la señal más
-// real que tenemos de "qué tan importante" es un proveedor.
-function serviciosPorTelefono() {
-  const mapa = new Map();
-  for (const archivo of ['proveedores-directorio.json', 'proveedores-mty-guadalajara.json', 'proveedores-mty-gomez-palacio.json']) {
-    let lista; try { lista = require('../data/' + archivo); } catch { continue; }
-    for (const p of lista) {
-      if (!p.telefono) continue;
-      const tel10 = String(p.telefono).replace(/\D/g, '').slice(-10);
-      const n = Number(p.servicios || 0);
-      if (!mapa.has(tel10) || mapa.get(tel10) < n) mapa.set(tel10, n);
-    }
-  }
-  return mapa;
+// Las 50 rutas más importantes (ya sembradas en la Base de Datos con el
+// mismo texto "Municipio - Municipio" que trae c.rutas de cada proveedor —
+// ver backend/data/proveedores-top50-rutas.json y contactos.js).
+function rutasTop50() {
+  let lista; try { lista = require('../data/proveedores-top50-rutas.json'); } catch { return new Set(); }
+  return new Set(lista.map(r => String(r.destino || '').trim().toLowerCase()).filter(Boolean));
 }
 
-async function topProveedores(n) {
-  const servicios = serviciosPorTelefono();
+// Proveedores de la Base de Datos que cubren al menos una de esas 50 rutas —
+// deduplicados por teléfono, para que a nadie le llegue más de un mensaje
+// aunque cubra varias rutas del Top 50.
+async function proveedoresTop50Rutas() {
+  const rutas = rutasTop50();
+  if (!rutas.size) return [];
   const bd = await contactos.listarPorAgente('SOFIA', { tipo: 'proveedor' });
-  return bd
-    .filter(c => c.telefono && !/Estatus en catálogo: (Baja|Suspendido)/i.test(c.notas || ''))
-    .map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono, servicios: servicios.get(String(c.telefono).replace(/\D/g, '').slice(-10)) || 0 }))
-    .sort((a, b) => b.servicios - a.servicios)
-    .slice(0, n);
+  return bd.filter(c => {
+    if (!c.telefono || /Estatus en catálogo: (Baja|Suspendido)/i.test(c.notas || '')) return false;
+    const susRutas = String(c.rutas || '').split(/[,;\n]+/).map(r => r.trim().toLowerCase()).filter(Boolean);
+    return susRutas.some(r => rutas.has(r));
+  }).map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono }));
 }
 
 const titulo = s => String(s || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
@@ -117,10 +109,10 @@ async function correrSiToca(pushActividad) {
   guardarUltimaFecha(fecha);
 
   let lista;
-  try { lista = await topProveedores(TOP_N); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return; }
-  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: no hay proveedores con teléfono para mandarla hoy' }); return; }
+  try { lista = await proveedoresTop50Rutas(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return; }
+  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: ningún proveedor con teléfono cubre alguna de las 50 rutas más importantes hoy' }); return; }
 
-  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad — empezando con ${lista.length} proveedores, uno tras otro` });
+  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad (Top 50 rutas) — empezando con ${lista.length} proveedores, uno tras otro` });
 
   let enviados = 0, sinCredito = 0, fallidos = 0;
   let i = 0;
@@ -155,7 +147,7 @@ function iniciar(pushActividad) {
   if (!HABILITADO) { console.log('[difusionGeneral] Desactivado (SOFIA_DIFUSION_GENERAL != "true")'); return; }
   setInterval(() => correrSiToca(pushActividad).catch(e => console.error('[difusionGeneral]', e.message)), CHEQUEO_MS);
   correrSiToca(pushActividad).catch(() => {}); // por si el server arranca ya pasada la hora
-  console.log(`[difusionGeneral] Activo — ${TOP_N} proveedores a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
+  console.log(`[difusionGeneral] Activo — proveedores del Top 50 de rutas, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
-module.exports = { iniciar, correrSiToca, topProveedores };
+module.exports = { iniciar, correrSiToca, proveedoresTop50Rutas };
