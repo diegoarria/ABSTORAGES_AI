@@ -402,6 +402,49 @@ async function cargarTop50Rutas({ archivo = 'proveedores-top50-rutas.json', flag
   console.log(`[Contactos] Top 50 Rutas: ${nuevos} proveedores nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
 }
 
+// ── Rutas 51-100 (PDF, ene-sep 2026) ────────────────────────────────────────
+// Mismo criterio que cargarTop50Rutas(), pero este reporte no trae "veces
+// colocada" por proveedor (no hay columna de servicios/meses) — solo
+// ranking, proveedor, contacto, teléfono y tarifa.
+async function cargarRutas51a100({ archivo = 'proveedores-rutas-51-100.json', flag = 'rutas-51-100-oct-2026' } = {}) {
+  if (leerFlags()[flag]) return;
+  let rutas;
+  try { rutas = require('../data/' + archivo); } catch { return; }
+  let nuevos = 0, actualizados = 0, fallos = 0;
+  for (const ruta of rutas) {
+    const rutaLabel = ruta.destino;
+    for (const p of ruta.proveedores) {
+      try {
+        const tel = p.telefono && p.telefono !== 'Sin información' ? p.telefono : null;
+        const nombre = p.contacto && p.contacto !== 'Sin información' ? p.contacto : p.empresa;
+        const costoTxt = (p.costo_minimo === null || p.costo_minimo === undefined) ? 'sin dato' : `$${Number(p.costo_minimo).toLocaleString('es-MX')}`;
+        const linea = `${rutaLabel}: ${costoTxt} mínimo (Rutas 51-100 ene-sep 2026)`;
+
+        let c = null;
+        if (tel) c = await buscarPorTelefono(tel, 'sofia');
+        if (!c) c = (await listarPorAgente('SOFIA', { tipo: 'proveedor', q: p.empresa })).find(x => (x.empresa || '') === p.empresa) || null;
+
+        if (!c) {
+          c = await upsertContacto({
+            agente: 'sofia', tipo: 'proveedor', nombre_completo: nombre, empresa: p.empresa, telefono: tel || undefined,
+            notas: `Clave: ${p.codigo}`, rutas: rutaLabel, unidades: UNIDAD_DEFAULT,
+            resumen_interaccion: `Alta desde Rutas 51-100 (${rutaLabel})`, canal: 'permanente',
+          });
+          await actualizarCampoProveedor(c.id, 'tarifas', linea);
+          nuevos++;
+        } else {
+          await actualizarCampoProveedor(c.id, 'rutas', uneLista(c.rutas, rutaLabel));
+          if (!String(c.tarifas || '').includes(rutaLabel)) await actualizarCampoProveedor(c.id, 'tarifas', [c.tarifas, linea].filter(Boolean).join(' | '));
+          await rellenarSiVacio(c.id, { empresa: p.empresa, notas: `Clave: ${p.codigo}`, unidades: UNIDAD_DEFAULT });
+          actualizados++;
+        }
+      } catch (e) { fallos++; console.error(`[Contactos] Error cargando ${p.codigo} en ruta ${rutaLabel}:`, e.message); }
+    }
+  }
+  if (!fallos) marcarFlag(flag);
+  console.log(`[Contactos] Rutas 51-100: ${nuevos} proveedores nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
+}
+
 // ── Clientes (destino) del Top 50 de rutas ──────────────────────────────────
 // backend/data/clientes-top50-rutas.json: la empresa/CEDIS que RECIBE la carga
 // en cada una de las 50 rutas (columna "Cliente / Destino" del PDF, distinta
@@ -522,6 +565,7 @@ async function sembrarCatalogos() {
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-guadalajara.json', ruta: 'Monterrey-Guadalajara', flag: 'catalogo-mty-gdl-2026-09-27' });
   await cargarDirectorio({ archivo: 'proveedores-directorio.json', flag: 'directorio-proveedores-2026-09-27' });
   await cargarTop50Rutas();
+  await cargarRutas51a100();
   await cargarClientesTop50Rutas();
   await unidadPorDefectoProveedores();
 }

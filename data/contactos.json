@@ -21,8 +21,8 @@
         "fecha": "2026-09-24T18:10:05.518Z"
       }
     ],
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Santa Catarina - El Salto",
-    "tarifas": "Monterrey-Guadalajara: $19,333 promedio · 3 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Santa Catarina - El Salto, Zapopan - San Nicolas de los Garza, Santa Catarina - Mexicali, Santa Catarina - Hermosillo",
+    "tarifas": "Monterrey-Guadalajara: $19,333 promedio · 3 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - San Nicolas de los Garza: $2,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Mexicali: $2,500 mínimo (R",
     "unidades": "caja seca 53"
   },
   {
@@ -110,7 +110,7 @@
     "empresa": "ADBLUE INTERNACIONAL SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1402 · Estatus en catálogo: No asignado",
-    "rutas": "Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Santa Catarina - Santa Catarina",
+    "rutas": "Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Santa Catarina - Santa Catarina, Apodaca - Gomez Palacio, Santa Catarina - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.574Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.574Z",
@@ -123,7 +123,7 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,683 promedio · 30 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 25 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $14,683 promedio · 30 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 25 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Gomez Palacio: $3,300 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - San Nicolas de los Garza: $7,000 mínimo (Ru"
   },
   {
     "id": "CT-MUKKCYGUF617",
@@ -136,7 +136,7 @@
     "empresa": "TRANSRAPIDOS VALERIO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P0548 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Torreon, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan",
+    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Torreon, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Santa Catarina - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.574Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.574Z",
@@ -214,7 +214,7 @@
     "empresa": "RITO ALBERTO CALIXTO CRUZ",
     "tipo_carga": null,
     "notas": "Clave: P1509 · Estatus en catálogo: Recurrente",
-    "rutas": "Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Ramos Arizpe - Cienega de Flores",
+    "rutas": "Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Ramos Arizpe - Cienega de Flores, Monterrey - Monterrey, Gral Escobedo - San Nicolas de los Garza, Ramos Arizpe - Altamira, Escobedo - Tampico, Monterrey - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.574Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.574Z",
@@ -227,7 +227,7 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,833 promedio · 6 servicio(s) en la ruta | Guadalupe - Torreon: $14,000 mínimo · 77 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $15,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $15,833 promedio · 6 servicio(s) en la ruta | Guadalupe - Torreon: $14,000 mínimo · 77 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $15,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Monterrey: $5,500 mínimo (Rutas 51-100 ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $5,500 mínimo (Rutas"
   },
   {
     "id": "CT-MUKKCYGVR29C",
@@ -318,7 +318,7 @@
     "empresa": "RISOCO LOGISTICS",
     "tipo_carga": null,
     "notas": "Clave: P1434 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey, Zapopan - San Nicolas de los Garza, Guadalajara - Doctor Gonzalez, Tlajomulco de Zuñiga - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -344,7 +344,7 @@
     "empresa": "TRANSPORTADORA GRIJALVA SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1241 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Santa Catarina - Gomez Palacio",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Ramos Arizpe - Juarez",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -357,7 +357,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,500 promedio · 2 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $14,500 promedio · 2 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Juarez: $2,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVLRAU",
@@ -396,7 +396,7 @@
     "empresa": "AUTOLINEAS SAN JOSE SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1601 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Gomez Palacio, Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Gomez Palacio, Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado, Apodaca - Tijuana",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -422,7 +422,7 @@
     "empresa": "TRACTO LINEAS MEXICANAS",
     "tipo_carga": null,
     "notas": "Clave: P1574 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Tecamac - San Nicolas de los Garza",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Tecamac - San Nicolas de los Garza, Apodaca - Gomez Palacio",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -435,7 +435,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Gomez Palacio: $3,300 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVDNDE",
@@ -474,7 +474,7 @@
     "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
     "tipo_carga": null,
     "notas": "Clave: P1242 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Guadalupe - Tlajomulco de Zuñiga, Monterrey - Cuautitlan Izcalli, Monterrey - Tultitlan",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Guadalupe - Tlajomulco de Zuñiga, Monterrey - Cuautitlan Izcalli, Monterrey - Tultitlan, Toluca - Ramos Arizpe, Tecamac - Guadalupe, Guadalupe - Tecamac, Toluca - Saltillo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -500,7 +500,7 @@
     "empresa": "JOSE RAMON FLORES ALANIS",
     "tipo_carga": null,
     "notas": "Clave: P1479 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Guadalupe - Tlajomulco de Zuñiga, Cuautitlan Izcalli - Apodaca, Guadalupe - Tultitlan, Tlajomulco de Zuñiga - Monterrey, Monterrey - Chalco",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Guadalupe - Tlajomulco de Zuñiga, Cuautitlan Izcalli - Apodaca, Guadalupe - Tultitlan, Tlajomulco de Zuñiga - Monterrey, Monterrey - Chalco, Zapopan - San Nicolas de los Garza, Guadalajara - Doctor Gonzalez, Ramos Arizpe - Tamuin, Guadalupe - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -526,7 +526,7 @@
     "empresa": "TRISKEL LOGISTICS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1396 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Gomez Palacio, Santa Catarina - Santa Catarina",
+    "rutas": "Santa Catarina - Gomez Palacio, Santa Catarina - Santa Catarina, Ramos Arizpe - Tamuin, Guadalupe - Cd Valles",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -539,7 +539,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Gomez Palacio: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Gomez Palacio: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tamuin: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Cd Valles: $19,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVDNNP",
@@ -578,7 +578,7 @@
     "empresa": "BRENTON MULTIOPERADORA Y SERVICIOS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1079 · Estatus en catálogo: Baja",
-    "rutas": "Guadalupe - Torreon, Ramos Arizpe - Cienega de Flores, Escobedo - Guadalupe",
+    "rutas": "Guadalupe - Torreon, Ramos Arizpe - Cienega de Flores, Escobedo - Guadalupe, Ramos Arizpe - Apodaca, Monterrey - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -591,7 +591,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $24,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $24,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Apodaca: $8,000 mínimo (Rutas 51-100 ene-sep 2026) | Monterrey - Santa Catarina: $2,500 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVS2GI",
@@ -604,7 +604,7 @@
     "empresa": "CARLOS EDUARDO GARDUÑO ROMERO",
     "tipo_carga": null,
     "notas": "Clave: P1061 · Estatus en catálogo: No asignado",
-    "rutas": null,
+    "rutas": "Tlajomulco de Zuñiga - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -617,7 +617,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $11,000 promedio · 1 servicio(s) en la ruta"
+    "tarifas": "Monterrey-Gómez Palacio: $11,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Santa Catarina: $24,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGWS43F",
@@ -656,7 +656,7 @@
     "empresa": "ESTEBAN NAVARRO TORRES",
     "tipo_carga": null,
     "notas": "Clave: P633 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Puebla, Guadalupe - Tlajomulco de Zuñiga, Guadalupe - Tultitlan, Santa Catarina - Irapuato, Monterrey - Tultitlan, Monterrey - Queretaro",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Puebla, Guadalupe - Tlajomulco de Zuñiga, Guadalupe - Tultitlan, Santa Catarina - Irapuato, Monterrey - Tultitlan, Monterrey - Queretaro, Santa Catarina - Puebla de Zaragoza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -682,7 +682,7 @@
     "empresa": "TRANS GROUP JR SAPI DE CV",
     "tipo_carga": null,
     "notas": "Clave: P966 · Estatus en catálogo: Suspendido",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Zapopan - Santa Catarina, Cuautla - Ameca, Guadalupe - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -695,7 +695,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,972 promedio · 18 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,972 promedio · 18 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - Santa Catarina: $25,500 mínimo (Rutas 51-100 ene-sep 2026) | Cuautla - Ameca: $25,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Guadalajara: $19,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGWI780",
@@ -708,7 +708,7 @@
     "empresa": "IRENE ISABEL GARZA LEAL",
     "tipo_carga": null,
     "notas": "Clave: P1151 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Tijuana, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Monterrey, Tlajomulco de Zuñiga - Guadalupe",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Tijuana, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Monterrey, Tlajomulco de Zuñiga - Guadalupe, Zapopan - San Nicolas de los Garza, Guadalajara - Doctor Gonzalez, Santa Catarina - Hermosillo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -734,7 +734,7 @@
     "empresa": "GUSTAVO GARCIA CORTEZ",
     "tipo_carga": null,
     "notas": "Clave: P1082 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Santa Catarina - Puebla, Ramos Arizpe - Oriental, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Guadalupe, Monterrey - Chalco, Monterrey - Queretaro",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Santa Catarina - Puebla, Ramos Arizpe - Oriental, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Guadalupe, Monterrey - Chalco, Monterrey - Queretaro, Santa Catarina - Puebla de Zaragoza, Guadalupe - Cd Valles, Monterrey - Pedro Escobedo, Guadalupe - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -760,7 +760,7 @@
     "empresa": "PORTEADORA DE BIENES Y SERVICIOS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P75 · Estatus en catálogo: No asignado",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Puebla, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Puebla, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey, Santa Catarina - Puebla de Zaragoza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -786,7 +786,7 @@
     "empresa": "EXPRESS GRAN TIBURON SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1072 · Estatus en catálogo: Intermitente",
-    "rutas": "Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Tecamac - San Nicolas de los Garza, Guadalupe - Tlajomulco de Zuñiga, Tepotzotlan - San Nicolas de los Garza",
+    "rutas": "Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Tecamac - San Nicolas de los Garza, Guadalupe - Tlajomulco de Zuñiga, Tepotzotlan - San Nicolas de los Garza, Tecamac - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -916,7 +916,7 @@
     "empresa": "ALEJANDRO GARAY GUERRERO",
     "tipo_carga": null,
     "notas": "Clave: P1164 · Estatus en catálogo: Potencial",
-    "rutas": "Tepotzotlan - Ciudad Guzman, Tecamac - El Salto",
+    "rutas": "Tepotzotlan - Ciudad Guzman, Tecamac - El Salto, Tecamac - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -929,7 +929,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,600 promedio · 5 servicio(s) en la ruta | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,600 promedio · 5 servicio(s) en la ruta | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Guadalajara: $20,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGWP59S",
@@ -942,7 +942,7 @@
     "empresa": "ALGO EXPRESS LOGISTICS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1404 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tijuana, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - El Salto, Santa Catarina - Mexicali",
+    "rutas": "Santa Catarina - Tijuana, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - El Salto, Santa Catarina - Mexicali, Santa Catarina - Hermosillo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -955,7 +955,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 4 servicio(s) en la ruta | Santa Catarina - Tijuana: $2,120 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $2,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $65,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 4 servicio(s) en la ruta | Santa Catarina - Tijuana: $2,120 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $2,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $65,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Hermosillo: $48,00"
   },
   {
     "id": "CT-MUKKCYGWOYXZ",
@@ -994,7 +994,7 @@
     "empresa": "TRANSPORTES ECOLOGICOS ZERG SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1581 · Estatus en catálogo: Potencial",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Monterrey, Ocoyoacac - Ramos Arizpe",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Monterrey, Ocoyoacac - Ramos Arizpe, Tlajomulco de Zuñiga - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -1020,7 +1020,7 @@
     "empresa": "MARCOS ARZATE VILLAVICENCIO",
     "tipo_carga": null,
     "notas": "Clave: P1580 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Guadalupe - Tlajomulco de Zuñiga, Toluca - Escobedo, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan, Monterrey - Chalco, Tepotzotlan - San Nicolas de los Garza, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Santa Catarina - Cuautitlan Izcalli",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Guadalupe - Tlajomulco de Zuñiga, Toluca - Escobedo, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan, Monterrey - Chalco, Tepotzotlan - San Nicolas de los Garza, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Santa Catarina - Cuautitlan Izcalli, Teca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -1046,7 +1046,7 @@
     "empresa": "AUTOTRANSPORTES PERTH SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1242 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Ramos Arizpe - Teoloyucan, Guadalupe - Tultitlan, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Santa Catarina - Cuautitlan Izcalli",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Ramos Arizpe - Teoloyucan, Guadalupe - Tultitlan, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Santa Catarina - Cuautitlan Izcalli, Toluca - Saltillo, Monterrey - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -1384,7 +1384,7 @@
     "empresa": "TRANSPORTADORA GEOS",
     "tipo_carga": null,
     "notas": "Clave: P1558 · Estatus en catálogo: Intermitente",
-    "rutas": "Santa Catarina - Tultitlan, Tecamac - San Nicolas de los Garza, Guadalupe - Tlajomulco de Zuñiga, Toluca - Escobedo, Tecamac - Zapopan, Tlajomulco de Zuñiga - Monterrey, Tecamac - El Salto, Santa Catarina - Cuautitlan Izcalli",
+    "rutas": "Santa Catarina - Tultitlan, Tecamac - San Nicolas de los Garza, Guadalupe - Tlajomulco de Zuñiga, Toluca - Escobedo, Tecamac - Zapopan, Tlajomulco de Zuñiga - Monterrey, Tecamac - El Salto, Santa Catarina - Cuautitlan Izcalli, Zapopan - Santa Catarina, Toluca - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1410,7 +1410,7 @@
     "empresa": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
     "tipo_carga": null,
     "notas": "Clave: P1450 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan, Santa Catarina - El Salto",
+    "rutas": "Santa Catarina - Tultitlan, Santa Catarina - El Salto, Cuautla - Ameca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1423,7 +1423,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautla - Ameca: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGX7F14",
@@ -1436,7 +1436,7 @@
     "empresa": "NOVAKLOGISTICS",
     "tipo_carga": null,
     "notas": "Clave: P1596 · Estatus en catálogo: Baja",
-    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tlajomulco de Zuñiga, Monterrey - Tultitlan, Toluca - Saltillo, Santa Catarina - Tizayuca",
+    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tlajomulco de Zuñiga, Monterrey - Tultitlan, Toluca - Saltillo, Santa Catarina - Tizayuca, Monterrey - Ixtapaluca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1462,7 +1462,7 @@
     "empresa": "SKYBRIDGE LOGISTICS",
     "tipo_carga": null,
     "notas": "Clave: P1585 · Estatus en catálogo: Potencial",
-    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - San Luis Rio Colorado, Tlajomulco de Zuñiga - Monterrey, Santa Catarina - Tizayuca",
+    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - San Luis Rio Colorado, Tlajomulco de Zuñiga - Monterrey, Santa Catarina - Tizayuca, Santa Catarina - Hermosillo, Santa Catarina - Mexicali",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1488,7 +1488,7 @@
     "empresa": "HEBERTO JAVIER RODRIGUEZ PERALES",
     "tipo_carga": null,
     "notas": "Clave: P1591 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe, Santa Catarina - Santa Catarina",
+    "rutas": "Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe, Santa Catarina - Santa Catarina, Zapopan - Santa Catarina, Tecamac - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1514,7 +1514,7 @@
     "empresa": "MIGUEL ALEJANDRO ESCAMILLA SOLIS",
     "tipo_carga": null,
     "notas": "Clave: P1593 · Estatus en catálogo: Intermitente",
-    "rutas": "Santa Catarina - Tultitlan",
+    "rutas": "Santa Catarina - Tultitlan, Tecamac - Piedras Negras",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1527,7 +1527,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $42,500 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXBPKF",
@@ -1540,7 +1540,7 @@
     "empresa": "TRANSPORTES REVIARYA",
     "tipo_carga": null,
     "notas": "Clave: P1554 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Monterrey - Cuautitlan Izcalli, Santa Catarina - Tizayuca",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Monterrey - Cuautitlan Izcalli, Santa Catarina - Tizayuca, Monterrey - Pedro Escobedo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1592,7 +1592,7 @@
     "empresa": "ROJAS TRAILERS",
     "tipo_carga": null,
     "notas": "Clave: P1534 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Toluca - Saltillo, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey, Monterrey - Chalco",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Toluca - Saltillo, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey, Monterrey - Chalco, Tlajomulco de Zuñiga - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1644,7 +1644,7 @@
     "empresa": "JOSE HOMERO ROMO REYES",
     "tipo_carga": null,
     "notas": "Clave: P1523 · Estatus en catálogo: Baja",
-    "rutas": "Tecamac - Monterrey, Guadalupe - Tlajomulco de Zuñiga, Tepotzotlan - San Nicolas de los Garza, Monterrey - Tultitlan",
+    "rutas": "Tecamac - Monterrey, Guadalupe - Tlajomulco de Zuñiga, Tepotzotlan - San Nicolas de los Garza, Monterrey - Tultitlan, Iztapalapa - Apodaca, Tecamac - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1657,7 +1657,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Tecamac - Monterrey: $23,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Tecamac - Monterrey: $23,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Iztapalapa - Apodaca: $23,000"
   },
   {
     "id": "CT-MUKKCYGX1DPS",
@@ -1670,7 +1670,7 @@
     "empresa": "AUTOLINEAS VIFE",
     "tipo_carga": null,
     "notas": "Clave: P222 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Tlajomulco de Zuñiga - Guadalupe",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Tlajomulco de Zuñiga - Guadalupe, Zapopan - Santa Catarina, Tecamac - Guadalajara, Guadalupe - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1683,7 +1683,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $21,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $5,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $21,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $5,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - Santa Catarina: $25,"
   },
   {
     "id": "CT-MUKKCYGXW4PS",
@@ -1774,7 +1774,7 @@
     "empresa": "JLC TRANSPORTACIONES SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1052 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tamuin",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1787,7 +1787,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tamuin: $20,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXT8ZL",
@@ -2033,7 +2033,7 @@
     "empresa": "MONTES TRUCKING",
     "tipo_carga": null,
     "notas": "Clave: P1170 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Monterrey - Cuautitlan Izcalli, Guadalupe - Tultitlan, Monterrey - Chalco, Tepotzotlan - San Nicolas de los Garza, Santa Catarina - Cuautitlan Izcalli",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Monterrey - Cuautitlan Izcalli, Guadalupe - Tultitlan, Monterrey - Chalco, Tepotzotlan - San Nicolas de los Garza, Santa Catarina - Cuautitlan Izcalli, Apodaca - Azcapotzalco, Ramos Arizpe - Cuautitlan, Tecamac - Saltillo, Guadalupe - Tecamac",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.481Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.481Z",
@@ -2059,7 +2059,7 @@
     "empresa": "JOSE GUADALUPE LOZANO BELTRAN",
     "tipo_carga": null,
     "notas": "Clave: P855 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
+    "rutas": "Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado, Santa Catarina - Hermosillo, Santa Catarina - Cordoba",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.481Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.481Z",
@@ -2072,7 +2072,7 @@
         "fecha": "2026-10-01T20:57:28.481Z"
       }
     ],
-    "tarifas": "Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $62,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $62,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Hermosillo: $3,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Cordoba: $32,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF6ZP14",
@@ -2085,7 +2085,7 @@
     "empresa": "SERGIO GERARDO DE ROSAS GALAN",
     "tipo_carga": null,
     "notas": "Clave: P1012 · Estatus en catálogo: Intermitente",
-    "rutas": "Santa Catarina - Tultitlan, Santa Catarina - Puebla, Ramos Arizpe - Teoloyucan, Ramos Arizpe - Oriental, Monterrey - Chalco, Santa Catarina - Tizayuca",
+    "rutas": "Santa Catarina - Tultitlan, Santa Catarina - Puebla, Ramos Arizpe - Teoloyucan, Ramos Arizpe - Oriental, Monterrey - Chalco, Santa Catarina - Tizayuca, Santa Catarina - Puebla de Zaragoza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2111,7 +2111,7 @@
     "empresa": "JOSE ANTONIO RODRIGUEZ JUAREZ",
     "tipo_carga": null,
     "notas": "Clave: P1184 · Estatus en catálogo: No asignado",
-    "rutas": "Escobedo - Guadalupe",
+    "rutas": "Escobedo - Guadalupe, Gral Escobedo - San Nicolas de los Garza, Santa Catarina - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2124,7 +2124,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Escobedo - Guadalupe: $6,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Escobedo - Guadalupe: $6,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $6,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - San Nicolas de los Garza: $6,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF6K3FR",
@@ -2137,7 +2137,7 @@
     "empresa": "MONICA CORONA LINARES",
     "tipo_carga": null,
     "notas": "Clave: P61 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Puebla, Santa Catarina - Tizayuca",
+    "rutas": "Santa Catarina - Puebla, Santa Catarina - Tizayuca, Santa Catarina - Puebla de Zaragoza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2150,7 +2150,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Santa Catarina - Puebla: $1,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca: $21,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Puebla: $1,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca: $21,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla de Zaragoza: $23,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF61I9O",
@@ -2163,7 +2163,7 @@
     "empresa": "TRANSPORTES ESPECIALIZADOS KAMIR",
     "tipo_carga": null,
     "notas": "Clave: P1122 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Toluca - Escobedo, Guadalupe - Tultitlan, Santa Catarina - Irapuato, Santa Catarina - El Salto, Santa Catarina - Tizayuca",
+    "rutas": "Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Toluca - Escobedo, Guadalupe - Tultitlan, Santa Catarina - Irapuato, Santa Catarina - El Salto, Santa Catarina - Tizayuca, Cuautla - Ameca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2189,7 +2189,7 @@
     "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1431 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Guadalupe - Tultitlan, Tepotzotlan - San Nicolas de los Garza, Monterrey - Queretaro, Ramos Arizpe - Cienega de Flores, Santa Catarina - Cuautitlan Izcalli",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Guadalupe - Tultitlan, Tepotzotlan - San Nicolas de los Garza, Monterrey - Queretaro, Ramos Arizpe - Cienega de Flores, Santa Catarina - Cuautitlan Izcalli, Ramos Arizpe - Tamuin, Ramos Arizpe - Cuautitlan, Tecamac - Saltillo, Iztapalapa - Apodaca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2215,7 +2215,7 @@
     "empresa": "TRANSPORTREZA",
     "tipo_carga": null,
     "notas": "Clave: P1113 · Estatus en catálogo: Recurrente",
-    "rutas": "Tecamac - San Nicolas de los Garza, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Cuautitlan Izcalli - Apodaca, Tecamac - El Salto",
+    "rutas": "Tecamac - San Nicolas de los Garza, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Cuautitlan Izcalli - Apodaca, Tecamac - El Salto, Zapopan - Santa Catarina, Tecamac - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2241,7 +2241,7 @@
     "empresa": "TRANSPORTES CAV GAR SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P3 · Estatus en catálogo: Intermitente",
-    "rutas": null,
+    "rutas": "Escobedo - Cd Juarez, Ramos Arizpe - Juarez",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2253,7 +2253,8 @@
         "resumen": "Alta desde el directorio de proveedores con teléfono",
         "fecha": "2026-10-01T20:57:28.482Z"
       }
-    ]
+    ],
+    "tarifas": "Escobedo - Cd Juarez: $2,500 mínimo (Rutas 51-100 ene-sep 2026) | Ramos Arizpe - Juarez: $33,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF6H7WJ",
@@ -2292,7 +2293,7 @@
     "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
     "tipo_carga": null,
     "notas": "Clave: P810 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Toluca - Saltillo, Tecamac - Zapopan, Tecamac - El Salto, Ocoyoacac - Ramos Arizpe",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Toluca - Saltillo, Tecamac - Zapopan, Tecamac - El Salto, Ocoyoacac - Ramos Arizpe, Toluca - Ramos Arizpe, Ramos Arizpe - Cuautitlan, Tecamac - Ramos Arizpe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2318,7 +2319,7 @@
     "empresa": "ASESORES INTEGRALES KOTE-MAR SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1520 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Cuautitlan Izcalli - Apodaca, Monterrey - Tultitlan, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan, Santa Catarina - Irapuato, Tlajomulco de Zuñiga - Guadalupe",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Cuautitlan Izcalli - Apodaca, Monterrey - Tultitlan, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan, Santa Catarina - Irapuato, Tlajomulco de Zuñiga - Guadalupe, Monterrey - Ixtapaluca, Santa Catarina - Cuautitlan Izcalli, Iztapalapa - Apodaca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2446,7 +2447,7 @@
     "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
     "tipo_carga": null,
     "notas": "Clave: P1587 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Toluca - Escobedo, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Toluca - Escobedo, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan, Tecamac - Piedras Negras, Monterrey - Tultitlan, Monterrey - Ixtapaluca, Santa Catarina - Cuautitlan Izcalli, Tecamac - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2497,7 +2498,7 @@
     "empresa": "GRUPO TRANSPORTISTA HIDALGO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1411 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Monterrey - Chalco, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Monterrey - Chalco, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Tecamac - Guadalajara",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2523,7 +2524,7 @@
     "empresa": "LOGISTICA ESPECIALIZADA VR72",
     "tipo_carga": null,
     "notas": "Clave: P1557 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Monterrey - Tultitlan, Monterrey - Cuautitlan Izcalli, Monterrey - Chalco, Monterrey - Queretaro, Santa Catarina - Cuautitlan Izcalli",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Monterrey - Tultitlan, Monterrey - Cuautitlan Izcalli, Monterrey - Chalco, Monterrey - Queretaro, Santa Catarina - Cuautitlan Izcalli, Monterrey - Ixtapaluca, Apodaca - Azcapotzalco",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2600,7 +2601,7 @@
     "empresa": "PEDRO ANTONIO MEJIA VALENZUELA",
     "tipo_carga": null,
     "notas": "Clave: P1161 · Estatus en catálogo: Intermitente",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Iztapalapa - Apodaca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2613,7 +2614,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Iztapalapa - Apodaca: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF715ZB",
@@ -2651,7 +2652,7 @@
     "empresa": "LOGISTICA VECAM",
     "tipo_carga": null,
     "notas": "Clave: P1560 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Monterrey - Cuautitlan Izcalli, Monterrey - Queretaro",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Monterrey - Cuautitlan Izcalli, Monterrey - Queretaro, Tecamac - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2677,7 +2678,7 @@
     "empresa": "EDEER JAIME CASTILLO VILLARREAL",
     "tipo_carga": null,
     "notas": "Clave: P1485 · Estatus en catálogo: No asignado",
-    "rutas": "Guadalupe - Torreon",
+    "rutas": "Guadalupe - Torreon, Guadalupe - Hermosillo, Guadalupe - Cd Valles, Escobedo - Tampico, Santa Catarina - Hermosillo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2690,7 +2691,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Hermosillo: $45,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Cd Valles: $18,000 mínimo (Rutas 51-100 ene-sep 2026) | Escobedo - Tampico: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Hermosillo: $45,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7YMTH",
@@ -2729,7 +2730,7 @@
     "empresa": "TRANSPORTES SIETE ANGELES",
     "tipo_carga": null,
     "notas": "Clave: P1481 · Estatus en catálogo: Recurrente",
-    "rutas": "Tlajomulco de Zuñiga - Monterrey, Santa Catarina - Santa Catarina",
+    "rutas": "Tlajomulco de Zuñiga - Monterrey, Santa Catarina - Santa Catarina, Monterrey - Monterrey, Gral Escobedo - San Nicolas de los Garza, Santa Catarina - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2742,7 +2743,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Monterrey: sin dato mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Monterrey: sin dato mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Monterrey: $5,500 mínimo (Rutas 51-100 ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $5,500 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - San Nicolas de los Garza: $5,500 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7R7CX",
@@ -2780,7 +2781,7 @@
     "empresa": "LOGISTICA TNA SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P283 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Tecamac - San Nicolas de los Garza",
+    "rutas": "Santa Catarina - Tultitlan, Tecamac - San Nicolas de los Garza, Apodaca - Azcapotzalco, Monterrey - Pedro Escobedo, Guadalupe - Tecamac",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2793,7 +2794,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Azcapotzalco: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Monterrey - Pedro Escobedo: $17,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Tecamac: $19,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF77MFB",
@@ -2831,7 +2832,7 @@
     "empresa": "DELFINO ADELAIDO JUAREZ OLIVERA",
     "tipo_carga": null,
     "notas": "Clave: P996 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Santa Catarina - Puebla, Monterrey - Cuautitlan Izcalli, Tecamac - Zapopan, Tecamac - El Salto",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Santa Catarina - Puebla, Monterrey - Cuautitlan Izcalli, Tecamac - Zapopan, Tecamac - El Salto, Tecamac - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.484Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.484Z",
@@ -2857,7 +2858,7 @@
     "empresa": "JOSE AARON DE LA GARZA BOTELLO",
     "tipo_carga": null,
     "notas": "Clave: P1519 · Estatus en catálogo: Recurrente",
-    "rutas": null,
+    "rutas": "Guadalupe - Reynosa",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.484Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.484Z",
@@ -2869,7 +2870,8 @@
         "resumen": "Alta desde el directorio de proveedores con teléfono",
         "fecha": "2026-10-01T20:57:28.484Z"
       }
-    ]
+    ],
+    "tarifas": "Guadalupe - Reynosa: $17,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF85S6M",
@@ -2959,7 +2961,7 @@
     "empresa": "CARLOS EDUARDO BARBA RODRIGUEZ",
     "tipo_carga": null,
     "notas": "Clave: P1366 · Estatus en catálogo: No asignado",
-    "rutas": "Guadalupe - Torreon, Santa Catarina - Santa Catarina, Escobedo - Guadalupe",
+    "rutas": "Guadalupe - Torreon, Santa Catarina - Santa Catarina, Escobedo - Guadalupe, Gral Escobedo - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.484Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.484Z",
@@ -2972,7 +2974,7 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $5,500 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF98C4O",
@@ -2985,7 +2987,7 @@
     "empresa": "NESTOR ARRIETA FLORES",
     "tipo_carga": null,
     "notas": "Clave: P1425 · Estatus en catálogo: No asignado",
-    "rutas": "Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca",
+    "rutas": "Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Toluca - Ramos Arizpe, Tecamac - Saltillo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.485Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.485Z",
@@ -2998,7 +3000,7 @@
         "fecha": "2026-10-01T20:57:28.485Z"
       }
     ],
-    "tarifas": "Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Ramos Arizpe: $24,000 mínimo (Rutas 51-100 ene-sep 2026) | Tecamac - Saltillo: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF9FCNL",
@@ -3037,7 +3039,7 @@
     "empresa": "WHITE STAR EVOLUTION SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1550 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tultitlan, Tlajomulco de Zuñiga - Guadalupe",
+    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tultitlan, Tlajomulco de Zuñiga - Guadalupe, Guadalajara - Doctor Gonzalez, Apodaca - Azcapotzalco",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3050,7 +3052,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalajara - Doctor Gonzalez: $25,000 mínimo (Rutas 51-100 ene-sep 2026) | Apodaca - Azcapotzalco: $19,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFANJO7",
@@ -3240,7 +3242,7 @@
     "empresa": "TRANSPORTES CAVAZOS ARREDONDO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1511 · Estatus en catálogo: No asignado",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe, Zapopan - San Nicolas de los Garza, Tlajomulco de Zuñiga - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3253,7 +3255,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - San Nicolas de los Garza: $25,000 mínimo (Rutas 51-100 ene-sep 2026) | Tlajomulco de Zuñiga - Santa Catarina: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFACFS1",
@@ -3292,7 +3294,7 @@
     "empresa": "SIGMA LOGISTICS JH",
     "tipo_carga": null,
     "notas": "Clave: P1579 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Monterrey - Cuautitlan Izcalli",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Monterrey - Cuautitlan Izcalli, Ramos Arizpe - Apodaca, Monterrey - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3368,7 +3370,7 @@
     "empresa": "BAHNSEN G",
     "tipo_carga": null,
     "notas": "Clave: P1501 · Estatus en catálogo: Intermitente",
-    "rutas": "Tepotzotlan - Ciudad Guzman, Monterrey - Tultitlan",
+    "rutas": "Tepotzotlan - Ciudad Guzman, Monterrey - Tultitlan, Tecamac - Piedras Negras, Zapopan - Santa Catarina, Guadalajara - Doctor Gonzalez",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3381,7 +3383,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Tepotzotlan - Ciudad Guzman: $21,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tepotzotlan - Ciudad Guzman: $21,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $37,000 mínimo (Rutas 51-100 ene-sep 2026) | Zapopan - Santa Catarina: $24,500 mínimo (Rutas 51-100 ene-sep 2026) | Guadalajara - Doctor Gonzalez: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBHMPR",
@@ -3419,7 +3421,7 @@
     "empresa": "GUSTAVO FABIAN RODRIGUEZ MARROQUIN",
     "tipo_carga": null,
     "notas": "Clave: P1526 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
+    "rutas": "Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado, Apodaca - Tijuana",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3432,7 +3434,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tijuana: $2,330 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $5,615 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $2,330 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $5,615 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Tijuana: $70,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBN1PB",
@@ -3445,7 +3447,7 @@
     "empresa": "SALVADOR SALAS LAZCANO",
     "tipo_carga": null,
     "notas": "Clave: P1567 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
+    "rutas": "Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado, Apodaca - Tijuana",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3458,7 +3460,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $63,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,400 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $63,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,400 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Tijuana: $68,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFB4DU6",
@@ -3522,7 +3524,7 @@
     "empresa": "CARLOS IVAN TORRES GARCIA",
     "tipo_carga": null,
     "notas": "Clave: P1128 · Estatus en catálogo: Potencial",
-    "rutas": "Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca",
+    "rutas": "Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Monterrey - Tultitlan, Tecamac - Saltillo, Iztapalapa - Apodaca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3535,7 +3537,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Tecamac - Saltillo:"
   },
   {
     "id": "CT-MUQ0MGFBR6J1",
@@ -3674,7 +3676,7 @@
     "empresa": "NESTOR TOMAS CABRERA MEDINA",
     "tipo_carga": null,
     "notas": "Clave: P1417 · Estatus en catálogo: No asignado",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Toluca - Ramos Arizpe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3687,7 +3689,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Ramos Arizpe: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFB7UPV",
@@ -3851,32 +3853,7 @@
     "empresa": "DIANA KAREN RAMOS ZACARIAS",
     "tipo_carga": null,
     "notas": "Clave: P1539 · Estatus en catálogo: Recurrente",
-    "rutas": null,
-    "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
-    "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
-    "created_at": "2026-10-01T20:57:28.487Z",
-    "interacciones": [
-      {
-        "agente": "SOFIA",
-        "canal": "permanente",
-        "resumen": "Alta desde el directorio de proveedores con teléfono",
-        "fecha": "2026-10-01T20:57:28.487Z"
-      }
-    ]
-  },
-  {
-    "id": "CT-MUQ0MGFBRCWM",
-    "agente_asignado": "SOFIA",
-    "tipo": "proveedor",
-    "nombre_completo": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
-    "puesto": null,
-    "telefono": "+5217225909520",
-    "email": null,
-    "empresa": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
-    "tipo_carga": null,
-    "notas": "Clave: P102 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Tultitlan",
+    "rutas": "Monterrey - Monterrey",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3889,7 +3866,33 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey - Monterrey: $5,500 mínimo (Rutas 51-100 ene-sep 2026)"
+  },
+  {
+    "id": "CT-MUQ0MGFBRCWM",
+    "agente_asignado": "SOFIA",
+    "tipo": "proveedor",
+    "nombre_completo": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
+    "puesto": null,
+    "telefono": "+5217225909520",
+    "email": null,
+    "empresa": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
+    "tipo_carga": null,
+    "notas": "Clave: P102 · Estatus en catálogo: No asignado",
+    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tecamac",
+    "unidades": "caja seca 53",
+    "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
+    "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
+    "created_at": "2026-10-01T20:57:28.487Z",
+    "interacciones": [
+      {
+        "agente": "SOFIA",
+        "canal": "permanente",
+        "resumen": "Alta desde el directorio de proveedores con teléfono",
+        "fecha": "2026-10-01T20:57:28.487Z"
+      }
+    ],
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tecamac: $19,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBVIT6",
@@ -4156,7 +4159,7 @@
     "empresa": "YANEISI ARELI CAVAZOS LEAL",
     "tipo_carga": null,
     "notas": "Clave: P1588 · Estatus en catálogo: Intermitente",
-    "rutas": "Tultitlan - Cancun, Santa Catarina - San Luis Rio Colorado",
+    "rutas": "Tultitlan - Cancun, Santa Catarina - San Luis Rio Colorado, Tecamac - Piedras Negras, Apodaca - Tijuana",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4169,7 +4172,7 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "Tultitlan - Cancun: $65,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $3,200 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tultitlan - Cancun: $65,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $3,200 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $45,000 mínimo (Rutas 51-100 ene-sep 2026) | Apodaca - Tijuana: $69,500 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFCURMA",
@@ -4307,7 +4310,7 @@
     "empresa": "LUIS ANGEL PARAS SALAZAR",
     "tipo_carga": null,
     "notas": "Clave: P1503 · Estatus en catálogo: Recurrente",
-    "rutas": null,
+    "rutas": "Ramos Arizpe - Tamuin, Guadalupe - Cd Valles, Escobedo - Tampico",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4319,7 +4322,8 @@
         "resumen": "Alta desde el directorio de proveedores con teléfono",
         "fecha": "2026-10-01T20:57:28.488Z"
       }
-    ]
+    ],
+    "tarifas": "Ramos Arizpe - Tamuin: $20,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Cd Valles: $19,350 mínimo (Rutas 51-100 ene-sep 2026) | Escobedo - Tampico: $18,200 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFC2TTU",
@@ -4860,32 +4864,7 @@
     "empresa": "MIGUEL ANGEL FRANCO AGUIRRE",
     "tipo_carga": null,
     "notas": "Clave: P1522 · Estatus en catálogo: Intermitente",
-    "rutas": null,
-    "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-01T20:57:28.489Z",
-    "fecha_ultimo_contacto": "2026-10-01T20:57:28.489Z",
-    "created_at": "2026-10-01T20:57:28.489Z",
-    "interacciones": [
-      {
-        "agente": "SOFIA",
-        "canal": "permanente",
-        "resumen": "Alta desde el directorio de proveedores con teléfono",
-        "fecha": "2026-10-01T20:57:28.489Z"
-      }
-    ]
-  },
-  {
-    "id": "CT-MUQ0MGFDVMKS",
-    "agente_asignado": "SOFIA",
-    "tipo": "proveedor",
-    "nombre_completo": "HARI HERNANDEZ GONZALEZ",
-    "puesto": null,
-    "telefono": "+5218116409226",
-    "email": null,
-    "empresa": "AUTO LINEAS VERDES DE MONTERREY",
-    "tipo_carga": null,
-    "notas": "Clave: P1390 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina - Santa Catarina",
+    "rutas": "Apodaca - Tijuana",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.489Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.489Z",
@@ -4898,7 +4877,33 @@
         "fecha": "2026-10-01T20:57:28.489Z"
       }
     ],
-    "tarifas": "Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Apodaca - Tijuana: $68,000 mínimo (Rutas 51-100 ene-sep 2026)"
+  },
+  {
+    "id": "CT-MUQ0MGFDVMKS",
+    "agente_asignado": "SOFIA",
+    "tipo": "proveedor",
+    "nombre_completo": "HARI HERNANDEZ GONZALEZ",
+    "puesto": null,
+    "telefono": "+5218116409226",
+    "email": null,
+    "empresa": "AUTO LINEAS VERDES DE MONTERREY",
+    "tipo_carga": null,
+    "notas": "Clave: P1390 · Estatus en catálogo: No asignado",
+    "rutas": "Santa Catarina - Santa Catarina, Monterrey - Monterrey",
+    "unidades": "caja seca 53",
+    "fecha_primer_contacto": "2026-10-01T20:57:28.489Z",
+    "fecha_ultimo_contacto": "2026-10-01T20:57:28.489Z",
+    "created_at": "2026-10-01T20:57:28.489Z",
+    "interacciones": [
+      {
+        "agente": "SOFIA",
+        "canal": "permanente",
+        "resumen": "Alta desde el directorio de proveedores con teléfono",
+        "fecha": "2026-10-01T20:57:28.489Z"
+      }
+    ],
+    "tarifas": "Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Monterrey: $5,500 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFDO2ND",
@@ -5237,7 +5242,7 @@
     "empresa": "GONFER LOGISTIC SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1600 · Estatus en catálogo: No asignado",
-    "rutas": null,
+    "rutas": "Escobedo - Cd Juarez",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.490Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.490Z",
@@ -5249,7 +5254,8 @@
         "resumen": "Alta desde el directorio de proveedores con teléfono",
         "fecha": "2026-10-01T20:57:28.490Z"
       }
-    ]
+    ],
+    "tarifas": "Escobedo - Cd Juarez: $2,500 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFE2UWQ",
@@ -5313,7 +5319,7 @@
     "empresa": "TRANSPORTES REFRIGERADOS OSG S.A DE C.V.",
     "tipo_carga": null,
     "notas": "Clave: P1562 · Estatus en catálogo: Potencial",
-    "rutas": null,
+    "rutas": "Santa Catarina - Hermosillo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.490Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.490Z",
@@ -5325,7 +5331,8 @@
         "resumen": "Alta desde el directorio de proveedores con teléfono",
         "fecha": "2026-10-01T20:57:28.490Z"
       }
-    ]
+    ],
+    "tarifas": "Santa Catarina - Hermosillo: $48,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFE1OM3",
@@ -8831,7 +8838,7 @@
     ]
   },
   {
-    "id": "CT-MUW4M0PW06G9",
+    "id": "CT-MUW52NXJYY0E",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "ALDO GARCIA",
@@ -8843,21 +8850,21 @@
     "notas": "Clave: P1129",
     "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Ramos Arizpe - Teoloyucan, Monterrey - Cuautitlan Izcalli, Santa Catarina - Irapuato",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.652Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.652Z",
-    "created_at": "2026-10-06T03:35:43.652Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.231Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.231Z",
+    "created_at": "2026-10-06T03:48:40.231Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.652Z"
+        "fecha": "2026-10-06T03:48:40.231Z"
       }
     ],
     "tarifas": "Santa Catarina - Tultitlan: $1,500 mínimo · 29 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Irapuato: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas en"
   },
   {
-    "id": "CT-MUW4M0PY9P8A",
+    "id": "CT-MUW52NXLMNAM",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "ODILON ARAIZA SANCHEZ",
@@ -8867,23 +8874,23 @@
     "empresa": "ODILON ARAIZA SANCHEZ",
     "tipo_carga": null,
     "notas": "Clave: P1281",
-    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Ramos Arizpe - Teoloyucan, Tepotzotlan - San Nicolas de los Garza",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Ramos Arizpe - Teoloyucan, Tepotzotlan - San Nicolas de los Garza, Tecamac - Piedras Negras",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.654Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.654Z",
-    "created_at": "2026-10-06T03:35:43.654Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.233Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.233Z",
+    "created_at": "2026-10-06T03:48:40.233Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.654Z"
+        "fecha": "2026-10-06T03:48:40.233Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $40,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0PY938L",
+    "id": "CT-MUW52NXMQEVZ",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "LORENA VARGAS TELLEZ",
@@ -8893,23 +8900,23 @@
     "empresa": "LORENA VARGAS TELLEZ",
     "tipo_carga": null,
     "notas": "Clave: P1002",
-    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Toluca - Escobedo, Guadalupe - Tultitlan",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Toluca - Escobedo, Guadalupe - Tultitlan, Toluca - Guadalupe, Monterrey - Pedro Escobedo, Guadalupe - Tecamac, Iztapalapa - Apodaca",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.654Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.654Z",
-    "created_at": "2026-10-06T03:35:43.654Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.234Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.234Z",
+    "created_at": "2026-10-06T03:48:40.234Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.654Z"
+        "fecha": "2026-10-06T03:48:40.234Z"
       }
     ],
     "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas"
   },
   {
-    "id": "CT-MUW4M0PYWXIA",
+    "id": "CT-MUW52NXMXCD3",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "WENDY DAMARIS",
@@ -8921,21 +8928,21 @@
     "notas": "Clave: P1013",
     "rutas": "Santa Catarina - Tultitlan",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.654Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.654Z",
-    "created_at": "2026-10-06T03:35:43.654Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.234Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.234Z",
+    "created_at": "2026-10-06T03:48:40.234Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.654Z"
+        "fecha": "2026-10-06T03:48:40.234Z"
       }
     ],
     "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0PY49G3",
+    "id": "CT-MUW52NXMXQ7Z",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "DANIEL ROSAS CAZARES",
@@ -8947,21 +8954,21 @@
     "notas": "Clave: P1315",
     "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Ramos Arizpe - Tultitlan de Mariano Escobedo",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.654Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.654Z",
-    "created_at": "2026-10-06T03:35:43.654Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.234Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.234Z",
+    "created_at": "2026-10-06T03:48:40.234Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.654Z"
+        "fecha": "2026-10-06T03:48:40.234Z"
       }
     ],
     "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0PZUEEA",
+    "id": "CT-MUW52NXNWZ1A",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "FRANCISCO PLACIDO CANTU LOPEZ",
@@ -8971,23 +8978,23 @@
     "empresa": "FRANCISCO PLACIDO CANTU LOPEZ",
     "tipo_carga": null,
     "notas": "Clave: P1078",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Altamira",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.655Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.655Z",
-    "created_at": "2026-10-06T03:35:43.655Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.235Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.235Z",
+    "created_at": "2026-10-06T03:48:40.235Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.655Z"
+        "fecha": "2026-10-06T03:48:40.235Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Altamira: $1,100 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0PZG5TH",
+    "id": "CT-MUW52NXNCNJP",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "GRUPO TRANSPORTISTA CH HERMANOS SA DE CV",
@@ -8999,21 +9006,21 @@
     "notas": "Clave: P1300",
     "rutas": "Tlajomulco de Zuñiga - Escobedo",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.655Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.655Z",
-    "created_at": "2026-10-06T03:35:43.655Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.235Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.235Z",
+    "created_at": "2026-10-06T03:48:40.235Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.655Z"
+        "fecha": "2026-10-06T03:48:40.235Z"
       }
     ],
     "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0Q03RG2",
+    "id": "CT-MUW52NXN3N4B",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "LUIS ANTONIO LOPEZ PADILLA",
@@ -9023,23 +9030,23 @@
     "empresa": "LUIS ANOTONIO LOPEZ PADILLA",
     "tipo_carga": null,
     "notas": "Clave: P1537",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Tultitlan - Cancun, Monterrey - Cuautitlan Izcalli",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Tultitlan - Cancun, Monterrey - Cuautitlan Izcalli, Guadalajara - Doctor Gonzalez, Toluca - Saltillo",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.656Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.656Z",
-    "created_at": "2026-10-06T03:35:43.656Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.235Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.235Z",
+    "created_at": "2026-10-06T03:48:40.235Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.656Z"
+        "fecha": "2026-10-06T03:48:40.235Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tultitlan - Cancun: $60,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tultitlan - Cancun: $60,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalajar"
   },
   {
-    "id": "CT-MUW4M0Q0HJNT",
+    "id": "CT-MUW52NXOXJ7H",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "SUPER TRANSPORTES LOZANO SA DE CV",
@@ -9049,23 +9056,23 @@
     "empresa": "SUPER TRANSPORTES LOZANO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P347",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe, Zapopan - Santa Catarina",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.656Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.656Z",
-    "created_at": "2026-10-06T03:35:43.656Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.236Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.236Z",
+    "created_at": "2026-10-06T03:48:40.236Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.656Z"
+        "fecha": "2026-10-06T03:48:40.236Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - Santa Catarina: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0Q0LB7V",
+    "id": "CT-MUW52NXOCMFU",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "DAVID RETANA MONCAYO",
@@ -9075,23 +9082,23 @@
     "empresa": "DAVID RETANA MONCAYO",
     "tipo_carga": null,
     "notas": "Clave: P911",
-    "rutas": "Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Monterrey - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Guadalupe - Tultitlan, Tecamac - Zapopan, Tlajomulco de Zuñiga - Guadalupe, Tecamac - El Salto, Ramos Arizpe - Cienega de Flores",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Monterrey - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Guadalupe - Tultitlan, Tecamac - Zapopan, Tlajomulco de Zuñiga - Guadalupe, Tecamac - El Salto, Ramos Arizpe - Cienega de Flores, Toluca - Ramos Arizpe, Apodaca - Azcapotzalco, Ramos Arizpe - Cuautitlan, Tecamac - Ramos Arizpe",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.656Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.656Z",
-    "created_at": "2026-10-06T03:35:43.656Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.236Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.236Z",
+    "created_at": "2026-10-06T03:48:40.236Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.656Z"
+        "fecha": "2026-10-06T03:48:40.236Z"
       }
     ],
     "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-se"
   },
   {
-    "id": "CT-MUW4M0Q1EGJT",
+    "id": "CT-MUW52NXOTDMH",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "ARNULFO SANCHEZ GARCIA",
@@ -9101,23 +9108,23 @@
     "empresa": "ARNULFO SANCHEZ GARCIA",
     "tipo_carga": null,
     "notas": "Clave: P0805",
-    "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Ramos Arizpe - Cienega de Flores, Ocoyoacac - Ramos Arizpe",
+    "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Ramos Arizpe - Cienega de Flores, Ocoyoacac - Ramos Arizpe, Toluca - Ramos Arizpe, Tecamac - Guadalupe, Ramos Arizpe - Cuautitlan, Tecamac - Ramos Arizpe, Tecamac - Saltillo",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.657Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.657Z",
-    "created_at": "2026-10-06T03:35:43.657Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.236Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.236Z",
+    "created_at": "2026-10-06T03:48:40.236Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Tultitlan de Mariano Escobedo)",
-        "fecha": "2026-10-06T03:35:43.657Z"
+        "fecha": "2026-10-06T03:48:40.236Z"
       }
     ],
     "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 19 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene"
   },
   {
-    "id": "CT-MUW4M0Q13M58",
+    "id": "CT-MUW52NXPBNCG",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "RICARDO MENDOZA REYES",
@@ -9129,21 +9136,21 @@
     "notas": "Clave: P0997",
     "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.657Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.657Z",
-    "created_at": "2026-10-06T03:35:43.657Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.237Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.237Z",
+    "created_at": "2026-10-06T03:48:40.237Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Tultitlan de Mariano Escobedo)",
-        "fecha": "2026-10-06T03:35:43.657Z"
+        "fecha": "2026-10-06T03:48:40.237Z"
       }
     ],
     "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0Q2S7R7",
+    "id": "CT-MUW52NXQBQK1",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "SOCORRO SANCHEZ MEJIA",
@@ -9155,21 +9162,21 @@
     "notas": "Clave: P458",
     "rutas": "Cuautitlan Izcalli - Ramos Arizpe",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.658Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.658Z",
-    "created_at": "2026-10-06T03:35:43.658Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.238Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.238Z",
+    "created_at": "2026-10-06T03:48:40.238Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Cuautitlan Izcalli - Ramos Arizpe)",
-        "fecha": "2026-10-06T03:35:43.658Z"
+        "fecha": "2026-10-06T03:48:40.238Z"
       }
     ],
     "tarifas": "Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0QAP8BY",
+    "id": "CT-MUW52NXX52V0",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "JESUS SILVA TAMEZ",
@@ -9181,21 +9188,125 @@
     "notas": "Clave: P63",
     "rutas": "Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T03:35:43.666Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.666Z",
-    "created_at": "2026-10-06T03:35:43.666Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.245Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.245Z",
+    "created_at": "2026-10-06T03:48:40.245Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Guadalupe)",
-        "fecha": "2026-10-06T03:35:43.666Z"
+        "fecha": "2026-10-06T03:48:40.245Z"
       }
     ],
     "tarifas": "Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW4M0QDGCES",
+    "id": "CT-MUW52NY2XSEA",
+    "agente_asignado": "SOFIA",
+    "tipo": "proveedor",
+    "nombre_completo": "F&M SA DE CV",
+    "puesto": null,
+    "telefono": null,
+    "email": null,
+    "empresa": "F&M SA DE CV",
+    "tipo_carga": null,
+    "notas": "Clave: P0046",
+    "rutas": "Guadalupe - Reynosa",
+    "unidades": "caja seca 53",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.250Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.250Z",
+    "created_at": "2026-10-06T03:48:40.250Z",
+    "interacciones": [
+      {
+        "agente": "SOFIA",
+        "canal": "permanente",
+        "resumen": "Alta desde Rutas 51-100 (Guadalupe - Reynosa)",
+        "fecha": "2026-10-06T03:48:40.250Z"
+      }
+    ],
+    "tarifas": "Guadalupe - Reynosa: $14,000 mínimo (Rutas 51-100 ene-sep 2026)"
+  },
+  {
+    "id": "CT-MUW52NY3EY0J",
+    "agente_asignado": "SOFIA",
+    "tipo": "proveedor",
+    "nombre_completo": "LAZARO AGUIRRE",
+    "puesto": null,
+    "telefono": "+52 1 662 299 6100",
+    "email": null,
+    "empresa": "TRANSPORTES Y SERVICIOS LOGISTICOS AT S DE RL DE CV",
+    "tipo_carga": null,
+    "notas": "Clave: P1065",
+    "rutas": "Guadalupe - Hermosillo",
+    "unidades": "caja seca 53",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.251Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.251Z",
+    "created_at": "2026-10-06T03:48:40.251Z",
+    "interacciones": [
+      {
+        "agente": "SOFIA",
+        "canal": "permanente",
+        "resumen": "Alta desde Rutas 51-100 (Guadalupe - Hermosillo)",
+        "fecha": "2026-10-06T03:48:40.251Z"
+      }
+    ],
+    "tarifas": "Guadalupe - Hermosillo: $2,000 mínimo (Rutas 51-100 ene-sep 2026)"
+  },
+  {
+    "id": "CT-MUW52NY6BTMZ",
+    "agente_asignado": "SOFIA",
+    "tipo": "proveedor",
+    "nombre_completo": "MIGUEL ANGEL RAMIREZ RICO",
+    "puesto": null,
+    "telefono": "55 2945 8107",
+    "email": null,
+    "empresa": "MIGUEL ANGEL RAMIREZ RICO",
+    "tipo_carga": null,
+    "notas": "Clave: P1416",
+    "rutas": "Cuautla - Ameca",
+    "unidades": "caja seca 53",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.254Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.254Z",
+    "created_at": "2026-10-06T03:48:40.254Z",
+    "interacciones": [
+      {
+        "agente": "SOFIA",
+        "canal": "permanente",
+        "resumen": "Alta desde Rutas 51-100 (Cuautla - Ameca)",
+        "fecha": "2026-10-06T03:48:40.254Z"
+      }
+    ],
+    "tarifas": "Cuautla - Ameca: $24,000 mínimo (Rutas 51-100 ene-sep 2026)"
+  },
+  {
+    "id": "CT-MUW52NY63NYI",
+    "agente_asignado": "SOFIA",
+    "tipo": "proveedor",
+    "nombre_completo": "EDUARDO TRUJILLO DE LA ROSA",
+    "puesto": null,
+    "telefono": "8994519454",
+    "email": null,
+    "empresa": "EDUARDO TRUJILLO DE LA ROSA",
+    "tipo_carga": null,
+    "notas": "Clave: P1547",
+    "rutas": "Cuautla - Ameca",
+    "unidades": "caja seca 53",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.254Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.254Z",
+    "created_at": "2026-10-06T03:48:40.254Z",
+    "interacciones": [
+      {
+        "agente": "SOFIA",
+        "canal": "permanente",
+        "resumen": "Alta desde Rutas 51-100 (Cuautla - Ameca)",
+        "fecha": "2026-10-06T03:48:40.254Z"
+      }
+    ],
+    "tarifas": "Cuautla - Ameca: $22,500 mínimo (Rutas 51-100 ene-sep 2026)"
+  },
+  {
+    "id": "CT-MUW52NY70CM3",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "NUEVO CEDIS TULTITLAN - MEGA ALIMENTOS",
@@ -9207,20 +9318,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Tultitlan",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.669Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.669Z",
-    "created_at": "2026-10-06T03:35:43.669Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.669Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QD0XF8",
+    "id": "CT-MUW52NY7VORE",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CCM ESCOBEDO - BONAFONT",
@@ -9232,20 +9343,20 @@
     "notas": "CEDIS/cliente destino en Escobedo, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tlajomulco de Zuñiga - Escobedo",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.669Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.669Z",
-    "created_at": "2026-10-06T03:35:43.669Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.669Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QDYCL9",
+    "id": "CT-MUW52NY7OMGW",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "MB TORREON - MAS BODEGA Y LOGISTICA",
@@ -9257,20 +9368,20 @@
     "notas": "CEDIS/cliente destino en Torreón, Coahuila de Zaragoza (Top 50 Rutas ene-sep 2026)",
     "rutas": "Guadalupe - Torreon",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.669Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.669Z",
-    "created_at": "2026-10-06T03:35:43.669Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Guadalupe - Torreon)",
-        "fecha": "2026-10-06T03:35:43.669Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QESGBD",
+    "id": "CT-MUW52NY7LK11",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "DIKEN INTERNATIONAL SUC CENTRO",
@@ -9282,20 +9393,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán de Mariano Escobedo, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Tultitlan de Mariano Escobedo)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEFM90",
+    "id": "CT-MUW52NY7OWV8",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "OXXO RAMOS ARIZPE - CADENA COMERCIAL OXXO",
@@ -9307,20 +9418,20 @@
     "notas": "CEDIS/cliente destino en Ramos Arizpe, Coahuila de Zaragoza (Top 50 Rutas ene-sep 2026)",
     "rutas": "Cuautitlan Izcalli - Ramos Arizpe",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Cuautitlan Izcalli - Ramos Arizpe)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEO4O3",
+    "id": "CT-MUW52NY7WJ3L",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "HUB MTY - PEÑAFIEL BEBIDAS",
@@ -9332,20 +9443,20 @@
     "notas": "CEDIS/cliente destino en San Nicolás de los Garza, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tecamac - San Nicolas de los Garza",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tecamac - San Nicolas de los Garza)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QECERM",
+    "id": "CT-MUW52NY7FNXW",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS BONAFONT",
@@ -9357,20 +9468,20 @@
     "notas": "CEDIS/cliente destino en Escobedo, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tlajomulco de Zuñiga - Escobedo",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEXBX0",
+    "id": "CT-MUW52NY73VDA",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "MODERNA - PROVEEDORA DE EMBARQUES",
@@ -9382,20 +9493,20 @@
     "notas": "CEDIS/cliente destino en Monterrey, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tecamac - Monterrey",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tecamac - Monterrey)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEVIMS",
+    "id": "CT-MUW52NY7UIME",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "OMEGA PROVEEDORA DE ALIMENTOS",
@@ -9407,20 +9518,20 @@
     "notas": "CEDIS/cliente destino en Gómez Palacio, Durango (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Gomez Palacio",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Gomez Palacio)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QE185M",
+    "id": "CT-MUW52NY7CM4J",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "DAYMAC - JUAN JOSE SHUGERT VARELA",
@@ -9432,20 +9543,20 @@
     "notas": "CEDIS/cliente destino en Ciudad Guzmán, Jalisco (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tepotzotlan - Ciudad Guzman",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tepotzotlan - Ciudad Guzman)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEFE17",
+    "id": "CT-MUW52NY7K1Z4",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "INDUSTRIALIZADORA DE CARNICOS STRATTEGA",
@@ -9457,20 +9568,20 @@
     "notas": "CEDIS/cliente destino en Puebla, Puebla (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Puebla",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Puebla)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEQNST",
+    "id": "CT-MUW52NY7RBAX",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS TIJUANA - MEGA ALIMENTOS",
@@ -9482,20 +9593,20 @@
     "notas": "CEDIS/cliente destino en Tijuana, Baja California (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Tijuana",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tijuana)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEZPZV",
+    "id": "CT-MUW52NY71DAW",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CPR SAN NICOLAS - PEÑAFIEL BEBIDAS",
@@ -9507,20 +9618,20 @@
     "notas": "CEDIS/cliente destino en San Nicolás de los Garza, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tecamac - San Nicolas de los Garza",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tecamac - San Nicolas de los Garza)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEDDSW",
+    "id": "CT-MUW52NY7E9WV",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS TLAJOMULCO - MAS BODEGA Y LOGISTICA",
@@ -9532,20 +9643,20 @@
     "notas": "CEDIS/cliente destino en Tlajomulco de Zúñiga, Jalisco (Top 50 Rutas ene-sep 2026)",
     "rutas": "Guadalupe - Tlajomulco de Zuñiga",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Guadalupe - Tlajomulco de Zuñiga)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEA54W",
+    "id": "CT-MUW52NY71WFR",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "HEB ESCOBEDO",
@@ -9557,20 +9668,20 @@
     "notas": "CEDIS/cliente destino en Escobedo, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Toluca - Escobedo",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Toluca - Escobedo)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEOA4P",
+    "id": "CT-MUW52NY7S21P",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "DISTRIBUCIONES REMBAO - MEGA ALIMENTOS",
@@ -9582,20 +9693,20 @@
     "notas": "CEDIS/cliente destino en Mexicali, Baja California (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Mexicali",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Mexicali)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEX9B8",
+    "id": "CT-MUW52NY79ZO6",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "BUNZL DE MEXICO",
@@ -9607,20 +9718,20 @@
     "notas": "CEDIS/cliente destino en Apodaca, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Cuautitlan Izcalli - Apodaca",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Cuautitlan Izcalli - Apodaca)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEU76E",
+    "id": "CT-MUW52NY74FLA",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS CHEDRAUI TEOLOYUCAN - TIENDAS CHEDRAUI",
@@ -9632,20 +9743,20 @@
     "notas": "CEDIS/cliente destino en Teoloyucan, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Ramos Arizpe - Teoloyucan",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Teoloyucan)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEOU6K",
+    "id": "CT-MUW52NY7GGGS",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS SODIMAC TULTITLAN - GONHERRPLAST",
@@ -9657,20 +9768,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Monterrey - Tultitlan",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Monterrey - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEEJPW",
+    "id": "CT-MUW52NY7K8WM",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "MAS BODEGA CANCUN - MAS BODEGA Y LOGISTICA",
@@ -9682,20 +9793,20 @@
     "notas": "CEDIS/cliente destino en Cancún, Quintana Roo (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tultitlan - Cancun",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tultitlan - Cancun)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QE6V8O",
+    "id": "CT-MUW52NY71YKE",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS CITY CLUB TULTITLAN - TIENDAS SORIANA",
@@ -9707,20 +9818,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán de Mariano Escobedo, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.255Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.255Z",
+    "created_at": "2026-10-06T03:48:40.255Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Tultitlan de Mariano Escobedo)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.255Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEC0BK",
+    "id": "CT-MUW52NY8EE91",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "FRUTERIA WELTON - MEGA ALIMENTOS",
@@ -9732,20 +9843,20 @@
     "notas": "CEDIS/cliente destino en San Luis Río Colorado, Sonora (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - San Luis Rio Colorado",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - San Luis Rio Colorado)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEQQNC",
+    "id": "CT-MUW52NY8O1Y7",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "SAMS CLUB CUAUTITLAN - GONHERRPLAST",
@@ -9757,20 +9868,20 @@
     "notas": "CEDIS/cliente destino en Cuautitlán Izcalli, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Monterrey - Cuautitlan Izcalli",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Monterrey - Cuautitlan Izcalli)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEU4HC",
+    "id": "CT-MUW52NY81JRD",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "MAS BODEGA Y LOGISTICA",
@@ -9782,20 +9893,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Guadalupe - Tultitlan, Tlajomulco de Zuñiga - Guadalupe, Escobedo - Guadalupe",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Guadalupe - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QENQJB",
+    "id": "CT-MUW52NY8INKU",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "DISTRIBUIDORA FORKAMINOS SALTILLO",
@@ -9807,20 +9918,20 @@
     "notas": "CEDIS/cliente destino en Saltillo, Coahuila de Zaragoza (Top 50 Rutas ene-sep 2026)",
     "rutas": "Toluca - Saltillo",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Toluca - Saltillo)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QE3OHL",
+    "id": "CT-MUW52NY8KRB8",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "INTER PACKGING PARTNERSHIP - PROVEEDORA DE EMBARQUES",
@@ -9832,20 +9943,20 @@
     "notas": "CEDIS/cliente destino en Zapopan, Jalisco (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tecamac - Zapopan",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tecamac - Zapopan)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QE13E3",
+    "id": "CT-MUW52NY81J06",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "REALI",
@@ -9857,20 +9968,20 @@
     "notas": "CEDIS/cliente destino en Oriental, Puebla (Top 50 Rutas ene-sep 2026)",
     "rutas": "Ramos Arizpe - Oriental",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Oriental)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEDEUG",
+    "id": "CT-MUW52NY8RZ7B",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS IRAPUATO NUEVO - MEGA ALIMENTOS",
@@ -9882,20 +9993,20 @@
     "notas": "CEDIS/cliente destino en Irapuato, Guanajuato (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Irapuato",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Irapuato)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QEVT1E",
+    "id": "CT-MUW52NY8KH15",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "OPERADORA AVICOLA SAN MIGUEL - MEGA ALIMENTOS",
@@ -9907,20 +10018,20 @@
     "notas": "CEDIS/cliente destino en Puebla, Puebla (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Puebla",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Puebla)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QE54TY",
+    "id": "CT-MUW52NY888TV",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS GUADALAJARA - MEGA ALIMENTOS",
@@ -9932,20 +10043,20 @@
     "notas": "CEDIS/cliente destino en El Salto, Jalisco (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - El Salto",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.670Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.670Z",
-    "created_at": "2026-10-06T03:35:43.670Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - El Salto)",
-        "fecha": "2026-10-06T03:35:43.670Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFDO6D",
+    "id": "CT-MUW52NY8Q2Z8",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "OXXO MTY - BONAFONT",
@@ -9957,20 +10068,20 @@
     "notas": "CEDIS/cliente destino en Monterrey, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tlajomulco de Zuñiga - Monterrey",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Monterrey)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFUM9U",
+    "id": "CT-MUW52NY8V5X9",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS OXXO MEXICALI - MEGA ALIMENTOS",
@@ -9982,20 +10093,20 @@
     "notas": "CEDIS/cliente destino en Mexicali, Baja California (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Mexicali",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Mexicali)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFY5BF",
+    "id": "CT-MUW52NY8TM8W",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "MAS BODEGA Y LOGISTICA CEDIS TULTITLAN",
@@ -10007,20 +10118,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán de Mariano Escobedo, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Tultitlan de Mariano Escobedo)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFE13F",
+    "id": "CT-MUW52NY8MZCD",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "METAPEL",
@@ -10032,20 +10143,20 @@
     "notas": "CEDIS/cliente destino en El Salto, Jalisco (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tecamac - El Salto",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tecamac - El Salto)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFQXKN",
+    "id": "CT-MUW52NY8DZYF",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "OXXO GPE",
@@ -10057,20 +10168,20 @@
     "notas": "CEDIS/cliente destino en Guadalupe, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tlajomulco de Zuñiga - Guadalupe",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Guadalupe)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFDEN1",
+    "id": "CT-MUW52NY8CFEP",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "OMEGA PROV DE ALIMENTOS - MEGA ALIMENTOS",
@@ -10082,20 +10193,20 @@
     "notas": "CEDIS/cliente destino en Gómez Palacio, Durango (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Gomez Palacio",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Gomez Palacio)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFJSU2",
+    "id": "CT-MUW52NY8YH2V",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "ALEN SANTA CATARINA - ALEN DEL NORTE",
@@ -10107,20 +10218,20 @@
     "notas": "CEDIS/cliente destino en Santa Catarina, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Santa Catarina",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Santa Catarina)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFOSGF",
+    "id": "CT-MUW52NY8OY67",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS SAMS CHALCO - NUEVA WAL MART DE MEXICO",
@@ -10132,20 +10243,20 @@
     "notas": "CEDIS/cliente destino en Chalco, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Monterrey - Chalco",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Monterrey - Chalco)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QF20UN",
+    "id": "CT-MUW52NY8YN7S",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "ESSITY ZONA 5 - JUAN JOSE SHUGERT VARELA",
@@ -10157,20 +10268,20 @@
     "notas": "CEDIS/cliente destino en San Nicolás de los Garza, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Tepotzotlan - San Nicolas de los Garza",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Tepotzotlan - San Nicolas de los Garza)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFJWYB",
+    "id": "CT-MUW52NY8SD5G",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "SODIMAC CEDIS - GONHERRPLAST",
@@ -10182,20 +10293,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Monterrey - Tultitlan",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Monterrey - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFIV04",
+    "id": "CT-MUW52NY8ESX1",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "JOSE PEREDA REYES - MEGA ALIMENTOS",
@@ -10207,20 +10318,20 @@
     "notas": "CEDIS/cliente destino en Mexicali, Baja California (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Mexicali",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Mexicali)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFUSR6",
+    "id": "CT-MUW52NY8MTR8",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS SORIANA TULTITLAN - GONHERRPLAST",
@@ -10232,20 +10343,20 @@
     "notas": "CEDIS/cliente destino en Tultitlán, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Monterrey - Tultitlan",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Monterrey - Tultitlan)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QF3OSU",
+    "id": "CT-MUW52NY83XJZ",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "SORIANA QUERETARO - GONHERRPLAST",
@@ -10257,20 +10368,20 @@
     "notas": "CEDIS/cliente destino en Querétaro, Querétaro (Top 50 Rutas ene-sep 2026)",
     "rutas": "Monterrey - Queretaro",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Monterrey - Queretaro)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFYCBP",
+    "id": "CT-MUW52NY858CH",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CEDIS WAL-MART - NUEVA WALMART DE MEXICO",
@@ -10282,20 +10393,20 @@
     "notas": "CEDIS/cliente destino en Ciénega de Flores, Nuevo León (Top 50 Rutas ene-sep 2026)",
     "rutas": "Ramos Arizpe - Cienega de Flores",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Cienega de Flores)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFUVR8",
+    "id": "CT-MUW52NY8387J",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "CORPORATIVO DIKEN INTERNATIONAL - DIKEN INTERNATIONAL",
@@ -10307,20 +10418,20 @@
     "notas": "CEDIS/cliente destino en Ramos Arizpe, Coahuila de Zaragoza (Top 50 Rutas ene-sep 2026)",
     "rutas": "Ocoyoacac - Ramos Arizpe",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Ocoyoacac - Ramos Arizpe)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFRCQ0",
+    "id": "CT-MUW52NY8GW3V",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "TMLL - COGONMAR",
@@ -10332,20 +10443,20 @@
     "notas": "CEDIS/cliente destino en Tizayuca, Hidalgo (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Tizayuca",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tizayuca)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   },
   {
-    "id": "CT-MUW4M0QFH50A",
+    "id": "CT-MUW52NY8QXC6",
     "agente_asignado": "SOFIA",
     "tipo": "cliente",
     "nombre_completo": "GRUPO ZORRO - CEDIS SAN MARTIN OBISPO - MEGA ALIMENTOS",
@@ -10357,15 +10468,15 @@
     "notas": "CEDIS/cliente destino en Cuautitlán Izcalli, México (Top 50 Rutas ene-sep 2026)",
     "rutas": "Santa Catarina - Cuautitlan Izcalli",
     "unidades": null,
-    "fecha_primer_contacto": "2026-10-06T03:35:43.671Z",
-    "fecha_ultimo_contacto": "2026-10-06T03:35:43.671Z",
-    "created_at": "2026-10-06T03:35:43.671Z",
+    "fecha_primer_contacto": "2026-10-06T03:48:40.256Z",
+    "fecha_ultimo_contacto": "2026-10-06T03:48:40.256Z",
+    "created_at": "2026-10-06T03:48:40.256Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
         "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Cuautitlan Izcalli)",
-        "fecha": "2026-10-06T03:35:43.671Z"
+        "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
   }

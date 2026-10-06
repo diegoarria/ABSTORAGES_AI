@@ -1,0 +1,1998 @@
+[
+  {
+    "rank": 51,
+    "destino": "Tecamac - Piedras Negras",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1587",
+        "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "contacto": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "telefono": "5541758627",
+        "costo_minimo": 38000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 40000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1281",
+        "empresa": "ODILON ARAIZA SANCHEZ",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 40000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1501",
+        "empresa": "BAHNSEN G",
+        "contacto": "JOEL VERVER MARTINEZ",
+        "telefono": "5610596620",
+        "costo_minimo": 37000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1588",
+        "empresa": "YANEISI ARELI CAVAZOS LEAL",
+        "contacto": "SALVADOR ALMAGUER HERNANDEZ",
+        "telefono": "8184659685",
+        "costo_minimo": 45000.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P1593",
+        "empresa": "MIGUEL ALEJANDRO ESCAMILLA SOLIS",
+        "contacto": "KARLA ESCAMILLA",
+        "telefono": "5591808647",
+        "costo_minimo": 42500.0
+      }
+    ]
+  },
+  {
+    "rank": 52,
+    "destino": "Zapopan - San Nicolas de los Garza",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1434",
+        "empresa": "RISOCO LOGISTICS",
+        "contacto": "DAVID ALVAREZ",
+        "telefono": "871168 0772",
+        "costo_minimo": 24500.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1479",
+        "empresa": "JOSE RAMON FLORES ALANIS",
+        "contacto": "JOSE RAMON FLORES ALANIS",
+        "telefono": "8110302029",
+        "costo_minimo": 24500.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1561",
+        "empresa": "LOGISTICA VALOR Y EXITO",
+        "contacto": "FRANCISCO FAVIO ESPINOZA MONTOYA",
+        "telefono": "6681328696",
+        "costo_minimo": 2000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1151",
+        "empresa": "IRENE ISABEL GARZA LEAL",
+        "contacto": "IRENE ISABEL GARZA LEAL",
+        "telefono": "8136024336",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1511",
+        "empresa": "TRANSPORTES CAVAZOS ARREDONDO SA DE CV",
+        "contacto": "HECTOR A. GARCIA MARTINEZ",
+        "telefono": "8266880331",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 53,
+    "destino": "Monterrey - Tultitlan",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1128",
+        "empresa": "CARLOS IVAN TORRES GARCIA",
+        "contacto": "CARLOS IVAN",
+        "telefono": "+52 729 959 0004",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1411",
+        "empresa": "GRUPO TRANSPORTISTA HIDALGO SA DE CV",
+        "contacto": "LUIS FRANCISCO GUTIERREZ TAPIA",
+        "telefono": "772 105 85 99",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1431",
+        "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
+        "contacto": "EMILIANO BRIONES BARRAGAN",
+        "telefono": "5543799240",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P1557",
+        "empresa": "LOGISTICA ESPECIALIZADA VR72",
+        "contacto": "JUAN PABLO VEGA",
+        "telefono": "5587261409",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 7,
+        "codigo": "P1587",
+        "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "contacto": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "telefono": "5541758627",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 54,
+    "destino": "Monterrey - Monterrey",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1539",
+        "empresa": "DIANA KAREN RAMOS ZACARIAS",
+        "contacto": "DIANA KAREN RAMOS ZACARIAS",
+        "telefono": "8119076088",
+        "costo_minimo": 5500.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1390",
+        "empresa": "AUTO LINEAS VERDES DE MONTERREY",
+        "contacto": "HARI HERNANDEZ GONZALEZ",
+        "telefono": "8116409226",
+        "costo_minimo": 5500.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1481",
+        "empresa": "TRANSPORTES SIETE ANGELES",
+        "contacto": "PABLO ESPINOSA",
+        "telefono": "8115350612",
+        "costo_minimo": 5500.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1509",
+        "empresa": "RITO ALBERTO CALIXTO CRUZ",
+        "contacto": "RICARDO ABRAHAM CALIXTO HERNANDEZ",
+        "telefono": "8112812422",
+        "costo_minimo": 5500.0
+      }
+    ]
+  },
+  {
+    "rank": 55,
+    "destino": "Santa Catarina - Mexicali",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1561",
+        "empresa": "LOGISTICA VALOR Y EXITO",
+        "contacto": "FRANCISCO FAVIO ESPINOZA MONTOYA",
+        "telefono": "6681328696",
+        "costo_minimo": 2500.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1526",
+        "empresa": "GUSTAVO FABIAN RODRIGUEZ MARROQUIN",
+        "contacto": "FABIAN RODRIGUEZ",
+        "telefono": "8261718577",
+        "costo_minimo": 65000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1567",
+        "empresa": "SALVADOR SALAS LAZCANO",
+        "contacto": "SALVADOR LAZCANO",
+        "telefono": "8113697082",
+        "costo_minimo": 3000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1051",
+        "empresa": "FERNANDO ALCALÁ ORTIZ",
+        "contacto": "FERNANDO ALCALA ORTIZ",
+        "telefono": "52 1 81 2748 2989",
+        "costo_minimo": 65000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1464",
+        "empresa": "TRANSPORTES TACSA SA DE CV",
+        "contacto": "JOSE LUIS CAVAZOS",
+        "telefono": "8124242815",
+        "costo_minimo": 65000.0
+      }
+    ]
+  },
+  {
+    "rank": 56,
+    "destino": "Apodaca - Tijuana",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1464",
+        "empresa": "TRANSPORTES TACSA SA DE CV",
+        "contacto": "JOSE LUIS CAVAZOS",
+        "telefono": "8124242815",
+        "costo_minimo": 70000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1522",
+        "empresa": "MIGUEL ANGEL FRANCO AGUIRRE",
+        "contacto": "ANGEL DAVID FRANCO MENDEZ",
+        "telefono": "8445863518",
+        "costo_minimo": 68000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1526",
+        "empresa": "GUSTAVO FABIAN RODRIGUEZ MARROQUIN",
+        "contacto": "FABIAN RODRIGUEZ",
+        "telefono": "8261718577",
+        "costo_minimo": 70000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1567",
+        "empresa": "SALVADOR SALAS LAZCANO",
+        "contacto": "SALVADOR LAZCANO",
+        "telefono": "8113697082",
+        "costo_minimo": 68000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1588",
+        "empresa": "YANEISI ARELI CAVAZOS LEAL",
+        "contacto": "SALVADOR ALMAGUER HERNANDEZ",
+        "telefono": "8184659685",
+        "costo_minimo": 69500.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P1601",
+        "empresa": "AUTOLINEAS SAN JOSE SA DE CV",
+        "contacto": "JOSE LUIS CAVAZOS SALAZAR",
+        "telefono": "8124242815",
+        "costo_minimo": 70000.0
+      }
+    ]
+  },
+  {
+    "rank": 57,
+    "destino": "Santa Catarina - Tijuana",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1464",
+        "empresa": "TRANSPORTES TACSA SA DE CV",
+        "contacto": "JOSE LUIS CAVAZOS",
+        "telefono": "8124242815",
+        "costo_minimo": 3000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1526",
+        "empresa": "GUSTAVO FABIAN RODRIGUEZ MARROQUIN",
+        "contacto": "FABIAN RODRIGUEZ",
+        "telefono": "8261718577",
+        "costo_minimo": 1500.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1309",
+        "empresa": "EDGAR BONIFACIO AGUIRRE TAMEZ",
+        "contacto": "JONATHAN",
+        "telefono": "+52 1 826 126 5810",
+        "costo_minimo": 3000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1567",
+        "empresa": "SALVADOR SALAS LAZCANO",
+        "contacto": "SALVADOR LAZCANO",
+        "telefono": "8113697082",
+        "costo_minimo": null
+      }
+    ]
+  },
+  {
+    "rank": 58,
+    "destino": "Ramos Arizpe - Apodaca",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1513",
+        "empresa": "IMOX IMPULSORA PROFESIONAL SA DE CV",
+        "contacto": "SILVIA BRENTON",
+        "telefono": "8117251060",
+        "costo_minimo": 8000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1579",
+        "empresa": "SIGMA LOGISTICS JH",
+        "contacto": "JORDAN AVILA RODRIGUEZ",
+        "telefono": "8443114341",
+        "costo_minimo": 7500.0
+      }
+    ]
+  },
+  {
+    "rank": 59,
+    "destino": "Zapopan - Santa Catarina",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1501",
+        "empresa": "BAHNSEN G",
+        "contacto": "JOEL VERVER MARTINEZ",
+        "telefono": "5610596620",
+        "costo_minimo": 24500.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1113",
+        "empresa": "TRANSPORTREZA",
+        "contacto": "IVAN MENDOZA LOPEZ",
+        "telefono": "55 58 99 91 70",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1558",
+        "empresa": "TRANSPORTADORA GEOS",
+        "contacto": "GABRIELA ORTEGA",
+        "telefono": "6121089197",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 24500.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1591",
+        "empresa": "HEBERTO JAVIER RODRIGUEZ PERALES",
+        "contacto": "HEBERTO JAVIER RODRIGUEZ PERALES",
+        "telefono": "8661122432",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P222",
+        "empresa": "AUTOLINEAS VIFE",
+        "contacto": "MAXIMILIANO VILLARREAL",
+        "telefono": "8116366118",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 7,
+        "codigo": "P347",
+        "empresa": "SUPER TRANSPORTES LOZANO SA DE CV",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 8,
+        "codigo": "P966",
+        "empresa": "TRANS GROUP JR SAPI DE CV",
+        "contacto": "JOSE ROSARIO ORTIZ",
+        "telefono": "4492662158",
+        "costo_minimo": 25500.0
+      }
+    ]
+  },
+  {
+    "rank": 60,
+    "destino": "Apodaca - Gomez Palacio",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1402",
+        "empresa": "ADBLUE INTERNACIONAL SA DE CV",
+        "contacto": "JORGE GONZALEZ",
+        "telefono": "81 1636 6988",
+        "costo_minimo": 3300.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1574",
+        "empresa": "TRACTO LINEAS MEXICANAS",
+        "contacto": "MARCO ANTONIO SYDE DEL REAL",
+        "telefono": "8120009266",
+        "costo_minimo": 3300.0
+      }
+    ]
+  },
+  {
+    "rank": 61,
+    "destino": "Guadalupe - Reynosa",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1519",
+        "empresa": "JOSE AARON DE LA GARZA BOTELLO",
+        "contacto": "JOSE VERDIGO",
+        "telefono": "8132690690",
+        "costo_minimo": 17000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P0046",
+        "empresa": "F&M SA DE CV",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 14000.0
+      }
+    ]
+  },
+  {
+    "rank": 62,
+    "destino": "Gral Escobedo - San Nicolas de los Garza",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1509",
+        "empresa": "RITO ALBERTO CALIXTO CRUZ",
+        "contacto": "RICARDO ABRAHAM CALIXTO HERNANDEZ",
+        "telefono": "8112812422",
+        "costo_minimo": 5500.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1184",
+        "empresa": "JOSE ANTONIO RODRIGUEZ JUAREZ",
+        "contacto": "ANTONIO RODRIGUEZ",
+        "telefono": "+52 1 81 1531 9579",
+        "costo_minimo": 6000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1481",
+        "empresa": "TRANSPORTES SIETE ANGELES",
+        "contacto": "PABLO ESPINOSA",
+        "telefono": "8115350612",
+        "costo_minimo": 5500.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1366",
+        "empresa": "CARLOS EDUARDO BARBA RODRIGUEZ",
+        "contacto": "CARLOS EDUARDO BARBA RODRIGUEZ",
+        "telefono": "+52 1 81 2146 5043",
+        "costo_minimo": 5500.0
+      }
+    ]
+  },
+  {
+    "rank": 63,
+    "destino": "Santa Catarina - San Nicolas de los Garza",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1184",
+        "empresa": "JOSE ANTONIO RODRIGUEZ JUAREZ",
+        "contacto": "ANTONIO RODRIGUEZ",
+        "telefono": "+52 1 81 1531 9579",
+        "costo_minimo": 6000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1481",
+        "empresa": "TRANSPORTES SIETE ANGELES",
+        "contacto": "PABLO ESPINOSA",
+        "telefono": "8115350612",
+        "costo_minimo": 5500.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1402",
+        "empresa": "ADBLUE INTERNACIONAL SA DE CV",
+        "contacto": "JORGE GONZALEZ",
+        "telefono": "81 1636 6988",
+        "costo_minimo": 7000.0
+      }
+    ]
+  },
+  {
+    "rank": 64,
+    "destino": "Santa Catarina - Puebla de Zaragoza",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P75",
+        "empresa": "PORTEADORA DE BIENES Y SERVICIOS SA DE CV",
+        "contacto": "GERARDO",
+        "telefono": "52 1 221 100 2573",
+        "costo_minimo": 1200.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P633",
+        "empresa": "ESTEBAN NAVARRO TORRES",
+        "contacto": "ESTEBAN NAVARRO TORRES",
+        "telefono": "+52 1 222 310 7760",
+        "costo_minimo": 23000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1012",
+        "empresa": "SERGIO GERARDO DE ROSAS GALAN",
+        "contacto": "ALEJANDRO GALAN",
+        "telefono": "222 152 2442",
+        "costo_minimo": 23000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1082",
+        "empresa": "GUSTAVO GARCIA CORTEZ",
+        "contacto": "CESAR ALAN HERNANDEZ GONZALEZ",
+        "telefono": "899 105 8078",
+        "costo_minimo": 23000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P61",
+        "empresa": "MONICA CORONA LINARES",
+        "contacto": "OSCAR",
+        "telefono": "+52 1 221 217 1454",
+        "costo_minimo": 23000.0
+      }
+    ]
+  },
+  {
+    "rank": 65,
+    "destino": "Toluca - Ramos Arizpe",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P0805",
+        "empresa": "ARNULFO SANCHEZ GARCIA",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P911",
+        "empresa": "DAVID RETANA MONCAYO",
+        "contacto": "Sin información",
+        "telefono": "55 5431 9332",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 26000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P810",
+        "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
+        "contacto": "MIGUEL ANGEL OSNAYA VARGAS",
+        "telefono": "5544766455",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 66,
+    "destino": "Monterrey - Ixtapaluca",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1587",
+        "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "contacto": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "telefono": "5541758627",
+        "costo_minimo": 22000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1596",
+        "empresa": "NOVAKLOGISTICS",
+        "contacto": "RICARDO ALFREDO RODRIGUEZ RUBIO",
+        "telefono": "8115018533",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1520",
+        "empresa": "ASESORES INTEGRALES KOTE-MAR SA DE CV",
+        "contacto": "IVAN MORALES",
+        "telefono": "5552529466",
+        "costo_minimo": 20000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1557",
+        "empresa": "LOGISTICA ESPECIALIZADA VR72",
+        "contacto": "JUAN PABLO VEGA",
+        "telefono": "5587261409",
+        "costo_minimo": 22000.0
+      }
+    ]
+  },
+  {
+    "rank": 67,
+    "destino": "Ramos Arizpe - Altamira",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1078",
+        "empresa": "FRANCISCO PLACIDO CANTU LOPEZ",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 1100.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1509",
+        "empresa": "RITO ALBERTO CALIXTO CRUZ",
+        "contacto": "RICARDO ABRAHAM CALIXTO HERNANDEZ",
+        "telefono": "8112812422",
+        "costo_minimo": 600.0
+      }
+    ]
+  },
+  {
+    "rank": 68,
+    "destino": "Santa Catarina - Cuautitlan Izcalli",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 1500.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1520",
+        "empresa": "ASESORES INTEGRALES KOTE-MAR SA DE CV",
+        "contacto": "IVAN MORALES",
+        "telefono": "5552529466",
+        "costo_minimo": 2400.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1587",
+        "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "contacto": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "telefono": "5541758627",
+        "costo_minimo": 2400.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P548",
+        "empresa": "TRANSRAPIDOS VALERIO SA DE CV",
+        "contacto": "DANIEL MEDINA",
+        "telefono": "Sin información",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 69,
+    "destino": "Tlajomulco de Zuñiga - Escobedo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1434",
+        "empresa": "RISOCO LOGISTICS",
+        "contacto": "DAVID ALVAREZ",
+        "telefono": "871168 0772",
+        "costo_minimo": 2000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1242",
+        "empresa": "AUTOTRANSPORTES PERTH SA DE CV",
+        "contacto": "MICHELL JAIR CERDA VIDALES",
+        "telefono": "81 8654 5194",
+        "costo_minimo": 24000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1500",
+        "empresa": "DEFROA",
+        "contacto": "ALEJANDRO SANTOS",
+        "telefono": "5610720643",
+        "costo_minimo": 24500.0
+      }
+    ]
+  },
+  {
+    "rank": 70,
+    "destino": "Guadalupe - Hermosillo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1485",
+        "empresa": "EDEER JAIME CASTILLO VILLARREAL",
+        "contacto": "EDEER VILLAREAL",
+        "telefono": "8123320391",
+        "costo_minimo": 45000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1065",
+        "empresa": "TRANSPORTES Y SERVICIOS LOGISTICOS AT S DE RL DE CV",
+        "contacto": "LAZARO AGUIRRE",
+        "telefono": "+52 1 662 299 6100",
+        "costo_minimo": 2000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1136",
+        "empresa": "JESURY AGUIRRE MALVAEZ",
+        "contacto": "LAZARO AGUIRRE",
+        "telefono": "+52 662 299 6100",
+        "costo_minimo": 2000.0
+      }
+    ]
+  },
+  {
+    "rank": 71,
+    "destino": "Guadalajara - Doctor Gonzalez",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1151",
+        "empresa": "IRENE ISABEL GARZA LEAL",
+        "contacto": "IRENE ISABEL GARZA LEAL",
+        "telefono": "8136024336",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1434",
+        "empresa": "RISOCO LOGISTICS",
+        "contacto": "DAVID ALVAREZ",
+        "telefono": "871168 0772",
+        "costo_minimo": 26000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1479",
+        "empresa": "JOSE RAMON FLORES ALANIS",
+        "contacto": "JOSE RAMON FLORES ALANIS",
+        "telefono": "8110302029",
+        "costo_minimo": 27900.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1501",
+        "empresa": "BAHNSEN G",
+        "contacto": "JOEL VERVER MARTINEZ",
+        "telefono": "5610596620",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1537",
+        "empresa": "LUIS ANOTONIO LOPEZ PADILLA",
+        "contacto": "LUIS ANTONIO LOPEZ PADILLA",
+        "telefono": "5528281171",
+        "costo_minimo": 23000.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P1550",
+        "empresa": "WHITE STAR EVOLUTION SA DE CV",
+        "contacto": "DANIEL GUERRERO",
+        "telefono": "7775107903",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 72,
+    "destino": "Toluca - Ramos Arizpe",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1242",
+        "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
+        "contacto": "ORLANDO VAZQUEZ",
+        "telefono": "449 541 0182",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P810",
+        "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
+        "contacto": "MIGUEL ANGEL OSNAYA VARGAS",
+        "telefono": "5544766455",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1417",
+        "empresa": "NESTOR TOMAS CABRERA MEDINA",
+        "contacto": "NESTOR TOMAS CABRERA MEDINA",
+        "telefono": "444 322 4284",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1425",
+        "empresa": "NESTOR ARRIETA FLORES",
+        "contacto": "ALONDRA MENDOZA",
+        "telefono": "844 843 0563",
+        "costo_minimo": 24000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 26900.0
+      }
+    ]
+  },
+  {
+    "rank": 73,
+    "destino": "Ramos Arizpe - Tamuin",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1431",
+        "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
+        "contacto": "EMILIANO BRIONES BARRAGAN",
+        "telefono": "5543799240",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1479",
+        "empresa": "JOSE RAMON FLORES ALANIS",
+        "contacto": "JOSE RAMON FLORES ALANIS",
+        "telefono": "8110302029",
+        "costo_minimo": 2320.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1052",
+        "empresa": "JLC TRANSPORTACIONES SA DE CV",
+        "contacto": "LAZARO ALANIS",
+        "telefono": "8261010380",
+        "costo_minimo": 20000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1396",
+        "empresa": "TRISKEL LOGISTICS SA DE CV",
+        "contacto": "ROCIO",
+        "telefono": "+52 1 826 128 9323",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1503",
+        "empresa": "LUIS ANGEL PARAS SALAZAR",
+        "contacto": "LUIS ANGEL PARAS SALAZAR",
+        "telefono": "8261154303",
+        "costo_minimo": 20000.0
+      }
+    ]
+  },
+  {
+    "rank": 74,
+    "destino": "Apodaca - Azcapotzalco",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1550",
+        "empresa": "WHITE STAR EVOLUTION SA DE CV",
+        "contacto": "DANIEL GUERRERO",
+        "telefono": "7775107903",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1557",
+        "empresa": "LOGISTICA ESPECIALIZADA VR72",
+        "contacto": "JUAN PABLO VEGA",
+        "telefono": "5587261409",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P283",
+        "empresa": "LOGISTICA TNA SA DE CV",
+        "contacto": "JAVIER",
+        "telefono": "+52 1 722 631 8566",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P911",
+        "empresa": "DAVID RETANA MONCAYO",
+        "contacto": "Sin información",
+        "telefono": "55 5431 9332",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 75,
+    "destino": "Tecamac - Guadalupe",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P0805",
+        "empresa": "ARNULFO SANCHEZ GARCIA",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1113",
+        "empresa": "TRANSPORTREZA",
+        "contacto": "IVAN MENDOZA LOPEZ",
+        "telefono": "55 58 99 91 70",
+        "costo_minimo": 25500.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1242",
+        "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
+        "contacto": "ORLANDO VAZQUEZ",
+        "telefono": "449 541 0182",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1560",
+        "empresa": "LOGISTICA VECAM",
+        "contacto": "MARIA DEL CARMEN VEGA GONZALEZ",
+        "telefono": "4426515771",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 24500.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P1587",
+        "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "contacto": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
+        "telefono": "5541758627",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 7,
+        "codigo": "P996",
+        "empresa": "DELFINO ADELAIDO JUAREZ OLIVERA",
+        "contacto": "LUCIA QUEVEDO",
+        "telefono": "5569610092",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 76,
+    "destino": "Santa Catarina - Hermosillo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1585",
+        "empresa": "SKYBRIDGE LOGISTICS",
+        "contacto": "JOSUE RODRIGUEZ",
+        "telefono": "8140055654",
+        "costo_minimo": 4281.2
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1151",
+        "empresa": "IRENE ISABEL GARZA LEAL",
+        "contacto": "IRENE ISABEL GARZA LEAL",
+        "telefono": "8136024336",
+        "costo_minimo": 46000.0
+      }
+    ]
+  },
+  {
+    "rank": 77,
+    "destino": "Escobedo - Cd Juarez",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P3",
+        "empresa": "TRANSPORTES CAV GAR SA DE CV",
+        "contacto": "ADRIAN",
+        "telefono": "+52 1 844 311 3527",
+        "costo_minimo": 2500.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1600",
+        "empresa": "GONFER LOGISTIC SA DE CV",
+        "contacto": "HUMBERTO GONZALEZ",
+        "telefono": "8261234525",
+        "costo_minimo": 2500.0
+      }
+    ]
+  },
+  {
+    "rank": 78,
+    "destino": "Toluca - Guadalupe",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 26000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1002",
+        "empresa": "LORENA VARGAS TELLEZ",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 26000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1558",
+        "empresa": "TRANSPORTADORA GEOS",
+        "contacto": "GABRIELA ORTEGA",
+        "telefono": "6121089197",
+        "costo_minimo": 26000.0
+      }
+    ]
+  },
+  {
+    "rank": 79,
+    "destino": "Ramos Arizpe - Tultitlan de Mariano Escobedo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P810",
+        "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
+        "contacto": "MIGUEL ANGEL OSNAYA VARGAS",
+        "telefono": "5544766455",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P0805",
+        "empresa": "ARNULFO SANCHEZ GARCIA",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1581",
+        "empresa": "TRANSPORTES ECOLOGICOS ZERG SA DE CV",
+        "contacto": "RICARDO MARTINEZ TELLO",
+        "telefono": "4491866655",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P548",
+        "empresa": "TRANSRAPIDOS VALERIO SA DE CV",
+        "contacto": "DANIEL MEDINA",
+        "telefono": "Sin información",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 80,
+    "destino": "Guadalupe - Cd Valles",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1485",
+        "empresa": "EDEER JAIME CASTILLO VILLARREAL",
+        "contacto": "EDEER VILLAREAL",
+        "telefono": "8123320391",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1082",
+        "empresa": "GUSTAVO GARCIA CORTEZ",
+        "contacto": "CESAR ALAN HERNANDEZ GONZALEZ",
+        "telefono": "899 105 8078",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1396",
+        "empresa": "TRISKEL LOGISTICS SA DE CV",
+        "contacto": "ROCIO",
+        "telefono": "+52 1 826 128 9323",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1503",
+        "empresa": "LUIS ANGEL PARAS SALAZAR",
+        "contacto": "LUIS ANGEL PARAS SALAZAR",
+        "telefono": "8261154303",
+        "costo_minimo": 19350.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 81,
+    "destino": "Escobedo - Tampico",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1509",
+        "empresa": "RITO ALBERTO CALIXTO CRUZ",
+        "contacto": "RICARDO ABRAHAM CALIXTO HERNANDEZ",
+        "telefono": "8112812422",
+        "costo_minimo": 14000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1485",
+        "empresa": "EDEER JAIME CASTILLO VILLARREAL",
+        "contacto": "EDEER VILLAREAL",
+        "telefono": "8123320391",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1503",
+        "empresa": "LUIS ANGEL PARAS SALAZAR",
+        "contacto": "LUIS ANGEL PARAS SALAZAR",
+        "telefono": "8261154303",
+        "costo_minimo": 18200.0
+      }
+    ]
+  },
+  {
+    "rank": 82,
+    "destino": "Ramos Arizpe - Cuautitlan",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P810",
+        "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
+        "contacto": "MIGUEL ANGEL OSNAYA VARGAS",
+        "telefono": "5544766455",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P0805",
+        "empresa": "ARNULFO SANCHEZ GARCIA",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1431",
+        "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
+        "contacto": "EMILIANO BRIONES BARRAGAN",
+        "telefono": "5543799240",
+        "costo_minimo": null
+      },
+      {
+        "ranking": 5,
+        "codigo": "P911",
+        "empresa": "DAVID RETANA MONCAYO",
+        "contacto": "Sin información",
+        "telefono": "55 5431 9332",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 83,
+    "destino": "Tecamac - Ramos Arizpe",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P0805",
+        "empresa": "ARNULFO SANCHEZ GARCIA",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P810",
+        "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
+        "contacto": "MIGUEL ANGEL OSNAYA VARGAS",
+        "telefono": "5544766455",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 24500.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P911",
+        "empresa": "DAVID RETANA MONCAYO",
+        "contacto": "Sin información",
+        "telefono": "55 5431 9332",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 84,
+    "destino": "Monterrey - Pedro Escobedo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1082",
+        "empresa": "GUSTAVO GARCIA CORTEZ",
+        "contacto": "CESAR ALAN HERNANDEZ GONZALEZ",
+        "telefono": "899 105 8078",
+        "costo_minimo": 17000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1002",
+        "empresa": "LORENA VARGAS TELLEZ",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 17000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1554",
+        "empresa": "TRANSPORTES REVIARYA",
+        "contacto": "MONSERRAT JIMENEZ",
+        "telefono": "7731366218",
+        "costo_minimo": 17000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 17000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P283",
+        "empresa": "LOGISTICA TNA SA DE CV",
+        "contacto": "JAVIER",
+        "telefono": "+52 1 722 631 8566",
+        "costo_minimo": 17000.0
+      }
+    ]
+  },
+  {
+    "rank": 85,
+    "destino": "Tecamac - Saltillo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P0805",
+        "empresa": "ARNULFO SANCHEZ GARCIA",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1128",
+        "empresa": "CARLOS IVAN TORRES GARCIA",
+        "contacto": "CARLOS IVAN",
+        "telefono": "+52 729 959 0004",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1425",
+        "empresa": "NESTOR ARRIETA FLORES",
+        "contacto": "ALONDRA MENDOZA",
+        "telefono": "844 843 0563",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1431",
+        "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
+        "contacto": "EMILIANO BRIONES BARRAGAN",
+        "telefono": "5543799240",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 86,
+    "destino": "Guadalupe - Tecamac",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1002",
+        "empresa": "LORENA VARGAS TELLEZ",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P102",
+        "empresa": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
+        "contacto": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
+        "telefono": "+52 1 722 590 9520",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1242",
+        "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
+        "contacto": "ORLANDO VAZQUEZ",
+        "telefono": "449 541 0182",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 20000.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P283",
+        "empresa": "LOGISTICA TNA SA DE CV",
+        "contacto": "JAVIER",
+        "telefono": "+52 1 722 631 8566",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 87,
+    "destino": "Santa Catarina - Hermosillo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P855",
+        "empresa": "JOSE GUADALUPE LOZANO BELTRAN",
+        "contacto": "TERESA",
+        "telefono": "826 142 2369",
+        "costo_minimo": 3000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1485",
+        "empresa": "EDEER JAIME CASTILLO VILLARREAL",
+        "contacto": "EDEER VILLAREAL",
+        "telefono": "8123320391",
+        "costo_minimo": 45000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1561",
+        "empresa": "LOGISTICA VALOR Y EXITO",
+        "contacto": "FRANCISCO FAVIO ESPINOZA MONTOYA",
+        "telefono": "6681328696",
+        "costo_minimo": 47500.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1585",
+        "empresa": "SKYBRIDGE LOGISTICS",
+        "contacto": "JOSUE RODRIGUEZ",
+        "telefono": "8140055654",
+        "costo_minimo": 47000.0
+      }
+    ]
+  },
+  {
+    "rank": 88,
+    "destino": "Iztapalapa - Apodaca",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1002",
+        "empresa": "LORENA VARGAS TELLEZ",
+        "contacto": "Sin información",
+        "telefono": "Sin información",
+        "costo_minimo": 23000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1128",
+        "empresa": "CARLOS IVAN TORRES GARCIA",
+        "contacto": "CARLOS IVAN",
+        "telefono": "+52 729 959 0004",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1161",
+        "empresa": "PEDRO ANTONIO MEJIA VALENZUELA",
+        "contacto": "PEDRO ANTONIO MEJIA VALENZUELA",
+        "telefono": "442 635 3971",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1431",
+        "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
+        "contacto": "EMILIANO BRIONES BARRAGAN",
+        "telefono": "5543799240",
+        "costo_minimo": 23000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1520",
+        "empresa": "ASESORES INTEGRALES KOTE-MAR SA DE CV",
+        "contacto": "IVAN MORALES",
+        "telefono": "5552529466",
+        "costo_minimo": 23000.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P1523",
+        "empresa": "JOSE HOMERO ROMO REYES",
+        "contacto": "EMANUEL PEREZ",
+        "telefono": "8182052031",
+        "costo_minimo": 23000.0
+      }
+    ]
+  },
+  {
+    "rank": 89,
+    "destino": "Tecamac - Guadalajara",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1072",
+        "empresa": "EXPRESS GRAN TIBURON SA DE CV",
+        "contacto": "VIRGINIA LOPEZ",
+        "telefono": "81 1639 5065",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1164",
+        "empresa": "ALEJANDRO GARAY GUERRERO",
+        "contacto": "ALEJANDRO GARAY GUERRERO",
+        "telefono": "55 7068 4250",
+        "costo_minimo": 20000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1411",
+        "empresa": "GRUPO TRANSPORTISTA HIDALGO SA DE CV",
+        "contacto": "LUIS FRANCISCO GUTIERREZ TAPIA",
+        "telefono": "772 105 85 99",
+        "costo_minimo": null
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1523",
+        "empresa": "JOSE HOMERO ROMO REYES",
+        "contacto": "EMANUEL PEREZ",
+        "telefono": "8182052031",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1591",
+        "empresa": "HEBERTO JAVIER RODRIGUEZ PERALES",
+        "contacto": "HEBERTO JAVIER RODRIGUEZ PERALES",
+        "telefono": "8661122432",
+        "costo_minimo": 20000.0
+      },
+      {
+        "ranking": 6,
+        "codigo": "P222",
+        "empresa": "AUTOLINEAS VIFE",
+        "contacto": "MAXIMILIANO VILLARREAL",
+        "telefono": "8116366118",
+        "costo_minimo": 22000.0
+      }
+    ]
+  },
+  {
+    "rank": 90,
+    "destino": "Toluca - Saltillo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P810",
+        "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
+        "contacto": "MIGUEL ANGEL OSNAYA VARGAS",
+        "telefono": "5544766455",
+        "costo_minimo": 2000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1242",
+        "empresa": "AUTOTRANSPORTES PERTH SA DE CV",
+        "contacto": "MICHELL JAIR CERDA VIDALES",
+        "telefono": "81 8654 5194",
+        "costo_minimo": 26000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1242",
+        "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
+        "contacto": "ORLANDO VAZQUEZ",
+        "telefono": "449 541 0182",
+        "costo_minimo": 26000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1537",
+        "empresa": "LUIS ANOTONIO LOPEZ PADILLA",
+        "contacto": "LUIS ANTONIO LOPEZ PADILLA",
+        "telefono": "5528281171",
+        "costo_minimo": 26000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 26900.0
+      }
+    ]
+  },
+  {
+    "rank": 91,
+    "destino": "Monterrey - Cuautitlan Izcalli",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1170",
+        "empresa": "MONTES TRUCKING",
+        "contacto": "OSAIN MONTES",
+        "telefono": "55 1996 5834",
+        "costo_minimo": 4000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1557",
+        "empresa": "LOGISTICA ESPECIALIZADA VR72",
+        "contacto": "JUAN PABLO VEGA",
+        "telefono": "5587261409",
+        "costo_minimo": 2000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 92,
+    "destino": "Tlajomulco de Zuñiga - Santa Catarina",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1511",
+        "empresa": "TRANSPORTES CAVAZOS ARREDONDO SA DE CV",
+        "contacto": "HECTOR A. GARCIA MARTINEZ",
+        "telefono": "8266880331",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1061",
+        "empresa": "CARLOS EDUARDO GARDUÑO ROMERO",
+        "contacto": "MARYLIN",
+        "telefono": "52 1 871 781 8819",
+        "costo_minimo": 24000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1434",
+        "empresa": "RISOCO LOGISTICS",
+        "contacto": "DAVID ALVAREZ",
+        "telefono": "871168 0772",
+        "costo_minimo": 25500.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1534",
+        "empresa": "ROJAS TRAILERS",
+        "contacto": "DIEGO ROJAS",
+        "telefono": "8182094019",
+        "costo_minimo": 24500.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P1581",
+        "empresa": "TRANSPORTES ECOLOGICOS ZERG SA DE CV",
+        "contacto": "RICARDO MARTINEZ TELLO",
+        "telefono": "4491866655",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 93,
+    "destino": "Ramos Arizpe - Juarez",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P3",
+        "empresa": "TRANSPORTES CAV GAR SA DE CV",
+        "contacto": "ADRIAN",
+        "telefono": "+52 1 844 311 3527",
+        "costo_minimo": 33000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1241",
+        "empresa": "TRANSPORTADORA GRIJALVA SA DE CV",
+        "contacto": "GEMA",
+        "telefono": "+52 1 618 158 1843",
+        "costo_minimo": 2000.0
+      }
+    ]
+  },
+  {
+    "rank": 94,
+    "destino": "Cuautla - Ameca",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1450",
+        "empresa": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
+        "contacto": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
+        "telefono": "4381373494",
+        "costo_minimo": 25000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1122",
+        "empresa": "TRANSPORTES ESPECIALIZADOS KAMIR",
+        "contacto": "RUBEN DIAZ RODRIGUEZ",
+        "telefono": "55 1019 9558",
+        "costo_minimo": 24000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1416",
+        "empresa": "MIGUEL ANGEL RAMIREZ RICO",
+        "contacto": "MIGUEL ANGEL RAMIREZ RICO",
+        "telefono": "55 2945 8107",
+        "costo_minimo": 24000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1547",
+        "empresa": "EDUARDO TRUJILLO DE LA ROSA",
+        "contacto": "EDUARDO TRUJILLO DE LA ROSA",
+        "telefono": "8994519454",
+        "costo_minimo": 22500.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P966",
+        "empresa": "TRANS GROUP JR SAPI DE CV",
+        "contacto": "JOSE ROSARIO ORTIZ",
+        "telefono": "4492662158",
+        "costo_minimo": 25000.0
+      }
+    ]
+  },
+  {
+    "rank": 95,
+    "destino": "Monterrey - Tultitlan",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1579",
+        "empresa": "SIGMA LOGISTICS JH",
+        "contacto": "JORDAN AVILA RODRIGUEZ",
+        "telefono": "8443114341",
+        "costo_minimo": 2300.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1580",
+        "empresa": "MARCOS ARZATE VILLAVICENCIO",
+        "contacto": "JOSÉ ISRAEL DÍAZ DÍAZ",
+        "telefono": "5527021863",
+        "costo_minimo": 2300.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1242",
+        "empresa": "AUTOTRANSPORTES PERTH SA DE CV",
+        "contacto": "MICHELL JAIR CERDA VIDALES",
+        "telefono": "81 8654 5194",
+        "costo_minimo": 19000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1431",
+        "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
+        "contacto": "EMILIANO BRIONES BARRAGAN",
+        "telefono": "5543799240",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 96,
+    "destino": "Santa Catarina - Cordoba",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P855",
+        "empresa": "JOSE GUADALUPE LOZANO BELTRAN",
+        "contacto": "TERESA",
+        "telefono": "826 142 2369",
+        "costo_minimo": 32000.0
+      }
+    ]
+  },
+  {
+    "rank": 97,
+    "destino": "Guadalupe - Guadalajara",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1082",
+        "empresa": "GUSTAVO GARCIA CORTEZ",
+        "contacto": "CESAR ALAN HERNANDEZ GONZALEZ",
+        "telefono": "899 105 8078",
+        "costo_minimo": 18000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1479",
+        "empresa": "JOSE RAMON FLORES ALANIS",
+        "contacto": "JOSE RAMON FLORES ALANIS",
+        "telefono": "8110302029",
+        "costo_minimo": 21000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P222",
+        "empresa": "AUTOLINEAS VIFE",
+        "contacto": "MAXIMILIANO VILLARREAL",
+        "telefono": "8116366118",
+        "costo_minimo": 21000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P966",
+        "empresa": "TRANS GROUP JR SAPI DE CV",
+        "contacto": "JOSE ROSARIO ORTIZ",
+        "telefono": "4492662158",
+        "costo_minimo": 19000.0
+      }
+    ]
+  },
+  {
+    "rank": 98,
+    "destino": "Monterrey - Santa Catarina",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1509",
+        "empresa": "RITO ALBERTO CALIXTO CRUZ",
+        "contacto": "RICARDO ABRAHAM CALIXTO HERNANDEZ",
+        "telefono": "8112812422",
+        "costo_minimo": 2000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1513",
+        "empresa": "IMOX IMPULSORA PROFESIONAL SA DE CV",
+        "contacto": "SILVIA BRENTON",
+        "telefono": "8117251060",
+        "costo_minimo": 2500.0
+      }
+    ]
+  },
+  {
+    "rank": 99,
+    "destino": "Santa Catarina - Mexicali",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1464",
+        "empresa": "TRANSPORTES TACSA SA DE CV",
+        "contacto": "JOSE LUIS CAVAZOS",
+        "telefono": "8124242815",
+        "costo_minimo": 65000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1404",
+        "empresa": "ALGO EXPRESS LOGISTICS SA DE CV",
+        "contacto": "FERNANDO ALCALÁ ORTIZ",
+        "telefono": "81 2748 2989",
+        "costo_minimo": 65000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1585",
+        "empresa": "SKYBRIDGE LOGISTICS",
+        "contacto": "JOSUE RODRIGUEZ",
+        "telefono": "8140055654",
+        "costo_minimo": 63000.0
+      }
+    ]
+  },
+  {
+    "rank": 100,
+    "destino": "Santa Catarina - Hermosillo",
+    "proveedores": [
+      {
+        "ranking": 1,
+        "codigo": "P1404",
+        "empresa": "ALGO EXPRESS LOGISTICS SA DE CV",
+        "contacto": "FERNANDO ALCALÁ ORTIZ",
+        "telefono": "81 2748 2989",
+        "costo_minimo": 48000.0
+      },
+      {
+        "ranking": 2,
+        "codigo": "P1485",
+        "empresa": "EDEER JAIME CASTILLO VILLARREAL",
+        "contacto": "EDEER VILLAREAL",
+        "telefono": "8123320391",
+        "costo_minimo": 47000.0
+      },
+      {
+        "ranking": 3,
+        "codigo": "P1562",
+        "empresa": "TRANSPORTES REFRIGERADOS OSG S.A DE C.V.",
+        "contacto": "OSCAR LUIS SALAZAR SALAZAR",
+        "telefono": "8117362016",
+        "costo_minimo": 48000.0
+      },
+      {
+        "ranking": 4,
+        "codigo": "P1585",
+        "empresa": "SKYBRIDGE LOGISTICS",
+        "contacto": "JOSUE RODRIGUEZ",
+        "telefono": "8140055654",
+        "costo_minimo": 47000.0
+      },
+      {
+        "ranking": 5,
+        "codigo": "P855",
+        "empresa": "JOSE GUADALUPE LOZANO BELTRAN",
+        "contacto": "TERESA",
+        "telefono": "826 142 2369",
+        "costo_minimo": 47000.0
+      }
+    ]
+  }
+]
