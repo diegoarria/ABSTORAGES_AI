@@ -17,4 +17,13 @@ async function obtenerUbicacion(url, opts) {
   return proveedor.obtenerUbicacion(url, opts);
 }
 
-module.exports = { esUrlSoportada, obtenerUbicacion };
+// Fallback para folios SIN link de GPS propio: si hay una cuenta espejo de
+// Wialon configurada (WIALON_MIRROR_TOKEN), busca la unidad por nombre/placas
+// dentro de esa flota en vez de depender de que el proveedor comparta un
+// link por viaje. null si no hay cuenta espejo o no se encuentra la unidad.
+async function obtenerUbicacionPorNombre(nombre, opts) {
+  if (!wialon.MIRROR_ACTIVO) return null;
+  return wialon.obtenerUbicacionPorNombre(nombre, opts);
+}
+
+module.exports = { esUrlSoportada, obtenerUbicacion, obtenerUbicacionPorNombre };

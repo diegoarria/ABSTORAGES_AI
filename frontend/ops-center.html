@@ -1304,6 +1304,47 @@ function renderETA(etaData, citaDesRaw){
     '</div></div>';
 }
 
+// ── Riesgo calculado por el motor de monitoreo de NOA (noaMonitoreo.js) ────
+// Distinto del semáforo CRÍTICO/ATENCIÓN/NORMAL de arriba (ese viene del TMS)
+// — esto es la lectura determinística del motor nuevo (retraso real, GPS,
+// desviación de ruta). Se muestran los dos porque hoy son dos fuentes
+// independientes, a propósito (ver noaMonitoreo.js).
+var SEV_COLOR = { NORMAL:'var(--grn)', LOW:'var(--grn)', MEDIUM:'var(--warn)', HIGH:'#ff8c00', CRITICAL:'var(--crit)' };
+function renderRiesgoNOA(r, episodios, folio){
+  if (!r) return '';
+  var color = SEV_COLOR[r.severidad] || 'var(--t2)';
+  var anomList = (r.anomalias||[]).map(function(a){
+    return '<div style="font-size:11.5px;color:var(--t2);padding:3px 0;border-top:1px solid var(--b1)">'+
+      '<span style="color:'+(SEV_COLOR[a.severity]||'var(--t2)')+';font-weight:700">'+escH(a.severity)+'</span> · '+escH(a.reason)+
+    '</div>';
+  }).join('');
+  var epHtml = (episodios||[]).map(function(ep){
+    var btns = ep.feedback
+      ? '<span style="font-size:10.5px;color:var(--t3)">marcado: '+(ep.feedback==='real'?'✅ real':'⚪ ruido')+'</span>'
+      : '<button class="btn btn-sm" style="font-size:10px;padding:2px 7px" onclick="marcarFeedbackRiesgo(\''+ep.id+'\',\'real\')">✅ Fue real</button>'+
+        '<button class="btn btn-sm" style="font-size:10px;padding:2px 7px;margin-left:4px" onclick="marcarFeedbackRiesgo(\''+ep.id+'\',\'ruido\')">⚪ Fue ruido</button>';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:var(--t3);padding:4px 0;border-top:1px solid var(--b1)">'+
+      '<span>'+new Date(ep.cerradoEn).toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit'})+' · '+escH(ep.maxSeveridad)+' ('+ep.maxScore+'/100) · '+escH((ep.tipos||[]).join(', '))+'</span>'+
+      '<span style="flex-shrink:0">'+btns+'</span>'+
+    '</div>';
+  }).join('');
+  return '<div class="fd-sec">'+
+    '<div class="fd-sec-ttl"><span class="fd-ico">🧭</span>Riesgo — Motor NOA</div>'+
+    '<div style="display:flex;align-items:center;gap:8px;padding:4px 0">'+
+      '<span style="font-weight:800;font-size:13px;color:'+color+'">'+escH(r.severidad)+'</span>'+
+      '<span style="font-size:11px;color:var(--t3)">'+(r.riskScore||0)+'/100</span>'+
+      (r.gpsDisponible===false ? '<span style="font-size:10px;color:var(--t3)">· sin GPS</span>' : '')+
+    '</div>'+
+    anomList+
+    (epHtml ? '<div style="margin-top:6px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Episodios anteriores</div>'+epHtml : '')+
+  '</div>';
+}
+function marcarFeedbackRiesgo(id, feedback){
+  fetch('/api/noa/riesgo-episodios/'+encodeURIComponent(id)+'/feedback', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({feedback:feedback})
+  }).then(function(r){ if(r.ok){ var folioLbl=document.getElementById('fd-folio-id'); if(folioLbl) abrirFolioTMS(folioLbl.textContent,0); } });
+}
+
 function renderFolioDetail(d){
   var g = function(k){ return (d[k]||'').trim(); };
 
@@ -1347,12 +1388,15 @@ function renderFolioDetail(d){
   var estHtml = estComent ? '<div class="fd-comment">'+escH(estComent)+'</div>' : '';
 
   var etaHtml = renderETA(d._eta, d['Cita de Descarga'] || null);
+  var folioActual = g('Folio de servicio') || (document.getElementById('fd-folio-id') || {}).textContent || '';
+  var riesgoHtml = renderRiesgoNOA(d._riesgoNOA, d._riesgoEpisodios, folioActual);
 
   var body = document.getElementById('fd-body');
   // TMS respondió — reemplaza todo (incluyendo el quick view y el loader)
   body.innerHTML =
     rutaHtml +
     etaHtml +
+    riesgoHtml +
     fdSec('📦', 'Servicio',
       [fd('Cliente', g('Cliente')),
        fd('Fecha servicio', fmtDt(g('Fecha de Servicio'))),

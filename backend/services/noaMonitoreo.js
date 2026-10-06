@@ -24,6 +24,9 @@ const actividadBus = require('./actividadBus');
 const alertasStaff = require('./alertasStaff');
 const tms = require('./tms');
 const gpsProviders = require('./gpsProviders');
+const vapi = require('./vapi');
+const geocode = require('./geocode');
+const noaRiskFeedback = require('./noaRiskFeedback');
 
 const HABILITADO = process.env.NOA_MONITOREO === 'true';
 const TICK_MIN = Number(process.env.NOA_MONITOREO_TICK_MIN || 5);
@@ -41,7 +44,20 @@ const UMBRAL = {
     alto:     Number(process.env.NOA_MONITOREO_RETRASO_ALTO_MIN || 90),
   },
   riesgo: { medio: 21, alto: 51, critico: 76 }, // sobre el risk_score 0-100
+  // 80km por default a propósito — probado con MTY→CDMX: un punto normal
+  // sobre la autopista REAL (que no es recta) ya está a ~137km de la línea
+  // recta entre las dos ciudades. Con un umbral bajo, esta heurística generaría
+  // alertas falsas en cualquier ruta con curvas reales (que es casi todas).
+  // Ver nota completa de limitaciones en distanciaCrossTrackKm().
+  desviacionKm:       Number(process.env.NOA_MONITOREO_DESVIACION_KM || 80),
+  highSostenidoMin:   Number(process.env.NOA_MONITOREO_HIGH_SOSTENIDO_MIN || 30), // HIGH que no baja ni con chofer contactado = escala igual que CRITICAL
 };
+
+// Cooldown entre llamadas reactivas de NOA al chofer por el mismo folio —
+// sin esto, un folio que se queda en MEDIUM/HIGH llamaría al chofer cada
+// TICK_MIN minutos sin parar.
+const COOLDOWN_LLAMADA_MIN = Number(process.env.NOA_MONITOREO_COOLDOWN_LLAMADA_MIN || 45);
+const ultimaLlamadaChofer = new Map(); // folio → timestamp
 
 const feed = e => actividadBus.emitir({ agente: 'NOA', ...e });
 const minDesde = iso => iso ? (Date.now() - new Date(iso).getTime()) / 60000 : null;
@@ -83,20 +99,57 @@ function conTimeout(promise, ms) {
 }
 
 // ── GPS: best-effort, nunca bloquea el resto del monitoreo si falla o tarda ──
-async function leerGPS(folio) {
+// Si el folio no trae link de GPS (o no se pudo leer), intenta la cuenta
+// espejo de Wialon por placas del tractor (ver wialon.js) — no-op si no hay
+// WIALON_MIRROR_TOKEN configurado, así que no cambia nada para quien no
+// tenga una cuenta espejo dada por su proveedor.
+async function leerGPS(c) {
   return conTimeout((async () => {
     try {
-      const registros = await tms.buscarFolioNOA(folio);
+      const registros = await tms.buscarFolioNOA(c.folio);
       const url = registros?.[0]?.GPS;
-      if (!url || !gpsProviders.esUrlSoportada(url)) return { disponible: false };
-      const u = await gpsProviders.obtenerUbicacion(url, { conDireccion: true });
-      if (!u) return { disponible: true, lectura: null };
-      return { disponible: true, lectura: u };
+      if (url && gpsProviders.esUrlSoportada(url)) {
+        const u = await gpsProviders.obtenerUbicacion(url, { conDireccion: true });
+        if (u) return { disponible: true, lectura: u };
+      }
+      const placas = c.operador?.placas;
+      if (placas) {
+        const u = await gpsProviders.obtenerUbicacionPorNombre(placas, { conDireccion: true });
+        if (u) return { disponible: true, lectura: u, viaCuentaEspejo: true };
+      }
+      return { disponible: false };
     } catch (e) {
-      console.error(`[noaMonitoreo] Error leyendo GPS de ${folio}:`, e.message);
+      console.error(`[noaMonitoreo] Error leyendo GPS de ${c.folio}:`, e.message);
       return { disponible: false, error: e.message };
     }
   })(), GPS_TIMEOUT_MS);
+}
+
+// ── Distancia perpendicular (cross-track) de un punto a la línea recta
+// origen→destino, en km — fórmula esférica estándar de navegación. Es una
+// heurística DÉBIL para "desviación de ruta": no conoce la carretera real
+// (curvas, montaña, rodeos legítimos), solo la línea recta entre dos
+// ciudades. Por eso en evaluarViaje() nunca pesa más que MEDIUM ni dispara
+// CRITICAL por sí sola — sirve para detectar desvíos groseros, no para
+// vigilancia de geocerca real (eso requeriría un polyline de Google Maps
+// Directions, que este proyecto no tiene contratado — ver tariff.js).
+const R_TIERRA_KM = 6371;
+const rad = g => g * Math.PI / 180;
+function distanciaCrossTrackKm(origen, destino, punto) {
+  const d13 = Math.acos(Math.min(1, Math.max(-1,
+    Math.sin(rad(origen.lat)) * Math.sin(rad(punto.lat)) +
+    Math.cos(rad(origen.lat)) * Math.cos(rad(punto.lat)) * Math.cos(rad(punto.lng - origen.lng))
+  )));
+  if (!isFinite(d13) || d13 === 0) return 0;
+  const bearing = (lat1, lng1, lat2, lng2) => {
+    const y = Math.sin(rad(lng2 - lng1)) * Math.cos(rad(lat2));
+    const x = Math.cos(rad(lat1)) * Math.sin(rad(lat2)) - Math.sin(rad(lat1)) * Math.cos(rad(lat2)) * Math.cos(rad(lng2 - lng1));
+    return Math.atan2(y, x);
+  };
+  const theta13 = bearing(origen.lat, origen.lng, punto.lat, punto.lng);
+  const theta12 = bearing(origen.lat, origen.lng, destino.lat, destino.lng);
+  const dxt = Math.asin(Math.sin(d13) * Math.sin(theta13 - theta12)) * R_TIERRA_KM;
+  return Math.abs(dxt);
 }
 
 // ── Construye el contexto operativo + detecta anomalías (determinístico) ──
@@ -150,7 +203,7 @@ async function evaluarViaje(c) {
   }
 
   // 4) GPS (best-effort)
-  const gps = await leerGPS(c.folio);
+  const gps = await leerGPS(c);
   if (gps.disponible && gps.lectura) {
     const edadMin = minDesde(gps.lectura.timestamp);
     if (edadMin != null && edadMin >= UMBRAL.gpsStaleMin) {
@@ -180,6 +233,29 @@ async function evaluarViaje(c) {
   // Sin link de GPS para este folio: no es anomalía (muchos folios no lo
   // traen capturado), solo queda registrado para que el score lo sepa.
 
+  // 5) Desviación de ruta — ver distanciaCrossTrackKm() para las limitaciones
+  // de esta heurística (línea recta, no carretera real). Solo se evalúa ya
+  // en ruta y con GPS disponible, para no generar ruido en carga/descarga
+  // donde moverse unos km del centro de la ciudad es normal.
+  if (colocaciones.hitoAlcanzado(c, 'en_ruta') && !colocaciones.hitoAlcanzado(c, 'llego_destino') && gps.disponible && gps.lectura) {
+    try {
+      const [org, dst] = await Promise.all([geocode.forwardGeocode(c.origen), geocode.forwardGeocode(c.destino)]);
+      if (org && dst) {
+        const descKm = distanciaCrossTrackKm(org, dst, { lat: gps.lectura.lat, lng: gps.lectura.lng });
+        if (descKm >= UMBRAL.desviacionKm) {
+          anomalias.push({
+            tipo: 'DESVIACION_RUTA', severity: descKm >= UMBRAL.desviacionKm * 2 ? 'MEDIUM' : 'LOW', confidence: 0.5,
+            reason: `GPS está a ~${Math.round(descKm)} km de la línea recta ${c.origen} → ${c.destino}`,
+            evidence: { lat: gps.lectura.lat, lng: gps.lectura.lng, descKm: Math.round(descKm) },
+            recommended_action: 'request_driver_confirmation',
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`[noaMonitoreo] Error calculando desviación de ruta de ${c.folio}:`, e.message);
+    }
+  }
+
   return { anomalias, retrasoMin, gps, detenidoDesde, gpsVelocidadUltima };
 }
 
@@ -198,12 +274,66 @@ function resumenDecision(c, anomalias, riesgo) {
   return `Riesgo ${riesgo.score}/100 (${riesgo.severidad}) — ${partes}.`;
 }
 
+// ── Episodios: un tramo continuo de MEDIUM+ para un folio ─────────────────
+// Se usa para dos cosas: (2) saber cuánto lleva sostenido un HIGH para
+// escalar aunque nunca llegue a CRITICAL, y (6) tener algo concreto que
+// marcar después como "fue real" o "fue ruido" para calibrar los umbrales
+// (ver noaRiskFeedback.js) — mucho más útil que calificar cada tick suelto.
+const ORDEN_SEVERIDAD = { LOW: 1, MEDIUM: 2, HIGH: 3, CRITICAL: 4 };
+function actualizarEpisodio(c, riesgo, anomalias) {
+  const actual = c.monitoreoNOA?.episodio || null;
+  if (riesgo.severidad === 'NORMAL') {
+    if (actual) {
+      try {
+        noaRiskFeedback.registrarEpisodio({
+          folio: c.folio, desde: actual.desde,
+          maxSeveridad: actual.maxSeveridad, maxScore: actual.maxScore, tipos: actual.tipos,
+        });
+      } catch (e) { console.error('[noaMonitoreo] Error registrando episodio cerrado:', e.message); }
+    }
+    return null;
+  }
+  const tiposNuevos = anomalias.map(a => a.tipo);
+  if (!actual) {
+    return { desde: new Date().toISOString(), maxSeveridad: riesgo.severidad, maxScore: riesgo.score, tipos: [...new Set(tiposNuevos)] };
+  }
+  return {
+    desde: actual.desde,
+    maxSeveridad: ORDEN_SEVERIDAD[riesgo.severidad] > ORDEN_SEVERIDAD[actual.maxSeveridad] ? riesgo.severidad : actual.maxSeveridad,
+    maxScore: Math.max(actual.maxScore || 0, riesgo.score),
+    tipos: [...new Set([...(actual.tipos || []), ...tiposNuevos])],
+  };
+}
+
+// ── Cierra el loop con el chofer antes de necesitar a un humano ───────────
+// Reusa vapi.llamarStatusChofer tal cual (ya trae pausa/rate-limit/contexto
+// de folio) — la respuesta llega de forma asíncrona por /api/vapi/webhook,
+// igual que cualquier otra llamada de NOA (alerta_critica / estatus_relevante
+// vía structuredData, ver server-lite.js), no hay nada nuevo que cablear ahí.
+async function intentarLlamarChofer(c, riesgo, decision) {
+  const ultima = ultimaLlamadaChofer.get(c.folio) || 0;
+  if (Date.now() - ultima < COOLDOWN_LLAMADA_MIN * 60000) return;
+  const telefono = c.operador?.telefono || c.ganador?.tel;
+  if (!telefono) return; // sin teléfono no hay a quién llamar — ya es una limitación conocida, no una anomalía nueva
+  ultimaLlamadaChofer.set(c.folio, Date.now());
+  try {
+    await vapi.llamarStatusChofer({
+      telefono, nombre: c.operador?.nombre || c.ganador?.nombre || 'transportista',
+      folio: c.folio, ruta: `${c.origen || '?'} → ${c.destino || '?'}`,
+    });
+    feed({ tipo: 'LLAMADA_PROACTIVA', mensaje: `Folio ${c.folio}: NOA llamó al chofer por riesgo ${riesgo.severidad} — ${decision}`, metadata: { folio: c.folio, severidad: riesgo.severidad } });
+  } catch (e) {
+    console.error(`[noaMonitoreo] Error llamando al chofer del folio ${c.folio}:`, e.message);
+  }
+}
+
 // ── Tick: revisa todos los viajes colocados y aún no entregados ───────────
 async function evaluarYActuar(c) {
   try {
     const { anomalias, gps, detenidoDesde, gpsVelocidadUltima } = await evaluarViaje(c);
     const riesgo = calcularRiesgo(anomalias);
     const decision = resumenDecision(c, anomalias, riesgo);
+    const episodio = actualizarEpisodio(c, riesgo, anomalias);
 
     colocaciones.actualizarMonitoreoNOA(c.folio, {
       riskScore: riesgo.score, severidad: riesgo.severidad, anomalias,
@@ -211,17 +341,31 @@ async function evaluarYActuar(c) {
       detenidoDesde: detenidoDesde || null,
       gpsVelocidadUltima: gpsVelocidadUltima ?? null,
       gpsDisponible: gps.disponible,
+      episodio,
     });
 
     if (riesgo.severidad === 'CRITICAL' || riesgo.severidad === 'HIGH') {
       feed({ tipo: 'RIESGO_VIAJE', mensaje: `Folio ${c.folio}: ${decision}`, metadata: { folio: c.folio, severidad: riesgo.severidad, score: riesgo.score } });
     }
 
-    // Solo lo CRÍTICO escala solo — reusa el pipeline ya construido de
-    // NOA (dedup + kill-switch + WhatsApp/llamada/grupo), sin duplicar
-    // nada de esa lógica aquí.
-    if (riesgo.severidad === 'CRITICAL') {
-      await alertasStaff.alertarCriticoStaff({ folio: c.folio, motivo: decision, canal: 'monitoreo-noa' });
+    // Antes de necesitar a un humano, NOA intenta cerrar el loop sola
+    // llamando al chofer — MEDIUM+ (no espera a CRITICAL).
+    if (riesgo.severidad !== 'NORMAL' && riesgo.severidad !== 'LOW') {
+      await intentarLlamarChofer(c, riesgo, decision);
+    }
+
+    // Escalamiento: CRITICAL escala siempre. Además, un HIGH sostenido por
+    // más de highSostenidoMin (el chofer ya fue contactado y el riesgo no
+    // bajó) escala igual aunque nunca cruce a CRITICAL — antes esto se
+    // quedaba en silencio indefinidamente si el risk score no subía más.
+    const minEpisodio = episodio ? minDesde(episodio.desde) : null;
+    const highSostenido = riesgo.severidad === 'HIGH' && minEpisodio != null && minEpisodio >= UMBRAL.highSostenidoMin;
+
+    if (riesgo.severidad === 'CRITICAL' || highSostenido) {
+      const motivo = highSostenido && riesgo.severidad !== 'CRITICAL'
+        ? `${decision} (HIGH sostenido ${Math.round(minEpisodio)} min sin bajar pese a contactar al chofer)`
+        : decision;
+      await alertasStaff.alertarCriticoStaff({ folio: c.folio, motivo, canal: 'monitoreo-noa' });
     }
   } catch (e) {
     console.error(`[noaMonitoreo] Error evaluando folio ${c.folio}:`, e.message);

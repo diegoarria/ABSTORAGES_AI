@@ -85,6 +85,7 @@ const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
 const noaMonitoreo = require('./backend/services/noaMonitoreo');
+const noaRiskFeedback = require('./backend/services/noaRiskFeedback');
 const sofiaScheduler = require('./backend/services/sofiaScheduler');
 const difusionGeneral = require('./backend/services/difusionGeneral');
 const difusionClientes = require('./backend/services/difusionClientes');
@@ -2152,6 +2153,19 @@ app.get('/api/colocaciones', adminUOps, (req, res) => {
 // menos riesgo (exception-first). Mismo origen de datos que /api/colocaciones,
 // solo que acá va el cálculo de riesgo/anomalías del motor de NOA.
 app.get('/api/noa/monitoreo', adminUOps, (req, res) => res.json(noaMonitoreo.viajesMonitoreados()));
+
+// Episodios de riesgo (para marcar "fue real" / "fue ruido" y calibrar los
+// umbrales del motor de monitoreo — ver noaRiskFeedback.js).
+app.get('/api/noa/riesgo-episodios', adminUOps, (req, res) => {
+  res.json(noaRiskFeedback.listar({ folio: req.query.folio || undefined, limit: req.query.limit ? Number(req.query.limit) : undefined }));
+});
+app.post('/api/noa/riesgo-episodios/:id/feedback', adminUOps, express.json(), (req, res) => {
+  const { feedback } = req.body || {};
+  if (!['real', 'ruido'].includes(feedback)) return res.status(400).json({ error: 'feedback debe ser "real" o "ruido"' });
+  const ep = noaRiskFeedback.marcarFeedback(req.params.id, feedback);
+  if (!ep) return res.status(404).json({ error: 'Episodio no encontrado' });
+  res.json(ep);
+});
 app.post('/api/colocaciones/:folio/aprobar', soloAdmin, async (req, res) => {
   try {
     const { tel, manual, precio } = req.body || {};
@@ -2714,6 +2728,16 @@ app.get('/api/noa/folio/:folio', async (req, res) => {
     if (gpsProviders.esUrlSoportada(d['GPS'])) {
       const ubic = await gpsProviders.obtenerUbicacion(d['GPS']).catch(() => null);
       if (ubic) d._gpsVivo = ubic;
+    }
+
+    // Risk score del motor de monitoreo de NOA (colocaciones.js), si este
+    // folio ya pasó por SOFIA y tiene una colocación — complementa el
+    // estatus del TMS con la lectura determinística de noaMonitoreo.js.
+    const c = colocaciones.obtener(req.params.folio.toUpperCase());
+    if (c?.monitoreoNOA) d._riesgoNOA = c.monitoreoNOA; // lectura en vivo (riskScore, severidad, anomalias, episodio activo)
+    if (c) {
+      const episodios = noaRiskFeedback.listar({ folio: c.folio, limit: 5 }); // episodios ya cerrados — marcables como real/ruido
+      if (episodios.length) d._riesgoEpisodios = episodios;
     }
 
     res.json(d);
