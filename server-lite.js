@@ -2998,6 +2998,14 @@ async function handleChat(agente, req, res) {
   // inventar el propio cliente y falsificar cualquier IP.
   const ip = req.ip || null;
 
+  // Memoria unificada por contacto, no por canal — si esta sesión web ya se
+  // vinculó antes a un teléfono conocido (ver el bloque de LEAD_DATA más
+  // abajo), toda la conversación de ese contacto vive en un solo lugar con
+  // el MISMO id que usa el webhook de WhatsApp para ese teléfono — así que
+  // si después escribe por WhatsApp, SARA/SOFIA ya tienen todo el contexto
+  // del chat web, y viceversa. Pedido explícito del usuario (06-oct-2026).
+  let memId = memory.getSession(sid).meta?.canonicalId || sid;
+
   // Apagado de emergencia — máxima prioridad, por encima de todo lo demás
   // (mantenimiento, baneos, lo que sea). Se activa a mano desde el panel o
   // solo si el sistema detecta un ataque en curso (ver registrarBaneoPara-
@@ -3159,7 +3167,7 @@ async function handleChat(agente, req, res) {
     return res.end();
   }
 
-  const { contextBlock, history } = memory.buildContext(sid);
+  const { contextBlock, history } = memory.buildContext(memId);
   const tariffCtx = tariff.getContext();
   let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
 
@@ -3194,13 +3202,13 @@ async function handleChat(agente, req, res) {
 
   const messages = [...history, { role: 'user', content: message }];
 
-  memory.addMessage(sid, 'user', message);
+  memory.addMessage(memId, 'user', message);
   saveMessage(sid, agente, 'user', message);
   pushActividad({ agente, tipo: `MENSAJE_USUARIO`, mensaje: message.slice(0, 120), sessionId: sid, ip });
 
   // Garantizar que toda conversación con SARA quede registrada desde el primer mensaje
   if (agente === 'sara') {
-    const historial = memory.buildContext(sid).history || [];
+    const historial = memory.buildContext(memId).history || [];
     const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 160) || message.slice(0, 160);
     const extracted = leads.extractFromText(message, sid, { sara_nota: 'cotizacion_en_proceso', primer_mensaje });
     // Actualizar perfil del visitante con cualquier dato que el usuario mencione
@@ -3230,7 +3238,7 @@ async function handleChat(agente, req, res) {
       },
       () => {},
     );
-    memory.addMessage(sid, 'assistant', fullText);
+    memory.addMessage(memId, 'assistant', fullText);
     saveMessage(sid, agente, 'assistant', fullText);
     const agenteNombre = agente === 'sara' ? 'SARA' : agente === 'sofia' ? 'SOFIA' : agente === 'noa' ? 'NOA' : 'HÉCTOR';
     pushActividad({ agente: agenteNombre, tipo: `MENSAJE_${agenteNombre}`, mensaje: fullText.replace(/[*_`#>]/g,'').slice(0,120), sessionId: sid });
@@ -3251,7 +3259,7 @@ async function handleChat(agente, req, res) {
                        : hasCerrar  ? 'chat_cerrado'
                        : 'cotizacion_en_proceso';
 
-      const historial = memory.buildContext(sid).history || [];
+      const historial = memory.buildContext(memId).history || [];
       const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 300) || message.slice(0, 300);
 
       // Parsear token LEAD_DATA emitido por SARA con datos confirmados
@@ -3259,6 +3267,21 @@ async function handleChat(agente, req, res) {
       let datosSara = {};
       if (leadDataMatch) {
         try { datosSara = JSON.parse(leadDataMatch[1]); } catch {}
+      }
+
+      // Memoria unificada por contacto: en cuanto se conoce su teléfono por
+      // primera vez en esta sesión web, se fusiona todo lo platicado hasta
+      // ahora dentro del mismo id que usa el webhook de WhatsApp para ese
+      // teléfono — de aquí en adelante (en esta sesión y en las que vengan)
+      // la conversación vive en un solo lugar, sin importar el canal.
+      if (memId === sid && datosSara.telefono && datosSara.telefono !== '—') {
+        const telNorm = saraProactivo.normalizarE164(datosSara.telefono);
+        if (telNorm) {
+          const canonicalId = `wa_${agente}_${telNorm}`;
+          memory.mergeInto(sid, canonicalId);
+          memory.updateMeta(sid, { canonicalId });
+          memId = canonicalId;
+        }
       }
 
       // Upsert del lead con datos de SARA (más confiables que regex sobre texto libre)
@@ -3328,7 +3351,7 @@ async function handleChat(agente, req, res) {
 
       // Email de resumen al cierre de conversación (adicional al de primer contacto)
       if (hasCierre || hasEscalar || hasCerrar) {
-        const histMsg = memory.buildContext(sid).history || [];
+        const histMsg = memory.buildContext(memId).history || [];
         notifier.notificarResumen(lead, sara_nota, histMsg)
           .catch(e => console.error('[notifier]', e.message));
       } else {

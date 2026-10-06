@@ -85,6 +85,28 @@ function saveSummary(id, summary) {
   saveSession(id, session);
 }
 
+// Fusiona el historial completo de `fromId` dentro de `intoId` (orden
+// cronológico por ts) y deja a `fromId` marcada como fusionada, para no
+// repetir la fusión en llamadas futuras. No borra `fromId` — queda como
+// respaldo. Pensado para unificar la memoria de un mismo contacto cuando
+// pasa de una sesión anónima (chat web) a una identidad conocida (teléfono),
+// de forma que de ahí en adelante toda la conversación —sin importar el
+// canal— viva en un solo lugar (ver server-lite.js, handleChat).
+function mergeInto(fromId, intoId) {
+  if (!fromId || !intoId || fromId === intoId) return null;
+  const from = getSession(fromId);
+  if (from.meta?.mergedInto === intoId) return getSession(intoId); // ya fusionada, no repetir
+  const into = getSession(intoId);
+  into.history = [...into.history, ...from.history].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  into.meta = { ...from.meta, ...into.meta }; // lo de intoId (si ya existía) pisa lo de fromId
+  delete into.meta.canonicalId; // intoId es el id canónico, no apunta a sí mismo
+  delete into.meta.mergedInto;
+  saveSession(intoId, into);
+  from.meta = { ...from.meta, mergedInto: intoId, mergedAt: Date.now() };
+  saveSession(fromId, from);
+  return into;
+}
+
 // Borra una sesión por completo (archivo en disco) — borrado manual desde el
 // Historial de la plataforma. No hay papelera: una vez borrado, no hay forma
 // de recuperar esos mensajes.
@@ -115,4 +137,4 @@ function listSessions() {
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, listSessions, deleteSession };
+module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, listSessions, deleteSession, mergeInto };

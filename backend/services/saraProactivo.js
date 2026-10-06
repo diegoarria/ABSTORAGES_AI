@@ -145,4 +145,4 @@ async function enviarConfirmacionVenta(telefono, nombre, folio) {
   });
 }
 
-module.exports = { enviarSeguimientoLead, enviarCotizacion, enviarConfirmacionVenta, enviarUnidadConfirmada };
+module.exports = { enviarSeguimientoLead, enviarCotizacion, enviarConfirmacionVenta, enviarUnidadConfirmada, normalizarE164 };
