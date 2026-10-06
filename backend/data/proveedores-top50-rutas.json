@@ -1,7 +1,7 @@
 [
   {
     "rank": 1,
-    "destino": "TULTITLAN, MÉXICO",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - NUEVO CEDIS TULTITLAN-MEGA ALIMENTOS / / MÉXICO / TULTITLAN",
     "servicios_totales": 224,
     "proveedores": [
@@ -396,7 +396,7 @@
   },
   {
     "rank": 2,
-    "destino": "ESCOBEDO, NUEVO LEÓN",
+    "destino": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
     "ruta_completa": "PIT 4-BONAFONT / / JALISCO / TLAJOMULCO DE ZUÑIGA - CCM ESCOBEDO-BONAFONT / / NUEVO LEÓN / ESCOBEDO",
     "servicios_totales": 125,
     "proveedores": [
@@ -719,7 +719,7 @@
   },
   {
     "rank": 3,
-    "destino": "TORREON, COAHUILA DE ZARAGOZA",
+    "destino": "NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON",
     "ruta_completa": "-MAS BODEGA Y LOGISTICA / / NUEVO LEÓN / GUADALUPE - MB TORREON-MAS BODEGA Y LOGISTICA / / COAHUILA DE ZARAGOZA / TORREON",
     "servicios_totales": 121,
     "proveedores": [
@@ -862,7 +862,7 @@
   },
   {
     "rank": 4,
-    "destino": "TULTITLAN DE MARIANO ESCOBEDO, MÉXICO",
+    "destino": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
     "ruta_completa": "CORPORATIVO DIKEN INTERNATIONAL-DIKEN INTERNATIONAL / / COAHUILA DE ZARAGOZA / RAMOS ARIZPE - DIKEN INTERNATIONAL SUC CENTRO-DIKEN INTERNATIONAL / / MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
     "servicios_totales": 70,
     "proveedores": [
@@ -1032,7 +1032,7 @@
   },
   {
     "rank": 5,
-    "destino": "RAMOS ARIZPE, COAHUILA DE ZARAGOZA",
+    "destino": "MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE",
     "ruta_completa": "619-BONAFONT / / MÉXICO / CUAUTITLAN IZCALLI - OXXO RAMOS ARIZPE-BONAFONT / CADENA COMERCIAL OXXO / COAHUILA DE ZARAGOZA / RAMOS ARIZPE",
     "servicios_totales": 59,
     "proveedores": [
@@ -1229,7 +1229,7 @@
   },
   {
     "rank": 6,
-    "destino": "SAN NICOLAS DE LOS GARZA, NUEVO LEÓN",
+    "destino": "MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
     "ruta_completa": "PLANTA PEÑAFIEL TECAMAC-PEÑAFIEL BEBIDAS / / MÉXICO / TECAMAC - HUB MTY-PEÑAFIEL BEBIDAS / / NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
     "servicios_totales": 57,
     "proveedores": [
@@ -1435,7 +1435,7 @@
   },
   {
     "rank": 7,
-    "destino": "ESCOBEDO, NUEVO LEÓN (CEDIS BONAFONT)",
+    "destino": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
     "ruta_completa": "PIT 4-BONAFONT / / JALISCO / TLAJOMULCO DE ZUÑIGA - CEDIS BONAFONT-BONAFONT / / NUEVO LEÓN / ESCOBEDO",
     "servicios_totales": 51,
     "proveedores": [
@@ -1650,7 +1650,7 @@
   },
   {
     "rank": 8,
-    "destino": "MONTERREY, NUEVO LEÓN",
+    "destino": "MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY",
     "ruta_completa": "METAPEL-\"METAPEL\" / / MÉXICO / TECAMAC - MODERNA-PROVEEDORA DE EMBARQUES / / NUEVO LEÓN / MONTERREY",
     "servicios_totales": 49,
     "proveedores": [
@@ -1847,7 +1847,7 @@
   },
   {
     "rank": 9,
-    "destino": "GOMEZ PALACIO, DURANGO",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - OMEGA PROVEEDORA DE ALIMENTOS35078-MEGA ALIMENTOS / / DURANGO / GOMEZ PALACIO",
     "servicios_totales": 43,
     "proveedores": [
@@ -1945,7 +1945,7 @@
   },
   {
     "rank": 10,
-    "destino": "CIUDAD GUZMAN, JALISCO",
+    "destino": "MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN",
     "ruta_completa": "COMERCIAL DISTRIBUIDORA MAR-JUAN JOSE SHUGERT VARELA / / MÉXICO / TEPOTZOTLAN - DAYMAC-JUAN JOSE SHUGERT VARELA / / JALISCO / CIUDAD GUZMAN",
     "servicios_totales": 39,
     "proveedores": [
@@ -2088,7 +2088,7 @@
   },
   {
     "rank": 11,
-    "destino": "PUEBLA, PUEBLA (STRATTEGA)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - INDUSTRIALIZADORA DE CÁRNICOS STRATTEGA, S.A. DE C.V.-MEGA ALIMENTOS / / PUEBLA / PUEBLA",
     "servicios_totales": 37,
     "proveedores": [
@@ -2186,7 +2186,7 @@
   },
   {
     "rank": 12,
-    "destino": "TIJUANA, BAJA CALIFORNIA",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - CEDIS TIJUANA-MEGA ALIMENTOS / / BAJA CALIFORNIA / TIJUANA",
     "servicios_totales": 33,
     "proveedores": [
@@ -2257,7 +2257,7 @@
   },
   {
     "rank": 13,
-    "destino": "SAN NICOLAS DE LOS GARZA, NUEVO LEÓN (CPR)",
+    "destino": "MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
     "ruta_completa": "PLANTA PEÑAFIEL TECAMAC-PEÑAFIEL BEBIDAS / / MÉXICO / TECAMAC - CPR SAN NICOLAS-PEÑAFIEL BEBIDAS / / NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
     "servicios_totales": 30,
     "proveedores": [
@@ -2382,7 +2382,7 @@
   },
   {
     "rank": 14,
-    "destino": "TLAJOMULCO DE ZUÑIGA, JALISCO",
+    "destino": "NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA",
     "ruta_completa": "-MAS BODEGA Y LOGISTICA / / NUEVO LEÓN / GUADALUPE - CEDIS TLAJOMULCO-MAS BODEGA Y LOGISTICA / / JALISCO / TLAJOMULCO DE ZUÑIGA",
     "servicios_totales": 28,
     "proveedores": [
@@ -2552,7 +2552,7 @@
   },
   {
     "rank": 15,
-    "destino": "ESCOBEDO, NUEVO LEÓN (HEB)",
+    "destino": "MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO",
     "ruta_completa": "806-BONAFONT / / MÉXICO / TOLUCA - HEB ESCOBEDO-BONAFONT / HEB ESCOBEDO / NUEVO LEÓN / ESCOBEDO",
     "servicios_totales": 27,
     "proveedores": [
@@ -2632,7 +2632,7 @@
   },
   {
     "rank": 16,
-    "destino": "MEXICALI, BAJA CALIFORNIA (REMBAO)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - DISTRIBUCIONES REMBAO-MEGA ALIMENTOS / / BAJA CALIFORNIA / MEXICALI",
     "servicios_totales": 27,
     "proveedores": [
@@ -2694,7 +2694,7 @@
   },
   {
     "rank": 17,
-    "destino": "APODACA, NUEVO LEÓN",
+    "destino": "MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA",
     "ruta_completa": "-BUNZL DE MEXICO / / MÉXICO / CUAUTITLAN IZCALLI - -BUNZL DE MEXICO / / NUEVO LEÓN / APODACA",
     "servicios_totales": 26,
     "proveedores": [
@@ -2846,7 +2846,7 @@
   },
   {
     "rank": 18,
-    "destino": "TEOLOYUCAN, MÉXICO",
+    "destino": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN",
     "ruta_completa": "CORPORATIVO DIKEN INTERNATIONAL-DIKEN INTERNATIONAL / / COAHUILA DE ZARAGOZA / RAMOS ARIZPE - CEDIS CHEDRAUI TEOLOYUCAN- / TIENDAS CHEDRAUI SA DE CV / MÉXICO / TEOLOYUCAN",
     "servicios_totales": 26,
     "proveedores": [
@@ -2962,7 +2962,7 @@
   },
   {
     "rank": 19,
-    "destino": "TULTITLAN, MÉXICO (SODIMAC)",
+    "destino": "NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN",
     "ruta_completa": "LAS TORRES-GONHERRPLAST / / NUEVO LEÓN / MONTERREY - CEDIS SODIMAC TULTITLAN 5000-GONHERRPLAST / / MÉXICO / TULTITLAN",
     "servicios_totales": 24,
     "proveedores": [
@@ -3060,7 +3060,7 @@
   },
   {
     "rank": 20,
-    "destino": "CANCUN, QUINTANA ROO",
+    "destino": "MÉXICO / TULTITLAN - QUINTANA ROO / CANCUN",
     "ruta_completa": "CEDIS MB TULTITLAN-MAS BODEGA Y LOGISTICA / / MÉXICO / TULTITLAN - MAS BODEGA CANCUN-MAS BODEGA Y LOGISTICA / / QUINTANA ROO / CANCUN",
     "servicios_totales": 22,
     "proveedores": [
@@ -3095,7 +3095,7 @@
   },
   {
     "rank": 21,
-    "destino": "TULTITLAN DE MARIANO ESCOBEDO, MÉXICO (CITY CLUB)",
+    "destino": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
     "ruta_completa": "CORPORATIVO DIKEN INTERNATIONAL-DIKEN INTERNATIONAL / / COAHUILA DE ZARAGOZA / RAMOS ARIZPE - CEDIS CITY CLUB TULTITLAN-DIKEN INTERNATIONAL / TIENDAS SORIANA SA DE CV / MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
     "servicios_totales": 21,
     "proveedores": [
@@ -3202,7 +3202,7 @@
   },
   {
     "rank": 22,
-    "destino": "TULTITLAN, MÉXICO (LOGISTORAGE)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
     "ruta_completa": "LOGISTORAGE-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - NUEVO CEDIS TULTITLAN-MEGA ALIMENTOS / / MÉXICO / TULTITLAN",
     "servicios_totales": 21,
     "proveedores": [
@@ -3300,7 +3300,7 @@
   },
   {
     "rank": 23,
-    "destino": "SAN LUIS RIO COLORADO, SONORA",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - FRUTERIA WELTON SA DE CV-MEGA ALIMENTOS / / SONORA / SAN LUIS RIO COLORADO",
     "servicios_totales": 20,
     "proveedores": [
@@ -3380,7 +3380,7 @@
   },
   {
     "rank": 24,
-    "destino": "CUAUTITLAN IZCALLI, MÉXICO (SAMS CLUB)",
+    "destino": "NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI",
     "ruta_completa": "-GONHERRPLAST / / NUEVO LEÓN / MONTERREY - SAMS CLUB CUAUTITLAN-GONHERRPLAST / / MÉXICO / CUAUTITLAN IZCALLI",
     "servicios_totales": 19,
     "proveedores": [
@@ -3496,7 +3496,7 @@
   },
   {
     "rank": 25,
-    "destino": "TULTITLAN, MÉXICO (MAS BODEGA)",
+    "destino": "NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN",
     "ruta_completa": "-MAS BODEGA Y LOGISTICA / / NUEVO LEÓN / GUADALUPE - -MAS BODEGA Y LOGISTICA / / MÉXICO / TULTITLAN",
     "servicios_totales": 18,
     "proveedores": [
@@ -3621,7 +3621,7 @@
   },
   {
     "rank": 26,
-    "destino": "SALTILLO, COAHUILA DE ZARAGOZA",
+    "destino": "MÉXICO / TOLUCA - COAHUILA DE ZARAGOZA / SALTILLO",
     "ruta_completa": "806-BONAFONT / / MÉXICO / TOLUCA - DISTRIBUIDORA FORKAMINOS SALTILLO-BONAFONT / DISTRIBUIDORA FORKAMINOS SALTILLO / COAHUILA DE ZARAGOZA / SALTILLO",
     "servicios_totales": 18,
     "proveedores": [
@@ -3683,7 +3683,7 @@
   },
   {
     "rank": 27,
-    "destino": "ZAPOPAN, JALISCO",
+    "destino": "MÉXICO / TECAMAC - JALISCO / ZAPOPAN",
     "ruta_completa": "METAPEL-\"METAPEL\" / / MÉXICO / TECAMAC - INTER PACKGING PARTNERSHIP-PROVEEDORA DE EMBARQUES / / JALISCO / ZAPOPAN",
     "servicios_totales": 17,
     "proveedores": [
@@ -3763,7 +3763,7 @@
   },
   {
     "rank": 28,
-    "destino": "ORIENTAL, PUEBLA",
+    "destino": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - PUEBLA / ORIENTAL",
     "ruta_completa": "CORPORATIVO DIKEN INTERNATIONAL-DIKEN INTERNATIONAL / / COAHUILA DE ZARAGOZA / RAMOS ARIZPE - / REALI SA DE CV / PUEBLA / ORIENTAL",
     "servicios_totales": 16,
     "proveedores": [
@@ -3798,7 +3798,7 @@
   },
   {
     "rank": 29,
-    "destino": "IRAPUATO, GUANAJUATO",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - CEDIS IRAPUATO NUEVO-MEGA ALIMENTOS / / GUANAJUATO / IRAPUATO",
     "servicios_totales": 15,
     "proveedores": [
@@ -3860,7 +3860,7 @@
   },
   {
     "rank": 30,
-    "destino": "PUEBLA, PUEBLA (OPERADORA AVICOLA)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - OPERADORA AVICOLA SAN MIGUEL-MEGA ALIMENTOS / / PUEBLA / PUEBLA",
     "servicios_totales": 15,
     "proveedores": [
@@ -3904,7 +3904,7 @@
   },
   {
     "rank": 31,
-    "destino": "EL SALTO, JALISCO (GUADALAJARA)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - CEDIS GUADALAJARA-MEGA ALIMENTOS / / JALISCO / EL SALTO",
     "servicios_totales": 15,
     "proveedores": [
@@ -3984,7 +3984,7 @@
   },
   {
     "rank": 32,
-    "destino": "GUADALUPE, NUEVO LEÓN (MAS BODEGA)",
+    "destino": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
     "ruta_completa": "PIT 4-BONAFONT / / JALISCO / TLAJOMULCO DE ZUÑIGA - -MAS BODEGA Y LOGISTICA / / NUEVO LEÓN / GUADALUPE",
     "servicios_totales": 15,
     "proveedores": [
@@ -4082,7 +4082,7 @@
   },
   {
     "rank": 33,
-    "destino": "MONTERREY, NUEVO LEÓN (OXXO MTY)",
+    "destino": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY",
     "ruta_completa": "PIT 4-BONAFONT / / JALISCO / TLAJOMULCO DE ZUÑIGA - OXXO MTY-BONAFONT / OXXO MTY / NUEVO LEÓN / MONTERREY",
     "servicios_totales": 15,
     "proveedores": [
@@ -4180,7 +4180,7 @@
   },
   {
     "rank": 34,
-    "destino": "MEXICALI, BAJA CALIFORNIA (OXXO)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - CEDIS OXXO MEXICALI-MEGA ALIMENTOS / / BAJA CALIFORNIA / MEXICALI",
     "servicios_totales": 15,
     "proveedores": [
@@ -4233,7 +4233,7 @@
   },
   {
     "rank": 35,
-    "destino": "TULTITLAN DE MARIANO ESCOBEDO, MÉXICO (MAS BODEGA)",
+    "destino": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
     "ruta_completa": "CORPORATIVO DIKEN INTERNATIONAL-DIKEN INTERNATIONAL / / COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MAS BODEGA Y LOGISTICA CEDIS TULTITLAN- / MAS BODEGA Y LOGISTICA SA DE CV / MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
     "servicios_totales": 14,
     "proveedores": [
@@ -4304,7 +4304,7 @@
   },
   {
     "rank": 36,
-    "destino": "EL SALTO, JALISCO (METAPEL)",
+    "destino": "MÉXICO / TECAMAC - JALISCO / EL SALTO",
     "ruta_completa": "METAPEL-\"METAPEL\" / / MÉXICO / TECAMAC - -\"METAPEL\" / / JALISCO / EL SALTO",
     "servicios_totales": 12,
     "proveedores": [
@@ -4402,7 +4402,7 @@
   },
   {
     "rank": 37,
-    "destino": "GUADALUPE, NUEVO LEÓN (OXXO GPE)",
+    "destino": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
     "ruta_completa": "PIT 4-BONAFONT / / JALISCO / TLAJOMULCO DE ZUÑIGA - OXXO GPE, NL",
     "servicios_totales": 12,
     "proveedores": [
@@ -4491,7 +4491,7 @@
   },
   {
     "rank": 38,
-    "destino": "GOMEZ PALACIO, DURANGO (OMEGA)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - OMEGA PROV DE ALIMENTOS-MEGA ALIMENTOS / / DURANGO / GOMEZ PALACIO",
     "servicios_totales": 12,
     "proveedores": [
@@ -4571,7 +4571,7 @@
   },
   {
     "rank": 39,
-    "destino": "SANTA CATARINA, NUEVO LEÓN",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA",
     "ruta_completa": "UFP SANTA CATARINA-JUAN JOSE SHUGERT VARELA / / NUEVO LEÓN / SANTA CATARINA - ALEN SANTA CATARINA-ALEN DEL NORTE / / NUEVO LEÓN / SANTA CATARINA",
     "servicios_totales": 11,
     "proveedores": [
@@ -4642,7 +4642,7 @@
   },
   {
     "rank": 40,
-    "destino": "CHALCO, MÉXICO",
+    "destino": "NUEVO LEÓN / MONTERREY - MÉXICO / CHALCO",
     "ruta_completa": "-GONHERRPLAST / / NUEVO LEÓN / MONTERREY - CEDIS SAMS CHALCO- / NUEVA WAL MART DE MEXICO S DE RL DE CV / MÉXICO / CHALCO",
     "servicios_totales": 11,
     "proveedores": [
@@ -4722,7 +4722,7 @@
   },
   {
     "rank": 41,
-    "destino": "SAN NICOLAS DE LOS GARZA, NUEVO LEÓN (ESSITY)",
+    "destino": "MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
     "ruta_completa": "COMERCIAL DISTRIBUIDORA MAR-JUAN JOSE SHUGERT VARELA / / MÉXICO / TEPOTZOTLAN - ESSITY ZONA 5-JUAN JOSE SHUGERT VARELA / / NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
     "servicios_totales": 11,
     "proveedores": [
@@ -4802,7 +4802,7 @@
   },
   {
     "rank": 42,
-    "destino": "TULTITLAN, MÉXICO (SODIMAC CEDIS)",
+    "destino": "NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN",
     "ruta_completa": "-GONHERRPLAST / / NUEVO LEÓN / MONTERREY - SODIMAC CEDIS-GONHERRPLAST / / MÉXICO / TULTITLAN",
     "servicios_totales": 11,
     "proveedores": [
@@ -4855,7 +4855,7 @@
   },
   {
     "rank": 43,
-    "destino": "MEXICALI, BAJA CALIFORNIA (JOSE PEREDA)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - JOSE PEREDA REYES-MEGA ALIMENTOS / / BAJA CALIFORNIA / MEXICALI",
     "servicios_totales": 11,
     "proveedores": [
@@ -4917,7 +4917,7 @@
   },
   {
     "rank": 44,
-    "destino": "TULTITLAN, MÉXICO (SORIANA)",
+    "destino": "NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN",
     "ruta_completa": "-GONHERRPLAST / / NUEVO LEÓN / MONTERREY - CEDIS SORIANA TULTITLAN-GONHERRPLAST / / MÉXICO / TULTITLAN",
     "servicios_totales": 10,
     "proveedores": [
@@ -4988,7 +4988,7 @@
   },
   {
     "rank": 45,
-    "destino": "QUERETARO, QUERÉTARO",
+    "destino": "NUEVO LEÓN / MONTERREY - QUERÉTARO / QUERETARO",
     "ruta_completa": "-GONHERRPLAST / / NUEVO LEÓN / MONTERREY - SORIANA QUERETARO-GONHERRPLAST / / QUERÉTARO / QUERETARO",
     "servicios_totales": 10,
     "proveedores": [
@@ -5041,7 +5041,7 @@
   },
   {
     "rank": 46,
-    "destino": "CIENEGA DE FLORES, NUEVO LEÓN",
+    "destino": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES",
     "ruta_completa": "CORPORATIVO DIKEN INTERNATIONAL-DIKEN INTERNATIONAL / / COAHUILA DE ZARAGOZA / RAMOS ARIZPE - CEDIS WAL-MART (MONTERREY)- / NUEVA WALMART DE MEXICO S DE RL DE CV / NUEVO LEÓN / CIENEGA DE FLORES",
     "servicios_totales": 10,
     "proveedores": [
@@ -5103,7 +5103,7 @@
   },
   {
     "rank": 47,
-    "destino": "RAMOS ARIZPE, COAHUILA DE ZARAGOZA (ACRILICOS SABLON)",
+    "destino": "MÉXICO / OCOYOACAC - COAHUILA DE ZARAGOZA / RAMOS ARIZPE",
     "ruta_completa": "ACRILICOS SABLON-ACRILICOS SABLON SA DE CV / ACRILICOS SABLON SA DE CV / MÉXICO / OCOYOACAC - CORPORATIVO DIKEN INTERNATIONAL-DIKEN INTERNATIONAL / / COAHUILA DE ZARAGOZA / RAMOS ARIZPE",
     "servicios_totales": 10,
     "proveedores": [
@@ -5165,7 +5165,7 @@
   },
   {
     "rank": 48,
-    "destino": "TIZAYUCA, HIDALGO, MÉXICO",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO",
     "ruta_completa": "-COGONMAR / / NUEVO LEÓN / SANTA CATARINA - TMLL-COGONMAR / / MÉXICO / TIZAYUCA, HIDALGO",
     "servicios_totales": 10,
     "proveedores": [
@@ -5254,7 +5254,7 @@
   },
   {
     "rank": 49,
-    "destino": "GUADALUPE, NUEVO LEÓN (CCM ESCOBEDO)",
+    "destino": "NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE",
     "ruta_completa": "CCM ESCOBEDO-BONAFONT / / NUEVO LEÓN / ESCOBEDO - -MAS BODEGA Y LOGISTICA / / NUEVO LEÓN / GUADALUPE",
     "servicios_totales": 10,
     "proveedores": [
@@ -5298,7 +5298,7 @@
   },
   {
     "rank": 50,
-    "destino": "CUAUTITLAN IZCALLI, MÉXICO (GRUPO ZORRO)",
+    "destino": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / CUAUTITLAN IZCALLI",
     "ruta_completa": "-MEGA ALIMENTOS / / NUEVO LEÓN / SANTA CATARINA - GRUPO ZORRO (CEDIS SAN MARTIN OBISPO)-MEGA ALIMENTOS / / MÉXICO / CUAUTITLAN IZCALLI",
     "servicios_totales": 10,
     "proveedores": [
