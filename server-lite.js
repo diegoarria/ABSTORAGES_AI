@@ -136,6 +136,7 @@ async function bloqueTarifaRutaProveedor(telefono) {
 }
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
+const kapso = require('./backend/services/kapso');
 const twochat = require('./backend/services/twochat');
 const vision  = require('./backend/services/vision');
 const whatsappProactivo = require('./backend/services/whatsappProactivo');
@@ -929,6 +930,24 @@ app.get('/webhook/whatsapp', (req, res) => {
   } else {
     res.sendStatus(403);
   }
+});
+
+// ─── WhatsApp de SOFIA vía Kapso (número +52 1 81 3590 9778) ────────────────
+// Plomería de recepción únicamente — por ahora solo valida la firma y
+// registra el mensaje entrante. Todavía NO dispara a SOFIA (ver
+// backend/services/kapso.js para el porqué: cablear esto al flujo de
+// Twilio que ya está en producción es un paso aparte, pendiente). Cuando se
+// conecte, el agente SIEMPRE es 'sofia' — este número no es de SARA.
+app.post('/webhook/kapso', express.json({ verify: (req, res, buf) => { req.rawBody = buf; } }), (req, res) => {
+  res.sendStatus(200); // Kapso exige 200 en <10s — se contesta antes de procesar
+  const firma = req.headers['x-webhook-signature'];
+  if (!kapso.verificarFirma(req.rawBody, firma)) {
+    console.warn('[Kapso webhook] firma inválida — request descartado');
+    return;
+  }
+  const evento = req.headers['x-webhook-event'];
+  const msg = req.body?.message;
+  console.log(`[Kapso webhook] ${evento} — from ${msg?.from || '—'}: ${msg?.text?.body?.slice(0, 200) || '(sin texto)'}`);
 });
 
 // ─── 2Chat — grupo de WhatsApp "ABSTORAGES IA - TEST" (MVP SOFIA/NOA) ───────

@@ -1,6 +1,6 @@
 const sessions = require('../services/sessions');
 
-const PUBLIC_PATHS = ['/login', '/api/login', '/api/login/pin', '/api/logout', '/webhook/whatsapp', '/favicon.ico'];
+const PUBLIC_PATHS = ['/login', '/api/login', '/api/login/pin', '/api/logout', '/webhook/whatsapp', '/webhook/kapso', '/favicon.ico'];
 // Prefijos públicos: el link de "Ver chat en tiempo real" del email de SOFIA
 // no requiere sesión — el propio token en la URL es lo que autoriza, y solo
 // da acceso de lectura a esa única conversación (ver chatViewTokens.js).
