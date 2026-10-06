@@ -272,6 +272,7 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
 .combo-op.on { font-weight:700; color:var(--acc-tx); }
 .combo-op .n { color:var(--tx3); font-size:12px; flex-shrink:0; }
 .combo-vacio { padding:14px 10px; text-align:center; color:var(--tx3); font-size:12.5px; }
+.combo-grupo { padding:10px 10px 4px; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--tx3); }
 </style>
 <link rel="stylesheet" href="/css/shell.css">
 <script src="/js/shell.js"></script>
@@ -462,16 +463,27 @@ function recalcularRutas(){
 // ── Selector de ruta con buscador ───────────────────────────────────────────
 const sinAcentos = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 function etiquetaRuta(){ return filtroRuta === 'todas' ? 'Todas las rutas' : filtroRuta === '__sin' ? 'Sin rutas capturadas' : filtroRuta; }
+// Una ruta "específica" trae origen y destino (flecha o guion). Una entrada
+// suelta (ej. "NUEVO LEÓN", "SANTA CATARINA") es cobertura de zona completa,
+// no una ruta puntual — se muestran aparte para no confundirlas.
+const esRutaEspecifica = r => /→|->|\s-\s/.test(r);
 function pintarRutas(){
   const q = sinAcentos(document.getElementById('rutaBuscar')?.value).trim();
   document.getElementById('rutaTxt').textContent = etiquetaRuta();
   const lista = document.getElementById('rutaLista');
   const fijas = [['todas', 'Todas las rutas', null], ['__sin', 'Sin rutas capturadas', null]].filter(([, t]) => !q || sinAcentos(t).includes(q));
-  const rutas = [...rutasConocidas.entries()].filter(([r]) => !q || sinAcentos(r).includes(q)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+  const todas = [...rutasConocidas.entries()].filter(([r]) => !q || sinAcentos(r).includes(q)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+  const especificas = todas.filter(([r]) => esRutaEspecifica(r));
+  const sueltas = todas.filter(([r]) => !esRutaEspecifica(r));
   const MAX = 120;
   const op = ([v, t, n]) => `<div class="combo-op ${v === filtroRuta ? 'on' : ''}" role="option" data-v="${esc(v)}" onclick="elegirRuta(this.dataset.v)"><span>${esc(t)}</span>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
-  const items = [...fijas.map(f => op(f)), ...rutas.slice(0, MAX).map(([r, n]) => op([r, r, n]))];
-  lista.innerHTML = items.length ? items.join('') + (rutas.length > MAX ? `<div class="combo-vacio">Mostrando ${MAX} de ${rutas.length}. Escribe para acotar.</div>` : '') : '<div class="combo-vacio">Ninguna ruta coincide.</div>';
+  const etiquetaGrupo = t => `<div class="combo-grupo">${esc(t)}</div>`;
+  const items = [
+    ...fijas.map(f => op(f)),
+    ...(especificas.length ? [etiquetaGrupo('Rutas específicas (origen - destino)'), ...especificas.slice(0, MAX).map(([r, n]) => op([r, r, n]))] : []),
+    ...(sueltas.length ? [etiquetaGrupo('Cobertura por zona/ciudad (sin ruta puntual)'), ...sueltas.slice(0, MAX).map(([r, n]) => op([r, r, n]))] : []),
+  ];
+  lista.innerHTML = items.length ? items.join('') + (especificas.length + sueltas.length > MAX * 2 ? `<div class="combo-vacio">Mostrando los primeros resultados. Escribe para acotar.</div>` : '') : '<div class="combo-vacio">Ninguna ruta coincide.</div>';
   const primero = lista.querySelector('.combo-op'); if (primero && q) primero.classList.add('hl');
 }
 function toggleRutaPop(forzar){
