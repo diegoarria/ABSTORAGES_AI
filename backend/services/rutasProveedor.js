@@ -15,7 +15,7 @@ const GRUPOS = [
   ['monterrey', 'mty', 'nuevo leon', 'nl', 'apodaca', 'guadalupe', 'san nicolas', 'san pedro garza garcia', 'santa catarina', 'escobedo', 'garcia', 'juarez nl', 'salinas victoria', 'ciénega de flores', 'cienega de flores'],
   ['guadalajara', 'gdl', 'jalisco', 'zapopan', 'tlaquepaque', 'tonala', 'el salto', 'tlajomulco'],
   ['cdmx', 'ciudad de mexico', 'df', 'distrito federal', 'mexico df'],
-  ['estado de mexico', 'edomex', 'toluca', 'naucalpan', 'tlalnepantla', 'ecatepec', 'cuautitlan', 'cuautitlan izcalli', 'tultitlan'],
+  ['estado de mexico', 'edomex', 'toluca', 'naucalpan', 'tlalnepantla', 'ecatepec', 'cuautitlan', 'cuautitlan izcalli', 'tultitlan', 'jilotzingo', 'santa ana jilotzingo', 'atizapan', 'atizapan de zaragoza', 'huixquilucan', 'nicolas romero', 'ixtlahuaca'],
   ['queretaro', 'qro'],
   ['leon', 'guanajuato', 'gto', 'irapuato', 'celaya', 'silao', 'salamanca'],
   ['aguascalientes', 'ags'],
