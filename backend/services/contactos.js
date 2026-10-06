@@ -355,6 +355,53 @@ async function rellenarSiVacio(id, campos) {
   return true;
 }
 
+// ── Top 50 rutas más importantes (PDF, ene-sep 2026) ────────────────────────
+// backend/data/proveedores-top50-rutas.json: 50 rutas, ya ordenadas de la que
+// más se coloca a la que menos (rank 1→50 por servicios_totales), y dentro de
+// cada ruta sus proveedores ya ordenados de más a menos colocaciones. Se
+// procesan en ese mismo orden. Por proveedor se guarda: ruta(s) que maneja,
+// teléfono, costo mínimo (en "tarifas", nunca en notas), contacto y cuántas
+// veces colocó esa ruta — mismo criterio de "solo se completa lo que falte"
+// que el resto de este archivo: nunca pisa lo que ya haya en la Base de Datos.
+async function cargarTop50Rutas({ archivo = 'proveedores-top50-rutas.json', flag = 'top50-rutas-oct-2026' } = {}) {
+  if (leerFlags()[flag]) return;
+  let rutas;
+  try { rutas = require('../data/' + archivo); } catch { return; }
+  let nuevos = 0, actualizados = 0, fallos = 0;
+  for (const ruta of rutas) {
+    const rutaLabel = ruta.destino;
+    for (const p of ruta.proveedores) {
+      try {
+        const tel = p.telefono && p.telefono !== 'Sin información' ? p.telefono : null;
+        const nombre = p.contacto && p.contacto !== 'Sin información' ? p.contacto : p.empresa;
+        const costoTxt = (p.costo_minimo === null || p.costo_minimo === undefined) ? 'sin dato' : `$${Number(p.costo_minimo).toLocaleString('es-MX')}`;
+        const linea = `${rutaLabel}: ${costoTxt} mínimo · ${p.total} servicio(s) colocados (Top 50 Rutas ene-sep 2026)`;
+
+        let c = null;
+        if (tel) c = await buscarPorTelefono(tel, 'sofia');
+        if (!c) c = (await listarPorAgente('SOFIA', { tipo: 'proveedor', q: p.empresa })).find(x => (x.empresa || '') === p.empresa) || null;
+
+        if (!c) {
+          c = await upsertContacto({
+            agente: 'sofia', tipo: 'proveedor', nombre_completo: nombre, empresa: p.empresa, telefono: tel || undefined,
+            notas: `Clave: ${p.codigo}`, rutas: rutaLabel, unidades: UNIDAD_DEFAULT,
+            resumen_interaccion: `Alta desde Top 50 Rutas (${rutaLabel})`, canal: 'permanente',
+          });
+          await actualizarCampoProveedor(c.id, 'tarifas', linea);
+          nuevos++;
+        } else {
+          await actualizarCampoProveedor(c.id, 'rutas', uneLista(c.rutas, rutaLabel));
+          if (!String(c.tarifas || '').includes(rutaLabel)) await actualizarCampoProveedor(c.id, 'tarifas', [c.tarifas, linea].filter(Boolean).join(' | '));
+          await rellenarSiVacio(c.id, { empresa: p.empresa, notas: `Clave: ${p.codigo}`, unidades: UNIDAD_DEFAULT });
+          actualizados++;
+        }
+      } catch (e) { fallos++; console.error(`[Contactos] Error cargando ${p.codigo} en ruta ${rutaLabel}:`, e.message); }
+    }
+  }
+  if (!fallos) marcarFlag(flag);
+  console.log(`[Contactos] Top 50 Rutas: ${nuevos} proveedores nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
+}
+
 // ── Directorio completo de proveedores (PDF de AppSheet, 27-sep-2026) ───────
 // Clave, proveedor, contacto, teléfono, unidades (caja seca 53) y sus 3 rutas
 // principales. Proveedor nuevo (por teléfono) → se crea completo. Proveedor que
@@ -406,6 +453,7 @@ async function sembrarCatalogos() {
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-gomez-palacio.json', ruta: 'Monterrey-Gómez Palacio', flag: 'catalogo-mty-gp-2026-09-27' });
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-guadalajara.json', ruta: 'Monterrey-Guadalajara', flag: 'catalogo-mty-gdl-2026-09-27' });
   await cargarDirectorio({ archivo: 'proveedores-directorio.json', flag: 'directorio-proveedores-2026-09-27' });
+  await cargarTop50Rutas();
   await unidadPorDefectoProveedores();
 }
 
