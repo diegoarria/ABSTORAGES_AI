@@ -496,7 +496,7 @@ async function notificarRespuestaSofia({ quien, tipo, telefono, texto, respuesta
 // reporteDisponibilidad.js) a Diego, Rafael y Gabriel.
 function textoFechaCorta(iso) {
   const [y, m, d] = String(iso || '').split('-').map(Number);
-  if (!y) return iso || '—';
+  if (!y) return 'Por definir';
   return new Intl.DateTimeFormat('es-MX', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d, 12)));
 }
 
@@ -509,8 +509,8 @@ async function notificarListaDisponibilidad(lista) {
       <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;font-weight:600;">${esc(d.nombre || '—')}</td>
       <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.telefono || '—')}</td>
       <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(textoFechaCorta(d.fecha))}</td>
-      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.ruta || '—')}</td>
-      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.unidad || '—')}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.ruta || 'Por definir')}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111;">${esc(d.unidad || 'Por definir')}</td>
     </tr>`).join('');
 
   const tabla = lista.length ? `

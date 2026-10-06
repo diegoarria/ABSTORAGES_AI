@@ -186,7 +186,7 @@ function procesarSenales({ telefono, nombre, respuesta }) {
     const df = json(respuesta, 'DISPONIBILIDAD_FUTURA');
     if (df) {
       const d = colocaciones.agregarDisponibilidad({ telefono, nombre, fecha: df.fecha, ruta: df.ruta, unidad: df.unidad, detalle: df.detalle });
-      if (d) feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible el ${textoFecha(d.fecha)}${d.ruta ? ' (' + d.ruta + ')' : ''} — SOFIA le escribirá ese día para confirmar`, metadata: { id: d.id } });
+      if (d) feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible${d.fecha ? ' el ' + textoFecha(d.fecha) : ' próximamente (sin fecha confirmada)'}${d.ruta ? ' (' + d.ruta + ')' : ''} — ${d.fecha ? 'SOFIA le escribirá ese día para confirmar' : 'el equipo le dará seguimiento'}`, metadata: { id: d.id } });
     }
 
     // Un proveedor ofrece una ruta por su cuenta (con o sin orden activa con
@@ -279,8 +279,13 @@ function tickDisponibilidades() {
   const hoy = colocaciones.fechaMTY();
   const mañana = colocaciones.fechaMTY(Date.now() + 24 * 60 * 60 * 1000);
   for (const d of colocaciones.disponibilidades()) {
-    if (d.estado !== 'pendiente') continue;
-    if (d.fecha < hoy) { colocaciones.actualizarDisponibilidad(d.id, { estado: 'vencida' }); continue; }
+    // Antes solo se revisaba el vencimiento de las "pendiente" — una vez que
+    // una pasaba a "recordada" (ya se le mandó el aviso del día) se dejaba de
+    // chequear y se quedaba viva para siempre en el reporte. Ahora se vence
+    // sin importar en cuál de los dos estados esté.
+    if (!['pendiente', 'recordada'].includes(d.estado)) continue;
+    if (d.fecha && d.fecha < hoy) { colocaciones.actualizarDisponibilidad(d.id, { estado: 'vencida' }); continue; }
+    if (d.estado !== 'pendiente' || !d.fecha) continue; // ya se le recordó, o no hay fecha que vigilar — nada más que hacer
 
     if (d.fecha === mañana && !d.recordatorioPreviaEn && horario.permitido(false)) {
       colocaciones.actualizarDisponibilidad(d.id, { recordatorioPreviaEn: new Date().toISOString() });

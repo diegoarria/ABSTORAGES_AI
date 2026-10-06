@@ -265,12 +265,29 @@ function resolverSugerencia(id, estado) { const s = db.sugerencias.find(x => x.i
 // ── Disponibilidad futura prometida por un proveedor ("el miércoles tengo unidad") ──
 // SOFIA la guarda y, la mañana de ese día, le manda una plantilla aprobada de
 // seguimiento (fuera de la ventana de 24 h de WhatsApp solo se pueden plantillas).
+// No hace falta tener los 4 datos: con teléfono + al menos uno de fecha/ruta/
+// unidad/detalle ya se guarda — lo que falte lo completa el reporte con
+// "Por definir" (ver notifier.js). Sin fecha, nunca vence sola ni dispara el
+// recordatorio automático del día (tickDisponibilidades la deja en pie).
 function agregarDisponibilidad({ telefono, nombre, fecha, ruta, unidad, detalle }) {
-  if (!telefono || !/^\d{4}-\d{2}-\d{2}$/.test(String(fecha || ''))) return null;
-  if (fecha < fechaMTY()) return null; // ya pasó — no es una promesa a futuro
-  const dup = db.disponibilidades.find(d => d.estado === 'pendiente' && tel10(d.telefono) === tel10(telefono) && d.fecha === fecha && (d.ruta || '') === (ruta || ''));
-  if (dup) return dup;
-  const d = { id: 'DP-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(), telefono, nombre: nombre || '', fecha, ruta: ruta ? String(ruta).slice(0, 120) : '', unidad: unidad ? String(unidad).slice(0, 80) : '', detalle: detalle ? String(detalle).slice(0, 200) : '', creada: ahora(), estado: 'pendiente', recordatorioEn: null };
+  if (!telefono) return null;
+  const fechaValida = /^\d{4}-\d{2}-\d{2}$/.test(String(fecha || '')) ? fecha : null;
+  if (fechaValida && fechaValida < fechaMTY()) return null; // ya pasó — no es una promesa a futuro
+  if (!fechaValida && !ruta && !unidad && !detalle) return null; // nada útil que guardar
+
+  // Mismo proveedor, misma fecha (o ambos sin fecha) ya en pie → se completa
+  // en vez de crear una fila duplicada.
+  const activa = db.disponibilidades.find(d => ['pendiente', 'recordada'].includes(d.estado) && tel10(d.telefono) === tel10(telefono) && (d.fecha || null) === (fechaValida || null));
+  if (activa) {
+    if (ruta && !activa.ruta) activa.ruta = String(ruta).slice(0, 120);
+    if (unidad && !activa.unidad) activa.unidad = String(unidad).slice(0, 80);
+    if (detalle) activa.detalle = String(detalle).slice(0, 200);
+    if (nombre && !activa.nombre) activa.nombre = nombre;
+    guardar();
+    return activa;
+  }
+
+  const d = { id: 'DP-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(), telefono, nombre: nombre || '', fecha: fechaValida || '', ruta: ruta ? String(ruta).slice(0, 120) : '', unidad: unidad ? String(unidad).slice(0, 80) : '', detalle: detalle ? String(detalle).slice(0, 200) : '', creada: ahora(), estado: 'pendiente', recordatorioEn: null };
   db.disponibilidades.push(d); db.disponibilidades = db.disponibilidades.slice(-500); guardar();
   return d;
 }
