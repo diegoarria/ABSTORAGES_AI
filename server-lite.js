@@ -2135,6 +2135,17 @@ app.post('/api/colocaciones/:folio/aprobar', soloAdmin, async (req, res) => {
     res.json(r);
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
+// Detener por completo la difusión de un folio — no se le vuelve a mandar
+// nada a ningún proveedor más (mismo mecanismo que DETENER_BUSQUEDA cuando
+// alguien del equipo se lo avisa a SOFIA por WhatsApp, aquí es un botón).
+app.post('/api/colocaciones/:folio/detener', soloAdmin, async (req, res) => {
+  try {
+    const quien = req.user?.nombre || req.user?.email || 'el equipo';
+    const r = sofiaOperacion.detenerBusquedaPorEquipo(String(req.params.folio || '').toUpperCase(), quien);
+    if (!r.ok) return res.status(400).json({ error: r.motivo === 'no_existe' ? 'Folio no encontrado' : 'Este folio ya no está en búsqueda activa' });
+    res.json(r);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
 app.get('/api/proveedores/ranking', adminUOps, (req, res) => res.json(colocaciones.ranking()));
 app.get('/api/proveedores/:telefono/desempeno', adminUOps, (req, res) => res.json(colocaciones.estadisticas(req.params.telefono)));
 

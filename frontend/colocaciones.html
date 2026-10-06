@@ -22,7 +22,7 @@
 .card h3 { font-size:17px; font-weight:800; letter-spacing:-.01em; }
 .sub { font-size:13px; color:var(--tx2); margin-top:3px; }
 .tag { font-size:10.5px; font-weight:700; padding:4px 11px; border-radius:20px; text-transform:uppercase; letter-spacing:.06em; }
-.t-buscando { background:var(--acc-soft); color:var(--acc-tx); } .t-colocado { background:var(--ok-soft); color:var(--ok); } .t-sin_unidad { background:var(--crit-soft); color:var(--crit); }
+.t-buscando { background:var(--acc-soft); color:var(--acc-tx); } .t-colocado { background:var(--ok-soft); color:var(--ok); } .t-sin_unidad { background:var(--crit-soft); color:var(--crit); } .t-detenido_equipo { background:var(--warn-soft); color:var(--warn); }
 .tbl-w { overflow-x:auto; margin-top:16px; }
 table { width:100%; border-collapse:collapse; font-size:13.5px; }
 th { text-align:left; color:var(--tx3); font-size:11px; text-transform:uppercase; letter-spacing:.07em; padding:9px 12px; font-weight:700; border-bottom:1px solid var(--bd); white-space:nowrap; }
@@ -33,6 +33,8 @@ tr.rec td:first-child { border-radius:10px 0 0 10px; } tr.rec td:last-child { bo
 .line { font-size:13px; color:var(--tx2); margin-top:14px; line-height:1.6; }
 .win { margin-top:16px; padding:14px 16px; background:var(--ok-soft); border-radius:12px; font-size:14px; }
 .man { display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; padding-top:16px; border-top:1px solid var(--bd); }
+.btn-danger { background:var(--crit-soft); color:var(--crit); border-color:transparent; }
+.btn-danger:hover:not(:disabled) { filter:brightness(0.95); }
 .man input { flex:1; min-width:220px; background:var(--surface); border:1px solid var(--bd-strong); border-radius:9px; padding:9px 12px; color:var(--tx); font-size:13.5px; font-family:inherit; }
 .man input:focus { outline:none; border-color:var(--acc); box-shadow:var(--focus); }
 .hitos { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
@@ -63,6 +65,7 @@ tr.rec td:first-child { border-radius:10px 0 0 10px; } tr.rec td:last-child { bo
       <div class="filter on" data-f="buscando">En búsqueda</div>
       <div class="filter" data-f="colocado">Colocados</div>
       <div class="filter" data-f="sin_unidad">Sin unidad</div>
+      <div class="filter" data-f="detenido_equipo">Difusión detenida</div>
       <div class="filter" data-f="disp">Disponibilidades</div>
       <div class="filter" data-f="ranking">Ranking</div>
       <div class="filter" data-f="kpis">KPIs</div>
@@ -102,8 +105,9 @@ function tarjeta(c) {
   const contactados = provs.length ? `<div class="line"><b>Contactados:</b> ${provs.map(p => `${esc(p.nombre)} (${ESTADO[p.estado] || p.estado}, ola ${p.ola})`).join(' · ')}</div>` : '';
   const pend = (c.pendientes || []).length ? `<div class="line"><b>En espera de la siguiente ola:</b> ${c.pendientes.map(p => esc(p.nombre)).join(', ')}</div>` : '';
   const ganador = c.ganador ? `<div class="win"><b>${esc(c.ganador.nombre)}</b>${c.ganador.precio ? ' a ' + $(c.ganador.precio) : ''} · aprobó ${esc(c.ganador.aprobadoPor || '—')} · ${hora(c.colocadoEn)}</div>${lineaHitos(c)}` : '';
-  const manual = c.estado === 'buscando' ? `<div class="man"><input id="m-${esc(c.folio)}" placeholder="Colocar con otro proveedor (nombre)"><button class="btn btn-secondary btn-sm" onclick="manual('${esc(c.folio)}')">Colocar manualmente</button></div>` : '';
-  return `<div class="card" data-folio="${esc(c.folio)}"><div class="card-h"><div><h3>${esc(c.folio)} · ${esc(c.origen)} → ${esc(c.destino)}</h3><div class="sub">${esc(c.empresa || '')} · ${esc(c.tipo_unidad || 'unidad por definir')} · creada ${hora(c.creada)}${c.urgente ? ' · urgente' : ''}</div></div><span class="tag t-${c.estado}">${c.estado.replace('_',' ')}</span></div><div class="ctx" id="ctx-${esc(c.folio)}"></div>${ofertas}${contactados}${pend}${ganador}${manual}</div>`;
+  const detenido = c.estado === 'detenido_equipo' ? `<div class="line" style="color:var(--warn)"><b>Difusión detenida:</b> ${esc(c.motivoDetenido || 'sin motivo registrado')}${c.detenidoEn ? ' · ' + hora(c.detenidoEn) : ''}</div>` : '';
+  const manual = c.estado === 'buscando' ? `<div class="man"><input id="m-${esc(c.folio)}" placeholder="Colocar con otro proveedor (nombre)"><button class="btn btn-secondary btn-sm" onclick="manual('${esc(c.folio)}')">Colocar manualmente</button><button class="btn btn-danger btn-sm" onclick="detener('${esc(c.folio)}')">Detener difusión</button></div>` : '';
+  return `<div class="card" data-folio="${esc(c.folio)}"><div class="card-h"><div><h3>${esc(c.folio)} · ${esc(c.origen)} → ${esc(c.destino)}</h3><div class="sub">${esc(c.empresa || '')} · ${esc(c.tipo_unidad || 'unidad por definir')} · creada ${hora(c.creada)}${c.urgente ? ' · urgente' : ''}</div></div><span class="tag t-${c.estado}">${c.estado.replace('_',' ')}</span></div><div class="ctx" id="ctx-${esc(c.folio)}"></div>${ofertas}${contactados}${pend}${detenido}${ganador}${manual}</div>`;
 }
 
 async function render() {
@@ -151,6 +155,11 @@ async function agregarNota(folio) {
 async function aprobar(folio, tel, nombre, precio) {
   if (!confirm(`¿Colocar el folio ${folio} con ${nombre}${precio ? ' a ' + $(precio) : ''}? SOFIA le avisará por plantilla aprobada.`)) return;
   try { const r = await api('/api/colocaciones/' + encodeURIComponent(folio) + '/aprobar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ tel }) }); alert(r.mensajeAlGanador ? 'Listo. Se le avisó al proveedor.' : 'Listo. (No se pudo mandar el aviso al proveedor — avísale tú.)'); render(); }
+  catch (e) { alert('No se pudo: ' + e.message); }
+}
+async function detener(folio) {
+  if (!confirm(`¿Detener por completo la difusión del folio ${folio}? SOFIA no le vuelve a mandar nada a ningún proveedor más para este folio — es irreversible, tendrías que relanzarlo a mano si luego sí necesitas unidad.`)) return;
+  try { await api('/api/colocaciones/' + encodeURIComponent(folio) + '/detener', { method:'POST' }); render(); }
   catch (e) { alert('No se pudo: ' + e.message); }
 }
 async function manual(folio) {
