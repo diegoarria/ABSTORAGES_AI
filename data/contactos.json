@@ -21,8 +21,8 @@
         "fecha": "2026-09-24T18:10:05.518Z"
       }
     ],
-    "rutas": "Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO",
-    "tarifas": "Monterrey-Guadalajara: $19,333 promedio · 3 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "rutas": "Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Santa Catarina - El Salto",
+    "tarifas": "Monterrey-Guadalajara: $19,333 promedio · 3 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
     "unidades": "caja seca 53"
   },
   {
@@ -110,7 +110,7 @@
     "empresa": "ADBLUE INTERNACIONAL SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1402 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA",
+    "rutas": "Monterrey-Gómez Palacio, Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Santa Catarina - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.574Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.574Z",
@@ -123,7 +123,7 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,683 promedio · 30 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $13,000 mínimo · 25 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $14,683 promedio · 30 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 25 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGUF617",
@@ -136,7 +136,7 @@
     "empresa": "TRANSRAPIDOS VALERIO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P0548 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, NUEVO LE",
+    "rutas": "Monterrey-Gómez Palacio, Santa Catarina - Tultitlan, Guadalupe - Torreon, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.574Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.574Z",
@@ -149,7 +149,7 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,111 promedio · 10 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $12,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - "
+    "tarifas": "Monterrey-Gómez Palacio: $13,111 promedio · 10 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $12,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San "
   },
   {
     "id": "CT-MUKKCYGUQ2IN",
@@ -162,7 +162,7 @@
     "empresa": "PROLOGIC CUSTOM SERVICES AND FORWARDING",
     "tipo_carga": null,
     "notas": "Clave: P1270 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO",
+    "rutas": "Monterrey-Gómez Palacio, Santa Catarina - Gomez Palacio",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.574Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.574Z",
@@ -175,7 +175,7 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,275 promedio · 8 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $13,275 promedio · 8 servicio(s) en la ruta | Santa Catarina - Gomez Palacio: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGUBF9F",
@@ -214,7 +214,7 @@
     "empresa": "RITO ALBERTO CALIXTO CRUZ",
     "tipo_carga": null,
     "notas": "Clave: P1509 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES",
+    "rutas": "Monterrey-Gómez Palacio, Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Ramos Arizpe - Cienega de Flores",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.574Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.574Z",
@@ -227,7 +227,7 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,833 promedio · 6 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $14,000 mínimo · 77 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $15,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES: $8,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $15,833 promedio · 6 servicio(s) en la ruta | Guadalupe - Torreon: $14,000 mínimo · 77 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $15,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVR29C",
@@ -240,7 +240,7 @@
     "empresa": "WOF TRUCKS",
     "tipo_carga": null,
     "notas": "Clave: P1529 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO",
+    "rutas": "Monterrey-Gómez Palacio, Guadalupe - Torreon, Santa Catarina - Gomez Palacio",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -253,7 +253,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 4 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 4 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVR5EK",
@@ -266,7 +266,7 @@
     "empresa": "JORGE ALEJANDRO MONTELONGO MORENO",
     "tipo_carga": null,
     "notas": "Clave: P486 · Estatus en catálogo: Baja",
-    "rutas": "NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO",
+    "rutas": "Guadalupe - Torreon, Santa Catarina - Gomez Palacio",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -279,7 +279,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 3 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 3 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVREK9",
@@ -292,7 +292,7 @@
     "empresa": "JUAN MANUEL PALACIOS GARCÍA",
     "tipo_carga": null,
     "notas": "Clave: P1460 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON",
+    "rutas": "Monterrey-Gómez Palacio, Guadalupe - Torreon",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -305,7 +305,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,333 promedio · 3 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $13,333 promedio · 3 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGV6HBP",
@@ -318,7 +318,7 @@
     "empresa": "RISOCO LOGISTICS",
     "tipo_carga": null,
     "notas": "Clave: P1434 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Gómez Palacio, Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY",
+    "rutas": "Monterrey-Gómez Palacio, Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Santa Catarina - Gomez Palacio, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -331,7 +331,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 2 servicio(s) en la ruta | Monterrey-Guadalajara: $22,500 promedio · 2 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,500 mínimo · 28 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $15,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $15,000 mínimo · 3 servicio(s) colocados (Top 50 "
+    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 2 servicio(s) en la ruta | Monterrey-Guadalajara: $22,500 promedio · 2 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 28 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $15,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $15,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 3 servici"
   },
   {
     "id": "CT-MUKKCYGVSLBL",
@@ -344,7 +344,7 @@
     "empresa": "TRANSPORTADORA GRIJALVA SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1241 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Gómez Palacio, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO",
+    "rutas": "Monterrey-Gómez Palacio, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Santa Catarina - Gomez Palacio",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -357,7 +357,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,500 promedio · 2 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $14,500 promedio · 2 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVLRAU",
@@ -396,7 +396,7 @@
     "empresa": "AUTOLINEAS SAN JOSE SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1601 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Gómez Palacio, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI, NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO",
+    "rutas": "Monterrey-Gómez Palacio, Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Gomez Palacio, Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -409,7 +409,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $18,000 promedio · 1 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $27,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA: $1,500 mínimo · 21 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / "
+    "tarifas": "Monterrey-Gómez Palacio: $18,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $27,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tijuana: $1,500 mínimo · 21 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $1,798 mínimo · 16 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis R"
   },
   {
     "id": "CT-MUKKCYGVMZ5L",
@@ -422,7 +422,7 @@
     "empresa": "TRACTO LINEAS MEXICANAS",
     "tipo_carga": null,
     "notas": "Clave: P1574 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Gómez Palacio, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
+    "rutas": "Monterrey-Gómez Palacio, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Tecamac - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -435,7 +435,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 1 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVDNDE",
@@ -448,7 +448,7 @@
     "empresa": "TR SERVICIOS LOGÍSTICOS DE LA LAGUNA SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1569 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO",
+    "rutas": "Monterrey-Gómez Palacio, Guadalupe - Torreon, Santa Catarina - Gomez Palacio",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -461,7 +461,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $14,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVHSNE",
@@ -474,7 +474,7 @@
     "empresa": "EDWIN ALAIN RODRIGUEZ NAJERA",
     "tipo_carga": null,
     "notas": "Clave: P1242 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Gómez Palacio, Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN",
+    "rutas": "Monterrey-Gómez Palacio, Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Guadalupe - Tlajomulco de Zuñiga, Monterrey - Cuautitlan Izcalli, Monterrey - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -487,7 +487,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,500 promedio · 1 servicio(s) en la ruta | Monterrey-Guadalajara: $20,000 promedio · 3 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 1 servicio(s) colocados (Top"
+    "tarifas": "Monterrey-Gómez Palacio: $15,500 promedio · 1 servicio(s) en la ruta | Monterrey-Guadalajara: $20,000 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s)"
   },
   {
     "id": "CT-MUKKCYGVA4G3",
@@ -500,7 +500,7 @@
     "empresa": "JOSE RAMON FLORES ALANIS",
     "tipo_carga": null,
     "notas": "Clave: P1479 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Gómez Palacio, Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO",
+    "rutas": "Monterrey-Gómez Palacio, Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - Monterrey, Santa Catarina - Gomez Palacio, Guadalupe - Tlajomulco de Zuñiga, Cuautitlan Izcalli - Apodaca, Guadalupe - Tultitlan, Tlajomulco de Zuñiga - Monterrey, Monterrey - Chalco",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -513,7 +513,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $17,500 promedio · 1 servicio(s) en la ruta | Monterrey-Guadalajara: $19,750 promedio · 4 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $15,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,500 mínimo · 1 servicio(s) colocad"
+    "tarifas": "Monterrey-Gómez Palacio: $17,500 promedio · 1 servicio(s) en la ruta | Monterrey-Guadalajara: $19,750 promedio · 4 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $15,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,500 mínimo · 1 servicio(s) coloca"
   },
   {
     "id": "CT-MUKKCYGVINEM",
@@ -526,7 +526,7 @@
     "empresa": "TRISKEL LOGISTICS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1396 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Gómez Palacio, NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO, NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA",
+    "rutas": "Monterrey-Gómez Palacio, Santa Catarina - Gomez Palacio, Santa Catarina - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -539,7 +539,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - DURANGO / GOMEZ PALACIO: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $13,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Gomez Palacio: $13,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVDNNP",
@@ -578,7 +578,7 @@
     "empresa": "BRENTON MULTIOPERADORA Y SERVICIOS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1079 · Estatus en catálogo: Baja",
-    "rutas": "Ramos Arizpe → Apodaca, Guadalupe → Torreon, Ramos Arizpe → Cienega De Flores, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES, NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Ramos Arizpe → Apodaca, Guadalupe → Torreon, Ramos Arizpe → Cienega De Flores, Guadalupe - Torreon, Ramos Arizpe - Cienega de Flores, Escobedo - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.575Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.575Z",
@@ -591,7 +591,7 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $24,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES: $8,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE: $3,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $24,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGVS2GI",
@@ -656,7 +656,7 @@
     "empresa": "ESTEBAN NAVARRO TORRES",
     "tipo_carga": null,
     "notas": "Clave: P633 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN, NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, NUEVO LEÓN / MONTERREY - QUERÉTARO / QUERETARO",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Puebla, Guadalupe - Tlajomulco de Zuñiga, Guadalupe - Tultitlan, Santa Catarina - Irapuato, Monterrey - Tultitlan, Monterrey - Queretaro",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -669,7 +669,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $17,667 promedio · 30 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA: $23,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $18,000"
+    "tarifas": "Monterrey-Guadalajara: $17,667 promedio · 30 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $23,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19"
   },
   {
     "id": "CT-MUKKCYGWS1PO",
@@ -682,7 +682,7 @@
     "empresa": "TRANS GROUP JR SAPI DE CV",
     "tipo_carga": null,
     "notas": "Clave: P966 · Estatus en catálogo: Suspendido",
-    "rutas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -695,7 +695,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,972 promedio · 18 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,972 promedio · 18 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGWI780",
@@ -708,7 +708,7 @@
     "empresa": "IRENE ISABEL GARZA LEAL",
     "tipo_carga": null,
     "notas": "Clave: P1151 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI, NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Tijuana, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Monterrey, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -721,7 +721,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,923 promedio · 13 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA: $67,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA "
+    "tarifas": "Monterrey-Guadalajara: $18,923 promedio · 13 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tijuana: $67,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $3,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis "
   },
   {
     "id": "CT-MUKKCYGW9B2H",
@@ -734,7 +734,7 @@
     "empresa": "GUSTAVO GARCIA CORTEZ",
     "tipo_carga": null,
     "notas": "Clave: P1082 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - PUEBLA / ORIENTAL, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE, NUEVO LEÓN / MONTERREY - MÉXICO / CHALCO, NUEVO LEÓN / MONTERREY - QUERÉTARO / QUERETARO",
+    "rutas": "Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Santa Catarina - Puebla, Ramos Arizpe - Oriental, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Guadalupe, Monterrey - Chalco, Monterrey - Queretaro",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -747,7 +747,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,600 promedio · 11 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $17,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE "
+    "tarifas": "Monterrey-Guadalajara: $18,600 promedio · 11 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $17,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Oriental: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - "
   },
   {
     "id": "CT-MUKKCYGWHAO0",
@@ -760,7 +760,7 @@
     "empresa": "PORTEADORA DE BIENES Y SERVICIOS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P75 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY",
+    "rutas": "Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Santa Catarina - Puebla, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -773,7 +773,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,556 promedio · 9 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $2,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA: $23,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO: $19,000 m"
+    "tarifas": "Monterrey-Guadalajara: $19,556 promedio · 9 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $2,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $23,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadal"
   },
   {
     "id": "CT-MUKKCYGW95HU",
@@ -786,7 +786,7 @@
     "empresa": "EXPRESS GRAN TIBURON SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1072 · Estatus en catálogo: Intermitente",
-    "rutas": "Monterrey-Guadalajara, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
+    "rutas": "Monterrey-Guadalajara, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Tecamac - San Nicolas de los Garza, Guadalupe - Tlajomulco de Zuñiga, Tepotzotlan - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -799,7 +799,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 9 servicio(s) en la ruta | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 míni"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 9 servicio(s) en la ruta | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas d"
   },
   {
     "id": "CT-MUKKCYGW516X",
@@ -812,7 +812,7 @@
     "empresa": "JUAN LOZA CARRILLO",
     "tipo_carga": null,
     "notas": "Clave: P844 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, MÉXICO / TECAMAC - JALISCO / EL SALTO",
+    "rutas": "Monterrey-Guadalajara, Tecamac - El Salto",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -825,7 +825,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,750 promedio · 8 servicio(s) en la ruta | MÉXICO / TECAMAC - JALISCO / EL SALTO: $20,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,750 promedio · 8 servicio(s) en la ruta | Tecamac - El Salto: $20,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGWBWKN",
@@ -864,7 +864,7 @@
     "empresa": "NANCY YAZMIN GOMEZ GOMEZ",
     "tipo_carga": null,
     "notas": "Clave: P1101 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / TECAMAC - JALISCO / ZAPOPAN, MÉXICO / TECAMAC - JALISCO / EL SALTO",
+    "rutas": "Monterrey-Guadalajara, Tepotzotlan - Ciudad Guzman, Tecamac - Zapopan, Tecamac - El Salto",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -877,7 +877,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,833 promedio · 6 servicio(s) en la ruta | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $20,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - JALISCO / ZAPOPAN: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - JALISCO / EL SALTO: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,833 promedio · 6 servicio(s) en la ruta | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Zapopan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGW9G0B",
@@ -916,7 +916,7 @@
     "empresa": "ALEJANDRO GARAY GUERRERO",
     "tipo_carga": null,
     "notas": "Clave: P1164 · Estatus en catálogo: Potencial",
-    "rutas": "Monterrey-Guadalajara, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / TECAMAC - JALISCO / EL SALTO",
+    "rutas": "Monterrey-Guadalajara, Tepotzotlan - Ciudad Guzman, Tecamac - El Salto",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -929,7 +929,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,600 promedio · 5 servicio(s) en la ruta | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - JALISCO / EL SALTO: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,600 promedio · 5 servicio(s) en la ruta | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGWP59S",
@@ -942,7 +942,7 @@
     "empresa": "ALGO EXPRESS LOGISTICS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1404 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tijuana, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - El Salto, Santa Catarina - Mexicali",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -955,7 +955,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 4 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA: $2,120 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $2,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 4 servicio(s) en la ruta | Santa Catarina - Tijuana: $2,120 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $2,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $65,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGWOYXZ",
@@ -994,7 +994,7 @@
     "empresa": "TRANSPORTES ECOLOGICOS ZERG SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1581 · Estatus en catálogo: Potencial",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY, MÉXICO / OCOYOACAC - COAHUILA DE ZARAGOZA / RAMOS ARIZPE",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Santa Catarina - El Salto, Tlajomulco de Zuñiga - Monterrey, Ocoyoacac - Ramos Arizpe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -1007,7 +1007,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 3 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SA"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepo"
   },
   {
     "id": "CT-MUKKCYGWTV2M",
@@ -1020,7 +1020,7 @@
     "empresa": "MARCOS ARZATE VILLAVICENCIO",
     "tipo_carga": null,
     "notas": "Clave: P1580 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Guadalupe - Tlajomulco de Zuñiga, Toluca - Escobedo, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan, Monterrey - Chalco, Tepotzotlan - San Nicolas de los Garza, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Hidalgo, Santa Cat",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -1033,7 +1033,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,667 promedio · 3 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,500 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS D"
+    "tarifas": "Monterrey-Guadalajara: $19,667 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $24,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monte"
   },
   {
     "id": "CT-MUKKCYGWCS5O",
@@ -1046,7 +1046,7 @@
     "empresa": "AUTOTRANSPORTES PERTH SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1242 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN, MÉXICO / OCOYOACAC - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO, NUEVO ",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Ramos Arizpe - Teoloyucan, Guadalupe - Tultitlan, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Hidalgo, Santa Catarina - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.576Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.576Z",
@@ -1059,7 +1059,7 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,333 promedio · 3 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAH"
+    "tarifas": "Monterrey-Guadalajara: $18,333 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos"
   },
   {
     "id": "CT-MUKKCYGWQ9AH",
@@ -1124,7 +1124,7 @@
     "empresa": "ERICK DANIEL RENDON ROBLES",
     "tipo_carga": null,
     "notas": "Clave: P1505 · Estatus en catálogo: Potencial",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY",
+    "rutas": "Monterrey-Guadalajara, Guadalupe - Tlajomulco de Zuñiga, Tlajomulco de Zuñiga - Monterrey",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1137,7 +1137,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $20,000 promedio · 2 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $20,000 promedio · 2 servicio(s) en la ruta | Guadalupe - Tlajomulco de Zuñiga: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXT6AB",
@@ -1150,7 +1150,7 @@
     "empresa": "MARIA DEL CARMEN CAVAZOS IBARRA",
     "tipo_carga": null,
     "notas": "Clave: P1121 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI",
+    "rutas": "Monterrey-Guadalajara, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - Mexicali",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1163,7 +1163,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI: $67,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $67,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXU1YN",
@@ -1176,7 +1176,7 @@
     "empresa": "DEFROA",
     "tipo_carga": null,
     "notas": "Clave: P1500 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tepotzotlan - Ciudad Guzman, Santa Catarina - Puebla, Guadalupe - Tlajomulco de Zuñiga",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1189,7 +1189,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $27,300 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMA"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | Santa Catarina - Tultitlan: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $27,300 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebl"
   },
   {
     "id": "CT-MUKKCYGXEN6I",
@@ -1202,7 +1202,7 @@
     "empresa": "LINEA EXPRESS DE AMERICA",
     "tipo_carga": null,
     "notas": "Clave: P1516 · Estatus en catálogo: Suspendido",
-    "rutas": "NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI, MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
+    "rutas": "Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - Mexicali, Tepotzotlan - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1215,7 +1215,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,500 promedio · 2 servicio(s) en la ruta | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,500 promedio · 2 servicio(s) en la ruta | Guadalupe - Tlajomulco de Zuñiga: $19,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXJYHH",
@@ -1228,7 +1228,7 @@
     "empresa": "MIRIAM ELIDETH MOLINA MALDONADO",
     "tipo_carga": null,
     "notas": "Clave: P1308 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN",
+    "rutas": "Monterrey-Guadalajara, Tepotzotlan - Ciudad Guzman",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1241,7 +1241,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXCZ6M",
@@ -1384,7 +1384,7 @@
     "empresa": "TRANSPORTADORA GEOS",
     "tipo_carga": null,
     "notas": "Clave: P1558 · Estatus en catálogo: Intermitente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - JALISCO / ZAPOPAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY, MÉXICO / TECAMAC - JALISCO / EL SALTO, NUEVO LEÓN / SANTA CATARINA - MÉXICO / CUAUTITLAN IZCALLI",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tecamac - San Nicolas de los Garza, Guadalupe - Tlajomulco de Zuñiga, Toluca - Escobedo, Tecamac - Zapopan, Tlajomulco de Zuñiga - Monterrey, Tecamac - El Salto, Santa Catarina - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1397,7 +1397,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO: $3,000 mínim"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Zapopan: $19,000 míni"
   },
   {
     "id": "CT-MUKKCYGXZDJL",
@@ -1410,7 +1410,7 @@
     "empresa": "ADOLFO JOVANNY MENDOZA VILLARRUEL",
     "tipo_carga": null,
     "notas": "Clave: P1450 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Santa Catarina - El Salto",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1423,7 +1423,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGX7F14",
@@ -1436,7 +1436,7 @@
     "empresa": "NOVAKLOGISTICS",
     "tipo_carga": null,
     "notas": "Clave: P1596 · Estatus en catálogo: Baja",
-    "rutas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, MÉXICO / TOLUCA - COAHUILA DE ZARAGOZA / SALTILLO, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO",
+    "rutas": "Santa Catarina - Tultitlan, Guadalupe - Tlajomulco de Zuñiga, Monterrey - Tultitlan, Toluca - Saltillo, Santa Catarina - Tizayuca, Hidalgo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1449,7 +1449,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TOLUCA - COAHUILA DE ZARAGOZA / SALTILLO: $2,586.34 mínim"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Saltillo: $2,586.34 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca, Hidalgo: $19,0"
   },
   {
     "id": "CT-MUKKCYGX5AXM",
@@ -1462,7 +1462,7 @@
     "empresa": "SKYBRIDGE LOGISTICS",
     "tipo_carga": null,
     "notas": "Clave: P1585 · Estatus en catálogo: Potencial",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Guadalupe - Tlajomulco de Zuñiga, Santa Catarina - San Luis Rio Colorado, Tlajomulco de Zuñiga - Monterrey, Santa Catarina - Tizayuca, Hidalgo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1475,7 +1475,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO: $4,800 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONT"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,800 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catari"
   },
   {
     "id": "CT-MUKKCYGX4SE1",
@@ -1488,7 +1488,7 @@
     "empresa": "HEBERTO JAVIER RODRIGUEZ PERALES",
     "tipo_carga": null,
     "notas": "Clave: P1591 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE, NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe, Santa Catarina - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1501,7 +1501,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN /"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - "
   },
   {
     "id": "CT-MUKKCYGX2HUJ",
@@ -1514,7 +1514,7 @@
     "empresa": "MIGUEL ALEJANDRO ESCAMILLA SOLIS",
     "tipo_carga": null,
     "notas": "Clave: P1593 · Estatus en catálogo: Intermitente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1527,7 +1527,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXBPKF",
@@ -1540,7 +1540,7 @@
     "empresa": "TRANSPORTES REVIARYA",
     "tipo_carga": null,
     "notas": "Clave: P1554 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Monterrey - Cuautitlan Izcalli, Santa Catarina - Tizayuca, Hidalgo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1553,7 +1553,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI: $19,000 mínimo "
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca, Hidalg"
   },
   {
     "id": "CT-MUKKCYGXAXHI",
@@ -1566,7 +1566,7 @@
     "empresa": "DISTRIBUIDORA JEYAPA",
     "tipo_carga": null,
     "notas": "Clave: P1577 · Estatus en catálogo: Potencial",
-    "rutas": "Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA",
+    "rutas": "Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Tlajomulco de Zuñiga",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1579,7 +1579,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGX00H4",
@@ -1592,7 +1592,7 @@
     "empresa": "ROJAS TRAILERS",
     "tipo_carga": null,
     "notas": "Clave: P1534 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / TOLUCA - COAHUILA DE ZARAGOZA / SALTILLO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / MONTERREY - MÉXICO / CHALCO",
+    "rutas": "Monterrey-Guadalajara, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Toluca - Saltillo, Tlajomulco de Zuñiga - Guadalupe, Tlajomulco de Zuñiga - Monterrey, Monterrey - Chalco",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1605,7 +1605,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mín"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: "
   },
   {
     "id": "CT-MUKKCYGXJGJR",
@@ -1618,7 +1618,7 @@
     "empresa": "TSM CONNECT SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1467 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - PUEBLA / ORIENTAL",
+    "rutas": "Monterrey-Guadalajara, Ramos Arizpe - Tultitlan de Mariano Escobedo, Guadalupe - Tlajomulco de Zuñiga, Ramos Arizpe - Oriental",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1631,7 +1631,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - PUEBLA / ORIENTAL: $26,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Ramos Arizpe - Tultitlan de Mariano Escobedo: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Oriental: $26,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXPSVG",
@@ -1644,7 +1644,7 @@
     "empresa": "JOSE HOMERO ROMO REYES",
     "tipo_carga": null,
     "notas": "Clave: P1523 · Estatus en catálogo: Baja",
-    "rutas": "MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA, MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN",
+    "rutas": "Tecamac - Monterrey, Guadalupe - Tlajomulco de Zuñiga, Tepotzotlan - San Nicolas de los Garza, Monterrey - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1657,7 +1657,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $23,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - JALISCO / TLAJOMULCO DE ZUÑIGA: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN: $17,000 mín"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Tecamac - Monterrey: $23,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGX1DPS",
@@ -1670,7 +1670,7 @@
     "empresa": "AUTOLINEAS VIFE",
     "tipo_carga": null,
     "notas": "Clave: P222 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1683,7 +1683,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $21,000 promedio · 1 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA: $5,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE: $25,000 mín"
+    "tarifas": "Monterrey-Guadalajara: $21,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $5,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXW4PS",
@@ -1774,7 +1774,7 @@
     "empresa": "JLC TRANSPORTACIONES SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1052 · Estatus en catálogo: Recurrente",
-    "rutas": "Monterrey-Guadalajara, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
+    "rutas": "Monterrey-Guadalajara, Tlajomulco de Zuñiga - Escobedo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1787,7 +1787,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,000 promedio · 1 servicio(s) en la ruta | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGXT8ZL",
@@ -1878,7 +1878,7 @@
     "empresa": "JOSÉ ANGEL GARCÍA HERRERA",
     "tipo_carga": null,
     "notas": "Clave: P1191 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey-Guadalajara, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN",
+    "rutas": "Monterrey-Guadalajara, Monterrey - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-09-28T01:23:20.577Z",
     "fecha_ultimo_contacto": "2026-09-28T01:23:20.577Z",
@@ -1891,7 +1891,7 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Monterrey - Tultitlan: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUKKCYGX2BE5",
@@ -2033,7 +2033,7 @@
     "empresa": "MONTES TRUCKING",
     "tipo_carga": null,
     "notas": "Clave: P1170 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tultitlan, Ramos Arizpe → Tultitlan, Tecamac → San Nicolas De Los Garza, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, NUE",
+    "rutas": "Santa Catarina → Tultitlan, Ramos Arizpe → Tultitlan, Tecamac → San Nicolas De Los Garza, Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Monterrey - Cuautitlan Izcalli, Guadalupe - Tultitlan, Monterrey - Chalco, Tepotzotlan - San Nicolas de los Garza, Santa Catarina - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.481Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.481Z",
@@ -2046,7 +2046,7 @@
         "fecha": "2026-10-01T20:57:28.481Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 27 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $2,000 mínimo · 10 servicio(s) co"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 27 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 9 servicio(s) colocados (Top 50 "
   },
   {
     "id": "CT-MUQ0MGF5KXKN",
@@ -2059,7 +2059,7 @@
     "empresa": "JOSE GUADALUPE LOZANO BELTRAN",
     "tipo_carga": null,
     "notas": "Clave: P855 · Estatus en catálogo: Recurrente",
-    "rutas": "Ramos Arizpe → Merida, Ramos Arizpe → Cancun, Cordoba → Guadalupe, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI, NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO",
+    "rutas": "Ramos Arizpe → Merida, Ramos Arizpe → Cancun, Cordoba → Guadalupe, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.481Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.481Z",
@@ -2072,7 +2072,7 @@
         "fecha": "2026-10-01T20:57:28.481Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO: $62,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $62,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF6ZP14",
@@ -2085,7 +2085,7 @@
     "empresa": "SERGIO GERARDO DE ROSAS GALAN",
     "tipo_carga": null,
     "notas": "Clave: P1012 · Estatus en catálogo: Intermitente",
-    "rutas": "Ramos Arizpe → Puebla, Ramos Arizpe → Oriental, Guadalupe → Huejoztingo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - PUEBLA / ORIENTAL, NUEVO LEÓN / MONTERREY - MÉXICO / CHALCO, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO",
+    "rutas": "Ramos Arizpe → Puebla, Ramos Arizpe → Oriental, Guadalupe → Huejoztingo, Santa Catarina - Tultitlan, Santa Catarina - Puebla, Ramos Arizpe - Teoloyucan, Ramos Arizpe - Oriental, Monterrey - Chalco, Santa Catarina - Tizayuca, Hidalgo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2098,7 +2098,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA: $3,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN: $18,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - PUEBLA / ORIENTAL: $26,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUE"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $3,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $18,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Oriental: $26,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Chalco: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tiz"
   },
   {
     "id": "CT-MUQ0MGF6LZVX",
@@ -2111,7 +2111,7 @@
     "empresa": "JOSE ANTONIO RODRIGUEZ JUAREZ",
     "tipo_carga": null,
     "notas": "Clave: P1184 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → San Nicolas De Los Garza, Escobedo → Guadalupe, Santa Catarina → Santa Catarina, NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Santa Catarina → San Nicolas De Los Garza, Escobedo → Guadalupe, Santa Catarina → Santa Catarina, Escobedo - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2124,7 +2124,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE: $6,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Escobedo - Guadalupe: $6,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF6K3FR",
@@ -2137,7 +2137,7 @@
     "empresa": "MONICA CORONA LINARES",
     "tipo_carga": null,
     "notas": "Clave: P61 · Estatus en catálogo: Recurrente",
-    "rutas": "Huejotzingo → Guadalupe, Santa Catarina → Puebla, Garcia → La Magdalena Tlaltelulco, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO",
+    "rutas": "Huejotzingo → Guadalupe, Santa Catarina → Puebla, Garcia → La Magdalena Tlaltelulco, Santa Catarina - Puebla, Santa Catarina - Tizayuca, Hidalgo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2150,7 +2150,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA: $1,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO: $21,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Puebla: $1,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca, Hidalgo: $21,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF61I9O",
@@ -2163,7 +2163,7 @@
     "empresa": "TRANSPORTES ESPECIALIZADOS KAMIR",
     "tipo_carga": null,
     "notas": "Clave: P1122 · Estatus en catálogo: Recurrente",
-    "rutas": "Huejotzingo → Guadalupe, Cordoba → Guadalupe, Toluca → Escobedo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN, NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO, NUEVO LEÓN / SANTA CATARINA - JALISCO / EL SALTO, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TIZAYUCA, HIDALGO",
+    "rutas": "Huejotzingo → Guadalupe, Cordoba → Guadalupe, Toluca → Escobedo, Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Toluca - Escobedo, Guadalupe - Tultitlan, Santa Catarina - Irapuato, Santa Catarina - El Salto, Santa Catarina - Tizayuca, Hidalgo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2176,7 +2176,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO: $26,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / "
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $26,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Irapuato: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarin"
   },
   {
     "id": "CT-MUQ0MGF66GCX",
@@ -2189,7 +2189,7 @@
     "empresa": "PRO FLEET PROFESIONALES EN ADMINISTRACION Y MANTENIMIENTO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1431 · Estatus en catálogo: Recurrente",
-    "rutas": "Tecamac → San Nicolas De Los Garza, Ramos Arizpe → Tultitlan De Mariano Escobedo, Ramos Arizpe → Teoloyucan, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXIC",
+    "rutas": "Tecamac → San Nicolas De Los Garza, Ramos Arizpe → Tultitlan De Mariano Escobedo, Ramos Arizpe → Teoloyucan, Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Guadalupe - Tultitlan, Tepotzotlan - San Nicolas de los Garza, Monterrey - Queretaro, Ramos Arizpe - Cienega de Flores, Santa Catarina - Cuautitl",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2202,7 +2202,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 6 servicio(s) col"
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 10 servicio(s) colocados (Top 50 "
   },
   {
     "id": "CT-MUQ0MGF6ZT9F",
@@ -2215,7 +2215,7 @@
     "empresa": "TRANSPORTREZA",
     "tipo_carga": null,
     "notas": "Clave: P1113 · Estatus en catálogo: Recurrente",
-    "rutas": "Toluca → Escobedo, Tecamac → San Nicolas De Los Garza, Huejotzingo → Guadalupe, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, MÉXICO / TECAMAC - JALISCO / EL SALTO",
+    "rutas": "Toluca → Escobedo, Tecamac → San Nicolas De Los Garza, Huejotzingo → Guadalupe, Tecamac - San Nicolas de los Garza, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Cuautitlan Izcalli - Apodaca, Tecamac - El Salto",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2228,7 +2228,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CU"
+    "tarifas": "Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026"
   },
   {
     "id": "CT-MUQ0MGF6SSHZ",
@@ -2266,7 +2266,7 @@
     "empresa": "MARIVEL CASTILLO IBARRA",
     "tipo_carga": null,
     "notas": "Clave: P1291 · Estatus en catálogo: Potencial",
-    "rutas": "Tultitlan → Cancun, Tlalnepantla → Escobedo, Tecamac → Escobedo, MÉXICO / TULTITLAN - QUINTANA ROO / CANCUN",
+    "rutas": "Tultitlan → Cancun, Tlalnepantla → Escobedo, Tecamac → Escobedo, Tultitlan - Cancun",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.482Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.482Z",
@@ -2279,7 +2279,7 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "MÉXICO / TULTITLAN - QUINTANA ROO / CANCUN: $62,000 mínimo · 14 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tultitlan - Cancun: $62,000 mínimo · 14 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7M0OQ",
@@ -2292,7 +2292,7 @@
     "empresa": "MIGUEL ANGEL OSNAYA VARGAS",
     "tipo_carga": null,
     "notas": "Clave: P810 · Estatus en catálogo: Recurrente",
-    "rutas": "Ramos Arizpe → Tultitlan De Mariano Escobedo, Tlajomulco De Zuñiga → Escobedo, Cuautitlan Izcalli → Ramos Arizpe, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LE",
+    "rutas": "Ramos Arizpe → Tultitlan De Mariano Escobedo, Tlajomulco De Zuñiga → Escobedo, Cuautitlan Izcalli → Ramos Arizpe, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Toluca - Saltillo, Tecamac - Zapopan, Tecamac - El Salto, Ocoyoacac - Ramos Arizpe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2305,7 +2305,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $24,000 mínimo · 1 servicio("
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 4 servicio(s) coloca"
   },
   {
     "id": "CT-MUQ0MGF7FQ5Q",
@@ -2318,7 +2318,7 @@
     "empresa": "ASESORES INTEGRALES KOTE-MAR SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1520 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Tultitlan, Cuautitlan Izcalli → Apodaca, Tlajomulco De Zuñiga → Escobedo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, NUEVO LEÓN / GUADALUPE - MÉXICO /",
+    "rutas": "Santa Catarina → Tultitlan, Cuautitlan Izcalli → Apodaca, Tlajomulco De Zuñiga → Escobedo, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tepotzotlan - Ciudad Guzman, Cuautitlan Izcalli - Apodaca, Monterrey - Tultitlan, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan, Santa Catarina - Irapuato, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2331,7 +2331,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $18,000 mínimo · 15 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas "
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 15 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas"
   },
   {
     "id": "CT-MUQ0MGF704SV",
@@ -2369,7 +2369,7 @@
     "empresa": "GRUPO AIR COND SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1171 · Estatus en catálogo: Intermitente",
-    "rutas": "Garcia → Cuautitlan, Guadalupe → Cd Sahagun Hidalgo, Apodaca → Cuautitlan Izcalli, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
+    "rutas": "Garcia → Cuautitlan, Guadalupe → Cd Sahagun Hidalgo, Apodaca → Cuautitlan Izcalli, Santa Catarina - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2382,7 +2382,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7M1J4",
@@ -2395,7 +2395,7 @@
     "empresa": "ANA SELENE ENRIQUEZ ROJAS",
     "tipo_carga": null,
     "notas": "Clave: P1112 · Estatus en catálogo: Recurrente",
-    "rutas": "Ramos Arizpe → Tultitlan, Ramos Arizpe → Tultitlan De Mariano Escobedo, San Nicolas De Los Garza → Queretaro, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
+    "rutas": "Ramos Arizpe → Tultitlan, Ramos Arizpe → Tultitlan De Mariano Escobedo, San Nicolas De Los Garza → Queretaro, Ramos Arizpe - Tultitlan de Mariano Escobedo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2408,7 +2408,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7KIJB",
@@ -2446,7 +2446,7 @@
     "empresa": "TASSIO BENJAMIN RAMIREZ HERNANDEZ",
     "tipo_carga": null,
     "notas": "Clave: P1587 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tultitlan, Cuautitlan Izcalli → Ramos Arizpe, Tecamac → Monterrey, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN, MÉXICO /",
+    "rutas": "Santa Catarina → Tultitlan, Cuautitlan Izcalli → Ramos Arizpe, Tecamac → Monterrey, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Toluca - Escobedo, Guadalupe - Tultitlan, Toluca - Saltillo, Tecamac - Zapopan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2459,7 +2459,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas e"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep "
   },
   {
     "id": "CT-MUQ0MGF7UZSP",
@@ -2497,7 +2497,7 @@
     "empresa": "GRUPO TRANSPORTISTA HIDALGO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1411 · Estatus en catálogo: Recurrente",
-    "rutas": "Ramos Arizpe → Tultitlan De Mariano Escobedo, Ramos Arizpe → Tultitlan, Monterrey → Tultitlan, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, NUEVO LEÓN / MONTERREY - MÉXICO / CHALCO, MÉXICO / OCOYOACAC -,",
+    "rutas": "Ramos Arizpe → Tultitlan De Mariano Escobedo, Ramos Arizpe → Tultitlan, Monterrey → Tultitlan, Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Monterrey - Tultitlan, Monterrey - Chalco, Ocoyoacac - Ramos Arizpe, Santa Catarina - Tizayuca, Hidalgo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2510,7 +2510,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA: $23,000 mínimo · 1 servicio(s) colocados (Top 50 "
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 "
   },
   {
     "id": "CT-MUQ0MGF77IJ1",
@@ -2523,7 +2523,7 @@
     "empresa": "LOGISTICA ESPECIALIZADA VR72",
     "tipo_carga": null,
     "notas": "Clave: P1557 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tultitlan, Monterrey → Cuautitlan Izcalli, Monterrey → Tultitlan, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI, NUEVO LEÓN / MONTERREY - MÉXICO / CHALCO, NUEVO LEÓN / MONTERREY - QUERÉTARO / QUERETARO, NUEVO LEÓN / SANTA CATARINA - MÉXICO / CUAUTITLAN IZCALLI",
+    "rutas": "Santa Catarina → Tultitlan, Monterrey → Cuautitlan Izcalli, Monterrey → Tultitlan, Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Monterrey - Tultitlan, Monterrey - Cuautitlan Izcalli, Monterrey - Chalco, Monterrey - Queretaro, Santa Catarina - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2536,7 +2536,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 17 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-se"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 17 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Chalco: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF73Q8H",
@@ -2549,7 +2549,7 @@
     "empresa": "TRANSPORTADORA LECIA SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P102 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Tultitlan, Guadalupe → Tultitlan, Ramos Arizpe → Tultitlan De Mariano Escobedo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
+    "rutas": "Santa Catarina → Tultitlan, Guadalupe → Tultitlan, Ramos Arizpe → Tultitlan De Mariano Escobedo, Santa Catarina - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2562,7 +2562,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 11 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 11 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7UYUF",
@@ -2600,7 +2600,7 @@
     "empresa": "PEDRO ANTONIO MEJIA VALENZUELA",
     "tipo_carga": null,
     "notas": "Clave: P1161 · Estatus en catálogo: Intermitente",
-    "rutas": "San Nicolas De Los Garza → Queretaro, Santa Catarina → Tultitlan, Tlajomulco De Zuñiga → Escobedo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA",
+    "rutas": "San Nicolas De Los Garza → Queretaro, Santa Catarina → Tultitlan, Tlajomulco De Zuñiga → Escobedo, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2613,7 +2613,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF715ZB",
@@ -2651,7 +2651,7 @@
     "empresa": "LOGISTICA VECAM",
     "tipo_carga": null,
     "notas": "Clave: P1560 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Tultitlan, Tecamac → San Nicolas De Los Garza, Tlajomulco De Zuñiga → Escobedo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI, NUEVO LEÓN / MONTERREY - ",
+    "rutas": "Santa Catarina → Tultitlan, Tecamac → San Nicolas De Los Garza, Tlajomulco De Zuñiga → Escobedo, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Monterrey - Cuautitlan Izcalli, Monterrey - Queretaro",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2664,7 +2664,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $2,555 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas e"
+    "tarifas": "Santa Catarina - Tultitlan: $2,555 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 202"
   },
   {
     "id": "CT-MUQ0MGF7I6TJ",
@@ -2677,7 +2677,7 @@
     "empresa": "EDEER JAIME CASTILLO VILLARREAL",
     "tipo_carga": null,
     "notas": "Clave: P1485 · Estatus en catálogo: No asignado",
-    "rutas": "Guadalupe → Torreon, Santa Catarina → Hermosillo, Guadalupe → Hermosillo, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON",
+    "rutas": "Guadalupe → Torreon, Santa Catarina → Hermosillo, Guadalupe → Hermosillo, Guadalupe - Torreon",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2690,7 +2690,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7YMTH",
@@ -2703,7 +2703,7 @@
     "empresa": "RUPERTO PEÑA SALAZAR",
     "tipo_carga": null,
     "notas": "Clave: P272 · Estatus en catálogo: Recurrente",
-    "rutas": "San Nicolas De Los Garza → Cancun, Escobedo → Cancun, Monterrey → Cheuman Yucatan, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA",
+    "rutas": "San Nicolas De Los Garza → Cancun, Escobedo → Cancun, Monterrey → Cheuman Yucatan, Santa Catarina - Tijuana",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2716,7 +2716,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA: $68,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7UDTR",
@@ -2729,7 +2729,7 @@
     "empresa": "TRANSPORTES SIETE ANGELES",
     "tipo_carga": null,
     "notas": "Clave: P1481 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → San Nicolas De Los Garza, Santa Catarina → Santa Catarina, Gral Escobedo → San Nicolas De Los Garza, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA",
+    "rutas": "Santa Catarina → San Nicolas De Los Garza, Santa Catarina → Santa Catarina, Gral Escobedo → San Nicolas De Los Garza, Tlajomulco de Zuñiga - Monterrey, Santa Catarina - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2742,7 +2742,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / MONTERREY: sin dato mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA: $5,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Monterrey: sin dato mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF7R7CX",
@@ -2780,7 +2780,7 @@
     "empresa": "LOGISTICA TNA SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P283 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tultitlan, Monterrey → Pedro Escobedo, Cuautitlan Izcalli → Escobedo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
+    "rutas": "Santa Catarina → Tultitlan, Monterrey → Pedro Escobedo, Cuautitlan Izcalli → Escobedo, Santa Catarina - Tultitlan, Tecamac - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.483Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.483Z",
@@ -2793,7 +2793,7 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF77MFB",
@@ -2831,7 +2831,7 @@
     "empresa": "DELFINO ADELAIDO JUAREZ OLIVERA",
     "tipo_carga": null,
     "notas": "Clave: P996 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Tultitlan, Tlajomulco De Zuñiga → Escobedo, Zuazua → Toluca, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI, MÉXICO / TECAMAC - JALISCO / ZAPOPAN, MÉXICO / TECAMAC - JALISCO / EL SALTO",
+    "rutas": "Santa Catarina → Tultitlan, Tlajomulco De Zuñiga → Escobedo, Zuazua → Toluca, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Santa Catarina - Puebla, Monterrey - Cuautitlan Izcalli, Tecamac - Zapopan, Tecamac - El Salto",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.484Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.484Z",
@@ -2844,7 +2844,7 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas e"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $1,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-s"
   },
   {
     "id": "CT-MUQ0MGF87FR6",
@@ -2882,7 +2882,7 @@
     "empresa": "JUAN CARLOS DE LA GARZA VALADEZ",
     "tipo_carga": null,
     "notas": "Clave: P1459 · Estatus en catálogo: No asignado",
-    "rutas": "Monterrey → Ixtapaluca, Tecamac → Saltillo, Tecamac → Escobedo, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, MÉXICO / TECAMAC - JALISCO / EL SALTO",
+    "rutas": "Monterrey → Ixtapaluca, Tecamac → Saltillo, Tecamac → Escobedo, Santa Catarina - Tultitlan, Tecamac - Monterrey, Monterrey - Tultitlan, Tecamac - El Salto",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.484Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.484Z",
@@ -2895,7 +2895,7 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - JALISCO / EL SALTO: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF8I135",
@@ -2933,7 +2933,7 @@
     "empresa": "OMAR ROSAS TREJO",
     "tipo_carga": null,
     "notas": "Clave: P1101 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tultitlan, Ramos Arizpe → Tultitlan De Mariano Escobedo, Apodaca → Morelia, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
+    "rutas": "Santa Catarina → Tultitlan, Ramos Arizpe → Tultitlan De Mariano Escobedo, Apodaca → Morelia, Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.484Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.484Z",
@@ -2946,7 +2946,7 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF8IONS",
@@ -2959,7 +2959,7 @@
     "empresa": "CARLOS EDUARDO BARBA RODRIGUEZ",
     "tipo_carga": null,
     "notas": "Clave: P1366 · Estatus en catálogo: No asignado",
-    "rutas": "Guadalupe → Torreon, Santa Catarina → Santa Catarina, Santa Catarina → Monterrey, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA, NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Guadalupe → Torreon, Santa Catarina → Santa Catarina, Santa Catarina → Monterrey, Guadalupe - Torreon, Santa Catarina - Santa Catarina, Escobedo - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.484Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.484Z",
@@ -2972,7 +2972,7 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE: $3,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF98C4O",
@@ -2985,7 +2985,7 @@
     "empresa": "NESTOR ARRIETA FLORES",
     "tipo_carga": null,
     "notas": "Clave: P1425 · Estatus en catálogo: No asignado",
-    "rutas": "Toluca → Ramos Arizpe, Ocoyoacac → Ramos Arizpe, Tecamac → San Nicolas De Los Garza, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA",
+    "rutas": "Toluca → Ramos Arizpe, Ocoyoacac → Ramos Arizpe, Tecamac → San Nicolas De Los Garza, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.485Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.485Z",
@@ -2998,7 +2998,7 @@
         "fecha": "2026-10-01T20:57:28.485Z"
       }
     ],
-    "tarifas": "MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGF9FCNL",
@@ -3011,7 +3011,7 @@
     "empresa": "DIRAC LOGISTICA EXPERTS S DE RL DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1397 · Estatus en catálogo: Recurrente",
-    "rutas": "Ramos Arizpe → Tultitlan, Ramos Arizpe → Teoloyucan, Tecamac → San Nicolas De Los Garza, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN",
+    "rutas": "Ramos Arizpe → Tultitlan, Ramos Arizpe → Teoloyucan, Tecamac → San Nicolas De Los Garza, Guadalupe - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.485Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.485Z",
@@ -3024,7 +3024,7 @@
         "fecha": "2026-10-01T20:57:28.485Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Guadalupe - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFA20DP",
@@ -3037,7 +3037,7 @@
     "empresa": "WHITE STAR EVOLUTION SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1550 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tultitlan, Tlajomulco De Zuñiga → Guadalupe, Guadalupe → Tultitlan, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Santa Catarina → Tultitlan, Tlajomulco De Zuñiga → Guadalupe, Guadalupe → Tultitlan, Santa Catarina - Tultitlan, Guadalupe - Tultitlan, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3050,7 +3050,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFANJO7",
@@ -3113,7 +3113,7 @@
     "empresa": "JOSE TELLO HERNANDEZ",
     "tipo_carga": null,
     "notas": "Clave: P1454 · Estatus en catálogo: Recurrente",
-    "rutas": "Tecamac → Monterrey, Tecamac → Escobedo, Cuautitlan Izcalli → Apodaca, MÉXICO / TECAMAC - JALISCO / EL SALTO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Tecamac → Monterrey, Tecamac → Escobedo, Cuautitlan Izcalli → Apodaca, Tecamac - El Salto, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3126,7 +3126,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "MÉXICO / TECAMAC - JALISCO / EL SALTO: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFADXCA",
@@ -3214,7 +3214,7 @@
     "empresa": "BENJAMIN REYES RODRIGUEZ",
     "tipo_carga": null,
     "notas": "Clave: P387 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Puebla, García → Cuautlancingo, Garcia → La Magdalena Tlaltelulco, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA",
+    "rutas": "Santa Catarina → Puebla, García → Cuautlancingo, Garcia → La Magdalena Tlaltelulco, Santa Catarina - Puebla",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3227,7 +3227,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Puebla: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFAM4AP",
@@ -3240,7 +3240,7 @@
     "empresa": "TRANSPORTES CAVAZOS ARREDONDO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1511 · Estatus en catálogo: No asignado",
-    "rutas": "Tlajomulco De Zuñiga → Escobedo, Tlajomulco De Zuñiga → Guadalupe, Tlajomulco De Zuñiga → Santa Catarina, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Tlajomulco De Zuñiga → Escobedo, Tlajomulco De Zuñiga → Guadalupe, Tlajomulco De Zuñiga → Santa Catarina, Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3253,7 +3253,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFACFS1",
@@ -3266,7 +3266,7 @@
     "empresa": "HORACIO BAUTISTA JIMENEZ",
     "tipo_carga": null,
     "notas": "Clave: P1378 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Tultitlan, Saltillo → Cuautitlan, Monterrey → Cuautitlan Izcalli, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI",
+    "rutas": "Santa Catarina → Tultitlan, Saltillo → Cuautitlan, Monterrey → Cuautitlan Izcalli, Santa Catarina - Tultitlan, Monterrey - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3279,7 +3279,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFANHQC",
@@ -3292,7 +3292,7 @@
     "empresa": "SIGMA LOGISTICS JH",
     "tipo_carga": null,
     "notas": "Clave: P1579 · Estatus en catálogo: No asignado",
-    "rutas": "Guadalupe → Torreon, Ramos Arizpe → Apodaca, Tecamac → San Nicolas De Los Garza, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI",
+    "rutas": "Guadalupe → Torreon, Ramos Arizpe → Apodaca, Tecamac → San Nicolas De Los Garza, Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Guadalupe - Torreon, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca, Monterrey - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.486Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.486Z",
@@ -3305,7 +3305,7 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / GUADALUPE - COAHUILA DE ZARAGOZA / TORREON: $15,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 202"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $15,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBAOWE",
@@ -3368,7 +3368,7 @@
     "empresa": "BAHNSEN G",
     "tipo_carga": null,
     "notas": "Clave: P1501 · Estatus en catálogo: Intermitente",
-    "rutas": "Tepotzotlan → Ciudad Guzman, Zapopan → Santa Catarina, Monterrey → Ixtapaluca, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN",
+    "rutas": "Tepotzotlan → Ciudad Guzman, Zapopan → Santa Catarina, Monterrey → Ixtapaluca, Tepotzotlan - Ciudad Guzman, Monterrey - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3381,7 +3381,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $21,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tepotzotlan - Ciudad Guzman: $21,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBHMPR",
@@ -3419,7 +3419,7 @@
     "empresa": "GUSTAVO FABIAN RODRIGUEZ MARROQUIN",
     "tipo_carga": null,
     "notas": "Clave: P1526 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tijuana, Santa Catarina → Mexicali, Ramos Arizpe → Mexicali, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI, NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO",
+    "rutas": "Santa Catarina → Tijuana, Santa Catarina → Mexicali, Ramos Arizpe → Mexicali, Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3432,7 +3432,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA: $2,330 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO: $5,615 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $2,330 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $5,615 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBN1PB",
@@ -3445,7 +3445,7 @@
     "empresa": "SALVADOR SALAS LAZCANO",
     "tipo_carga": null,
     "notas": "Clave: P1567 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Mexicali, Santa Catarina → Tijuana, Apodaca → Tijuana, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI, NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO",
+    "rutas": "Santa Catarina → Mexicali, Santa Catarina → Tijuana, Apodaca → Tijuana, Santa Catarina - Tijuana, Santa Catarina - Mexicali, Santa Catarina - San Luis Rio Colorado",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3458,7 +3458,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA: $68,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / MEXICALI: $63,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO: $4,400 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $63,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,400 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFB4DU6",
@@ -3471,7 +3471,7 @@
     "empresa": "OSCAR GUILLERMO JURAIDINI SILVA",
     "tipo_carga": null,
     "notas": "Clave: P1524 · Estatus en catálogo: Intermitente",
-    "rutas": "Tlajomulco De Zuñiga → Escobedo, Tecamac → Monterrey, Toluca → Saltillo, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY",
+    "rutas": "Tlajomulco De Zuñiga → Escobedo, Tecamac → Monterrey, Toluca → Saltillo, Tlajomulco de Zuñiga - Escobedo, Ramos Arizpe - Tultitlan de Mariano Escobedo, Tecamac - Monterrey",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3484,7 +3484,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBOSX9",
@@ -3522,7 +3522,7 @@
     "empresa": "CARLOS IVAN TORRES GARCIA",
     "tipo_carga": null,
     "notas": "Clave: P1128 · Estatus en catálogo: Potencial",
-    "rutas": "Santa Catarina → Tultitlan, Tecamac → Saltillo, Monterrey → Tultitlan, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA",
+    "rutas": "Santa Catarina → Tultitlan, Tecamac → Saltillo, Monterrey → Tultitlan, Santa Catarina - Tultitlan, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Cuautitlan Izcalli - Apodaca",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3535,7 +3535,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-s"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBR6J1",
@@ -3573,7 +3573,7 @@
     "empresa": "ADRIAN ANGELES GARCIA",
     "tipo_carga": null,
     "notas": "Clave: P1421 · Estatus en catálogo: No asignado",
-    "rutas": "Queretaro → San Nicolas De Los Garza, Queretaro → Santa Catarina, Queretaro → Alcaldia Azcapotzalco, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
+    "rutas": "Queretaro → San Nicolas De Los Garza, Queretaro → Santa Catarina, Queretaro → Alcaldia Azcapotzalco, Tlajomulco de Zuñiga - Escobedo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3586,7 +3586,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBQZHO",
@@ -3674,7 +3674,7 @@
     "empresa": "NESTOR TOMAS CABRERA MEDINA",
     "tipo_carga": null,
     "notas": "Clave: P1417 · Estatus en catálogo: No asignado",
-    "rutas": "Tlajomulco De Zuñiga → Escobedo, Tecamac → San Nicolas De Los Garza, Queretaro → Santa Catarina, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN",
+    "rutas": "Tlajomulco De Zuñiga → Escobedo, Tecamac → San Nicolas De Los Garza, Queretaro → Santa Catarina, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3687,7 +3687,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFB7UPV",
@@ -3700,7 +3700,7 @@
     "empresa": "EDGAR BONIFACIO AGUIRRE TAMEZ",
     "tipo_carga": null,
     "notas": "Clave: P1309 · Estatus en catálogo: Potencial",
-    "rutas": "Santa Catarina → Tijuana, Santa Catarina → Mexicali, Zapopan → Santa Catarina, NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA",
+    "rutas": "Santa Catarina → Tijuana, Santa Catarina → Mexicali, Zapopan → Santa Catarina, Santa Catarina - Tijuana",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3713,7 +3713,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - BAJA CALIFORNIA / TIJUANA: $70,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $70,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBI0FM",
@@ -3876,7 +3876,7 @@
     "empresa": "MARIA GUADALUPE VELAZQUEZ GARDUÑO",
     "tipo_carga": null,
     "notas": "Clave: P102 · Estatus en catálogo: No asignado",
-    "rutas": "Saltillo → Cuautitlan, Guadalupe → Tecamac, Santa Catarina → Tultitlan, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
+    "rutas": "Saltillo → Cuautitlan, Guadalupe → Tecamac, Santa Catarina → Tultitlan, Santa Catarina - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.487Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.487Z",
@@ -3889,7 +3889,7 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFBVIT6",
@@ -4002,7 +4002,7 @@
     "empresa": "HUGO CESAR CEPEDA GONZALEZ",
     "tipo_carga": null,
     "notas": "Clave: P1492 · Estatus en catálogo: Potencial",
-    "rutas": "Escobedo → Guadalupe, Gral Escobedo → Santa Catarina, Santa Catarina → Cienega De Flores, NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Escobedo → Guadalupe, Gral Escobedo → Santa Catarina, Santa Catarina → Cienega De Flores, Escobedo - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4015,7 +4015,7 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / ESCOBEDO - NUEVO LEÓN / GUADALUPE: $2,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Escobedo - Guadalupe: $2,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFCQD78",
@@ -4028,7 +4028,7 @@
     "empresa": "MARIA DEL PILAR AVILA LOPEZ",
     "tipo_carga": null,
     "notas": "Clave: P1439 · Estatus en catálogo: Intermitente",
-    "rutas": "Monterrey → Tultitlan, Monterrey → Cuautitlan Izcalli, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI",
+    "rutas": "Monterrey → Tultitlan, Monterrey → Cuautitlan Izcalli, Monterrey - Tultitlan, Monterrey - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4041,7 +4041,7 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN: $2,200 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey - Tultitlan: $2,200 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFCFIT4",
@@ -4054,7 +4054,7 @@
     "empresa": "EMMANUEL AGUILAR GARCIA",
     "tipo_carga": null,
     "notas": "Clave: P1525 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Tultitlan, San Nicolas De Los Garza → Alcaldia Azcapotzalco, Monterrey → Cuautitlan Izcalli, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI",
+    "rutas": "Santa Catarina → Tultitlan, San Nicolas De Los Garza → Alcaldia Azcapotzalco, Monterrey → Cuautitlan Izcalli, Santa Catarina - Tultitlan, Tecamac - Monterrey, Tecamac - San Nicolas de los Garza, Monterrey - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4067,7 +4067,7 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $26,150 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $26,150 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFCX5G9",
@@ -4105,7 +4105,7 @@
     "empresa": "FLORENCIO GARZA CARDENAS",
     "tipo_carga": null,
     "notas": "Clave: P1555 · Estatus en catálogo: Potencial",
-    "rutas": "Santa Catarina → Irapuato, Santa Catarina → Leon De Los Aldama, NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO",
+    "rutas": "Santa Catarina → Irapuato, Santa Catarina → Leon De Los Aldama, Santa Catarina - Irapuato",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4118,7 +4118,7 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO: $17,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Irapuato: $17,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFCLHEG",
@@ -4156,7 +4156,7 @@
     "empresa": "YANEISI ARELI CAVAZOS LEAL",
     "tipo_carga": null,
     "notas": "Clave: P1588 · Estatus en catálogo: Intermitente",
-    "rutas": "Apodaca → Tijuana, Tultitlan → Cancun, Santa Catarina → San Luis Rio Colorado, MÉXICO / TULTITLAN - QUINTANA ROO / CANCUN, NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO",
+    "rutas": "Apodaca → Tijuana, Tultitlan → Cancun, Santa Catarina → San Luis Rio Colorado, Tultitlan - Cancun, Santa Catarina - San Luis Rio Colorado",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4169,7 +4169,7 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "MÉXICO / TULTITLAN - QUINTANA ROO / CANCUN: $65,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / SANTA CATARINA - SONORA / SAN LUIS RIO COLORADO: $3,200 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tultitlan - Cancun: $65,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $3,200 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFCURMA",
@@ -4332,7 +4332,7 @@
     "empresa": "DANIELA GUZMAN SALAZAR",
     "tipo_carga": null,
     "notas": "Clave: P1333 · Estatus en catálogo: Recurrente",
-    "rutas": "Santa Catarina → Mexicali, Santa Catarina → Obregon, Santa Catarina → Irapuato, NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO",
+    "rutas": "Santa Catarina → Mexicali, Santa Catarina → Obregon, Santa Catarina → Irapuato, Santa Catarina - Irapuato",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.488Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.488Z",
@@ -4345,7 +4345,7 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Irapuato: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFCYZDY",
@@ -4508,7 +4508,7 @@
     "empresa": "ENRIQUE BRIONES VILLELA",
     "tipo_carga": null,
     "notas": "Clave: P1543 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → San Luis Potosi, Cuautla → Matehuala, Tepotzotlan → San Nicolas De Los Garza, MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
+    "rutas": "Santa Catarina → San Luis Potosi, Cuautla → Matehuala, Tepotzotlan → San Nicolas De Los Garza, Tepotzotlan - San Nicolas de los Garza",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.489Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.489Z",
@@ -4521,7 +4521,7 @@
         "fecha": "2026-10-01T20:57:28.489Z"
       }
     ],
-    "tarifas": "MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFD5M9M",
@@ -4809,7 +4809,7 @@
     "empresa": "ALEJANDRA ADELINA SOBERANES RUIZ",
     "tipo_carga": null,
     "notas": "Clave: P1605 · Estatus en catálogo: Potencial",
-    "rutas": "Azcapotzalco → Saltillo, Santa Catarina → Puebla, NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA",
+    "rutas": "Azcapotzalco → Saltillo, Santa Catarina → Puebla, Santa Catarina - Puebla",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.489Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.489Z",
@@ -4822,7 +4822,7 @@
         "fecha": "2026-10-01T20:57:28.489Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - PUEBLA / PUEBLA: sin dato mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Puebla: sin dato mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFDFLZX",
@@ -4885,7 +4885,7 @@
     "empresa": "AUTO LINEAS VERDES DE MONTERREY",
     "tipo_carga": null,
     "notas": "Clave: P1390 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Santa Catarina, Monterrey → Monterrey, NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA",
+    "rutas": "Santa Catarina → Santa Catarina, Monterrey → Monterrey, Santa Catarina - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.489Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.489Z",
@@ -4898,7 +4898,7 @@
         "fecha": "2026-10-01T20:57:28.489Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFDO2ND",
@@ -4911,7 +4911,7 @@
     "empresa": "JUAN CARLOS LOPEZ PEREZ",
     "tipo_carga": null,
     "notas": "Clave: P1536 · Estatus en catálogo: No asignado",
-    "rutas": "Santa Catarina → Santa Catarina, Gral Escobedo → Santa Catarina, NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA",
+    "rutas": "Santa Catarina → Santa Catarina, Gral Escobedo → Santa Catarina, Santa Catarina - Santa Catarina",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.489Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.489Z",
@@ -4924,7 +4924,7 @@
         "fecha": "2026-10-01T20:57:28.489Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - NUEVO LEÓN / SANTA CATARINA: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFDVZI2",
@@ -5287,7 +5287,7 @@
     "empresa": "CARLOS ALBERTO DAVILA IRACHETA",
     "tipo_carga": null,
     "notas": "Clave: P1531 · Estatus en catálogo: Potencial",
-    "rutas": "Tlajomulco De Zuñiga → Guadalupe, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Tlajomulco De Zuñiga → Guadalupe, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.490Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.490Z",
@@ -5300,7 +5300,7 @@
         "fecha": "2026-10-01T20:57:28.490Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE: $25,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Guadalupe: $25,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFELM2X",
@@ -5363,7 +5363,7 @@
     "empresa": "MARIA VICTORIA RODRIGUEZ CONTRERAS",
     "tipo_carga": null,
     "notas": "Clave: P1572 · Estatus en catálogo: Potencial",
-    "rutas": "Tlajomulco De Zuñiga → Escobedo, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
+    "rutas": "Tlajomulco De Zuñiga → Escobedo, Tlajomulco de Zuñiga - Escobedo",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.490Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.490Z",
@@ -5376,7 +5376,7 @@
         "fecha": "2026-10-01T20:57:28.490Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFEQB8E",
@@ -5439,7 +5439,7 @@
     "empresa": "BENJAMIN LIMON RODRIGUEZ",
     "tipo_carga": null,
     "notas": "Clave: P1538 · Estatus en catálogo: Intermitente",
-    "rutas": "Santa Catarina → Tultitlan, NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
+    "rutas": "Santa Catarina → Tultitlan, Santa Catarina - Tultitlan",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.490Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.490Z",
@@ -5452,7 +5452,7 @@
         "fecha": "2026-10-01T20:57:28.490Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFENQWK",
@@ -8140,7 +8140,7 @@
     "empresa": "FLASHER SUPPLY CHAIN SAS DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1598 · Estatus en catálogo: Potencial",
-    "rutas": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES",
+    "rutas": "Ramos Arizpe - Cienega de Flores",
     "unidades": "caja seca 53",
     "fecha_primer_contacto": "2026-10-01T20:57:28.496Z",
     "fecha_ultimo_contacto": "2026-10-01T20:57:28.496Z",
@@ -8153,7 +8153,7 @@
         "fecha": "2026-10-01T20:57:28.496Z"
       }
     ],
-    "tarifas": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Ramos Arizpe - Cienega de Flores: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
     "id": "CT-MUQ0MGFKVMT4",
@@ -8831,7 +8831,7 @@
     ]
   },
   {
-    "id": "CT-MUW23UNGXD0V",
+    "id": "CT-MUW2A5NPAK9Q",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "ALDO GARCIA",
@@ -8841,23 +8841,23 @@
     "empresa": "SAUL GARCIA E HIJOS S DE RL DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1129",
-    "rutas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI, NUEVO LEÓN / SANTA CATARINA - GUANAJUATO / IRAPUATO",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Ramos Arizpe - Teoloyucan, Monterrey - Cuautitlan Izcalli, Santa Catarina - Irapuato",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.748Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.748Z",
-    "created_at": "2026-10-06T02:25:36.748Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.949Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.949Z",
+    "created_at": "2026-10-06T02:30:30.949Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN)",
-        "fecha": "2026-10-06T02:25:36.748Z"
+        "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
+        "fecha": "2026-10-06T02:30:30.949Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $1,500 mínimo · 29 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI: $19,000 mínimo · 1 servicio(s) colocados (Top 5"
+    "tarifas": "Santa Catarina - Tultitlan: $1,500 mínimo · 29 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Irapuato: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas en"
   },
   {
-    "id": "CT-MUW23UNKC6KA",
+    "id": "CT-MUW2A5NS5OXL",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "ODILON ARAIZA SANCHEZ",
@@ -8867,23 +8867,23 @@
     "empresa": "ODILON ARAIZA SANCHEZ",
     "tipo_carga": null,
     "notas": "Clave: P1281",
-    "rutas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Ramos Arizpe - Teoloyucan, Tepotzotlan - San Nicolas de los Garza",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.752Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.752Z",
-    "created_at": "2026-10-06T02:25:36.752Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.952Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.952Z",
+    "created_at": "2026-10-06T02:30:30.952Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN)",
-        "fecha": "2026-10-06T02:25:36.752Z"
+        "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
+        "fecha": "2026-10-06T02:30:30.952Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 1 servicio(s) colocad"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNKNXUZ",
+    "id": "CT-MUW2A5NTZC0O",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "LORENA VARGAS TELLEZ",
@@ -8893,23 +8893,23 @@
     "empresa": "LORENA VARGAS TELLEZ",
     "tipo_carga": null,
     "notas": "Clave: P1002",
-    "rutas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN",
+    "rutas": "Santa Catarina - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Toluca - Escobedo, Guadalupe - Tultitlan",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.752Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.752Z",
-    "created_at": "2026-10-06T02:25:36.752Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.953Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.953Z",
+    "created_at": "2026-10-06T02:30:30.953Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN)",
-        "fecha": "2026-10-06T02:25:36.752Z"
+        "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
+        "fecha": "2026-10-06T02:30:30.953Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 4 servicio(s) colo"
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas"
   },
   {
-    "id": "CT-MUW23UNKHC5M",
+    "id": "CT-MUW2A5NTA1TP",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "WENDY DAMARIS",
@@ -8919,23 +8919,23 @@
     "empresa": "WENDY DAMARIS ZAMORA GONZALEZ",
     "tipo_carga": null,
     "notas": "Clave: P1013",
-    "rutas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN",
+    "rutas": "Santa Catarina - Tultitlan",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.752Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.752Z",
-    "created_at": "2026-10-06T02:25:36.752Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.953Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.953Z",
+    "created_at": "2026-10-06T02:30:30.953Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN)",
-        "fecha": "2026-10-06T02:25:36.752Z"
+        "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
+        "fecha": "2026-10-06T02:30:30.953Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNKF2ZM",
+    "id": "CT-MUW2A5NT5YAG",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "DANIEL ROSAS CAZARES",
@@ -8945,23 +8945,23 @@
     "empresa": "DC EXPRESS PAQUETERIA SAS",
     "tipo_carga": null,
     "notas": "Clave: P1315",
-    "rutas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO",
+    "rutas": "Santa Catarina - Tultitlan, Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Ramos Arizpe - Tultitlan de Mariano Escobedo",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.752Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.752Z",
-    "created_at": "2026-10-06T02:25:36.752Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.953Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.953Z",
+    "created_at": "2026-10-06T02:30:30.953Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN)",
-        "fecha": "2026-10-06T02:25:36.752Z"
+        "resumen": "Alta desde Top 50 Rutas (Santa Catarina - Tultitlan)",
+        "fecha": "2026-10-06T02:30:30.953Z"
       }
     ],
-    "tarifas": "NUEVO LEÓN / SANTA CATARINA - MÉXICO / TULTITLAN: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-s"
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNLFGNV",
+    "id": "CT-MUW2A5NUOPHN",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "FRANCISCO PLACIDO CANTU LOPEZ",
@@ -8971,23 +8971,23 @@
     "empresa": "FRANCISCO PLACIDO CANTU LOPEZ",
     "tipo_carga": null,
     "notas": "Clave: P1078",
-    "rutas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.753Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.753Z",
-    "created_at": "2026-10-06T02:25:36.753Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.954Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.954Z",
+    "created_at": "2026-10-06T02:30:30.954Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO)",
-        "fecha": "2026-10-06T02:25:36.753Z"
+        "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
+        "fecha": "2026-10-06T02:30:30.954Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNM631X",
+    "id": "CT-MUW2A5NUX2GY",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "GRUPO TRANSPORTISTA CH HERMANOS SA DE CV",
@@ -8997,23 +8997,23 @@
     "empresa": "GRUPO TRANSPORTISTA CH HERMANOS SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P1300",
-    "rutas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.754Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.754Z",
-    "created_at": "2026-10-06T02:25:36.754Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.954Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.954Z",
+    "created_at": "2026-10-06T02:30:30.954Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO)",
-        "fecha": "2026-10-06T02:25:36.754Z"
+        "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
+        "fecha": "2026-10-06T02:30:30.954Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNMR55L",
+    "id": "CT-MUW2A5NV5RT6",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "LUIS ANTONIO LOPEZ PADILLA",
@@ -9023,23 +9023,23 @@
     "empresa": "LUIS ANOTONIO LOPEZ PADILLA",
     "tipo_carga": null,
     "notas": "Clave: P1537",
-    "rutas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN, MÉXICO / TULTITLAN - QUINTANA ROO / CANCUN, NUEVO LEÓN / MONTERREY - MÉXICO / CUAUTITLAN IZCALLI",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tecamac - Monterrey, Tepotzotlan - Ciudad Guzman, Tultitlan - Cancun, Monterrey - Cuautitlan Izcalli",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.754Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.754Z",
-    "created_at": "2026-10-06T02:25:36.754Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.955Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.955Z",
+    "created_at": "2026-10-06T02:30:30.955Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO)",
-        "fecha": "2026-10-06T02:25:36.754Z"
+        "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
+        "fecha": "2026-10-06T02:30:30.955Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TEPOTZOTLAN - JALISCO / CIUDAD GUZMAN: $22,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TULTITLAN - QUINTANA ROO / CANCUN: $60,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | NUEVO LEÓN / MONTERREY - "
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tultitlan - Cancun: $60,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNM5PJ5",
+    "id": "CT-MUW2A5NV5D6V",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "SUPER TRANSPORTES LOZANO SA DE CV",
@@ -9049,23 +9049,23 @@
     "empresa": "SUPER TRANSPORTES LOZANO SA DE CV",
     "tipo_carga": null,
     "notas": "Clave: P347",
-    "rutas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.754Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.754Z",
-    "created_at": "2026-10-06T02:25:36.754Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.955Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.955Z",
+    "created_at": "2026-10-06T02:30:30.955Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO)",
-        "fecha": "2026-10-06T02:25:36.754Z"
+        "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
+        "fecha": "2026-10-06T02:30:30.955Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNNT08J",
+    "id": "CT-MUW2A5NVSY9P",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "DAVID RETANA MONCAYO",
@@ -9075,23 +9075,23 @@
     "empresa": "DAVID RETANA MONCAYO",
     "tipo_carga": null,
     "notas": "Clave: P911",
-    "rutas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, NUEVO LEÓN / MONTERREY - MÉXICO / TULTITLAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, NUEVO LEÓN / GUADALUPE - MÉXICO / TULTITLAN, MÉXICO / TECAMAC - JALISCO / ZAPOPAN, JALISCO / TLAJOMUL",
+    "rutas": "Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Cuautitlan Izcalli - Apodaca, Monterrey - Tultitlan, Ramos Arizpe - Tultitlan de Mariano Escobedo, Guadalupe - Tultitlan, Tecamac - Zapopan, Tlajomulco de Zuñiga - Guadalupe, Tecamac - El Salto, Ramos Arizpe - Cienega de Flores",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.755Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.755Z",
-    "created_at": "2026-10-06T02:25:36.755Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.955Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.955Z",
+    "created_at": "2026-10-06T02:30:30.955Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO)",
-        "fecha": "2026-10-06T02:25:36.755Z"
+        "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Escobedo)",
+        "fecha": "2026-10-06T02:30:30.955Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / ESCOBEDO: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep "
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-se"
   },
   {
-    "id": "CT-MUW23UNNWLZP",
+    "id": "CT-MUW2A5NWX2FS",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "ARNULFO SANCHEZ GARCIA",
@@ -9101,23 +9101,23 @@
     "empresa": "ARNULFO SANCHEZ GARCIA",
     "tipo_carga": null,
     "notas": "Clave: P0805",
-    "rutas": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE, MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA, MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY, MÉXICO / TOLUCA - NUEVO LEÓN / ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - NUEVO LEÓN / CIENEGA DE FLORES, MÉXICO / OCOYOACAC - COAHUILA DE",
+    "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Tecamac - San Nicolas de los Garza, Tecamac - Monterrey, Toluca - Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan, Ramos Arizpe - Cienega de Flores, Ocoyoacac - Ramos Arizpe",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.755Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.755Z",
-    "created_at": "2026-10-06T02:25:36.755Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.956Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.956Z",
+    "created_at": "2026-10-06T02:30:30.956Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO)",
-        "fecha": "2026-10-06T02:25:36.755Z"
+        "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Tultitlan de Mariano Escobedo)",
+        "fecha": "2026-10-06T02:30:30.956Z"
       }
     ],
-    "tarifas": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 19 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / SAN NICOLAS DE LOS GARZA: $25,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / TECAMAC - NUEVO LEÓN / MONTERREY: $25,000 mínimo · 3 servicio(s) colocados"
+    "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 19 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene"
   },
   {
-    "id": "CT-MUW23UNND3SX",
+    "id": "CT-MUW2A5NW7XD3",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "RICARDO MENDOZA REYES",
@@ -9127,23 +9127,23 @@
     "empresa": "RICARDO MENDOZA REYES",
     "tipo_carga": null,
     "notas": "Clave: P0997",
-    "rutas": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO, MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA, COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN",
+    "rutas": "Ramos Arizpe - Tultitlan de Mariano Escobedo, Cuautitlan Izcalli - Apodaca, Ramos Arizpe - Teoloyucan",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.755Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.755Z",
-    "created_at": "2026-10-06T02:25:36.755Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.956Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.956Z",
+    "created_at": "2026-10-06T02:30:30.956Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO)",
-        "fecha": "2026-10-06T02:25:36.755Z"
+        "resumen": "Alta desde Top 50 Rutas (Ramos Arizpe - Tultitlan de Mariano Escobedo)",
+        "fecha": "2026-10-06T02:30:30.956Z"
       }
     ],
-    "tarifas": "COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TULTITLAN DE MARIANO ESCOBEDO: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | MÉXICO / CUAUTITLAN IZCALLI - NUEVO LEÓN / APODACA: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | COAHUILA DE ZARAGOZA / RAMOS ARIZPE - MÉXICO / TEOLOYUCAN: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNOY8VK",
+    "id": "CT-MUW2A5NXA5V1",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "SOCORRO SANCHEZ MEJIA",
@@ -9153,23 +9153,23 @@
     "empresa": "SOCORRO SANCHEZ MEJIA",
     "tipo_carga": null,
     "notas": "Clave: P458",
-    "rutas": "MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE",
+    "rutas": "Cuautitlan Izcalli - Ramos Arizpe",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.756Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.756Z",
-    "created_at": "2026-10-06T02:25:36.756Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.957Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.957Z",
+    "created_at": "2026-10-06T02:30:30.957Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE)",
-        "fecha": "2026-10-06T02:25:36.756Z"
+        "resumen": "Alta desde Top 50 Rutas (Cuautitlan Izcalli - Ramos Arizpe)",
+        "fecha": "2026-10-06T02:30:30.957Z"
       }
     ],
-    "tarifas": "MÉXICO / CUAUTITLAN IZCALLI - COAHUILA DE ZARAGOZA / RAMOS ARIZPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   },
   {
-    "id": "CT-MUW23UNWWGN6",
+    "id": "CT-MUW2A5O4N2TZ",
     "agente_asignado": "SOFIA",
     "tipo": "proveedor",
     "nombre_completo": "JESUS SILVA TAMEZ",
@@ -9179,19 +9179,19 @@
     "empresa": "JESUS SILVA TAMEZ",
     "tipo_carga": null,
     "notas": "Clave: P63",
-    "rutas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE",
+    "rutas": "Tlajomulco de Zuñiga - Guadalupe",
     "unidades": "caja seca 53",
-    "fecha_primer_contacto": "2026-10-06T02:25:36.764Z",
-    "fecha_ultimo_contacto": "2026-10-06T02:25:36.764Z",
-    "created_at": "2026-10-06T02:25:36.764Z",
+    "fecha_primer_contacto": "2026-10-06T02:30:30.964Z",
+    "fecha_ultimo_contacto": "2026-10-06T02:30:30.964Z",
+    "created_at": "2026-10-06T02:30:30.964Z",
     "interacciones": [
       {
         "agente": "SOFIA",
         "canal": "permanente",
-        "resumen": "Alta desde Top 50 Rutas (JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE)",
-        "fecha": "2026-10-06T02:25:36.764Z"
+        "resumen": "Alta desde Top 50 Rutas (Tlajomulco de Zuñiga - Guadalupe)",
+        "fecha": "2026-10-06T02:30:30.964Z"
       }
     ],
-    "tarifas": "JALISCO / TLAJOMULCO DE ZUÑIGA - NUEVO LEÓN / GUADALUPE: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
   }
 ]
