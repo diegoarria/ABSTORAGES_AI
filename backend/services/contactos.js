@@ -482,7 +482,42 @@ async function unidadPorDefectoProveedores() {
   } catch (e) { console.error('[Contactos] Error asignando unidad por defecto:', e.message); }
 }
 
+// ── Limpieza total de "rutas" — pedido explícito del usuario (06-oct-2026) ──
+// Vacía el campo "rutas" de TODOS los proveedores y clientes (los del Top 50
+// y también los de catálogos/directorio viejos), una sola vez. Después
+// resetea las marcas del Top 50 para que cargarTop50Rutas()/
+// cargarClientesTop50Rutas() lo vuelvan a sembrar completo y limpio, sin el
+// corte a medias que había quedado antes ni el formato viejo de rutas.
+// Las marcas de catálogo/directorio NO se resetean a propósito: esas rutas
+// viejas (ej. "Monterrey-Guadalajara", flechas "→") quedan fuera para
+// siempre, que es justo lo que se pidió.
+async function limpiarTodasLasRutas() {
+  const flag = 'limpieza-total-rutas-2026-10-06';
+  if (leerFlags()[flag]) return;
+  let limpiados = 0, fallos = 0;
+  for (const tipo of ['proveedor', 'cliente']) {
+    for (const agente of ['SARA', 'SOFIA', 'NOA']) {
+      let lista;
+      try { lista = await listarPorAgente(agente, { tipo }); } catch (e) { console.error(`[Contactos] Error listando ${tipo}/${agente} para limpiar rutas:`, e.message); continue; }
+      for (const c of lista) {
+        if (!String(c.rutas || '').trim()) continue;
+        try { await actualizarCampoProveedor(c.id, 'rutas', ''); limpiados++; }
+        catch (e) { fallos++; console.error(`[Contactos] Error limpiando rutas de ${c.id}:`, e.message); }
+      }
+    }
+  }
+  if (!fallos) {
+    marcarFlag(flag);
+    const f = leerFlags();
+    delete f['top50-rutas-oct-2026'];
+    delete f['clientes-top50-rutas-oct-2026'];
+    try { fs.writeFileSync(FLAGS_FILE, JSON.stringify(f, null, 2)); } catch (e) { console.error('[Contactos] No se pudieron resetear las marcas del Top 50:', e.message); }
+  }
+  console.log(`[Contactos] Limpieza total de rutas: ${limpiados} contactos vaciados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
+}
+
 async function sembrarCatalogos() {
+  await limpiarTodasLasRutas();
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-gomez-palacio.json', ruta: 'Monterrey-Gómez Palacio', flag: 'catalogo-mty-gp-2026-09-27' });
   await cargarCatalogoRuta({ archivo: 'proveedores-mty-guadalajara.json', ruta: 'Monterrey-Guadalajara', flag: 'catalogo-mty-gdl-2026-09-27' });
   await cargarDirectorio({ archivo: 'proveedores-directorio.json', flag: 'directorio-proveedores-2026-09-27' });
