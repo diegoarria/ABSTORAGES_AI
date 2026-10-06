@@ -84,6 +84,7 @@ const callLog        = require('./backend/services/callLog');
 const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
+const noaMonitoreo = require('./backend/services/noaMonitoreo');
 const sofiaScheduler = require('./backend/services/sofiaScheduler');
 const difusionGeneral = require('./backend/services/difusionGeneral');
 const difusionClientes = require('./backend/services/difusionClientes');
@@ -2128,6 +2129,10 @@ app.get('/api/colocaciones', adminUOps, (req, res) => {
     .map(c => ({ ...c, comparativo: colocaciones.comparativo(c), checklist_estado: c.estado === 'colocado' ? colocaciones.estadoChecklist(c) : [] }));
   res.json(lista);
 });
+// Monitoreo de NOA — viajes ya colocados y en tránsito, ordenados de más a
+// menos riesgo (exception-first). Mismo origen de datos que /api/colocaciones,
+// solo que acá va el cálculo de riesgo/anomalías del motor de NOA.
+app.get('/api/noa/monitoreo', adminUOps, (req, res) => res.json(noaMonitoreo.viajesMonitoreados()));
 app.post('/api/colocaciones/:folio/aprobar', soloAdmin, async (req, res) => {
   try {
     const { tel, manual, precio } = req.body || {};
@@ -3870,6 +3875,7 @@ app.listen(PORT, async () => {
   // el real. Ver monitoringControl.js para el porqué de esto.
   await monitoringControl.iniciar();
   noaScheduler.iniciar(pushActividad);
+  noaMonitoreo.iniciar();
   sofiaScheduler.iniciar(pushActividad);
   difusionGeneral.iniciar(pushActividad);
   difusionClientes.iniciar();

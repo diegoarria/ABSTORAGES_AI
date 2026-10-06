@@ -186,6 +186,17 @@ function detenerBusqueda(folio, motivo) {
   return c;
 }
 
+// Última lectura del motor de monitoreo de NOA para este viaje — riesgo,
+// severidad, anomalías detectadas y el resumen de la última decisión. Campo
+// propio y separado de todo lo demás que ya guarda la colocación (lo que
+// coloca/negocia SOFIA no se toca) — ver backend/services/noaMonitoreo.js.
+function actualizarMonitoreoNOA(folio, datos) {
+  const c = obtener(folio); if (!c) return null;
+  c.monitoreoNOA = { ...(c.monitoreoNOA || {}), ...datos, actualizadoEn: ahora() };
+  guardar();
+  return c.monitoreoNOA;
+}
+
 function cambiarEstado(folio, estado) { const c = obtener(folio); if (!c) return null; c.estado = estado; guardar(); return c; }
 function marcarAviso(folio, clave) { const c = obtener(folio); if (!c) return; c.avisos[clave] = ahora(); guardar(); }
 // El cliente confirmó que lo necesita con urgencia — salta la ventana de
@@ -311,7 +322,7 @@ module.exports = {
   fechaMTY, tel10, crear, obtener, todas, abiertas, marcarContactado, porTelefono, registrarRespuesta, registrarOferta, registrarOfertaVapi,
   CHECKLIST, estadoChecklist, checklistCompleto, marcarChecklist,
   HITOS, hitoAlcanzado, marcarHito, registrarRetraso, guardarOperador, marcarChequeo, marcarAlertaSeg,
-  detenerBusqueda, asignar, cambiarEstado, marcarAviso, marcarUrgente, actualizarSeguimiento, guardarCambios, estadisticas, puntaje, comparativo, ranking,
+  detenerBusqueda, asignar, cambiarEstado, marcarAviso, marcarUrgente, actualizarSeguimiento, actualizarMonitoreoNOA, guardarCambios, estadisticas, puntaje, comparativo, ranking,
   agregarDisponibilidad, disponibilidades, actualizarDisponibilidad,
   agregarSugerencia, sugerencias, resolverSugerencia, kpiBase, kpiMeta, kpiGuardar,
 };
