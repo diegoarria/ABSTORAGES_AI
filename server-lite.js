@@ -251,10 +251,11 @@ function agenteParaNumeroWA(numero) {
   return 'sara'; // fallback histórico — TWILIO_WHATSAPP_NUMBER es el número original de SARA antes de separar por agente
 }
 
-async function sendWhatsApp(to, text, agente = 'noa') {
-  // ── BLOQUEO ABSOLUTO — ningún token de control sale nunca por WhatsApp ──
-  // Se aplica AQUÍ, dentro de la función que de verdad manda el mensaje, sin
-  // importar qué código haya llamado a sendWhatsApp ni si ya se "limpió" antes.
+// ── BLOQUEO ABSOLUTO — ningún token de control sale nunca por WhatsApp ──
+// Compartido por TODOS los transportes (Twilio y Kapso) — sin importar qué
+// código haya llamado a enviar ni si ya se "limpió" antes, este es el único
+// lugar donde se filtra antes de que algo salga de verdad hacia un cliente.
+async function prepararTextoWA(text, to) {
   const antes = text;
   text = text
     .replace(/LEAD_DATA\s*:[\s\S]*$/gi, '')
@@ -285,6 +286,11 @@ async function sendWhatsApp(to, text, agente = 'noa') {
   text = limpiarFormatoWhatsApp(text);
   text = await contactos.protegerDatosProveedores(text); // nunca sale el teléfono/correo de un proveedor
   text = aTuteo(text); // nunca voseo: siempre tuteo mexicano
+  return text;
+}
+
+async function sendWhatsApp(to, text, agente = 'noa') {
+  text = await prepararTextoWA(text, to);
   if (!text) { console.log(`[WA] Mensaje vacío tras filtrar control, no se envía a ${to}`); return; }
 
   if (!WA_LIVE) {
@@ -321,6 +327,20 @@ async function sendWhatsApp(to, text, agente = 'noa') {
     else        console.log(`[WA] OK → ${to}`);
   } catch (e) {
     console.error('[WA] Error enviando:', e.message);
+  }
+}
+
+// Mismo filtrado que sendWhatsApp (prepararTextoWA), pero manda por Kapso —
+// el número de SOFIA +52 1 81 3590 9778 (ver backend/services/kapso.js).
+// Nunca para sara/noa: ese número es solo de SOFIA.
+async function sendWhatsAppKapso(to, text) {
+  text = await prepararTextoWA(text, to);
+  if (!text) { console.log(`[WA-Kapso] Mensaje vacío tras filtrar control, no se envía a ${to}`); return; }
+  try {
+    await kapso.enviarMensaje(to, text);
+    console.log(`[WA-Kapso] OK → ${to}`);
+  } catch (e) {
+    console.error('[WA-Kapso] Error enviando:', e.message);
   }
 }
 
@@ -421,7 +441,12 @@ async function procesarRequerimiento(rq, persona) {
 app.get('/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
 
 // ─── MIDDLEWARE ────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '2mb' }));
+// `verify` guarda el body crudo en req.rawBody — lo necesita /webhook/kapso
+// para validar la firma HMAC (el parser de abajo es GLOBAL y consume el
+// stream antes que cualquier express.json() declarado a nivel de ruta más
+// abajo en el archivo, así que capturarlo aquí es el único lugar que de
+// verdad funciona).
+app.use(express.json({ limit: '2mb', verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 // CORS abierto solo para el widget (rutas /api/widget/* y /widget) — el
 // candado de dominio (domainLock) rechaza cualquier Origin que no sea
@@ -934,21 +959,198 @@ app.get('/webhook/whatsapp', (req, res) => {
 });
 
 // ─── WhatsApp de SOFIA vía Kapso (número +52 1 81 3590 9778) ────────────────
-// Plomería de recepción únicamente — por ahora solo valida la firma y
-// registra el mensaje entrante. Todavía NO dispara a SOFIA (ver
-// backend/services/kapso.js para el porqué: cablear esto al flujo de
-// Twilio que ya está en producción es un paso aparte, pendiente). Cuando se
-// conecte, el agente SIEMPRE es 'sofia' — este número no es de SARA.
-app.post('/webhook/kapso', express.json({ verify: (req, res, buf) => { req.rawBody = buf; } }), (req, res) => {
+// Mismo flujo que el webhook de Twilio (línea ~517) pero recortado para
+// SOFIA únicamente — este número no es de SARA ni de NOA, así que se omiten
+// las ramas de esos agentes a propósito, no por descuido. Duplica la
+// orquestación del webhook de Twilio en vez de reusarla directamente: ese
+// handler ya está en producción y es demasiado riesgoso de refactorizar en
+// este pase solo para parametrizar el transporte. El filtrado de salida
+// (prepararTextoWA) SÍ está compartido — eso es lo crítico de seguridad.
+// No soporta adjuntos/imágenes todavía (a diferencia del webhook de Twilio) —
+// pendiente, igual que el de Twilio tuvo que esperar su propio turno.
+const AGENTE_KAPSO = 'sofia';
+async function manejarMensajeKapso(phone, texto) {
+  if (emergencyShutdown.estaActivo()) { console.log(`[Kapso-IN] apagado de emergencia activo, ignorando mensaje de ${phone}`); return; }
+  if (phoneBanlist.estaBaneado(phone)) { console.log(`[Kapso-IN] teléfono baneado, ignorando mensaje de ${phone}`); return; }
+  if (Date.now() < MANTENIMIENTO_HASTA.getTime()) { console.log(`[Kapso-IN] SOFIA en mantenimiento forzado, ignorando mensaje de ${phone}`); return; }
+
+  const session = `wa_sofia_${phone}`;
+  const { contextBlock, history } = memory.buildContext(session);
+  const esPrimerMensaje = history.length === 0;
+  const tariffCtx = tariff.getContext();
+  let systemPrompt = buildPrompt(AGENTE_KAPSO, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
+  const personaEquipo = staffDirectory.buscarPorTelefono(phone);
+  systemPrompt += `\n\nHoy es ${new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeZone: 'America/Monterrey' }).format(new Date())} (hora de Monterrey). Fecha en formato AAAA-MM-DD: ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())}.`;
+  if (personaEquipo) {
+    systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
+    systemPrompt += await contactos.bloqueDirectorioProveedores();
+    systemPrompt += folioContexto.bloque();
+  } else {
+    const foliosPersona = [...folioContexto.foliosPorTelefono(phone), ...colocaciones.porTelefono(phone, false).map(c => c.folio)];
+    if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
+    systemPrompt += await bloqueTarifaRutaProveedor(phone);
+    systemPrompt += sofiaOperacion.bloqueChecklist(phone);
+    const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO);
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+  }
+
+  if (promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
+    memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    saveMessage(session, AGENTE_KAPSO, 'user', texto); saveMessage(session, AGENTE_KAPSO, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    return;
+  }
+  if (promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
+    memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    saveMessage(session, AGENTE_KAPSO, 'user', texto); saveMessage(session, AGENTE_KAPSO, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    pushActividad({ agente: 'SOFIA', tipo: 'ALERTA_FUGA_PROMPT', mensaje: texto.slice(0, 200), sessionId: session });
+    phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO }).catch(() => {});
+    registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone}`);
+    ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO, motivo: texto.slice(0, 300), severity: 'critical' });
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO);
+    return;
+  }
+  if (personaEquipo?.nombre !== 'Diego') {
+    const palabra = attackWordlist.detectar(texto);
+    if (palabra) {
+      const telefonoNorm = phoneBanlist.normalizar(phone);
+      const { count, alcanzoLimite } = attackStrikes.registrar(telefonoNorm, palabra);
+      pushActividad({ agente: 'SOFIA', tipo: 'ALERTA_INTENTO_ATAQUE', mensaje: `"${palabra}" (intento ${count}/${attackStrikes.LIMITE})`, sessionId: session });
+      if (alcanzoLimite) {
+        memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        saveMessage(session, AGENTE_KAPSO, 'user', texto); saveMessage(session, AGENTE_KAPSO, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        phoneBanlist.banear({ telefono: phone, motivo: `3 intentos de ataque — último: "${palabra}" en "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO }).catch(() => {});
+        registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone} (3 strikes)`);
+        ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO, motivo: `3er intento: "${palabra}"`, severity: 'critical' });
+        sendPush({ title: '🚫 Teléfono baneado — 3 intentos de ataque', body: `SOFIA · ${phone} · última palabra: "${palabra}"`, tag: 'telefono-baneado', url: '/', tipo: 'ALERTA_INTENTO_ATAQUE', urgente: true }).catch(() => {});
+        await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO);
+        return;
+      }
+    }
+  }
+
+  if (tms.ENABLED) { const tmsCtx = await tms.getContextoSOFIA(texto); if (tmsCtx) systemPrompt += tmsCtx; }
+
+  memory.addMessage(session, 'user', texto);
+  saveMessage(session, AGENTE_KAPSO, 'user', texto);
+
+  if (personaEquipo && texto) {
+    const rq = requerimiento.parsear(texto);
+    if (rq) {
+      let confirmacion;
+      try { confirmacion = await procesarRequerimiento(rq, personaEquipo); }
+      catch (e) { console.error('[requerimiento]', e.message); confirmacion = `Recibí el requerimiento del folio ${rq.folio}, pero tuve un error al procesarlo (${e.message}). No contacté a nadie.`; }
+      memory.addMessage(session, 'assistant', confirmacion);
+      saveMessage(session, AGENTE_KAPSO, 'assistant', confirmacion);
+      for (const bloque of splitForWhatsApp(confirmacion)) await sendWhatsAppKapso(phone, bloque);
+      return;
+    }
+  }
+
+  await humanDelay.esperar(texto);
+  let respuesta = '';
+  await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
+  memory.addMessage(session, 'assistant', respuesta);
+  saveMessage(session, AGENTE_KAPSO, 'assistant', respuesta);
+
+  const FRASE_RECLAMO_PAGO = 'Enseguida lo revisaré con el equipo de administración, ellos podrán resolverte este tema lo antes posible.';
+  const FRASE_TARIFA = 'Lo consultaré con mi equipo de ABSTORAGES.';
+  const mencionoTarifa = !SOFIA_NEGOCIA_TARIFA && /TARIFA_MENCIONADA\s*:/i.test(respuesta);
+  const FRASE_SIN_UNIDADES = 'Muchas gracias, avísame cuando cuentes con disponibilidad.';
+  const dijoSinUnidades = /OFERTA_PROVEEDOR\s*:\s*\{[^}]*"disponible"\s*:\s*false/i.test(respuesta);
+  const textoSalida = (!personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO
+    : (!personaEquipo && mencionoTarifa) ? FRASE_TARIFA
+    : (!personaEquipo && dijoSinUnidades) ? FRASE_SIN_UNIDADES
+    : limpiarControlParaCliente(respuesta);
+  const MULETILLA = /[¿]?\s*(?:hay\s+)?(?:algo|alguna cosa)\s+m[aá]s\s+en\s+(?:lo\s+)?(?:que|qué)\s+(?:te\s+)?(?:pueda|podamos|puedo)\s+ayud(?:arte|ar)[^.?!]*[?.!]?/gi;
+  const textoLimpio = !personaEquipo ? (textoSalida.replace(MULETILLA, '').replace(/\s{2,}/g, ' ').trim() || textoSalida) : textoSalida;
+  for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque);
+
+  if (personaEquipo) {
+    const dm = respuesta.match(/DETENER_BUSQUEDA\s*:\s*(\{[^\n]+\})/i);
+    if (dm) { let d = {}; try { d = JSON.parse(dm[1]); } catch {} if (d.folio) sofiaOperacion.detenerBusquedaPorEquipo(String(d.folio).toUpperCase(), personaEquipo.nombre); }
+  }
+
+  if (!personaEquipo) {
+    try {
+      const conocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO).catch(() => null);
+      const quien = conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : phone;
+      const corto = t => String(t || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+      pushActividad({ agente: 'SOFIA', tipo: 'CONVERSACION_WA', mensaje: `${quien}: "${corto(texto)}" → SOFIA: "${corto(limpiarControlParaCliente(respuesta))}"`, sessionId: session, metadata: { telefono: phone, tipoContacto: conocido?.tipo || null, via: 'kapso' } });
+
+      const ahoraMs = Date.now();
+      if (ahoraMs - (_ultimoEmailRespuesta.get(phone) || 0) > 10 * 60 * 1000) {
+        _ultimoEmailRespuesta.set(phone, ahoraMs);
+        notifier.notificarRespuestaSofia({ quien: conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo', tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), respuestaSofia: limpiarControlParaCliente(respuesta).slice(0, 800), sessionId: session }).catch(() => {});
+      }
+
+      if (conocido?.tipo === 'proveedor') {
+        if (Date.now() - (_ultimoAvisoRespuesta.get(phone) || 0) > 30 * 60 * 1000) {
+          _ultimoAvisoRespuesta.set(phone, Date.now());
+          sendPush({ title: '💬 Un proveedor le contestó a SOFIA', body: `${quien}: "${corto(texto)}"`, tag: 'prov-respondio', url: '/actividad.html', tipo: 'PROVEEDOR_RESPONDIO' }).catch(() => {});
+        }
+        sofiaOperacion.procesarSenales({ telefono: phone, nombre: conocido?.nombre_completo, respuesta });
+        const rm = respuesta.match(/RESULTADO_CONTACTO:\s*(\{[^\n]+\})/);
+        if (rm) {
+          let r = {}; try { r = JSON.parse(rm[1]); } catch {}
+          const etiquetas = { acuerdo: '🤝 ACUERDO CERRADO', sin_acuerdo: '✖️ Sin acuerdo', pendiente: '⏳ Pendiente' };
+          if (etiquetas[r.resultado]) {
+            const detalleR = r.resumen ? ` · ${corto(r.resumen)}` : '';
+            pushActividad({ agente: 'SOFIA', tipo: 'RESULTADO_CONTACTO', mensaje: `${etiquetas[r.resultado]} con ${quien}${detalleR}`, sessionId: session, metadata: { resultado: r.resultado } });
+            if (r.resultado !== 'pendiente') sendPush({ title: `${etiquetas[r.resultado]} — SOFIA`, body: `${quien}${detalleR}`, tag: 'resultado-contacto', url: '/actividad.html', tipo: 'RESULTADO_CONTACTO', urgente: r.resultado === 'acuerdo' }).catch(() => {});
+          }
+        }
+      }
+
+      if (!conocido) {
+        const pn = respuesta.match(/PROVEEDOR_NUEVO:\s*(\{[^\n]+\})/);
+        if (pn) {
+          try {
+            const d = JSON.parse(pn[1]);
+            const c = candidatosProveedor.agregar({ nombre: d.nombre, telefono: phone, empresa: d.empresa, unidades: d.unidades, rutas: d.rutas, resumen: d.resumen });
+            if (c) {
+              pushActividad({ agente: 'SOFIA', tipo: 'PROVEEDOR_NUEVO', mensaje: `Candidato nuevo: ${c.nombre || phone}${c.rutas ? ' — ' + c.rutas : ''} — pendiente de aprobación en Base de Datos`, sessionId: session, metadata: { id: c.id } });
+              notifier.notificarProveedorNuevo({ nombre: c.nombre, telefono: phone, empresa: c.empresa, unidades: c.unidades, rutas: c.rutas, resumen: c.resumen }).catch(() => {});
+            }
+          } catch (e) { console.error('[PROVEEDOR_NUEVO] inválido:', e.message); }
+        }
+      }
+    } catch (e) { console.error('[Kapso monitoreo en vivo]', e.message); }
+  }
+
+  const contactoMatchWA = respuesta.match(/UPSERT_CONTACTO:\s*(\{[^\n]+\})/);
+  if (contactoMatchWA) {
+    try {
+      const datos = JSON.parse(contactoMatchWA[1]);
+      contactos.upsertContacto({ agente: AGENTE_KAPSO, tipo: datos.tipo || 'proveedor', nombre_completo: datos.nombre_completo || datos.nombre, telefono: datos.telefono, email: datos.email, empresa: datos.empresa, tipo_carga: datos.tipo_carga, resumen_interaccion: datos.resumen_interaccion || datos.resumen, canal: 'whatsapp' }).catch(e => console.error('[contactos]', e.message));
+    } catch (e) { console.error('[UPSERT_CONTACTO Kapso] JSON inválido:', e.message); }
+  }
+
+  if (esPrimerMensaje) pushActividad({ agente: 'SOFIA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp vía Kapso: ${phone}`, sessionId: session });
+}
+
+app.post('/webhook/kapso', (req, res) => {
   res.sendStatus(200); // Kapso exige 200 en <10s — se contesta antes de procesar
   const firma = req.headers['x-webhook-signature'];
   if (!kapso.verificarFirma(req.rawBody, firma)) {
     console.warn('[Kapso webhook] firma inválida — request descartado');
     return;
   }
-  const evento = req.headers['x-webhook-event'];
-  const msg = req.body?.message;
-  console.log(`[Kapso webhook] ${evento} — from ${msg?.from || '—'}: ${msg?.text?.body?.slice(0, 200) || '(sin texto)'}`);
+  setImmediate(async () => {
+    try {
+      const evento = req.headers['x-webhook-event'];
+      const msg = req.body?.message;
+      if (evento !== 'whatsapp.message.received' || !msg) return;
+      const texto = (msg.text?.body || '').trim();
+      const from = msg.from;
+      if (!from || !texto) { console.log('[Kapso-IN] sin from/texto, ignorando'); return; }
+      const phone = `+${String(from).replace(/\D/g, '')}`;
+      console.log(`[Kapso-IN] de ${phone}: ${texto.slice(0, 200)}`);
+      await manejarMensajeKapso(phone, texto);
+    } catch (e) {
+      console.error('[Kapso webhook]', e.message);
+    }
+  });
 });
 
 // ─── 2Chat — grupo de WhatsApp "ABSTORAGES IA - TEST" (MVP SOFIA/NOA) ───────
