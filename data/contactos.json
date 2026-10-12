@@ -10479,5 +10479,1406 @@
         "fecha": "2026-10-06T03:48:40.256Z"
       }
     ]
+  },
+  {
+    "id": "CT-MV5INXWKSRGE",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "Erika Martinez",
+    "puesto": null,
+    "telefono": "3332838407",
+    "email": "erika.martinez@gustinos.com",
+    "empresa": "ALIMENTOS EXTRUIDOS",
+    "tipo_carga": null,
+    "notas": "Tel. alterno: 3313205445 (ext. 175 el principal)",
+    "rutas": null,
+    "unidades": null,
+    "rfc": "AEX850222KE6",
+    "estatus": "Potencial",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.524Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.524Z",
+    "created_at": "2026-10-12T17:19:03.524Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.524Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWKFBRV",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "Diana Suarez",
+    "puesto": null,
+    "telefono": "8443403456",
+    "email": "coordinador.trafico@snacker.com.mx",
+    "empresa": "BOMESA SA DE CV",
+    "tipo_carga": null,
+    "notas": "Tel. alterno: 84435956954",
+    "rutas": null,
+    "unidades": null,
+    "rfc": "BOM111017Q16",
+    "estatus": "Potencial",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.524Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.524Z",
+    "created_at": "2026-10-12T17:19:03.524Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.524Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWLGMIZ",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JUAN SANCHEZ",
+    "puesto": null,
+    "telefono": "8121509232",
+    "email": "juans@tebonclass.com",
+    "empresa": "TEBON CLASS DE MEXICO SA DE CV",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "TCM0511236B1",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.525Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.525Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      },
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.525Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWL6O8R",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ELIZABETH MOLINA GARCIA",
+    "puesto": null,
+    "telefono": "4461332554",
+    "email": "lceballos@kolaloka.com",
+    "empresa": "INDUSTRIAS KOLA LOKA",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "IKL900119HW3",
+    "estatus": "Potencial",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.525Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.525Z",
+    "created_at": "2026-10-12T17:19:03.525Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.525Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWL5OGL",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ERIKA GUILLERMO / JORGE MEDINA",
+    "puesto": null,
+    "telefono": "8130954756",
+    "email": "erika.guillermo@smurfitwestrock.mx",
+    "empresa": "PAPEL Y EMPAQUES GONDI MONTERREY",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "PEG170907426",
+    "estatus": "Potencial",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.525Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.525Z",
+    "created_at": "2026-10-12T17:19:03.525Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.525Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWL6T6V",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "HECTOR REYES",
+    "puesto": null,
+    "telefono": "8441827677",
+    "email": "Hector.Reyes@sacoaei.com",
+    "empresa": "SACO AEI POLIMEROS RAMOS ARIZPE S DE RL DE CV",
+    "tipo_carga": null,
+    "notas": "Tel. alterno: 2211173252",
+    "rutas": null,
+    "unidades": null,
+    "rfc": "SAP231211JEA",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.525Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.525Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      },
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.525Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWLDW9Y",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "Estefania Mejia",
+    "puesto": null,
+    "telefono": "5567878140",
+    "email": "contabilidad2@totalmentereflejante.com",
+    "empresa": "TOTALMENTE REFLEJANTE",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "TRE1205305M1",
+    "estatus": "Potencial",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.525Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.525Z",
+    "created_at": "2026-10-12T17:19:03.525Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.525Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWLLCIX",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "RAUL CRUZ NIETO",
+    "puesto": null,
+    "telefono": "4421579696",
+    "email": "raul@t-reflex.com",
+    "empresa": "TREFLEX",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "TRE180928EM7",
+    "estatus": "Potencial",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.525Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.525Z",
+    "created_at": "2026-10-12T17:19:03.525Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
+        "fecha": "2026-10-12T17:19:03.525Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWM2RUD",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "SAMANTHA NAVARRO",
+    "puesto": null,
+    "telefono": "8123851020",
+    "email": "gerardo_gpg@hotmail.com",
+    "empresa": "AG. TRAUMA Y ORTOPEDIA",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "ATO110314DD7",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.526Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.526Z",
+    "created_at": "2026-10-12T17:19:03.526Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.526Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWMWY6N",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "CECILIA HERRERA",
+    "puesto": null,
+    "telefono": "9991000426",
+    "email": "cherrera@aproillubricants.com",
+    "empresa": "APROIL",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "APR190731EE7",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.526Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.526Z",
+    "created_at": "2026-10-12T17:19:03.526Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.526Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNBAR5",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "CARLOS VARGAS",
+    "puesto": null,
+    "telefono": "8110320809",
+    "email": "324cv9@sipav.com.mx",
+    "empresa": "ARTURO VARELA VARGAS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "VAVA690112DR4",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNGA2U",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ANAHI ALVARADO",
+    "puesto": null,
+    "telefono": "8110048256",
+    "email": "logistica@bnbsolutions.mx",
+    "empresa": "BNB SOLUTIONS SA DE CV",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "BSO181205799",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNKVWP",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "SUSANA ESMERALDA",
+    "puesto": null,
+    "telefono": "6641819552",
+    "email": "susana@caliresources.com.mx",
+    "empresa": "CALIRESOURCES DE BAJA CALIFORNIA",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "CBC130805LK8",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNWNG6",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ERNESTO PEÑA",
+    "puesto": null,
+    "telefono": "6681729995",
+    "email": "ventaslm@rodisacv.com",
+    "empresa": "COMPASS TECNOLOGIA EN EMPAQUE",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "CTE160305E51",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWN0ZZQ",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "DIANA REYES",
+    "puesto": null,
+    "telefono": "8129739320",
+    "email": "diana.reyesg@arcacontal.com",
+    "empresa": "COMPAÑIA TOPO CHICO",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "TCI200427743",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNYSH0",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "HUMBERTO VARELA",
+    "puesto": null,
+    "telefono": "6142546034",
+    "email": "humberto@alberochihuahua.com",
+    "empresa": "DISTRIBUIDORA WATO",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "DWA181207DL8",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNOQ1T",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "FERNANDO ROJO",
+    "puesto": null,
+    "telefono": "8123705234",
+    "email": "Frojo@teiker.mx",
+    "empresa": "ENVIOS Y SOLUCIONES TEIKER",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "EST180809PX2",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNDU8C",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "EDSON SALAS",
+    "puesto": null,
+    "telefono": "8120021890",
+    "email": null,
+    "empresa": "GERARDO ALBERTO SALAS RODRIGUEZ",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "SARG900424FC1",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNF4OT",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "GABRIEL CANTÚ",
+    "puesto": null,
+    "telefono": "8115318316",
+    "email": "gcantreyes@gmail.com",
+    "empresa": "GABRIEL CANTU REYES",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "CARG921121559",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      },
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNE066",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "SONIA FERNANDEZ",
+    "puesto": null,
+    "telefono": "8117066808",
+    "email": null,
+    "empresa": "IMPORTACIONES EPILSON",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "IEP200714I91",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWNQZJE",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JULIAN GARZA",
+    "puesto": null,
+    "telefono": "8120402953",
+    "email": "jgarza@wowmexico.mx",
+    "empresa": "IMPORTADORA WOW",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "IWO190909GQ1",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.527Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.527Z",
+    "created_at": "2026-10-12T17:19:03.527Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.527Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWO6YYJ",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "LUZ ELENA ESCOBEDO",
+    "puesto": null,
+    "telefono": "8115994890",
+    "email": "lucy@integraciondemarcas.com",
+    "empresa": "INTEGRACION DE MARCAS SA DE CV",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "IMA031127QQ5",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWO882I",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ANA GARCIA",
+    "puesto": null,
+    "telefono": "8122003242",
+    "email": "compras@jjsustentable.com",
+    "empresa": "JJ MATERIALES SUSTENTABLES",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "JMS080808BU5",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWOIAW5",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "PEDRO",
+    "puesto": null,
+    "telefono": "8115399841",
+    "email": "COMPRASLONGORIA@longoria.com.mx",
+    "empresa": "L. LONGORIA",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "LLO130705QJ2",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWO3FS4",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "FLOR TOVAR",
+    "puesto": null,
+    "telefono": "7291074932",
+    "email": "cuentasporcobrar@manaf.com.mx",
+    "empresa": "MANAF COMMERCE SA DE CV",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "MCO161014QX3",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWO05V4",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "KAREN GUTIERREZ",
+    "puesto": null,
+    "telefono": "5611114861",
+    "email": "importaciones@mexportmexico.com",
+    "empresa": "MEXPORT",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "MEX840809JB1",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWOCL25",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "BEATRIZ LOZA / KARLA MEDINA / SOFIA KIM",
+    "puesto": null,
+    "telefono": "5568781135",
+    "email": "beatriz.loza@navien.com",
+    "empresa": "NAVIEN MEXICO SA DE CV",
+    "tipo_carga": null,
+    "notas": "Tel. alterno: 5515077135",
+    "rutas": null,
+    "unidades": null,
+    "rfc": "NME1709068B3",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWOFP7H",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JOSE ANTONIO ESQUIVEL",
+    "puesto": null,
+    "telefono": "8180206242",
+    "email": "jaesquivel@lozano.com.mx",
+    "empresa": "PAPELERIA LOZANO HERMANOS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "PLH86093081A",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWOZBFD",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "EDUARDO ESTRADA",
+    "puesto": null,
+    "telefono": "5531386498",
+    "email": "eduardo_estrada@parautos.com.mx",
+    "empresa": "PARAUTOS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "PAR0104254U1",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWOEH4A",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "CARLOS YAÑEZ",
+    "puesto": null,
+    "telefono": "8127275070",
+    "email": "compras1@santre.org",
+    "empresa": "SANTRE INDUSTRIAL",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "SIN000918IE0",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWOO2QX",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JOAQUIN",
+    "puesto": null,
+    "telefono": "3314208469",
+    "email": "jefedealmacen@tecnopet.com.mx",
+    "empresa": "TECNOPET SA DE CV",
+    "tipo_carga": null,
+    "notas": "Tel. alterno: 3318710464",
+    "rutas": null,
+    "unidades": null,
+    "rfc": "TPE910918TQ4",
+    "estatus": "Intermitente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.528Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.528Z",
+    "created_at": "2026-10-12T17:19:03.528Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Intermitente)",
+        "fecha": "2026-10-12T17:19:03.528Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWPTQUH",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JESUS MARTÍNEZ",
+    "puesto": null,
+    "telefono": "8180913441",
+    "email": "jose.martinez@iconn.com.mx",
+    "empresa": "7-ELEVEN MEXICO SA DE CV",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "SEM980701STA",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWPMRRL",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "PEDRO MARTINEZ",
+    "puesto": null,
+    "telefono": "8116112274",
+    "email": "Pmartinez@corzengroup.com",
+    "empresa": "MULTICERAS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "MUL891229AB5",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      },
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWPS8NF",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ADRIANA ROSALES",
+    "puesto": null,
+    "telefono": "5665153921",
+    "email": null,
+    "empresa": "BONAFONT",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "BON9206241N5",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWPDMB4",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "MARIO RIVAS",
+    "puesto": null,
+    "telefono": "8112690625",
+    "email": "mrivas@bunzl.com.mx",
+    "empresa": "BUNZL DE MEXICO",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "BME9303056P2",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWP6P69",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "MELISSA ARROYO",
+    "puesto": null,
+    "telefono": "8112516499",
+    "email": "operaciones@mgsolucionesingtegrales.com",
+    "empresa": "COGONMAR",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "COG170524GH2",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWP0M5A",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "IRMA GRANDA",
+    "puesto": null,
+    "telefono": "5580764919",
+    "email": "Irma-Yaritza.GRANDA@danone.com",
+    "empresa": "ENVASADORAS DE AGUAS EN MEXICO",
+    "tipo_carga": null,
+    "notas": "Tel. alterno: 55 8531 5155",
+    "rutas": null,
+    "unidades": null,
+    "rfc": "EAM001231D51",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWP707E",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "Claudia Mayorga",
+    "puesto": null,
+    "telefono": "8180407070",
+    "email": "cmayorga@espomega.com",
+    "empresa": "ESPOMEGA",
+    "tipo_carga": null,
+    "notas": "Ext. 112",
+    "rutas": null,
+    "unidades": null,
+    "rfc": "ESP0401151D0",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWP4B2U",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JACINTO",
+    "puesto": null,
+    "telefono": "8111059178",
+    "email": "logistica@gonherrplast.com",
+    "empresa": "GONHERRPLAST",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "GON141023MG7",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWP8U97",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ERIKA SHUGERT",
+    "puesto": null,
+    "telefono": "6623405028",
+    "email": "admin@syslog-logistics.com",
+    "empresa": "JUAN JOSE SHUGERT VARELA",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "SUVJ550525GV3",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWPXOCU",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JEZIEL RAMOS",
+    "puesto": null,
+    "telefono": "8116008461",
+    "email": "jeziel@injusa.com",
+    "empresa": "JUGUETERA INJUMEX",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "JIN1509285M1",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWPLQNX",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "BENEDICTO CUEVAS",
+    "puesto": null,
+    "telefono": "5512490507",
+    "email": "benedicto.cuevas@iconn.com.mx",
+    "empresa": "MAS BODEGA Y LOGISTICA",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "CCA030408D46",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWPUF6D",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JULIO SIERRA",
+    "puesto": null,
+    "telefono": "8117785060",
+    "email": "julio.sierra@megaalimentos.com",
+    "empresa": "MEGA ALIMENTOS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "MAL870225MAA",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.529Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.529Z",
+    "created_at": "2026-10-12T17:19:03.529Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.529Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQ6JAP",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ANTONIO MOTA",
+    "puesto": null,
+    "telefono": "5537174742",
+    "email": "lmendoza@metapel.com.mx",
+    "empresa": "METAPEL",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "MET030602JU0",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQWXQX",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "GUSTAVO RAMOS",
+    "puesto": null,
+    "telefono": "8180653320",
+    "email": "multiquimicosmg@hotmail.com",
+    "empresa": "MULTIQUIMICOS INTERNACIONALES MG",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "MIM1107126F4",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQHW3H",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ALBERTO GARCIA",
+    "puesto": null,
+    "telefono": "8115388708",
+    "email": "adm@ofertasregio.mx",
+    "empresa": "OFERTAS REGIOMONTANAS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "ORE170208QX9",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQD0RI",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "BERENICE PINZON",
+    "puesto": null,
+    "telefono": "8130380993",
+    "email": "bpinzon@ogalabs.com",
+    "empresa": "OGA LABS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "OLA201222LR1",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQQSW4",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "BRENDA CLEMENTE",
+    "puesto": null,
+    "telefono": "3311570784",
+    "email": "AnaBrenda.Clemente@kdrp.com",
+    "empresa": "PEÑAFIEL BEBIDAS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "PBE900712TV4",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQAL71",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "ALEJANDRO ROCHA",
+    "puesto": null,
+    "telefono": "8711376318",
+    "email": null,
+    "empresa": "PRODUCTOS ALIMENTICIOS LA MODERNA",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "PAM781201CW0",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQ52WA",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "PAMELA ALAMILLA",
+    "puesto": null,
+    "telefono": "8126111685",
+    "email": "pamela.alamilla@sarotech.io",
+    "empresa": "SARO TECH SUMINISTROS",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "STS240524QP6",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MV5INXWQ9RZ4",
+    "agente_asignado": "SARA",
+    "tipo": "cliente",
+    "nombre_completo": "JUAN MATA",
+    "puesto": null,
+    "telefono": "8119921304",
+    "email": null,
+    "empresa": "YOGURT BOUTIQUE",
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": "YBO090804NY4",
+    "estatus": "Recurrente",
+    "fecha_primer_contacto": "2026-10-12T17:19:03.530Z",
+    "fecha_ultimo_contacto": "2026-10-12T17:19:03.530Z",
+    "created_at": "2026-10-12T17:19:03.530Z",
+    "interacciones": [
+      {
+        "agente": "SARA",
+        "canal": "permanente",
+        "resumen": "Alta desde cartera de clientes AppSheet (Recurrente)",
+        "fecha": "2026-10-12T17:19:03.530Z"
+      }
+    ]
   }
 ]

@@ -468,6 +468,38 @@ async function cargarRutas51a100({ archivo = 'proveedores-rutas-51-100.json', fl
   console.log(`[Contactos] Rutas 51-100: ${nuevos} proveedores nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
 }
 
+// ── Cartera de clientes de SARA (AppSheet, 12-oct-2026) ─────────────────────
+// backend/data/clientes-con-telefono-oct2026.json: los 55 clientes reales de
+// SARA con sus 6 datos de ficha (razón social, RFC, estatus, contacto, correo,
+// teléfono) — pedido explícito del usuario, mismos 6 campos que ya soporta
+// bloqueDatosCliente(). Se identifica por teléfono (a diferencia de los
+// clientes-destino del Top 50, que no traen uno). Se carga en orden
+// Potencial → Intermitente → Recurrente a propósito: si dos filas comparten
+// el mismo teléfono (pasa 3 veces en la fuente real — una persona de contacto
+// que figura para más de una empresa), la última en cargarse gana el campo
+// "empresa", y así la más importante (Recurrente) nunca queda pisada por una
+// Potencial/Intermitente cargada después.
+async function cargarClientesConTelefono({ archivo = 'clientes-con-telefono-oct2026.json', flag = 'clientes-telefono-oct-2026' } = {}) {
+  if (leerFlags()[flag]) return;
+  let clientes;
+  try { clientes = require('../data/' + archivo); } catch { return; }
+  let nuevos = 0, actualizados = 0, fallos = 0;
+  for (const cl of clientes) {
+    try {
+      const existente = await buscarPorTelefono(cl.telefono, 'sara');
+      await upsertContacto({
+        agente: 'sara', tipo: 'cliente',
+        nombre_completo: cl.nombre_completo || cl.empresa, telefono: cl.telefono, email: cl.email || null,
+        empresa: cl.empresa, rfc: cl.rfc || null, estatus: cl.estatus || null, notas: cl.notas || null,
+        resumen_interaccion: `Alta desde cartera de clientes AppSheet (${cl.estatus})`, canal: 'permanente',
+      });
+      if (existente) actualizados++; else nuevos++;
+    } catch (e) { fallos++; console.error(`[Contactos] Error cargando cliente ${cl.empresa}:`, e.message); }
+  }
+  if (!fallos) marcarFlag(flag);
+  console.log(`[Contactos] Cartera de clientes SARA: ${nuevos} clientes nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
+}
+
 // ── Clientes (destino) del Top 50 de rutas ──────────────────────────────────
 // backend/data/clientes-top50-rutas.json: la empresa/CEDIS que RECIBE la carga
 // en cada una de las 50 rutas (columna "Cliente / Destino" del PDF, distinta
@@ -590,6 +622,7 @@ async function sembrarCatalogos() {
   await cargarTop50Rutas();
   await cargarRutas51a100();
   await cargarClientesTop50Rutas();
+  await cargarClientesConTelefono();
   await unidadPorDefectoProveedores();
 }
 
