@@ -212,8 +212,11 @@ async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, 
 
 async function listarContactosPorAgente(agente, { tipo, q } = {}) {
   const AGENTE = agente.toUpperCase();
-  const cond = [`(agente_asignado = $1 OR id IN (SELECT contacto_id FROM interacciones WHERE agente = $1))`];
-  const vals = [AGENTE];
+  // NOA no da de alta contactos propios — vigila viajes que arman SARA y
+  // SOFIA, así que ve la base completa sin filtrar por agente_asignado
+  // (mismo criterio que la versión de archivo en contactos.js).
+  const cond = AGENTE === 'NOA' ? ['1=1'] : [`(agente_asignado = $1 OR id IN (SELECT contacto_id FROM interacciones WHERE agente = $1))`];
+  const vals = AGENTE === 'NOA' ? [] : [AGENTE];
   if (tipo) { vals.push(tipo); cond.push(`tipo = $${vals.length}`); }
   if (q) {
     vals.push(`%${q}%`);
