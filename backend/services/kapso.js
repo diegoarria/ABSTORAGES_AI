@@ -1,38 +1,45 @@
-// ── WhatsApp de SOFIA vía Kapso (número +52 1 81 3590 9778) ──────────────────
+// ── WhatsApp de SARA y SOFIA vía Kapso ───────────────────────────────────────
 // Segunda vía de WhatsApp, independiente de Twilio (ver sendWhatsApp en
-// server-lite.js, que hoy maneja el número de Twilio de SARA/SOFIA). Este
-// número nuevo es específicamente el de SOFIA — no reemplaza el de SARA.
-// Kapso expone la Cloud API de Meta directamente, no una API propia de alto
-// nivel como el Content API de Twilio.
-// Setup hecho el 06-oct-2026: número conectado y verificado en Kapso
-// (status CONNECTED, code_verification_status VERIFIED), login de CLI hecho
-// como diego.arria19@gmail.com, proyecto "Nuvos AI". Webhook de recepción
-// AÚN NO registrado contra este servidor (falta correr
-// `kapso whatsapp webhooks new --url <url pública>/webhook/kapso
-// --phone-number-id 1433231719864226 --event whatsapp.message.received
-// --active` una vez que haya una URL pública estable).
-// Este archivo solo trae la plomería (enviar + verificar firma de entrada);
-// todavía NO está conectado a la lógica de SOFIA (ver webhook en
-// server-lite.js) — ese cableado es un paso aparte, a propósito, para no
-// tocar el flujo de Twilio que ya está en producción. Cuando se conecte,
-// debe mapear este número SOLO al agente 'sofia' (igual que WA_NUMBERS.sofia
-// en server-lite.js), nunca a SARA.
+// server-lite.js). Kapso expone la Cloud API de Meta directamente, no una
+// API propia de alto nivel como el Content API de Twilio.
+// Un número por agente, igual que ya existe con Twilio (WA_NUMBERS en
+// server-lite.js) — NUNCA se cruzan entre sí.
+//
+// Números conectados y verificados en Kapso (proyecto "Nuvos AI",
+// diego.arria19@gmail.com):
+//   SOFIA — +52 1 81 3590 9778 — phone_number_id 1433231719864226 (06-oct-2026)
+//   SARA  — +52 1 81 8685 8950 — phone_number_id 1337732556092248 (12-oct-2026)
+// Webhook único (/webhook/kapso en server-lite.js) registrado contra ambos
+// números — el payload entrante trae su propio phone_number_id, con eso se
+// decide a qué agente pertenece el mensaje (ver resolverAgente abajo).
 const crypto = require('crypto');
 
 const API_BASE   = 'https://api.kapso.ai';
 const KAPSO_KEY  = process.env.KAPSO_API_KEY;
-const PHONE_ID   = process.env.KAPSO_PHONE_NUMBER_ID;
-const WEBHOOK_SECRET = process.env.KAPSO_WEBHOOK_SECRET; // se define al crear el webhook (--secret-key)
-const LIVE = !!(KAPSO_KEY && PHONE_ID);
+const WEBHOOK_SECRET = process.env.KAPSO_WEBHOOK_SECRET; // mismo secret para todos los números del proyecto
 
-async function enviarMensaje(to, texto) {
+// phone_number_id por agente — agregar aquí cuando se conecte el de NOA.
+const PHONE_IDS = {
+  sofia: process.env.KAPSO_PHONE_NUMBER_ID,       // ya existía, se mantiene el nombre del env var para no romper producción
+  sara:  process.env.KAPSO_PHONE_NUMBER_ID_SARA,
+};
+const LIVE = !!KAPSO_KEY;
+
+// A qué agente pertenece un phone_number_id entrante del webhook.
+function resolverAgente(phoneNumberId) {
+  const entrada = Object.entries(PHONE_IDS).find(([, id]) => id && id === String(phoneNumberId));
+  return entrada ? entrada[0] : null;
+}
+
+async function enviarMensaje(to, texto, agente = 'sofia') {
   const destino = String(to || '').replace(/\D/g, '');
   if (!destino) return null;
-  if (!LIVE) {
-    console.log(`[kapso STUB] → ${destino}: ${String(texto || '').slice(0, 80)}`);
+  const phoneId = PHONE_IDS[agente];
+  if (!LIVE || !phoneId) {
+    console.log(`[kapso STUB] (${agente}) → ${destino}: ${String(texto || '').slice(0, 80)}`);
     return { status: 'stub', to: destino };
   }
-  const r = await fetch(`${API_BASE}/meta/whatsapp/v24.0/${PHONE_ID}/messages`, {
+  const r = await fetch(`${API_BASE}/meta/whatsapp/v24.0/${phoneId}/messages`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-API-Key': KAPSO_KEY },
     body: JSON.stringify({
@@ -62,4 +69,4 @@ function verificarFirma(rawBody, firmaHeader) {
   }
 }
 
-module.exports = { enviarMensaje, verificarFirma, LIVE };
+module.exports = { enviarMensaje, verificarFirma, resolverAgente, LIVE };

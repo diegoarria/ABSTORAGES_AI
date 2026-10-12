@@ -333,14 +333,14 @@ async function sendWhatsApp(to, text, agente = 'noa') {
 // Mismo filtrado que sendWhatsApp (prepararTextoWA), pero manda por Kapso —
 // el número de SOFIA +52 1 81 3590 9778 (ver backend/services/kapso.js).
 // Nunca para sara/noa: ese número es solo de SOFIA.
-async function sendWhatsAppKapso(to, text) {
+async function sendWhatsAppKapso(to, text, agente = 'sofia') {
   text = await prepararTextoWA(text, to);
   if (!text) { console.log(`[WA-Kapso] Mensaje vacío tras filtrar control, no se envía a ${to}`); return; }
   try {
-    await kapso.enviarMensaje(to, text);
-    console.log(`[WA-Kapso] OK → ${to}`);
+    await kapso.enviarMensaje(to, text, agente);
+    console.log(`[WA-Kapso] (${agente}) OK → ${to}`);
   } catch (e) {
-    console.error('[WA-Kapso] Error enviando:', e.message);
+    console.error(`[WA-Kapso] (${agente}) Error enviando:`, e.message);
   }
 }
 
@@ -1135,6 +1135,147 @@ async function manejarMensajeKapso(phone, texto) {
   if (esPrimerMensaje) pushActividad({ agente: 'SOFIA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp vía Kapso: ${phone}`, sessionId: session });
 }
 
+// ─── WhatsApp de SARA vía Kapso (número +52 1 81 8685 8950) ─────────────────
+// Mismo criterio que manejarMensajeKapso (SOFIA) — duplica la orquestación
+// de SARA del webhook de Twilio en vez de parametrizarla, por el mismo
+// motivo: no tocar el handler de Twilio que ya está en producción.
+const AGENTE_KAPSO_SARA = 'sara';
+async function manejarMensajeKapsoSara(phone, texto) {
+  if (emergencyShutdown.estaActivo()) { console.log(`[Kapso-IN-SARA] apagado de emergencia activo, ignorando mensaje de ${phone}`); return; }
+  if (phoneBanlist.estaBaneado(phone)) { console.log(`[Kapso-IN-SARA] teléfono baneado, ignorando mensaje de ${phone}`); return; }
+  if (Date.now() < MANTENIMIENTO_HASTA.getTime()) { console.log(`[Kapso-IN-SARA] en mantenimiento forzado, ignorando mensaje de ${phone}`); return; }
+
+  const session = `wa_sara_${phone}`;
+  const { contextBlock, history } = memory.buildContext(session);
+  const esPrimerMensaje = history.length === 0;
+  const tariffCtx = tariff.getContext();
+  let systemPrompt = buildPrompt(AGENTE_KAPSO_SARA, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
+  const personaEquipo = staffDirectory.buscarPorTelefono(phone);
+  systemPrompt += `\n\nHoy es ${new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeZone: 'America/Monterrey' }).format(new Date())} (hora de Monterrey). Fecha en formato AAAA-MM-DD: ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())}.`;
+  if (personaEquipo) {
+    systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
+    systemPrompt += folioContexto.bloque();
+  } else {
+    const foliosPersona = folioContexto.foliosPorTelefono(phone);
+    if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
+    const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_SARA);
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+  }
+
+  if (promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
+    memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto); saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA, AGENTE_KAPSO_SARA);
+    return;
+  }
+  if (promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
+    memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto); saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    pushActividad({ agente: 'SARA', tipo: 'ALERTA_FUGA_PROMPT', mensaje: texto.slice(0, 200), sessionId: session });
+    phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_SARA }).catch(() => {});
+    registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone}`);
+    ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_SARA, motivo: texto.slice(0, 300), severity: 'critical' });
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_SARA);
+    return;
+  }
+  if (personaEquipo?.nombre !== 'Diego') {
+    const palabra = attackWordlist.detectar(texto);
+    if (palabra) {
+      const telefonoNorm = phoneBanlist.normalizar(phone);
+      const { count, alcanzoLimite } = attackStrikes.registrar(telefonoNorm, palabra);
+      pushActividad({ agente: 'SARA', tipo: 'ALERTA_INTENTO_ATAQUE', mensaje: `"${palabra}" (intento ${count}/${attackStrikes.LIMITE})`, sessionId: session });
+      if (alcanzoLimite) {
+        memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto); saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        phoneBanlist.banear({ telefono: phone, motivo: `3 intentos de ataque — último: "${palabra}" en "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_SARA }).catch(() => {});
+        registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone} (3 strikes)`);
+        ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_SARA, motivo: `3er intento: "${palabra}"`, severity: 'critical' });
+        sendPush({ title: '🚫 Teléfono baneado — 3 intentos de ataque', body: `SARA · ${phone} · última palabra: "${palabra}"`, tag: 'telefono-baneado', url: '/', tipo: 'ALERTA_INTENTO_ATAQUE', urgente: true }).catch(() => {});
+        await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_SARA);
+        return;
+      }
+    }
+  }
+
+  if (tms.ENABLED) { const tmsCtx = await tms.getContextoSARA(texto); if (tmsCtx) systemPrompt += tmsCtx; }
+
+  memory.addMessage(session, 'user', texto);
+  saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto);
+
+  await humanDelay.esperar(texto);
+  let respuesta = '';
+  await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
+  memory.addMessage(session, 'assistant', respuesta);
+  saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', respuesta);
+
+  const textoLimpio = limpiarControlParaCliente(respuesta);
+  for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque, AGENTE_KAPSO_SARA);
+
+  // Cliente confirmó que sigue necesitando la unidad con urgencia — se
+  // cierra automático con el proveedor recomendado (mismo flujo que Twilio).
+  if (!personaEquipo) {
+    const cu = respuesta.match(/CONFIRMAR_UNIDAD_URGENTE\s*:\s*(\{[^\n]+\})/i);
+    if (cu) {
+      let d = {}; try { d = JSON.parse(cu[1]); } catch {}
+      if (d.folio) sofiaOperacion.confirmarUrgentePorCliente(d.folio).catch(e => console.error('[sara-kapso] Error confirmando urgencia:', e.message));
+    }
+  }
+
+  if (!personaEquipo) {
+    try {
+      const conocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_SARA).catch(() => null);
+      const quien = conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : phone;
+      const corto = t => String(t || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+      pushActividad({ agente: 'SARA', tipo: 'CONVERSACION_WA', mensaje: `${quien}: "${corto(texto)}" → SARA: "${corto(textoLimpio)}"`, sessionId: session, metadata: { telefono: phone, tipoContacto: conocido?.tipo || null, via: 'kapso' } });
+
+      const ahoraMs = Date.now();
+      if (ahoraMs - (_ultimoEmailRespuesta.get(phone) || 0) > 10 * 60 * 1000) {
+        _ultimoEmailRespuesta.set(phone, ahoraMs);
+        notifier.notificarRespuestaSara({ quien: conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo', tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), respuestaSara: textoLimpio.slice(0, 800), sessionId: session }).catch(() => {});
+      }
+    } catch (e) { console.error('[Kapso-SARA monitoreo en vivo]', e.message); }
+
+    // Mismo flujo de captura/cierre que el chat del portal y el webhook de Twilio.
+    const hasCierre  = /NUEVA_ORDEN/i.test(respuesta);
+    const hasEscalar = /ESCALAR_HUMANO/i.test(respuesta);
+    const hasCerrar  = /CERRAR_CHAT/i.test(respuesta);
+    const sara_nota  = hasCierre ? 'cierre_de_venta' : hasEscalar ? 'escalado_a_operaciones' : hasCerrar ? 'chat_cerrado' : 'cotizacion_en_proceso';
+
+    const leadDataMatch = respuesta.match(/LEAD_DATA:\s*(\{[^\n]+\})/);
+    let datosSara = {};
+    if (leadDataMatch) { try { datosSara = JSON.parse(leadDataMatch[1]); } catch {} }
+
+    const primer_mensaje = (history.find(m => m.role === 'user')?.content || texto).slice(0, 300);
+    const lead = leads.add({ ...datosSara, sara_nota, primer_mensaje, sessionId: session, canal: 'whatsapp' });
+
+    if (hasCierre) {
+      pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: session });
+      sendPush({
+        title: '🚛 Nueva orden — SARA (Kapso)',
+        body: `${lead.empresa || lead.nombre || 'Cliente'} · ${lead.origen || ''}→${lead.destino || ''} · Folio ${lead.folio || ''}`,
+        tag: 'nueva-orden', url: '/', tipo: 'NUEVA_ORDEN', urgente: true,
+      }).catch(() => {});
+      await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore Kapso]', e.message));
+      contactos.upsertContacto({
+        agente: 'sara', tipo: 'cliente',
+        nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
+        empresa: lead.empresa, tipo_carga: lead.tipo_carga, rfc: lead.rfc,
+        resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
+        canal: 'whatsapp',
+      }).catch(e => console.error('[contactos]', e.message));
+      buscarUnidadParaOrden(lead);
+    }
+
+    if (esPrimerMensaje) notifier.notificarLead(lead).catch(e => console.error('[notifier Kapso primer-contacto]', e.message));
+    if (hasCierre || hasEscalar || hasCerrar) {
+      const histWA = memory.buildContext(session).history || [];
+      notifier.notificarResumen(lead, sara_nota, histWA).catch(e => console.error('[notifier Kapso resumen]', e.message));
+    }
+  }
+
+  if (esPrimerMensaje) pushActividad({ agente: 'SARA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp vía Kapso: ${phone}`, sessionId: session });
+}
+
 app.post('/webhook/kapso', (req, res) => {
   res.sendStatus(200); // Kapso exige 200 en <10s — se contesta antes de procesar
   const firma = req.headers['x-webhook-signature'];
@@ -1151,8 +1292,14 @@ app.post('/webhook/kapso', (req, res) => {
       const from = msg.from;
       if (!from || !texto) { console.log('[Kapso-IN] sin from/texto, ignorando'); return; }
       const phone = `+${String(from).replace(/\D/g, '')}`;
-      console.log(`[Kapso-IN] de ${phone}: ${texto.slice(0, 200)}`);
-      await manejarMensajeKapso(phone, texto);
+      // El payload trae su propio phone_number_id — con eso se decide si el
+      // mensaje es para SOFIA o para SARA (cada quien su número en Kapso).
+      const phoneNumberId = req.body?.phone_number_id || req.body?.conversation?.phone_number_id;
+      const agenteDestino = kapso.resolverAgente(phoneNumberId);
+      console.log(`[Kapso-IN] (${agenteDestino || 'desconocido'}) de ${phone}: ${texto.slice(0, 200)}`);
+      if (agenteDestino === 'sara') await manejarMensajeKapsoSara(phone, texto);
+      else if (agenteDestino === 'sofia') await manejarMensajeKapso(phone, texto);
+      else console.warn(`[Kapso-IN] phone_number_id desconocido (${phoneNumberId}), mensaje ignorado`);
     } catch (e) {
       console.error('[Kapso webhook]', e.message);
     }
