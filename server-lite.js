@@ -868,7 +868,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
         contactos.upsertContacto({
           agente: 'sara', tipo: 'cliente',
           nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
-          empresa: lead.empresa, tipo_carga: lead.tipo_carga,
+          empresa: lead.empresa, tipo_carga: lead.tipo_carga, rfc: lead.rfc,
           resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
           canal: 'whatsapp',
         }).catch(e => console.error('[contactos]', e.message));
@@ -2219,7 +2219,7 @@ app.post('/api/admin/nueva-orden-manual', soloAdmin, async (req, res) => {
     await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
     contactos.upsertContacto({
       agente: 'sara', tipo: 'cliente',
-      nombre_completo: nombre, telefono, email, empresa, tipo_carga,
+      nombre_completo: nombre, telefono, email, empresa, tipo_carga, rfc,
       resumen_interaccion: `Folio ${folio} — ${origen} → ${destino} (orden manual)`,
       canal: 'manual',
     }).catch(e => console.error('[contactos]', e.message));
@@ -3565,7 +3565,7 @@ async function handleChat(agente, req, res) {
         contactos.upsertContacto({
           agente: 'sara', tipo: 'cliente',
           nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
-          empresa: lead.empresa, tipo_carga: lead.tipo_carga,
+          empresa: lead.empresa, tipo_carga: lead.tipo_carga, rfc: lead.rfc,
           resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
           canal: 'chat',
         }).catch(e => console.error('[contactos]', e.message));

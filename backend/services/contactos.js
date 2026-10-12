@@ -37,7 +37,7 @@ function normalizarTelefono(t) {
   return (t || '').replace(/\D/g, '').slice(-10);
 }
 
-function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas, unidades }) {
+function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas, unidades, rfc, estatus }) {
   const AGENTE = (agente || '').toUpperCase();
   const tel = normalizarTelefono(telefono);
   let existente = null;
@@ -57,6 +57,8 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
     existente.notas           = notas || existente.notas;
     existente.rutas           = rutas || existente.rutas;
     existente.unidades        = unidades || existente.unidades;
+    existente.rfc             = rfc || existente.rfc;
+    existente.estatus         = estatus || existente.estatus || (tipo === 'cliente' || existente.tipo === 'cliente' ? 'Activo' : existente.estatus);
     existente.fecha_ultimo_contacto = ahora;
     contacto = existente;
   } else {
@@ -65,6 +67,7 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
       agente_asignado: AGENTE, tipo: tipo || null,
       nombre_completo: nombre_completo || 'Sin nombre', puesto: puesto || null, telefono: telefono || null,
       email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null, rutas: rutas || null, unidades: unidades || null,
+      rfc: rfc || null, estatus: estatus || (tipo === 'cliente' ? 'Activo' : null),
       fecha_primer_contacto: ahora, fecha_ultimo_contacto: ahora, created_at: ahora,
     };
     cache.push(contacto);
@@ -220,9 +223,28 @@ const TRATO_PROVEEDOR_BD =
 // nuevo — ni fría/de formulario, ni casual como con un proveedor de confianza.
 const TRATO_CLIENTE_BD =
   `\n\n## 🤝 TRATO CON ESTE CLIENTE — YA TIENE RELACIÓN COMERCIAL CON ABSTORAGES\n` +
-  `Mantén tu registro profesional de ejecutiva comercial — formal, no de amigos — pero trátalo como a alguien que ya conoces, no como un prospecto nuevo. ` +
-  `Salúdalo por su nombre, da continuidad natural a lo que ya han hablado o cotizado antes, y no repitas el proceso de calificación inicial ni le pidas otra vez datos que ya tienes. ` +
-  `No suene a primer contacto ni a formulario — suena a alguien que se acuerda de la relación comercial, con la calidez de un trato ya establecido, sin perder la formalidad.\n`;
+  `Trátalo como si la relación ya tuviera años — porque la tiene — pero SIEMPRE con registro formal y ejecutivo: cordial, amable, de servicio, enfocada en resolver y en estar disponible para él en todo momento. ` +
+  `Nunca lenguaje amigable/casual ni mucho menos grosero — con clientes NO es el trato relajado que usas con proveedores de confianza, es profesionalismo cálido, no cercanía informal. ` +
+  `Salúdalo por su nombre, da continuidad natural a lo que ya han hablado o cotizado antes, y no repitas el proceso de calificación inicial ni le pidas otra vez datos que ya tienes (ver los datos del cliente abajo). ` +
+  `No suene a primer contacto ni a formulario — suena a una ejecutiva que se acuerda perfectamente de la relación comercial, con la calidez de un trato ya establecido, sin perder jamás la formalidad.\n`;
+
+// Para clientes (no proveedores), SARA necesita ver los 6 datos del perfil
+// explícitos — no solo nombre/empresa — para no volver a pedirlos nunca:
+// Cliente/Razón Social, RFC, Estatus, Nombre de contacto, Correo, Teléfono.
+// Pedido explícito del usuario (12-oct-2026): si falta el correo, NUNCA
+// pedírselo — ya se le identifica por teléfono, eso basta.
+function bloqueDatosCliente(contacto) {
+  const campo = (label, valor) => `- **${label}:** ${valor || 'no disponible — no se lo pidas, sigue la conversación normal'}`;
+  return (
+    `\n**Datos del cliente en la Base de Datos:**\n` +
+    `${campo('Cliente / Razón social', contacto.empresa)}\n` +
+    `${campo('RFC', contacto.rfc)}\n` +
+    `${campo('Estatus', contacto.estatus)}\n` +
+    `${campo('Nombre de contacto', contacto.nombre_completo)}\n` +
+    `${campo('Correo electrónico', contacto.email)}\n` +
+    `${campo('Teléfono', contacto.telefono)}\n`
+  );
+}
 
 function bloqueContactoConocido(contacto) {
   const interacciones = (contacto.interacciones || []).slice(0, 5)
@@ -233,9 +255,10 @@ function bloqueContactoConocido(contacto) {
     `**${contacto.nombre_completo}**${contacto.empresa ? ` — ${contacto.empresa}` : ''} (${contacto.tipo || 'contacto'}). ` +
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
     (contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : contacto.tipo === 'cliente' ? TRATO_CLIENTE_BD : '') +
+    (contacto.tipo === 'cliente' ? bloqueDatosCliente(contacto) : '') +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
     (interacciones ? `Interacciones previas relevantes:\n${interacciones}\n\n` : '\n') +
-    `IMPORTANTE: esta persona YA está registrada en la Base de Datos de ABSTORAGES — NO le pidas nombre completo, teléfono ni correo, y NO apliques la regla de "PRIMER MENSAJE" con ella (esa regla es solo para desconocidos). Si te saluda, salúdala por su nombre y sigue la conversación normal.\n` +
+    `IMPORTANTE: esta persona YA está registrada en la Base de Datos de ABSTORAGES — NO le pidas nombre completo, teléfono ni correo (aunque el correo esté vacío, NO se lo pidas: ya lo identificas por teléfono), y NO apliques la regla de "PRIMER MENSAJE" con ella (esa regla es solo para desconocidos). Si te saluda, salúdala por su nombre y sigue la conversación normal.\n` +
     `Ya la conoces — no repitas preguntas que ya tienes contestadas ahí, y usa ese historial para dar continuidad natural a la conversación. No lo menciones de forma robótica ("según mis registros..."), solo úsalo como lo haría alguien que de verdad se acuerda.`
   );
 }

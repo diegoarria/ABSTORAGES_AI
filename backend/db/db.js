@@ -155,13 +155,13 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
 let columnasContactos = null;
 function asegurarColumnasContactos() {
   if (!columnasContactos) {
-    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT, ADD COLUMN IF NOT EXISTS tarifas TEXT')
+    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT, ADD COLUMN IF NOT EXISTS tarifas TEXT, ADD COLUMN IF NOT EXISTS rfc TEXT, ADD COLUMN IF NOT EXISTS estatus TEXT')
       .catch(e => { columnasContactos = null; throw e; });
   }
   return columnasContactos;
 }
 
-async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, unidades, resumen_interaccion, canal }) {
+async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, unidades, resumen_interaccion, canal, rfc, estatus }) {
   await asegurarColumnasContactos();
   let existente = null;
   if (telefono) {
@@ -185,16 +185,18 @@ async function upsertContacto({ agente, tipo, nombre_completo, telefono, email, 
          notas           = COALESCE(NULLIF($6,''), notas),
          rutas           = COALESCE(NULLIF($8,''), rutas),
          unidades        = COALESCE(NULLIF($9,''), unidades),
+         rfc             = COALESCE(NULLIF($10,''), rfc),
+         estatus         = COALESCE(NULLIF($11,''), estatus, CASE WHEN tipo = 'cliente' THEN 'Activo' ELSE NULL END),
          fecha_ultimo_contacto = NOW()
        WHERE id = $7 RETURNING *`,
-      [nombre_completo || '', telefono || '', email || '', empresa || '', tipo_carga || '', notas || '', existente.id, rutas || '', unidades || '']
+      [nombre_completo || '', telefono || '', email || '', empresa || '', tipo_carga || '', notas || '', existente.id, rutas || '', unidades || '', rfc || '', estatus || '']
     );
     contacto = rows[0];
   } else {
     const { rows } = await query(
-      `INSERT INTO contactos (agente_asignado, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, unidades)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-      [agente.toUpperCase(), tipo, nombre_completo || 'Sin nombre', telefono || null, email || null, empresa || null, tipo_carga || null, notas || null, rutas || null, unidades || null]
+      `INSERT INTO contactos (agente_asignado, tipo, nombre_completo, telefono, email, empresa, tipo_carga, notas, rutas, unidades, rfc, estatus)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+      [agente.toUpperCase(), tipo, nombre_completo || 'Sin nombre', telefono || null, email || null, empresa || null, tipo_carga || null, notas || null, rutas || null, unidades || null, rfc || null, estatus || (tipo === 'cliente' ? 'Activo' : null)]
     );
     contacto = rows[0];
   }
