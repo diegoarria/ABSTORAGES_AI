@@ -785,13 +785,18 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
         const A = agente.toUpperCase();
         pushActividad({ agente: A, tipo: 'CONVERSACION_WA', mensaje: `${quien}: "${corto(texto)}" → ${A}: "${corto(limpiarControlParaCliente(respuesta))}"`, sessionId: session, metadata: { telefono: phone, tipoContacto: conocido?.tipo || null } });
 
-        // Email a Diego y Rafael cuando alguien le contesta a SOFIA (máx. 1 cada 10 min por persona,
-        // para que una conversación de varios mensajes no llene el correo)
-        if (agente === 'sofia') {
+        // Email cuando alguien le contesta a SOFIA o a SARA (máx. 1 cada 10 min
+        // por persona, para que una conversación de varios mensajes no llene
+        // el correo) — mismo criterio para las dos, cada una a su propia
+        // lista de destinatarios (operaciones para SOFIA, comercial para SARA).
+        if (agente === 'sofia' || agente === 'sara') {
           const ahoraMs = Date.now();
           if (ahoraMs - (_ultimoEmailRespuesta.get(phone) || 0) > 10 * 60 * 1000) {
             _ultimoEmailRespuesta.set(phone, ahoraMs);
-            notifier.notificarRespuestaSofia({ quien: conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo', tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), respuestaSofia: limpiarControlParaCliente(respuesta).slice(0, 800), sessionId: session }).catch(() => {});
+            const quienEmail = conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo';
+            const datos = { quien: quienEmail, tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), sessionId: session };
+            if (agente === 'sofia') notifier.notificarRespuestaSofia({ ...datos, respuestaSofia: limpiarControlParaCliente(respuesta).slice(0, 800) }).catch(() => {});
+            else notifier.notificarRespuestaSara({ ...datos, respuestaSara: limpiarControlParaCliente(respuesta).slice(0, 800) }).catch(() => {});
           }
         }
 

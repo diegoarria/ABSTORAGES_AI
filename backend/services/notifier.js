@@ -359,6 +359,15 @@ const EQUIPO_OPS_EMAILS = [
   'yamilet.gamez@abstorages.com',
 ];
 const RESPUESTA_SOFIA_EMAILS = [...ALERT_EMAILS, ...EQUIPO_OPS_EMAILS];
+
+// Equipo comercial — mismo criterio que EQUIPO_OPS_EMAILS pero para SARA
+// (pedido explícito del usuario, 12-oct-2026): avisar cuando alguien le
+// conteste a SARA por WhatsApp, igual que ya se hace con SOFIA.
+const EQUIPO_COMERCIAL_EMAILS = [
+  'fabiola.perez@abstorages.com',
+  'guadalupe.dalera@abstorages.com',
+];
+const RESPUESTA_SARA_EMAILS = [...ALERT_EMAILS, ...EQUIPO_COMERCIAL_EMAILS];
 const DISPONIBILIDAD_LISTA_EMAILS = [...ALERT_EMAILS, ...EQUIPO_OPS_EMAILS];
 
 async function notificarAlerta({ title, body, tipo }) {
@@ -491,6 +500,39 @@ async function notificarRespuestaSofia({ quien, tipo, telefono, texto, respuesta
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a SOFIA:', e.message); }
 }
 
+// Alguien le contestó a SARA por WhatsApp — mismo formato que
+// notificarRespuestaSofia (incluye botón "Ver chat en tiempo real"), pero
+// para el equipo comercial en vez del de operaciones.
+async function notificarRespuestaSara({ quien, tipo, telefono, texto, respuestaSara, sessionId }) {
+  const asunto = `SARA — ${quien} le contestó por WhatsApp`;
+  const hora = new Date().toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey' });
+  const bloque = (titulo, t) => `<div style="margin:0 0 14px;"><div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">${esc(titulo)}</div><div style="font-size:14px;color:#111;white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">${esc(t)}</div></div>`;
+  const linkChat = sessionId ? `${PORTAL_URL}/ver-chat.html?token=${chatViewTokens.crear(sessionId, { nombre: quien, telefono })}` : null;
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#0f1d4a;padding:18px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">SARA · ABSTORAGES</div>
+      <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Respuesta por WhatsApp · ${esc(hora)}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#111;"><strong>${esc(quien)}</strong>${tipo ? ` (${esc(tipo)})` : ''}${telefono ? ` · ${esc(telefono)}` : ''} le contestó a SARA.</p>
+      ${bloque('Lo que escribió', texto || '(mensaje sin texto — posible imagen o audio)')}
+      ${respuestaSara ? bloque('Lo que respondió SARA', respuestaSara) : ''}
+      <p style="margin:0;font-size:12px;color:#6b7280;">Puedes ver la conversación completa en Historial.</p>
+    </div>
+    ${linkChat ? `
+    <div style="padding:0 24px 22px;text-align:center;">
+      <a href="${linkChat}" style="display:inline-block;background:#0f1d4a;color:#fff;padding:11px 26px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">Ver chat en tiempo real →</a>
+      <p style="margin:8px 0 0;font-size:11px;color:#9ca3af;">Solo esa conversación, modo observador — sin poder editar ni borrar nada.</p>
+    </div>` : ''}
+  </div>`;
+  if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
+  try {
+    await gmailTransport.sendMail({ from: `SARA ABSTORAGES <${GMAIL_USER}>`, to: RESPUESTA_SARA_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de respuesta a SARA enviado a ${RESPUESTA_SARA_EMAILS.join(', ')}`);
+  } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a SARA:', e.message); }
+}
+
 // Lista completa de proveedores con unidades disponibles — fecha, ruta,
 // nombre y teléfono. Se manda dos veces al día (7:00 AM y 19:05, ver
 // reporteDisponibilidad.js) a Diego, Rafael y Gabriel.
@@ -610,4 +652,4 @@ async function notificarProveedorNuevo({ nombre, telefono, empresa, unidades, ru
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de proveedor nuevo:', e.message); }
 }
 
-module.exports = { notificarRespuestaSofia, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta, notificarProveedorNuevo };
+module.exports = { notificarRespuestaSofia, notificarRespuestaSara, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta, notificarProveedorNuevo };
