@@ -609,6 +609,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     if (personaEquipo) {
       systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
       if (agente === 'sofia') systemPrompt += await contactos.bloqueDirectorioProveedores();
+      if (agente === 'noa') systemPrompt += await contactos.bloqueDirectorioNOA();
       systemPrompt += folioContexto.bloque(); // panorama completo de lo que el equipo está pidiendo
     } else {
       // Proveedor o cliente: solo el folio en el que participa
@@ -1408,6 +1409,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // conocido (proveedor/cliente con historial real)? El grupo se salta
       // esto porque ahí todos son equipo interno por definición.
       if (personaEquipo && agente === 'sofia') systemPrompt += await contactos.bloqueDirectorioProveedores();
+      if (personaEquipo && agente === 'noa') systemPrompt += await contactos.bloqueDirectorioNOA();
       if (personaEquipo) systemPrompt += folioContexto.bloque();
       else if (!esGrupo) {
         const foliosPersona = [...folioContexto.foliosPorTelefono(remitentePhone), ...(agente === 'sofia' ? colocaciones.porTelefono(remitentePhone, false).map(c => c.folio) : [])];
@@ -3433,6 +3435,7 @@ async function handleChat(agente, req, res) {
   }
 
   if (agente === 'sofia' && req.user) systemPrompt += await contactos.bloqueDirectorioProveedores();
+  if (agente === 'noa' && req.user) systemPrompt += await contactos.bloqueDirectorioNOA();
   if (req.user) systemPrompt += folioContexto.bloque();
 
   if (callMode) systemPrompt += '\n\n🎙️ MODO LLAMADA DE VOZ: El cliente está en una llamada. Responde en máximo 2 oraciones cortas y directas. Sin listas, sin markdown, sin asteriscos. Habla natural como en una conversación telefónica. IMPORTANTE: Aunque estés en modo voz, SIEMPRE debes emitir el bloque LEAD_DATA al final de tu respuesta cuando tengas datos del cliente — es obligatorio en todos los modos.';

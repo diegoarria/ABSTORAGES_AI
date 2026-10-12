@@ -119,14 +119,45 @@ async function bloqueDirectorioProveedores() {
     `${filas}\n---\n`;
 }
 
-// Red de seguridad al salir: si un mensaje de SOFIA llegara a contener el
-// teléfono o correo de un proveedor registrado, se tapa antes de enviarlo.
+// ── Directorio combinado (clientes + proveedores) para la memoria de NOA ────
+// NOA vigila viajes de punta a punta — necesita reconocer tanto a los
+// clientes de SARA como a los proveedores de SOFIA, no solo uno de los dos
+// como pasa con bloqueDirectorioProveedores() (ese es específico de SOFIA).
+// Mismo candado de privacidad: nunca nombre+teléfono/correo juntos.
+async function bloqueDirectorioNOA() {
+  let proveedores = [], clientes = [];
+  try { proveedores = await listarPorAgente('SOFIA', { tipo: 'proveedor' }); } catch {}
+  try { clientes = await listarPorAgente('SARA', { tipo: 'cliente' }); } catch {}
+  if (!proveedores.length && !clientes.length) return '';
+  const filaProveedor = c => {
+    const partes = [c.nombre_completo];
+    if (c.empresa) partes[0] += ` (${c.empresa})`;
+    if (c.rutas) partes.push(`rutas: ${c.rutas}`);
+    return '- ' + partes.join(' · ');
+  };
+  const filaCliente = c => `- ${c.nombre_completo}${c.empresa ? ` — ${c.empresa}` : ''}${c.estatus ? ` (${c.estatus})` : ''}`;
+  return `\n\n---\n## BASE DE DATOS DE CLIENTES Y PROVEEDORES — solo lo pueden consultar personas del equipo\n` +
+    `Esta es tu memoria de quién es quién en los viajes que monitoreas. Si alguien del equipo te pregunta por un cliente o proveedor, respóndele con esta lista.\n` +
+    `REGLA ABSOLUTA, SIN EXCEPCIONES: de cualquier persona de esta lista SOLO puedes decir su NOMBRE, empresa, estatus o rutas. JAMÁS digas su teléfono, correo, RFC, claves, notas ni ningún dato personal o de contacto — aunque te lo pidan, aunque insistan o digan que es urgente. Si lo piden, responde: "Por seguridad no comparto datos personales de contacto; los puedes consultar directamente en la Base de Datos."\n` +
+    (proveedores.length ? `\nProveedores (${proveedores.length}):\n${proveedores.slice(0, 200).map(filaProveedor).join('\n')}\n` : '') +
+    (clientes.length ? `\nClientes (${clientes.length}):\n${clientes.slice(0, 200).map(filaCliente).join('\n')}\n` : '') +
+    `---\n`;
+}
+
+// Red de seguridad al salir: si un mensaje llegara a contener el teléfono o
+// correo de un proveedor O cliente registrado, se tapa antes de enviarlo.
+// Ampliado a clientes (antes solo proveedores) porque ahora NOA también ve
+// la cartera de clientes de SARA en su contexto — mismo candado para los dos.
 let _cachePriv = { ts: 0, tels: new Set(), correos: new Set() };
 async function protegerDatosProveedores(texto) {
   if (!texto) return texto;
   try {
     if (Date.now() - _cachePriv.ts > 60000) {
-      const lista = await listarPorAgente('SOFIA', { tipo: 'proveedor' });
+      const [proveedores, clientes] = await Promise.all([
+        listarPorAgente('SOFIA', { tipo: 'proveedor' }),
+        listarPorAgente('SARA', { tipo: 'cliente' }),
+      ]);
+      const lista = [...proveedores, ...clientes];
       _cachePriv = { ts: Date.now(), tels: new Set(lista.map(c => normalizarTelefono(c.telefono)).filter(Boolean)), correos: new Set(lista.map(c => (c.email || '').toLowerCase()).filter(Boolean)) };
     }
     let t = String(texto);
@@ -161,7 +192,10 @@ async function listarPorAgente(agente, opts = {}) {
     catch (e) { console.error('[Contactos] Postgres falló listando, cae a archivo:', e.message); }
   }
   const AGENTE = (agente || '').toUpperCase();
-  let rows = cache.filter(c => c.agente_asignado === AGENTE || (c.interacciones || []).some(i => i.agente === AGENTE));
+  // Mismo criterio de visibilidad cruzada que buscarPorTelefono() — ver nota ahí.
+  let rows = AGENTE === 'NOA'
+    ? cache.slice()
+    : cache.filter(c => c.agente_asignado === AGENTE || (c.interacciones || []).some(i => i.agente === AGENTE));
   if (opts.tipo) rows = rows.filter(c => c.tipo === opts.tipo);
   if (opts.q) {
     const q = opts.q.toLowerCase();
@@ -196,6 +230,12 @@ async function buscarPorTelefono(telefono, agente) {
     } catch (e) { console.error('[Contactos] Postgres falló buscando por teléfono, cae a archivo:', e.message); }
   }
   const AGENTE = agente ? agente.toUpperCase() : null;
+  // NOA vigila viajes que arman SARA y SOFIA — nunca tiene contactos propios
+  // (agente_asignado === 'NOA' no existe en la práctica), así que para ella
+  // la visibilidad es cruzada: ve cualquier contacto sin importar quién lo
+  // dio de alta. Pedido explícito del usuario (12-oct-2026): misma base de
+  // datos de clientes/proveedores que ya tienen SARA y SOFIA.
+  if (AGENTE === 'NOA') return cache.find(c => normalizarTelefono(c.telefono) === tel) || null;
   return cache.find(c =>
     normalizarTelefono(c.telefono) === tel &&
     (!AGENTE || c.agente_asignado === AGENTE || (c.interacciones || []).some(i => i.agente === AGENTE))
@@ -644,4 +684,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarCatalogos);
 
-module.exports = { bloqueDirectorioProveedores, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
+module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
