@@ -146,6 +146,51 @@ async function historialCliente(nombreCliente) {
   return r?.datos || [];
 }
 
+// ── Scorecard de desempeño por cliente — % a tiempo, retraso promedio ───────
+// Pedido del usuario (12-oct-2026): "nivel Uber Freight" — esto es lo que
+// gana renovaciones con clientes corporativos, no solo la operación día a
+// día. Compara Cita de Descarga vs. Llegada a descarga de los servicios ya
+// concluidos del cliente en el periodo. El TMS no filtra por fecha del lado
+// del servidor (su filtro solo hace "contiene" en texto), así que se trae
+// hasta `limite` registros del cliente y se filtra el periodo en JS.
+// limite default en 50 — en pruebas, 200 tronó por timeout del TMS (45s),
+// 50 sí respondió a tiempo. Para un cliente con más de 50 servicios en 90
+// días habría que paginar, pero no es el caso típico.
+async function desempenoCliente(nombreCliente, dias = 90, limite = 50) {
+  if (!nombreCliente) return null;
+  const r = await query('detalle_servicios', {
+    pagina: 1, limite,
+    filtros: { 'Cliente': { contiene: nombreCliente.toUpperCase() } },
+    campos: ['Folio de servicio', 'Fecha de Servicio', 'Cliente', 'Cita de Descarga', 'Llegada a descarga', 'EstatusMonitoreoDetalle'],
+  });
+  const todos = r?.datos || [];
+  const desdeMs = Date.now() - dias * 24 * 60 * 60 * 1000;
+  const completados = todos.filter(s => {
+    const det = (s['EstatusMonitoreoDetalle'] || '').toLowerCase();
+    const concluido = det.includes('servicio concluido') || !!s['Llegada a descarga'];
+    const fechaMs = new Date(s['Fecha de Servicio'] || s['Cita de Descarga'] || 0).getTime();
+    return concluido && fechaMs >= desdeMs;
+  });
+  let aTiempo = 0, tarde = 0, sumaRetrasoMin = 0;
+  for (const s of completados) {
+    const cita = s['Cita de Descarga'] ? new Date(s['Cita de Descarga']).getTime() : null;
+    const llego = s['Llegada a descarga'] ? new Date(s['Llegada a descarga']).getTime() : null;
+    if (cita == null || llego == null || isNaN(cita) || isNaN(llego)) continue;
+    if (llego <= cita) aTiempo++;
+    else { tarde++; sumaRetrasoMin += (llego - cita) / 60000; }
+  }
+  const totalConDatos = aTiempo + tarde;
+  return {
+    cliente: nombreCliente,
+    periodoDias: dias,
+    totalServicios: completados.length,
+    totalConDatosDeTiempo: totalConDatos,
+    aTiempo, tarde,
+    porcentajeATiempo: totalConDatos ? Math.round((aTiempo / totalConDatos) * 100) : null,
+    retrasoPromedioMin: tarde ? Math.round(sumaRetrasoMin / tarde) : null,
+  };
+}
+
 // Rutas principales (top 15 por volumen) en el periodo dado o último año
 async function rutasPrincipales(desde, hasta) {
   const opts = { pagina: 1, limite: 500,
@@ -844,7 +889,7 @@ function iniciarPrewarmNOA() {
 
 module.exports = {
   // SARA
-  buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA,
+  buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA, desempenoCliente,
   // SOFIA
   listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, historialTarifaRuta, getContextoSOFIA, proveedoresParaVapi, foliosPorAsignar,
   // NOA

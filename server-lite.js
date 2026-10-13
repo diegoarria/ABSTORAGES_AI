@@ -84,6 +84,7 @@ const callLog        = require('./backend/services/callLog');
 const moderacion     = require('./backend/services/moderacion');
 const vapi        = require('./backend/services/vapi');
 const noaScheduler = require('./backend/services/noaScheduler');
+const hitosCliente = require('./backend/services/hitosCliente');
 const noaMonitoreo = require('./backend/services/noaMonitoreo');
 const noaRiskFeedback = require('./backend/services/noaRiskFeedback');
 const sofiaScheduler = require('./backend/services/sofiaScheduler');
@@ -2528,6 +2529,34 @@ async function geocodificarEntrePuntos(origenTxt, destinoTxt, fraccion) {
   }
 }
 
+// Ruta real (sigue carreteras, no línea recta) entre origen y destino —
+// OSRM público (project-osrm.org), gratis y sin API key. Es el servidor
+// demo de OSRM, pensado para pruebas, no para tráfico pesado de producción
+// — aceptable aquí porque son pocas rutas (origen-destino se repite mucho
+// entre folios) y queda cacheado por par de ciudades, no por folio.
+const _cacheRutas = new Map();
+async function obtenerRutaCarretera(origenTxt, destinoTxt) {
+  const clave = `${origenTxt}|${destinoTxt}`.toLowerCase();
+  if (_cacheRutas.has(clave)) return _cacheRutas.get(clave);
+  try {
+    const [org, dst] = await Promise.all([geocode.forwardGeocode(origenTxt), geocode.forwardGeocode(destinoTxt)]);
+    if (!org || !dst) { _cacheRutas.set(clave, null); return null; }
+    const url = `https://router.project-osrm.org/route/v1/driving/${org.lng},${org.lat};${dst.lng},${dst.lat}?overview=full&geometries=geojson`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`OSRM ${r.status}`);
+    const data = await r.json();
+    const coords = data?.routes?.[0]?.geometry?.coordinates;
+    if (!coords?.length) { _cacheRutas.set(clave, null); return null; }
+    const ruta = coords.map(([lng, lat]) => [lat, lng]); // Leaflet quiere [lat,lng], GeoJSON da [lng,lat]
+    _cacheRutas.set(clave, ruta);
+    return ruta;
+  } catch (e) {
+    console.error(`[api/noa/mapa] Error obteniendo ruta "${origenTxt}" → "${destinoTxt}":`, e.message);
+    _cacheRutas.set(clave, null);
+    return null;
+  }
+}
+
 // Mapa de flota — misma fuente de datos REAL que ya usa el banner de
 // arriba y el resto del panel NOA (tms.foliosActivosNOA() vía mapFolio(),
 // no la base interna de SOFIA en colocaciones.js — esa casi nunca tiene
@@ -2555,13 +2584,14 @@ app.get('/api/noa/mapa', adminUOps, async (req, res) => {
     const FRACCION_POR_ESTADO = { EN_CARGA: 0, EN_TRANSITO: 0.5, DETENIDA: 0.5, EN_DESTINO: 1 };
     const resultados = await Promise.allSettled(folios.map(async f => {
       const base = { folio: f.id, origen: f.or, destino: f.de, empresa: f.cl, ganador: f.pv, severidad: f.al || 'NORMAL', decisionSummary: f.inc || null };
+      const ruta = (f.or && f.de) ? await obtenerRutaCarretera(f.or, f.de) : null;
       if (f.gps?.la != null && f.gps?.ln != null) {
-        return { ...base, gpsLat: f.gps.la, gpsLng: f.gps.ln, gpsAproximado: false };
+        return { ...base, gpsLat: f.gps.la, gpsLng: f.gps.ln, gpsAproximado: false, ruta };
       }
-      if (!f.or || !f.de) return { ...base, gpsLat: null, gpsLng: null };
+      if (!f.or || !f.de) return { ...base, gpsLat: null, gpsLng: null, ruta: null };
       const aprox = await geocodificarEntrePuntos(f.or, f.de, FRACCION_POR_ESTADO[f.st] ?? 0.5);
-      if (aprox) return { ...base, gpsLat: aprox.lat, gpsLng: aprox.lng, gpsAproximado: true };
-      return { ...base, gpsLat: null, gpsLng: null };
+      if (aprox) return { ...base, gpsLat: aprox.lat, gpsLng: aprox.lng, gpsAproximado: true, ruta };
+      return { ...base, gpsLat: null, gpsLng: null, ruta: null };
     }));
     res.json(resultados.filter(r => r.status === 'fulfilled').map(r => r.value));
   } catch (e) {
@@ -2602,6 +2632,13 @@ app.post('/api/colocaciones/:folio/detener', soloAdmin, async (req, res) => {
 });
 app.get('/api/proveedores/ranking', adminUOps, (req, res) => res.json(colocaciones.ranking()));
 app.get('/api/proveedores/:telefono/desempeno', adminUOps, (req, res) => res.json(colocaciones.estadisticas(req.params.telefono)));
+// Scorecard de cliente — % de entregas a tiempo, sacado del TMS real
+// (Cita de Descarga vs. Llegada a descarga de servicios ya concluidos).
+app.get('/api/clientes/:empresa/desempeno', adminUOps, async (req, res) => {
+  if (!tms.ENABLED) return res.json(null);
+  try { res.json(await tms.desempenoCliente(req.params.empresa)); }
+  catch (e) { console.error('[api/clientes/desempeno]', e.message); res.json(null); }
+});
 
 app.get('/api/candidatos-proveedor', adminUOps, (req, res) => res.json(candidatosProveedor.listar(req.query.estado === 'todas' ? null : 'pendiente')));
 app.post('/api/candidatos-proveedor/:id/resolver', soloAdmin, async (req, res) => {
@@ -4336,6 +4373,7 @@ app.listen(PORT, async () => {
   await monitoringControl.iniciar();
   noaScheduler.iniciar(pushActividad);
   noaMonitoreo.iniciar();
+  hitosCliente.iniciar();
   sofiaScheduler.iniciar(pushActividad);
   difusionGeneral.iniciar(pushActividad);
   difusionClientes.iniciar();

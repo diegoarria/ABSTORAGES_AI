@@ -712,6 +712,10 @@ async function renderDetail(){
             ${rutas.length ? `<div class="tags">${rutas.map(r => `<span class="tagc">${esc(r)}</span>`).join('')}</div>` : '<div class="hint">Sin rutas capturadas.</div>'}
           </div>
         </div>
+      </section>
+      <section>
+        <div class="sec-title">Desempeño del servicio (últimos 90 días)</div>
+        <div id="desempeno-cliente-box"><div class="empty-msg">Cargando…</div></div>
       </section>` : '')}
 
       ${esProv && data.tarifas ? `<section><div class="sec-title">Tarifas históricas</div><div class="notes">${esc(data.tarifas)}</div></section>` : ''}
@@ -729,6 +733,7 @@ async function renderDetail(){
     </div>
   `;
   if (esProv) cargarDesempeno(data);
+  if (data.tipo === 'cliente') cargarDesempenoCliente(data);
 }
 
 // ── Envío masivo de plantillas aprobadas ───────────────────────────────────
@@ -949,6 +954,24 @@ async function cargarDesempeno(data){
     if (sb && mias.length) sb.innerHTML = `<div class="callout"><div class="callout-t">Sugerencias del proveedor pendientes de tu aprobación</div>` + mias.map(x =>
       `<div class="sug"><span>${{ruta_agregar:'Agregar ruta',ruta_quitar:'Quitar ruta',unidad_agregar:'Agregar unidad'}[x.tipo]}: <b>${esc(x.valor)}</b></span>
        <span class="sug-b"><button class="btn btn-primary btn-sm" onclick="resolverSugerencia('${x.id}',true)">Aprobar</button><button class="btn btn-ghost btn-sm" onclick="resolverSugerencia('${x.id}',false)">Descartar</button></span></div>`).join('') + '</div>';
+  } catch (e) { /* el desempeño es informativo — nunca rompe la ficha */ }
+}
+async function cargarDesempenoCliente(data){
+  const box = document.getElementById('desempeno-cliente-box');
+  if (!box || !data.empresa) return;
+  try {
+    const st = await (await fetch('/api/clientes/' + encodeURIComponent(data.empresa) + '/desempeno', { credentials:'include' })).json();
+    const tile = (v, l, s) => `<div class="stat"><div class="stat-v">${v}</div><div class="stat-l">${l}</div>${s ? `<div class="stat-s">${s}</div>` : ''}</div>`;
+    if (!st || st.totalConDatosDeTiempo === 0) {
+      box.innerHTML = '<div class="hint">Sin servicios concluidos con datos de cita/llegada en los últimos 90 días.</div>';
+      return;
+    }
+    const colorPct = st.porcentajeATiempo >= 90 ? 'var(--ok, #16a34a)' : st.porcentajeATiempo >= 75 ? 'var(--warn, #d97706)' : 'var(--danger, #dc2626)';
+    box.innerHTML = `<div class="stats">
+      ${tile(`<span style="color:${colorPct}">${st.porcentajeATiempo}<span class="unit">%</span></span>`, 'Entregas a tiempo', st.totalConDatosDeTiempo + ' servicios con dato de cita/llegada')}
+      ${tile(st.totalServicios, 'Servicios concluidos', '')}
+      ${tile(st.tarde, 'Con retraso', st.retrasoPromedioMin != null ? 'promedio ' + st.retrasoPromedioMin + ' min' : '')}
+    </div>`;
   } catch (e) { /* el desempeño es informativo — nunca rompe la ficha */ }
 }
 async function resolverSugerencia(id, aprobar){

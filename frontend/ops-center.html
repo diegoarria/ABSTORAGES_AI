@@ -826,7 +826,7 @@ function getVisibleCuentas() {
 // semáforo CRITICO/ATENCION/NORMAL de arriba (ese viene directo del TMS).
 (function(){
   var SEV_COLOR = { NORMAL:'#00B451', LOW:'#00B451', MEDIUM:'#FF8C00', ATENCION:'#FF8C00', HIGH:'#FF5C3C', CRITICAL:'#FF3A3A', CRITICO:'#FF3A3A', SIN_DATOS:'#6B7280' };
-  var map = null, markers = {};
+  var map = null, markers = {}, rutas = {};
 
   window.toggleNoaMapFullscreen = function(){
     var box = document.getElementById('noa-engine-box');
@@ -904,9 +904,26 @@ function getVisibleCuentas() {
       } else {
         markers[v.folio] = L.circleMarker([v.gpsLat, v.gpsLng], estilo).addTo(map).bindPopup(popup);
       }
+      // Ruta real sobre carretera (OSRM) — línea de fondo, debajo del punto.
+      // Se redibuja solo si cambió (evita parpadeo en cada refresco de 20s).
+      if (v.ruta && v.ruta.length) {
+        var rutaJson = JSON.stringify(v.ruta);
+        if (!rutas[v.folio] || rutas[v.folio]._abs_json !== rutaJson) {
+          if (rutas[v.folio]) map.removeLayer(rutas[v.folio]);
+          rutas[v.folio] = L.polyline(v.ruta, { color: color, weight: 2.5, opacity: 0.45, dashArray: aprox ? '2,6' : null }).addTo(map);
+          rutas[v.folio]._abs_json = rutaJson;
+          rutas[v.folio].bringToBack();
+        }
+      } else if (rutas[v.folio]) {
+        map.removeLayer(rutas[v.folio]);
+        delete rutas[v.folio];
+      }
     });
     Object.keys(markers).forEach(function(folio){
-      if (!vistos[folio]) { map.removeLayer(markers[folio]); delete markers[folio]; }
+      if (!vistos[folio]) {
+        map.removeLayer(markers[folio]); delete markers[folio];
+        if (rutas[folio]) { map.removeLayer(rutas[folio]); delete rutas[folio]; }
+      }
     });
   }
 
