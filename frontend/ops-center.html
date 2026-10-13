@@ -821,7 +821,7 @@ function getVisibleCuentas() {
 // — el motor determinístico de riesgo (noaMonitoreo.js), distinto del
 // semáforo CRITICO/ATENCION/NORMAL de arriba (ese viene directo del TMS).
 (function(){
-  var SEV_COLOR = { NORMAL:'#00B451', LOW:'#00B451', MEDIUM:'#FF8C00', HIGH:'#FF5C3C', CRITICAL:'#FF3A3A' };
+  var SEV_COLOR = { NORMAL:'#00B451', LOW:'#00B451', MEDIUM:'#FF8C00', HIGH:'#FF5C3C', CRITICAL:'#FF3A3A', SIN_DATOS:'#6B7280' };
   var map = null, markers = {};
 
   window.noaEngineTab = function(tab){
@@ -853,11 +853,12 @@ function getVisibleCuentas() {
     var vistos = {};
     conGps.forEach(function(v){
       vistos[v.folio] = true;
-      var color = SEV_COLOR[v.severidad] || SEV_COLOR.NORMAL;
-      var popup = '<div style="font:12px/1.5 Inter,sans-serif;min-width:160px">' +
+      var color = SEV_COLOR[v.severidad] || SEV_COLOR.SIN_DATOS;
+      var popup = '<div style="font:12px/1.5 Inter,sans-serif;min-width:170px">' +
         '<b>' + escH(v.folio) + '</b><br>' + escH(v.empresa||'') + '<br>' +
-        '<span style="color:'+color+';font-weight:700">' + escH(v.severidad||'NORMAL') + '</span> · ' + (v.riskScore||0) + '/100<br>' +
-        '<span style="color:#888">' + escH(v.gpsDireccion || (v.origen+' → '+v.destino)) + '</span>' +
+        '<span style="color:'+color+';font-weight:700">' + escH(v.severidad==='SIN_DATOS'?'Sin evaluar aún':v.severidad||'NORMAL') + '</span>' + (v.riskScore!=null ? ' · ' + v.riskScore + '/100' : '') + '<br>' +
+        '<span style="color:#888">' + escH(v.gpsDireccion || (v.origen+' → '+v.destino)) + '</span><br>' +
+        '<a href="#" onclick="abrirFolio(\''+escH(v.folio)+'\');return false" style="color:#2F6FED;font-weight:700;display:inline-block;margin-top:4px">Ver estatus en vivo →</a>' +
         '</div>';
       if (markers[v.folio]) {
         markers[v.folio].setLatLng([v.gpsLat, v.gpsLng]);
@@ -893,18 +894,24 @@ function getVisibleCuentas() {
   }
 
   var ultimoFetch = 0;
-  function tick(){
+  function tickRiesgo(){
     fetch('/api/noa/monitoreo', { credentials: 'include' })
       .then(function(r){ return r.ok ? r.json() : []; })
-      .then(function(viajes){
-        ultimoFetch = Date.now();
-        actualizarMapa(viajes);
-        renderTarjetasRiesgo(viajes);
-      })
+      .then(function(viajes){ ultimoFetch = Date.now(); renderTarjetasRiesgo(viajes); })
       .catch(function(){});
   }
-  setInterval(tick, 20000);
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(tick, 1200); });
+  // Aparte de las tarjetas: el mapa no depende de que el motor de riesgo ya
+  // haya evaluado el folio (funciona aunque NOA_MONITOREO esté apagado),
+  // así que consulta GPS en vivo de todos los viajes activos por su cuenta.
+  function tickMapa(){
+    fetch('/api/noa/mapa', { credentials: 'include' })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(actualizarMapa)
+      .catch(function(){});
+  }
+  setInterval(tickRiesgo, 20000);
+  setInterval(tickMapa, 20000);
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(tickRiesgo, 1200); setTimeout(tickMapa, 1500); });
 
   // ── Feed en vivo (terminal) — cualquier evento de NOA por SSE, no solo llamadas ──
   var FEED_ICONS = { RIESGO_VIAJE:'⚡', LLAMADA_PROACTIVA:'📞', MENSAJE_NUEVO:'💬', ALERTA_CRITICA:'🚨', ALERTA_INTENTO_ATAQUE:'🛡️', CONVERSACION_WA:'💬' };

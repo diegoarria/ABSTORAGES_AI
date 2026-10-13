@@ -406,4 +406,4 @@ function viajesMonitoreados() {
     .sort((a, b) => (b.riskScore || 0) - (a.riskScore || 0));
 }
 
-module.exports = { iniciar, tick, viajesMonitoreados, evaluarViaje, calcularRiesgo };
+module.exports = { iniciar, tick, viajesMonitoreados, evaluarViaje, calcularRiesgo, leerGPS };

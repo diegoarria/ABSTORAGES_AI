@@ -2510,6 +2510,38 @@ app.get('/api/colocaciones', adminUOps, (req, res) => {
 // solo que acá va el cálculo de riesgo/anomalías del motor de NOA.
 app.get('/api/noa/monitoreo', adminUOps, (req, res) => res.json(noaMonitoreo.viajesMonitoreados()));
 
+// Mapa de flota — a diferencia de /api/noa/monitoreo (que solo muestra
+// folios que YA evaluó el motor de riesgo, es decir con NOA_MONITOREO=true
+// activo), esto funciona siempre: pide GPS en vivo de todos los viajes
+// colocados y aún no entregados, sin depender de que el motor esté
+// prendido ni de que ya le haya tocado turno a ese folio en particular.
+// Usa el GPS ya cacheado en monitoreoNOA si es reciente (<15 min) para no
+// pedirlo de nuevo, y solo consulta en vivo lo que falte.
+app.get('/api/noa/mapa', adminUOps, async (req, res) => {
+  try {
+    const activos = colocaciones.todas().filter(c => c.estado === 'colocado' && !colocaciones.hitoAlcanzado(c, 'entregado'));
+    const CACHE_MS = 15 * 60 * 1000;
+    const resultados = await Promise.allSettled(activos.map(async c => {
+      const base = { folio: c.folio, origen: c.origen, destino: c.destino, empresa: c.empresa, ganador: c.ganador?.nombre || null };
+      const cache = c.monitoreoNOA;
+      const cacheFresco = cache?.gpsLat != null && cache?.actualizadoEn && (Date.now() - new Date(cache.actualizadoEn).getTime() < CACHE_MS);
+      if (cacheFresco) {
+        return { ...base, gpsLat: cache.gpsLat, gpsLng: cache.gpsLng, gpsDireccion: cache.gpsDireccion, riskScore: cache.riskScore ?? null, severidad: cache.severidad || 'SIN_DATOS', decisionSummary: cache.decisionSummary || null };
+      }
+      const gps = await noaMonitoreo.leerGPS(c);
+      if (gps.disponible && gps.lectura) {
+        colocaciones.actualizarMonitoreoNOA(c.folio, { gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion || null, gpsTimestamp: gps.lectura.timestamp || null });
+        return { ...base, gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion, riskScore: cache?.riskScore ?? null, severidad: cache?.severidad || 'SIN_DATOS', decisionSummary: cache?.decisionSummary || null };
+      }
+      return { ...base, gpsLat: null, gpsLng: null, severidad: cache?.severidad || 'SIN_DATOS' };
+    }));
+    res.json(resultados.filter(r => r.status === 'fulfilled').map(r => r.value));
+  } catch (e) {
+    console.error('[api/noa/mapa]', e.message);
+    res.status(500).json([]);
+  }
+});
+
 // Episodios de riesgo (para marcar "fue real" / "fue ruido" y calibrar los
 // umbrales del motor de monitoreo — ver noaRiskFeedback.js).
 app.get('/api/noa/riesgo-episodios', adminUOps, (req, res) => {
