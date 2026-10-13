@@ -65,6 +65,10 @@ async function sendEmail(lead) {
 
   const primerMsj = lead.primer_mensaje || lead.resumen || '';
 
+  const linkChat = lead.sessionId
+    ? `${PORTAL_URL}/ver-chat.html?token=${chatViewTokens.crear(lead.sessionId, { nombre: lead.nombre, telefono: lead.telefono })}`
+    : null;
+
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
       <div style="background:#0f1d4a;padding:20px 24px;">
@@ -96,6 +100,11 @@ async function sendEmail(lead) {
           ${row('Sesión',          lead.sessionId)}
         </table>
       </div>
+
+      ${linkChat ? `
+      <div style="padding:0 24px 24px;">
+        <a href="${linkChat}" style="display:inline-block;background:#0f1d4a;color:#fff;padding:11px 26px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">Ver chat en tiempo real →</a>
+      </div>` : ''}
     </div>`;
 
   const asunto = `🔔 Lead SARA: ${[lead.nombre, lead.empresa, ruta].filter(v => v && v !== '—').join(' · ') || lead.id}`;
