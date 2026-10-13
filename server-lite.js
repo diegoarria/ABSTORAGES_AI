@@ -138,6 +138,7 @@ async function bloqueTarifaRutaProveedor(telefono) {
 const alertasStaff = require('./backend/services/alertasStaff');
 const saraProactivo = require('./backend/services/saraProactivo');
 const kapso = require('./backend/services/kapso');
+const geocode = require('./backend/services/geocode');
 const twochat = require('./backend/services/twochat');
 const vision  = require('./backend/services/vision');
 const whatsappProactivo = require('./backend/services/whatsappProactivo');
@@ -2517,6 +2518,26 @@ app.get('/api/noa/monitoreo', adminUOps, (req, res) => res.json(noaMonitoreo.via
 // prendido ni de que ya le haya tocado turno a ese folio en particular.
 // Usa el GPS ya cacheado en monitoreoNOA si es reciente (<15 min) para no
 // pedirlo de nuevo, y solo consulta en vivo lo que falte.
+// Posición aproximada cuando no hay GPS real — geocodifica origen/destino y
+// coloca el punto según qué tan avanzado va el viaje (por hitos, no es la
+// posición real). Se marca gpsAproximado:true para que el frontend lo deje
+// clarísimo (nunca se presenta como si fuera GPS en vivo real).
+async function posicionAproximada(c) {
+  try {
+    const [org, dst] = await Promise.all([geocode.forwardGeocode(c.origen), geocode.forwardGeocode(c.destino)]);
+    if (!org && !dst) return null;
+    if (!org) return { lat: dst.lat, lng: dst.lng };
+    if (!dst) return { lat: org.lat, lng: org.lng };
+    // Antes de salir a ruta: junto al origen. En ruta: a medio camino
+    // (no hay forma de saber el avance real sin GPS). Llegando: junto al destino.
+    const t = colocaciones.hitoAlcanzado(c, 'llego_destino') ? 1 : colocaciones.hitoAlcanzado(c, 'en_ruta') ? 0.5 : 0;
+    return { lat: org.lat + (dst.lat - org.lat) * t, lng: org.lng + (dst.lng - org.lng) * t };
+  } catch (e) {
+    console.error(`[api/noa/mapa] Error geocodificando ${c.folio}:`, e.message);
+    return null;
+  }
+}
+
 app.get('/api/noa/mapa', adminUOps, async (req, res) => {
   try {
     const activos = colocaciones.todas().filter(c => c.estado === 'colocado' && !colocaciones.hitoAlcanzado(c, 'entregado'));
@@ -2526,12 +2547,19 @@ app.get('/api/noa/mapa', adminUOps, async (req, res) => {
       const cache = c.monitoreoNOA;
       const cacheFresco = cache?.gpsLat != null && cache?.actualizadoEn && (Date.now() - new Date(cache.actualizadoEn).getTime() < CACHE_MS);
       if (cacheFresco) {
-        return { ...base, gpsLat: cache.gpsLat, gpsLng: cache.gpsLng, gpsDireccion: cache.gpsDireccion, riskScore: cache.riskScore ?? null, severidad: cache.severidad || 'SIN_DATOS', decisionSummary: cache.decisionSummary || null };
+        return { ...base, gpsLat: cache.gpsLat, gpsLng: cache.gpsLng, gpsDireccion: cache.gpsDireccion, gpsAproximado: !!cache.gpsAproximado, riskScore: cache.riskScore ?? null, severidad: cache.severidad || 'SIN_DATOS', decisionSummary: cache.decisionSummary || null };
       }
       const gps = await noaMonitoreo.leerGPS(c);
       if (gps.disponible && gps.lectura) {
-        colocaciones.actualizarMonitoreoNOA(c.folio, { gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion || null, gpsTimestamp: gps.lectura.timestamp || null });
-        return { ...base, gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion, riskScore: cache?.riskScore ?? null, severidad: cache?.severidad || 'SIN_DATOS', decisionSummary: cache?.decisionSummary || null };
+        colocaciones.actualizarMonitoreoNOA(c.folio, { gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion || null, gpsTimestamp: gps.lectura.timestamp || null, gpsAproximado: false });
+        return { ...base, gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion, gpsAproximado: false, riskScore: cache?.riskScore ?? null, severidad: cache?.severidad || 'SIN_DATOS', decisionSummary: cache?.decisionSummary || null };
+      }
+      // Sin GPS real — nunca se deja el punto fuera del mapa: se aproxima
+      // por geocodificación de la ruta, marcado explícitamente como tal.
+      const aprox = await posicionAproximada(c);
+      if (aprox) {
+        colocaciones.actualizarMonitoreoNOA(c.folio, { gpsLat: aprox.lat, gpsLng: aprox.lng, gpsDireccion: null, gpsAproximado: true });
+        return { ...base, gpsLat: aprox.lat, gpsLng: aprox.lng, gpsAproximado: true, riskScore: cache?.riskScore ?? null, severidad: cache?.severidad || 'SIN_DATOS', decisionSummary: cache?.decisionSummary || null };
       }
       return { ...base, gpsLat: null, gpsLng: null, severidad: cache?.severidad || 'SIN_DATOS' };
     }));
