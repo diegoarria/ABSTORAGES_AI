@@ -341,6 +341,13 @@ async function evaluarYActuar(c) {
       detenidoDesde: detenidoDesde || null,
       gpsVelocidadUltima: gpsVelocidadUltima ?? null,
       gpsDisponible: gps.disponible,
+      // Posición en vivo — para el mapa de flota del Ops Center. Solo se
+      // guarda si hay lectura real; si no, se conserva la última conocida
+      // (actualizarMonitoreoNOA hace merge superficial, no pisa con undefined).
+      ...(gps.disponible && gps.lectura ? {
+        gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng,
+        gpsDireccion: gps.lectura.direccion || null, gpsTimestamp: gps.lectura.timestamp || null,
+      } : {}),
       episodio,
     });
 

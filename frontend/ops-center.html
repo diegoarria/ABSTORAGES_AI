@@ -18,6 +18,9 @@
 <link rel="stylesheet" href="/css/design-system.css">
 <link rel="stylesheet" href="/css/shell.css">
 <script src="/js/shell.js"></script>
+<!-- Mapa de flota en vivo de NOA — Leaflet, sin API key (OpenStreetMap) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
 /* Alias hacia los tokens corporativos de design-system.css — mismos nombres
    de variable de siempre para no reescribir cada var() ya usado en la
@@ -488,6 +491,34 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
       </div>
     </div>
 
+    <!-- ═══ Motor de monitoreo de NOA — mapa + riesgo en vivo + feed ═══ -->
+    <div style="border:1px solid var(--b1);border-radius:10px;background:var(--s2);margin:0 0 12px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--b1)">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 0 rgba(0,180,81,.5);animation:sof-live-pulse 1.8s infinite" aria-hidden="true"></span>
+        <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3)">Motor de monitoreo NOA — en vivo</span>
+        <div style="margin-left:auto;display:flex;gap:4px" role="group" aria-label="Vista del motor de monitoreo">
+          <button class="fchip on" id="noa-engine-tab-mapa" onclick="noaEngineTab('mapa')" aria-pressed="true" style="font-size:10.5px;padding:3px 9px">🗺️ Mapa</button>
+          <button class="fchip" id="noa-engine-tab-riesgo" onclick="noaEngineTab('riesgo')" aria-pressed="false" style="font-size:10.5px;padding:3px 9px">⚡ Riesgo</button>
+          <button class="fchip" id="noa-engine-tab-feed" onclick="noaEngineTab('feed')" aria-pressed="false" style="font-size:10.5px;padding:3px 9px">📡 Feed</button>
+        </div>
+      </div>
+
+      <div id="noa-engine-mapa" style="display:block">
+        <div id="noa-map" style="height:300px;width:100%;background:var(--s1)"></div>
+        <div id="noa-map-empty" style="display:none;padding:24px;text-align:center;color:var(--t3);font-size:12px">Ningún viaje con GPS activo en este momento.</div>
+      </div>
+
+      <div id="noa-engine-riesgo" style="display:none;padding:12px 14px;max-height:340px;overflow-y:auto">
+        <div id="noa-riesgo-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px"></div>
+        <div id="noa-riesgo-empty" style="display:none;padding:20px;text-align:center;color:var(--t3);font-size:12px">Sin viajes con riesgo detectado — todo en orden.</div>
+      </div>
+
+      <div id="noa-engine-feed" style="display:none;max-height:340px;overflow-y:auto;padding:10px 14px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.7;color:var(--t2);background:var(--s1)">
+        <div id="noa-feed-log"></div>
+        <div id="noa-feed-empty" style="color:var(--t3)">Esperando actividad de NOA…</div>
+      </div>
+    </div>
+
     <!-- Llamada en vivo -->
     <div id="noa-live-calls" style="display:none;border:1px solid var(--b1);border-radius:8px;background:var(--s2);margin:0 0 10px">
       <div style="padding:10px 14px 8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);display:flex;align-items:center;gap:6px">
@@ -778,6 +809,109 @@ function getVisibleCuentas() {
     return true;
   });
 }
+
+// ── NOA — MOTOR DE MONITOREO: mapa + tarjetas de riesgo + feed en vivo ──────
+// Fuente de datos: GET /api/noa/monitoreo (noaMonitoreo.viajesMonitoreados())
+// — el motor determinístico de riesgo (noaMonitoreo.js), distinto del
+// semáforo CRITICO/ATENCION/NORMAL de arriba (ese viene directo del TMS).
+(function(){
+  var SEV_COLOR = { NORMAL:'#00B451', LOW:'#00B451', MEDIUM:'#FF8C00', HIGH:'#FF5C3C', CRITICAL:'#FF3A3A' };
+  var map = null, markers = {};
+
+  window.noaEngineTab = function(tab){
+    ['mapa','riesgo','feed'].forEach(function(t){
+      document.getElementById('noa-engine-'+t).style.display = (t===tab ? 'block' : 'none');
+      var btn = document.getElementById('noa-engine-tab-'+t);
+      btn.classList.toggle('on', t===tab);
+      btn.setAttribute('aria-pressed', t===tab ? 'true' : 'false');
+    });
+    if (tab === 'mapa' && map) setTimeout(function(){ map.invalidateSize(); }, 50);
+  };
+
+  function initMap(){
+    if (map || typeof L === 'undefined') return;
+    map = L.map('noa-map', { zoomControl: true, attributionControl: false }).setView([23.6, -102.5], 5); // centro de México
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
+  }
+
+  function actualizarMapa(viajes){
+    if (typeof L === 'undefined') return;
+    initMap();
+    var conGps = viajes.filter(function(v){ return v.gpsLat != null && v.gpsLng != null; });
+    document.getElementById('noa-map-empty').style.display = conGps.length ? 'none' : 'block';
+    var vistos = {};
+    conGps.forEach(function(v){
+      vistos[v.folio] = true;
+      var color = SEV_COLOR[v.severidad] || SEV_COLOR.NORMAL;
+      var popup = '<div style="font:12px/1.5 Inter,sans-serif;min-width:160px">' +
+        '<b>' + escH(v.folio) + '</b><br>' + escH(v.empresa||'') + '<br>' +
+        '<span style="color:'+color+';font-weight:700">' + escH(v.severidad||'NORMAL') + '</span> · ' + (v.riskScore||0) + '/100<br>' +
+        '<span style="color:#888">' + escH(v.gpsDireccion || (v.origen+' → '+v.destino)) + '</span>' +
+        '</div>';
+      if (markers[v.folio]) {
+        markers[v.folio].setLatLng([v.gpsLat, v.gpsLng]);
+        markers[v.folio].setStyle({ color: color, fillColor: color });
+        markers[v.folio].setPopupContent(popup);
+      } else {
+        markers[v.folio] = L.circleMarker([v.gpsLat, v.gpsLng], {
+          radius: 8, color: color, fillColor: color, fillOpacity: 0.85, weight: 2,
+        }).addTo(map).bindPopup(popup);
+      }
+    });
+    Object.keys(markers).forEach(function(folio){
+      if (!vistos[folio]) { map.removeLayer(markers[folio]); delete markers[folio]; }
+    });
+  }
+
+  function renderTarjetasRiesgo(viajes){
+    var cont = document.getElementById('noa-riesgo-cards');
+    var enRiesgo = viajes.filter(function(v){ return v.severidad && v.severidad !== 'NORMAL'; });
+    document.getElementById('noa-riesgo-empty').style.display = enRiesgo.length ? 'none' : 'block';
+    cont.innerHTML = enRiesgo.map(function(v){
+      var color = SEV_COLOR[v.severidad] || SEV_COLOR.MEDIUM;
+      var anomalias = (v.anomalias||[]).map(function(a){ return '<div style="font-size:10.5px;color:var(--t3);padding:2px 0">• ' + escH(a.reason) + '</div>'; }).join('');
+      return '<div style="border:1px solid '+color+'55;border-left:3px solid '+color+';border-radius:8px;background:var(--s3);padding:10px 12px;cursor:pointer" onclick="abrirFolio(\''+escH(v.folio)+'\')">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px">' +
+          '<b style="font-size:12.5px">'+escH(v.folio)+'</b>' +
+          '<span style="font-size:10px;font-weight:800;color:'+color+'">'+escH(v.severidad)+' · '+(v.riskScore||0)+'</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--t2);margin:3px 0">'+escH(v.empresa||'')+' · '+escH(v.ganador||'sin proveedor')+'</div>' +
+        anomalias +
+      '</div>';
+    }).join('');
+  }
+
+  var ultimoFetch = 0;
+  function tick(){
+    fetch('/api/noa/monitoreo', { credentials: 'include' })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(viajes){
+        ultimoFetch = Date.now();
+        actualizarMapa(viajes);
+        renderTarjetasRiesgo(viajes);
+      })
+      .catch(function(){});
+  }
+  setInterval(tick, 20000);
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(tick, 1200); });
+
+  // ── Feed en vivo (terminal) — cualquier evento de NOA por SSE, no solo llamadas ──
+  var FEED_ICONS = { RIESGO_VIAJE:'⚡', LLAMADA_PROACTIVA:'📞', MENSAJE_NUEVO:'💬', ALERTA_CRITICA:'🚨', ALERTA_INTENTO_ATAQUE:'🛡️', CONVERSACION_WA:'💬' };
+  window.noaFeedHandle = function(data){
+    if (['LLAMADA_INICIADA','LLAMADA_VIVO','LLAMADA_ESTADO','LLAMADA_TERMINADA'].indexOf(data.tipo) !== -1) return; // esos ya los maneja el widget de llamada
+    var log = document.getElementById('noa-feed-log');
+    var empty = document.getElementById('noa-feed-empty');
+    if (!log) return;
+    if (empty) empty.style.display = 'none';
+    var hora = new Date().toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
+    var icono = FEED_ICONS[data.tipo] || '·';
+    var linea = document.createElement('div');
+    linea.style.cssText = 'padding:2px 0;border-bottom:1px solid var(--b1)';
+    linea.innerHTML = '<span style="color:var(--t3)">'+hora+'</span> ' + icono + ' ' + escH(data.mensaje||data.tipo||'');
+    log.insertBefore(linea, log.firstChild);
+    while (log.children.length > 80) log.removeChild(log.lastChild);
+  };
+})();
 
 // ── NOA RENDER ────────────────────────────────────────
 function renderNOA(){
@@ -2074,6 +2208,7 @@ function switchPage(p){
       if (data.type !== 'actividad') return;
       var w = widgets[(data.agente||'').toUpperCase()];
       if (w) w.handle(data);
+      if ((data.agente||'').toUpperCase() === 'NOA' && typeof noaFeedHandle === 'function') noaFeedHandle(data);
     };
     es.onerror = function(){ es.close(); setTimeout(conectar, 4000); };
   }
