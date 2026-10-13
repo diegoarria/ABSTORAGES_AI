@@ -240,7 +240,10 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .barrido-lbl.pronto{color:var(--warn)}
 
 /* ── FOLIO DETAIL PANEL ── */
-.fd-overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;background:var(--s1);transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);pointer-events:none}
+/* z-index 1000: Leaflet (el mapa de NOA) usa internamente hasta 700 en sus
+   propias capas/controles — sin superarlo, el mapa se quedaba visible por
+   encima del panel de detalle aunque este ya estuviera "abierto". */
+.fd-overlay{position:absolute;inset:0;z-index:1000;display:flex;flex-direction:column;background:var(--s1);transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);pointer-events:none}
 .fd-overlay.open{transform:translateX(0);pointer-events:all}
 .fd-head{height:48px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--b1);flex-shrink:0;background:var(--s2)}
 .fd-back{background:none;border:none;color:var(--t2);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:5px;line-height:1;display:flex;align-items:center;transition:background .13s}
