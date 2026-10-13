@@ -2511,57 +2511,57 @@ app.get('/api/colocaciones', adminUOps, (req, res) => {
 // solo que acá va el cálculo de riesgo/anomalías del motor de NOA.
 app.get('/api/noa/monitoreo', adminUOps, (req, res) => res.json(noaMonitoreo.viajesMonitoreados()));
 
-// Mapa de flota — a diferencia de /api/noa/monitoreo (que solo muestra
-// folios que YA evaluó el motor de riesgo, es decir con NOA_MONITOREO=true
-// activo), esto funciona siempre: pide GPS en vivo de todos los viajes
-// colocados y aún no entregados, sin depender de que el motor esté
-// prendido ni de que ya le haya tocado turno a ese folio en particular.
-// Usa el GPS ya cacheado en monitoreoNOA si es reciente (<15 min) para no
-// pedirlo de nuevo, y solo consulta en vivo lo que falte.
-// Posición aproximada cuando no hay GPS real — geocodifica origen/destino y
-// coloca el punto según qué tan avanzado va el viaje (por hitos, no es la
-// posición real). Se marca gpsAproximado:true para que el frontend lo deje
-// clarísimo (nunca se presenta como si fuera GPS en vivo real).
-async function posicionAproximada(c) {
+// Posición aproximada cuando un folio real no tiene GPS capturado —
+// geocodifica origen/destino (texto "Ciudad, Estado") y coloca el punto
+// según qué tan avanzado va el viaje. Nunca se presenta como GPS real —
+// el que la llama debe marcar gpsAproximado:true en la respuesta.
+async function geocodificarEntrePuntos(origenTxt, destinoTxt, fraccion) {
   try {
-    const [org, dst] = await Promise.all([geocode.forwardGeocode(c.origen), geocode.forwardGeocode(c.destino)]);
+    const [org, dst] = await Promise.all([geocode.forwardGeocode(origenTxt), geocode.forwardGeocode(destinoTxt)]);
     if (!org && !dst) return null;
     if (!org) return { lat: dst.lat, lng: dst.lng };
     if (!dst) return { lat: org.lat, lng: org.lng };
-    // Antes de salir a ruta: junto al origen. En ruta: a medio camino
-    // (no hay forma de saber el avance real sin GPS). Llegando: junto al destino.
-    const t = colocaciones.hitoAlcanzado(c, 'llego_destino') ? 1 : colocaciones.hitoAlcanzado(c, 'en_ruta') ? 0.5 : 0;
-    return { lat: org.lat + (dst.lat - org.lat) * t, lng: org.lng + (dst.lng - org.lng) * t };
+    return { lat: org.lat + (dst.lat - org.lat) * fraccion, lng: org.lng + (dst.lng - org.lng) * fraccion };
   } catch (e) {
-    console.error(`[api/noa/mapa] Error geocodificando ${c.folio}:`, e.message);
+    console.error(`[api/noa/mapa] Error geocodificando "${origenTxt}" → "${destinoTxt}":`, e.message);
     return null;
   }
 }
 
+// Mapa de flota — misma fuente de datos REAL que ya usa el banner de
+// arriba y el resto del panel NOA (tms.foliosActivosNOA() vía mapFolio(),
+// no la base interna de SOFIA en colocaciones.js — esa casi nunca tiene
+// folios porque la mayoría de las operaciones no pasan por el flujo de
+// búsqueda de SOFIA). Reusa _foliosCache si ya está caliente (la propia
+// página ya llama a /api/noa/folios al cargar); si no, lo arma aquí mismo.
 app.get('/api/noa/mapa', adminUOps, async (req, res) => {
   try {
-    const activos = colocaciones.todas().filter(c => c.estado === 'colocado' && !colocaciones.hitoAlcanzado(c, 'entregado'));
-    const CACHE_MS = 15 * 60 * 1000;
-    const resultados = await Promise.allSettled(activos.map(async c => {
-      const base = { folio: c.folio, origen: c.origen, destino: c.destino, empresa: c.empresa, ganador: c.ganador?.nombre || null };
-      const cache = c.monitoreoNOA;
-      const cacheFresco = cache?.gpsLat != null && cache?.actualizadoEn && (Date.now() - new Date(cache.actualizadoEn).getTime() < CACHE_MS);
-      if (cacheFresco) {
-        return { ...base, gpsLat: cache.gpsLat, gpsLng: cache.gpsLng, gpsDireccion: cache.gpsDireccion, gpsAproximado: !!cache.gpsAproximado, riskScore: cache.riskScore ?? null, severidad: cache.severidad || 'SIN_DATOS', decisionSummary: cache.decisionSummary || null };
+    let folios = _foliosCache?.data || [];
+    if (!folios.length && tms.ENABLED) {
+      try {
+        const activos = await tms.foliosActivosNOA();
+        if (activos?.length) {
+          folios = activos.map(mapFolio);
+          await Promise.all(folios.map(async f => {
+            if (!gpsProviders.esUrlSoportada(f.gps.url)) return;
+            const ubic = await gpsProviders.obtenerUbicacion(f.gps.url, { conDireccion: false }).catch(() => null);
+            if (ubic) { f.gps.la = ubic.lat; f.gps.ln = ubic.lng; }
+          }));
+          _foliosCache = { data: folios, ts: new Date().toISOString() };
+        }
+      } catch (e) { console.error('[api/noa/mapa] Error consultando TMS:', e.message); }
+    }
+
+    const FRACCION_POR_ESTADO = { EN_CARGA: 0, EN_TRANSITO: 0.5, DETENIDA: 0.5, EN_DESTINO: 1 };
+    const resultados = await Promise.allSettled(folios.map(async f => {
+      const base = { folio: f.id, origen: f.or, destino: f.de, empresa: f.cl, ganador: f.pv, severidad: f.al || 'NORMAL', decisionSummary: f.inc || null };
+      if (f.gps?.la != null && f.gps?.ln != null) {
+        return { ...base, gpsLat: f.gps.la, gpsLng: f.gps.ln, gpsAproximado: false };
       }
-      const gps = await noaMonitoreo.leerGPS(c);
-      if (gps.disponible && gps.lectura) {
-        colocaciones.actualizarMonitoreoNOA(c.folio, { gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion || null, gpsTimestamp: gps.lectura.timestamp || null, gpsAproximado: false });
-        return { ...base, gpsLat: gps.lectura.lat, gpsLng: gps.lectura.lng, gpsDireccion: gps.lectura.direccion, gpsAproximado: false, riskScore: cache?.riskScore ?? null, severidad: cache?.severidad || 'SIN_DATOS', decisionSummary: cache?.decisionSummary || null };
-      }
-      // Sin GPS real — nunca se deja el punto fuera del mapa: se aproxima
-      // por geocodificación de la ruta, marcado explícitamente como tal.
-      const aprox = await posicionAproximada(c);
-      if (aprox) {
-        colocaciones.actualizarMonitoreoNOA(c.folio, { gpsLat: aprox.lat, gpsLng: aprox.lng, gpsDireccion: null, gpsAproximado: true });
-        return { ...base, gpsLat: aprox.lat, gpsLng: aprox.lng, gpsAproximado: true, riskScore: cache?.riskScore ?? null, severidad: cache?.severidad || 'SIN_DATOS', decisionSummary: cache?.decisionSummary || null };
-      }
-      return { ...base, gpsLat: null, gpsLng: null, severidad: cache?.severidad || 'SIN_DATOS' };
+      if (!f.or || !f.de) return { ...base, gpsLat: null, gpsLng: null };
+      const aprox = await geocodificarEntrePuntos(f.or, f.de, FRACCION_POR_ESTADO[f.st] ?? 0.5);
+      if (aprox) return { ...base, gpsLat: aprox.lat, gpsLng: aprox.lng, gpsAproximado: true };
+      return { ...base, gpsLat: null, gpsLng: null };
     }));
     res.json(resultados.filter(r => r.status === 'fulfilled').map(r => r.value));
   } catch (e) {

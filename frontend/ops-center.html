@@ -822,7 +822,7 @@ function getVisibleCuentas() {
 // — el motor determinístico de riesgo (noaMonitoreo.js), distinto del
 // semáforo CRITICO/ATENCION/NORMAL de arriba (ese viene directo del TMS).
 (function(){
-  var SEV_COLOR = { NORMAL:'#00B451', LOW:'#00B451', MEDIUM:'#FF8C00', HIGH:'#FF5C3C', CRITICAL:'#FF3A3A', SIN_DATOS:'#6B7280' };
+  var SEV_COLOR = { NORMAL:'#00B451', LOW:'#00B451', MEDIUM:'#FF8C00', ATENCION:'#FF8C00', HIGH:'#FF5C3C', CRITICAL:'#FF3A3A', CRITICO:'#FF3A3A', SIN_DATOS:'#6B7280' };
   var map = null, markers = {};
 
   window.toggleNoaMapFullscreen = function(){
