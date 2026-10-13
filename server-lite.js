@@ -620,7 +620,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       // No es equipo interno — ¿ya es un contacto conocido (proveedor/cliente
       // con quien ya se cerró algo antes)? Si sí, se le da continuidad real.
       const contactoConocido = await contactos.buscarPorTelefono(phone, agente);
-      if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+      if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, agente);
     }
 
     // Fuga de proceso/metodología/reglas internas — corte determinístico,
@@ -997,7 +997,7 @@ async function manejarMensajeKapso(phone, texto) {
     systemPrompt += await bloqueTarifaRutaProveedor(phone);
     systemPrompt += sofiaOperacion.bloqueChecklist(phone);
     const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO);
-    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, AGENTE_KAPSO);
   }
 
   if (promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
@@ -1159,7 +1159,7 @@ async function manejarMensajeKapsoSara(phone, texto) {
     const foliosPersona = folioContexto.foliosPorTelefono(phone);
     if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
     const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_SARA);
-    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, AGENTE_KAPSO_SARA);
   }
 
   if (promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
@@ -1565,7 +1565,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       }
       if (!esGrupo && !personaEquipo) {
         const contactoConocido = await contactos.buscarPorTelefono(remitentePhone, agente);
-        if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+        if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, agente);
       }
       // Datos reales del TMS (folios, estatus, ubicación GPS en vivo) — sin
       // esto NOA/SOFIA no tienen forma de contestar sobre folios reales por

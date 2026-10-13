@@ -642,11 +642,13 @@ async function _llamarStatusNOA({ telefono, nombre, folio, ruta, rol }) {
 
   try { systemPrompt += require('./folioContexto').bloque({ alcance: 'folios', folios: [folio] }); } catch (e) { console.error('[Vapi] Error leyendo contexto del folio:', e.message); }
 
-  // ¿Ya has hablado antes con este transportista/cliente? (proveedores se
-  // guardan como 'sofia' al cerrar el trato — NOA consulta el mismo registro).
+  // ¿Ya has hablado antes con este transportista/cliente? NOA tiene
+  // visibilidad cruzada sobre toda la Base de Datos (ver buscarPorTelefono en
+  // contactos.js) — no hace falta fingir ser SOFIA/SARA para encontrarlo, y
+  // así además recibe el tono de trato propio de NOA (no el de ventas/amigos).
   try {
-    const contactoConocido = await contactos.buscarPorTelefono(telefono, esChofer ? 'sofia' : 'sara');
-    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
+    const contactoConocido = await contactos.buscarPorTelefono(telefono, 'noa');
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, 'noa');
   } catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
 
   if (!API_KEY || !PHONE_NUMBER_ID_NOA) {

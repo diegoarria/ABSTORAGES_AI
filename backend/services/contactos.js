@@ -286,7 +286,20 @@ function bloqueDatosCliente(contacto) {
   );
 }
 
-function bloqueContactoConocido(contacto) {
+// Trato de NOA con un contacto conocido — distinto del de SARA (ejecutiva
+// comercial) y SOFIA (amigo de confianza): NOA no vende ni negocia, solo
+// monitorea viajes. Pedido explícito del usuario (12-oct-2026): todo el que
+// ya está en la Base de Datos es alguien conocido para NOA también — nunca
+// tratarlo como si fuera la primera vez, sin importar si es cliente o
+// proveedor (por eso un solo bloque, no dos como con SARA/SOFIA).
+const TRATO_NOA_BD =
+  `\n\n## 🤝 TRATO CON ESTE CONTACTO — YA LO CONOCES, NO ES ALGUIEN NUEVO\n` +
+  `Esta persona ya está en la Base de Datos de ABSTORAGES — para ti es exactamente igual de conocida que para SARA o SOFIA, aunque tú no hayas hablado antes directamente con ella. Nunca actúes como si fuera la primera vez. ` +
+  `Tu tono es profesional, directo y de monitoreo — no vendes (como SARA) ni platicas relajado (como SOFIA): confirmas estatus, resuelves dudas operativas del viaje, y mantienes informado. ` +
+  `Reconócela por su nombre y, si es relevante, por su empresa o el folio en el que participa — nunca le pidas datos que ya tienes.\n`;
+
+function bloqueContactoConocido(contacto, agente) {
+  const esNOA = String(agente || '').toLowerCase() === 'noa';
   const interacciones = (contacto.interacciones || []).slice(0, 5)
     .map(i => `- ${new Date(i.fecha).toLocaleDateString('es-MX')} (${i.canal || 'otro'}): ${i.resumen || 'sin detalle'}`)
     .join('\n');
@@ -294,7 +307,7 @@ function bloqueContactoConocido(contacto) {
     `\n\n---\n\n## 🧠 CONTACTO CONOCIDO — YA TIENES HISTORIAL CON ESTA PERSONA\n` +
     `**${contacto.nombre_completo}**${contacto.empresa ? ` — ${contacto.empresa}` : ''} (${contacto.tipo || 'contacto'}). ` +
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
-    (contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : contacto.tipo === 'cliente' ? TRATO_CLIENTE_BD : '') +
+    (esNOA ? TRATO_NOA_BD : contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : contacto.tipo === 'cliente' ? TRATO_CLIENTE_BD : '') +
     (contacto.tipo === 'cliente' ? bloqueDatosCliente(contacto) : '') +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
     (interacciones ? `Interacciones previas relevantes:\n${interacciones}\n\n` : '\n') +
