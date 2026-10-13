@@ -435,6 +435,12 @@ body[data-page="sof"] .panel-sof{display:flex !important;flex:1}
 .hdr .brand img{display:none !important}
 .hdr .brand > div{display:none !important}
 .hdr .brand span{color:var(--text-100) !important;font-size:12px !important;letter-spacing:.1em !important}
+
+/* ── Mapa de flota de NOA — tiles de OpenStreetMap vienen en claro, se
+   invierten con CSS para que combinen con el tema oscuro del panel ── */
+#noa-map{background:#1a1a1a}
+#noa-map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.95) contrast(.9) saturate(.6)}
+#noa-map .leaflet-marker-icon,#noa-map .leaflet-popup,#noa-map .leaflet-control{filter:none}
 </style>
 <link rel="stylesheet" href="/css/corporate-tokens.css">
 <link rel="stylesheet" href="/css/ops.css">
@@ -831,7 +837,12 @@ function getVisibleCuentas() {
   function initMap(){
     if (map || typeof L === 'undefined') return;
     map = L.map('noa-map', { zoomControl: true, attributionControl: false }).setView([23.6, -102.5], 5); // centro de México
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
+    // OpenStreetMap estándar — 100% gratis, sin API key. Se le aplica un
+    // filtro CSS (ver #noa-map .leaflet-tile-pane) para que combine con el
+    // tema oscuro del panel, ya que los tiles en sí vienen en claro.
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '© OpenStreetMap',
+    }).addTo(map);
   }
 
   function actualizarMapa(viajes){
