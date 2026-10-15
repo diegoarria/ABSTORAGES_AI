@@ -510,7 +510,7 @@ app.post('/api/login/pin', (req, res) => {
   const { user: safe } = entry;
   const sid = sessions.create(safe);
   res.setHeader('Set-Cookie', `abs_session=${sid}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
-  res.json({ ok: true, user: safe, redirect: homeForRole(safe.role) });
+  res.json({ ok: true, user: safe, redirect: homeForRole(safe.role), token: sid });
 });
 
 app.post('/api/logout', (req, res) => {
@@ -1278,6 +1278,90 @@ async function manejarMensajeKapsoSara(phone, texto) {
   if (esPrimerMensaje) pushActividad({ agente: 'SARA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp vía Kapso: ${phone}`, sessionId: session });
 }
 
+// Mismo criterio que manejarMensajeKapso/manejarMensajeKapsoSara — duplica
+// la orquestación de NOA del webhook de Twilio en vez de parametrizarla.
+// NOA conserva su clave de sesión histórica (wa_${phone}, sin sufijo de
+// agente) para no romper continuidad con conversaciones ya guardadas desde
+// Twilio — mismo criterio que en el handler de Twilio (línea ~601).
+const AGENTE_KAPSO_NOA = 'noa';
+async function manejarMensajeKapsoNoa(phone, texto) {
+  if (emergencyShutdown.estaActivo()) { console.log(`[Kapso-IN-NOA] apagado de emergencia activo, ignorando mensaje de ${phone}`); return; }
+  if (phoneBanlist.estaBaneado(phone)) { console.log(`[Kapso-IN-NOA] teléfono baneado, ignorando mensaje de ${phone}`); return; }
+  if (Date.now() < MANTENIMIENTO_HASTA.getTime()) { console.log(`[Kapso-IN-NOA] en mantenimiento forzado, ignorando mensaje de ${phone}`); return; }
+
+  const session = `wa_${phone}`;
+  const { contextBlock, history } = memory.buildContext(session);
+  const esPrimerMensaje = history.length === 0;
+  const tariffCtx = tariff.getContext();
+  let systemPrompt = buildPrompt(AGENTE_KAPSO_NOA, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
+  const personaEquipo = staffDirectory.buscarPorTelefono(phone);
+  systemPrompt += `\n\nHoy es ${new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeZone: 'America/Monterrey' }).format(new Date())} (hora de Monterrey). Fecha en formato AAAA-MM-DD: ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())}.`;
+  if (personaEquipo) {
+    systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
+    systemPrompt += await contactos.bloqueDirectorioNOA();
+    systemPrompt += folioContexto.bloque();
+  } else {
+    const foliosPersona = folioContexto.foliosPorTelefono(phone);
+    if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
+    const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_NOA);
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, AGENTE_KAPSO_NOA);
+  }
+
+  if (promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
+    memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    saveMessage(session, AGENTE_KAPSO_NOA, 'user', texto); saveMessage(session, AGENTE_KAPSO_NOA, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA, AGENTE_KAPSO_NOA);
+    return;
+  }
+  if (promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
+    memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    saveMessage(session, AGENTE_KAPSO_NOA, 'user', texto); saveMessage(session, AGENTE_KAPSO_NOA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    pushActividad({ agente: 'NOA', tipo: 'ALERTA_FUGA_PROMPT', mensaje: texto.slice(0, 200), sessionId: session });
+    phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_NOA }).catch(() => {});
+    registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone}`);
+    ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_NOA, motivo: texto.slice(0, 300), severity: 'critical' });
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_NOA);
+    return;
+  }
+  if (personaEquipo?.nombre !== 'Diego') {
+    const palabra = attackWordlist.detectar(texto);
+    if (palabra) {
+      const telefonoNorm = phoneBanlist.normalizar(phone);
+      const { count, alcanzoLimite } = attackStrikes.registrar(telefonoNorm, palabra);
+      pushActividad({ agente: 'NOA', tipo: 'ALERTA_INTENTO_ATAQUE', mensaje: `"${palabra}" (intento ${count}/${attackStrikes.LIMITE})`, sessionId: session });
+      if (alcanzoLimite) {
+        memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        saveMessage(session, AGENTE_KAPSO_NOA, 'user', texto); saveMessage(session, AGENTE_KAPSO_NOA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        phoneBanlist.banear({ telefono: phone, motivo: `3 intentos de ataque — último: "${palabra}" en "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_NOA }).catch(() => {});
+        registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone} (3 strikes)`);
+        ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_NOA, motivo: `3er intento: "${palabra}"`, severity: 'critical' });
+        sendPush({ title: '🚫 Teléfono baneado — 3 intentos de ataque', body: `NOA · ${phone} · última palabra: "${palabra}"`, tag: 'telefono-baneado', url: '/', tipo: 'ALERTA_INTENTO_ATAQUE', urgente: true }).catch(() => {});
+        await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_NOA);
+        return;
+      }
+    }
+  }
+
+  if (tms.ENABLED) { const tmsCtx = await tms.getContextoNOA(texto); if (tmsCtx) systemPrompt += tmsCtx; }
+
+  memory.addMessage(session, 'user', texto);
+  saveMessage(session, AGENTE_KAPSO_NOA, 'user', texto);
+
+  await humanDelay.esperar(texto);
+  let respuesta = '';
+  await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
+  memory.addMessage(session, 'assistant', respuesta);
+  saveMessage(session, AGENTE_KAPSO_NOA, 'assistant', respuesta);
+
+  const textoLimpio = limpiarControlParaCliente(respuesta);
+  for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque, AGENTE_KAPSO_NOA);
+
+  const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
+  if (metaMatch) memory.updateMeta(session, { empresa: metaMatch[1].trim() });
+
+  if (esPrimerMensaje) pushActividad({ agente: 'NOA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp vía Kapso: ${phone}`, sessionId: session });
+}
+
 app.post('/webhook/kapso', (req, res) => {
   res.sendStatus(200); // Kapso exige 200 en <10s — se contesta antes de procesar
   const firma = req.headers['x-webhook-signature'];
@@ -1301,6 +1385,7 @@ app.post('/webhook/kapso', (req, res) => {
       console.log(`[Kapso-IN] (${agenteDestino || 'desconocido'}) de ${phone}: ${texto.slice(0, 200)}`);
       if (agenteDestino === 'sara') await manejarMensajeKapsoSara(phone, texto);
       else if (agenteDestino === 'sofia') await manejarMensajeKapso(phone, texto);
+      else if (agenteDestino === 'noa') await manejarMensajeKapsoNoa(phone, texto);
       else console.warn(`[Kapso-IN] phone_number_id desconocido (${phoneNumberId}), mensaje ignorado`);
     } catch (e) {
       console.error('[Kapso webhook]', e.message);
@@ -2563,7 +2648,7 @@ async function obtenerRutaCarretera(origenTxt, destinoTxt) {
 // folios porque la mayoría de las operaciones no pasan por el flujo de
 // búsqueda de SOFIA). Reusa _foliosCache si ya está caliente (la propia
 // página ya llama a /api/noa/folios al cargar); si no, lo arma aquí mismo.
-app.get('/api/noa/mapa', adminUOps, async (req, res) => {
+app.get('/api/noa/mapa', adminUOpsOCliente, async (req, res) => {
   try {
     let folios = _foliosCache?.data || [];
     if (!folios.length && tms.ENABLED) {
@@ -2579,6 +2664,10 @@ app.get('/api/noa/mapa', adminUOps, async (req, res) => {
           _foliosCache = { data: folios, ts: new Date().toISOString() };
         }
       } catch (e) { console.error('[api/noa/mapa] Error consultando TMS:', e.message); }
+    }
+
+    if (req.user?.role === 'cliente') {
+      folios = folios.filter(f => auth.folioEsDelCliente(f.cl, req.user.empresa));
     }
 
     const FRACCION_POR_ESTADO = { EN_CARGA: 0, EN_TRANSITO: 0.5, DETENIDA: 0.5, EN_DESTINO: 1 };
@@ -3099,7 +3188,10 @@ function mapFolio(s) {
   };
 }
 
-app.get('/api/noa/folios', async (req, res) => {
+app.get('/api/noa/folios', adminUOpsOCliente, async (req, res) => {
+  const filtrar = (folios) => req.user?.role === 'cliente'
+    ? folios.filter(f => auth.folioEsDelCliente(f.cl, req.user.empresa))
+    : folios;
   if (!tms.ENABLED) return res.json([]);
   try {
     const activos = await tms.foliosActivosNOA();
@@ -3114,12 +3206,12 @@ app.get('/api/noa/folios', async (req, res) => {
         if (ubic) { f.gps.la = ubic.lat; f.gps.ln = ubic.lng; }
       }));
       _foliosCache = { data: folios, ts: new Date().toISOString() };
-      return res.json(folios);
+      return res.json(filtrar(folios));
     }
     // TMS returned empty — serve cache if available
     if (_foliosCache) {
       console.warn('[NOA/folios] TMS returned 0 results — serving cache from', _foliosCache.ts);
-      return res.json(_foliosCache.data);
+      return res.json(filtrar(_foliosCache.data));
     }
     res.json([]);
   } catch (e) {
@@ -3127,7 +3219,7 @@ app.get('/api/noa/folios', async (req, res) => {
     // TMS error — serve cache if available
     if (_foliosCache) {
       console.warn('[NOA/folios] TMS error — serving cache from', _foliosCache.ts);
-      return res.json(_foliosCache.data);
+      return res.json(filtrar(_foliosCache.data));
     }
     res.status(503).json([]);
   }
@@ -3211,7 +3303,7 @@ function detectarAgente(id) {
   return 'desconocido';
 }
 
-app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
+app.get('/api/historial/sesiones', adminUOpsOCliente, async (req, res) => {
   try {
     const sesiones = await Promise.resolve(memory.listSessions());
     const todosLeads = await leads.list({ limit: 5000 });
@@ -3259,6 +3351,7 @@ app.get('/api/historial/sesiones', adminUOps, async (req, res) => {
     }
 
     if (req.user?.role === 'lector') enriquecidas = enriquecidas.filter(s => s.agente === 'sofia');
+    if (req.user?.role === 'cliente') enriquecidas = enriquecidas.filter(s => auth.folioEsDelCliente(s.empresa, req.user.empresa));
     res.json(enriquecidas.sort((a, b) => b.updatedAt - a.updatedAt));
   } catch (e) {
     console.error('[historial/sesiones]', e.message);
@@ -4003,6 +4096,13 @@ function soloAdmin(req, res, next) {
 }
 function adminUOps(req, res, next) {
   if (['admin', 'operaciones', 'lector'].includes(req.user?.role)) return next();
+  res.status(403).json({ error: 'Acceso restringido' });
+}
+// Igual que adminUOps pero además admite rol "cliente" — para rutas donde un
+// cliente externo puede entrar siempre que los datos se filtren por su
+// propia empresa (ver auth.folioEsDelCliente), nunca para Base de Datos.
+function adminUOpsOCliente(req, res, next) {
+  if (['admin', 'operaciones', 'lector', 'cliente'].includes(req.user?.role)) return next();
   res.status(403).json({ error: 'Acceso restringido' });
 }
 // ─── APAGADO DE EMERGENCIA — switch manual, sin necesitar redeploy ──────────

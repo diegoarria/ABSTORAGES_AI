@@ -8,8 +8,9 @@
 // Números conectados y verificados en Kapso (proyecto "Nuvos AI",
 // diego.arria19@gmail.com):
 //   SOFIA — +52 1 81 3590 9778 — phone_number_id 1433231719864226 (06-oct-2026)
-//   SARA  — +52 1 81 8685 8950 — phone_number_id 1337732556092248 (12-oct-2026)
-// Webhook único (/webhook/kapso en server-lite.js) registrado contra ambos
+//   SARA  — +52 1 81 8685 8950 — phone_number_id 1457395780780302 (15-oct-2026, re-registrado tras borrar el número viejo de Twilio)
+//   NOA   — +52 1 81 3590 9641 — phone_number_id 1406980499159394 (15-oct-2026)
+// Webhook único (/webhook/kapso en server-lite.js) registrado contra los tres
 // números — el payload entrante trae su propio phone_number_id, con eso se
 // decide a qué agente pertenece el mensaje (ver resolverAgente abajo).
 const crypto = require('crypto');
@@ -18,10 +19,11 @@ const API_BASE   = 'https://api.kapso.ai';
 const KAPSO_KEY  = process.env.KAPSO_API_KEY;
 const WEBHOOK_SECRET = process.env.KAPSO_WEBHOOK_SECRET; // mismo secret para todos los números del proyecto
 
-// phone_number_id por agente — agregar aquí cuando se conecte el de NOA.
+// phone_number_id por agente.
 const PHONE_IDS = {
   sofia: process.env.KAPSO_PHONE_NUMBER_ID,       // ya existía, se mantiene el nombre del env var para no romper producción
   sara:  process.env.KAPSO_PHONE_NUMBER_ID_SARA,
+  noa:   process.env.KAPSO_PHONE_NUMBER_ID_NOA,
 };
 const LIVE = !!KAPSO_KEY;
 
