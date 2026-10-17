@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SARA · ABSTORAGES</title>
+  <title>María · ABSTORAGES</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -18,7 +18,7 @@
     }
     .avatar {
       width: 36px; height: 36px; border-radius: 50%;
-      background: #1a3a8f url('/img/sara-avatar.png') center/cover no-repeat;
+      background: #1a3a8f url('/img/maria-avatar.png') center/cover no-repeat;
       flex-shrink: 0;
     }
     .header-info { flex: 1; }
@@ -43,7 +43,7 @@
       max-width: 82%; padding: 9px 13px;
       font-size: .82rem; line-height: 1.55; word-break: break-word;
     }
-    .msg.sara .bubble {
+    .msg.maria .bubble {
       background: #1a1a3a; border: 1px solid #2a2a4a;
       border-radius: 10px 10px 10px 2px;
     }
@@ -95,7 +95,7 @@
 
     .call-photo {
       width: 90px; height: 90px; border-radius: 50%;
-      background: #1a3a8f url('/img/sara-avatar.png') center/cover no-repeat;
+      background: #1a3a8f url('/img/maria-avatar.png') center/cover no-repeat;
       margin-bottom: 14px; flex-shrink: 0;
     }
     .call-photo.talking   { animation: ring-g 1.3s ease-out infinite; }
@@ -118,7 +118,7 @@
     .level-bar-wrap.visible { opacity: 1; }
     #level-bar { height: 100%; width: 0%; background: #2563eb; border-radius: 2px; transition: width .08s; }
 
-    /* SARA talking bars */
+    /* María talking bars */
     .sound-bars {
       display: flex; gap: 3px; align-items: flex-end; height: 22px;
       margin-bottom: 18px; opacity: 0; transition: opacity .2s;
@@ -146,10 +146,10 @@
   <div class="header">
     <div class="avatar"></div>
     <div class="header-info">
-      <div class="name">SARA Garza · ABSTORAGES</div>
+      <div class="name">María Fernández · ABSTORAGES</div>
       <div class="status">● En línea</div>
     </div>
-    <button class="btn-call" id="open-call" aria-label="Llamar a SARA">
+    <button class="btn-call" id="open-call" aria-label="Llamar a María">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.86 12 19.79 19.79 0 0 1 1.78 3.38 2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
       </svg>
@@ -158,7 +158,7 @@
 
   <div id="call-overlay">
     <div class="call-photo" id="call-photo"></div>
-    <div class="call-name">SARA Garza</div>
+    <div class="call-name">María Fernández</div>
     <div class="call-sub">Ejecutiva Comercial · ABSTORAGES</div>
     <div class="call-status" id="call-status">Conectando…</div>
     <div class="sound-bars" id="sound-bars">
@@ -190,7 +190,7 @@
   <script>
     const BASE    = window.location.origin;
     const SESSION = 'widget_' + Math.random().toString(36).slice(2);
-    // visitorId persiste entre visitas para que SARA recuerde al cliente
+    // visitorId persiste entre visitas para que María recuerde al cliente
     const VISITOR_ID = (() => {
       const key = 'abs_visitor_id';
       let id = localStorage.getItem(key);
@@ -249,7 +249,7 @@
       addBubble('user', toHtml(text));
       inp.disabled = true; btn.disabled = true;
       showTyping();
-      let saraText = '', saraDiv = null;
+      let mariaText = '', mariaDiv = null;
       try {
         const res = await fetch(`${BASE}/api/widget/chat`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -265,21 +265,21 @@
             try {
               const evt = JSON.parse(line.slice(6));
               if (evt.type === 'chunk') {
-                saraText += evt.text;
-                const c = cleanText(saraText);
-                if (!saraDiv) saraDiv = addBubble('sara', toHtml(c));
-                else saraDiv.querySelector('.bubble').innerHTML = toHtml(c);
+                mariaText += evt.text;
+                const c = cleanText(mariaText);
+                if (!mariaDiv) mariaDiv = addBubble('maria', toHtml(c));
+                else mariaDiv.querySelector('.bubble').innerHTML = toHtml(c);
                 msgsEl.scrollTop = msgsEl.scrollHeight;
-              } else if (evt.type === 'cerrar_chat') { closeChat(); return saraText; }
+              } else if (evt.type === 'cerrar_chat') { closeChat(); return mariaText; }
             } catch {}
           }
         }
       } catch {
         hideTyping();
-        addBubble('sara', 'Error de conexión. Intenta de nuevo.');
+        addBubble('maria', 'Error de conexión. Intenta de nuevo.');
       }
       if (!closed) { inp.disabled = false; btn.disabled = false; inp.focus(); }
-      return saraText;
+      return mariaText;
     }
 
     async function send() {
@@ -290,7 +290,7 @@
     }
     btn.addEventListener('click', send);
     inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) send(); });
-    addBubble('sara', '¡Hola! Soy <b>SARA Garza</b>, ejecutiva comercial de <b>ABSTORAGES Logistics Solutions</b>.<br>¿Con quién tengo el gusto y de qué empresa me contactas?');
+    addBubble('maria', '¡Hola! Soy <b>María Fernández</b>, ejecutiva comercial de <b>ABSTORAGES Logistics Solutions</b>.<br>¿Con quién tengo el gusto y de qué empresa me contactas?');
 
     // ── Call — VAD + MediaRecorder + ElevenLabs STT ───────────────────────────
     //
@@ -299,8 +299,8 @@
     // 2. AudioContext + AnalyserNode miden el nivel de audio 60fps
     // 3. Cuando el usuario habla (nivel > umbral) → MediaRecorder graba
     // 4. Cuando el usuario se calla (silencio > 900ms) → envía audio a /api/widget/stt
-    // 5. ElevenLabs Scribe transcribe → SARA responde → TTS → vuelve a escuchar
-    // 6. Si el usuario habla mientras SARA habla → barge-in (corta el audio)
+    // 5. ElevenLabs Scribe transcribe → María responde → TTS → vuelve a escuchar
+    // 6. Si el usuario habla mientras María habla → barge-in (corta el audio)
 
     const overlay    = document.getElementById('call-overlay');
     const callPhoto  = document.getElementById('call-photo');
@@ -356,7 +356,7 @@
     async function playTTS(text) {
       if (!text || !inCall) return;
       setSpeaking(true);
-      setStatus('● SARA está hablando…');
+      setStatus('● María está hablando…');
       try {
         const res = await fetch(`${BASE}/api/widget/tts`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -424,7 +424,7 @@
       const isSpeaking = rms > SPEAK_THRESHOLD;
 
       if (isSpeaking) {
-        // Barge-in: cut SARA mid-sentence
+        // Barge-in: cut María mid-sentence
         if (callState === 'speaking') {
           stopTTS();
           callState = 'listening';
@@ -497,8 +497,8 @@
       openCallBtn.style.display = 'none';
       setStatus('● En llamada');
 
-      // SARA greeting
-      await playTTS('¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?');
+      // María greeting
+      await playTTS('¡Hola! Soy María Fernández de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?');
 
       if (inCall) {
         callState = 'listening';

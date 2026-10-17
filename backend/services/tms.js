@@ -265,7 +265,7 @@ async function directorio(texto) {
 // ── Context builder para SARA ─────────────────────────────────────────────────
 // Detecta intención en el mensaje del usuario y pre-fetcha datos del TMS
 // Devuelve un bloque de texto para inyectar en el contexto de SARA
-async function getContextoSARA(mensajeUsuario) {
+async function getContextoMaria(mensajeUsuario) {
   if (!ENABLED) return '';
 
   const msg = mensajeUsuario.toLowerCase();
@@ -889,7 +889,7 @@ function iniciarPrewarmNOA() {
 
 module.exports = {
   // SARA
-  buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoSARA, desempenoCliente,
+  buscarCliente, historialCliente, rutasPrincipales, tarifasCliente, directorio, getContextoMaria, desempenoCliente,
   // SOFIA
   listarProveedores, buscarProveedor, rutasProveedor, proveedoresPorRuta, historialTarifaRuta, getContextoSOFIA, proveedoresParaVapi, foliosPorAsignar,
   // NOA

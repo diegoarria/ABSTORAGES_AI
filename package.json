@@ -1,7 +1,7 @@
 {
   "name": "abstorages-ai-portal",
   "version": "1.0.0",
-  "description": "ABSTORAGES AI Portal — SARA (Sales AI) + SOFIA (Operations Planner AI)",
+  "description": "ABSTORAGES AI Portal — MARÍA Fernández (Sales AI) + SOFIA (Operations Planner AI)",
   "main": "backend/server.js",
   "scripts": {
     "start": "node server-lite.js",

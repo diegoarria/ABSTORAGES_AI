@@ -1,4 +1,4 @@
-// ─── KPI DETAIL — Pantalla de detalle para SARA y SOFIA ──────────────────────
+// ─── KPI DETAIL — Pantalla de detalle para MARÍA y SOFIA ──────────────────────
 
 const KpiDetail = (() => {
 
@@ -189,8 +189,8 @@ const KpiDetail = (() => {
   }
 
   const CONFIG = {
-    sara: {
-      name    : 'SARA',
+    maria: {
+      name    : 'MARÍA',
       sub     : 'Detalle comercial · Clientes y prospectos',
       color   : 'green',
       get accent() { return isLight() ? '#007a3d' : '#00e87a'; },
@@ -311,8 +311,8 @@ const KpiDetail = (() => {
     };
     const bc = badgeColors[d.estatus] || { color: light ? '#374151' : '#7e8899', bg: light ? 'rgba(55,65,81,.08)' : 'rgba(126,136,153,.1)' };
 
-    // Campos de meta (diferentes para SARA vs SOFIA)
-    const metaFields = cfg.name === 'SARA'
+    // Campos de meta (diferentes para MARÍA vs SOFIA)
+    const metaFields = cfg.name === 'MARÍA'
       ? `<div class="kd-meta-item"><div class="kd-meta-label">Empresa</div><div class="kd-meta-val">${d.empresa}</div></div>
          <div class="kd-meta-item"><div class="kd-meta-label">Ruta</div><div class="kd-meta-val">${d.ruta}</div></div>
          <div class="kd-meta-item"><div class="kd-meta-label">Monto</div><div class="kd-meta-val" style="color:var(--verde);font-weight:700">${d.monto}</div></div>`
@@ -321,7 +321,7 @@ const KpiDetail = (() => {
          <div class="kd-meta-item"><div class="kd-meta-label">Transportista</div><div class="kd-meta-val">${d.transportista}</div></div>
          <div class="kd-meta-item"><div class="kd-meta-label">Unidad</div><div class="kd-meta-val">${d.unidad}</div></div>`;
 
-    const titleName = cfg.name === 'SARA' ? d.nombre : d.cliente;
+    const titleName = cfg.name === 'MARÍA' ? d.nombre : d.cliente;
 
     return `
       <div class="kd-card">
@@ -329,7 +329,7 @@ const KpiDetail = (() => {
           <div class="kd-card-avatar" style="background:${dim};color:${accent}">${d.initials}</div>
           <div class="kd-card-info">
             <div class="kd-card-name">${titleName}</div>
-            <div class="kd-card-empresa">${cfg.name === 'SARA' ? d.empresa : d.ruta}</div>
+            <div class="kd-card-empresa">${cfg.name === 'MARÍA' ? d.empresa : d.ruta}</div>
           </div>
           <div class="kd-card-badge" style="color:${bc.color};background:${bc.bg};border-color:${bc.color}30">
             ${d.estatus}

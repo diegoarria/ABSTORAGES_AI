@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>SARA Prospector — ABSTORAGES</title>
+<title>María Prospector — ABSTORAGES</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0B2A5B">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -77,12 +77,12 @@
 <link rel="stylesheet" href="/css/corporate.css">
 <script src="/js/shell.js"></script>
 </head>
-<body data-shell-title="SARA Prospector">
+<body data-shell-title="María Prospector">
 <main class="page-pr">
   <div class="crumbs"><a href="/">Portal</a><span>/</span><span>Prospector</span></div>
   <div class="page-head">
     <div>
-      <h1>SARA Prospector</h1>
+      <h1>María Prospector</h1>
       <p>Búsqueda de prospectos de Alimentos y Bebidas en México con Apollo y Lusha, y seguimiento de su secuencia de contacto.</p>
     </div>
   </div>
@@ -94,12 +94,12 @@
         <div class="field">
           <label>Industria</label>
           <select id="f-industria" disabled><option value="food_and_beverages" selected>Alimentos y bebidas</option></select>
-          <div class="help">Bloqueado: SARA solo prospecta Alimentos y bebidas.</div>
+          <div class="help">Bloqueado: María solo prospecta Alimentos y bebidas.</div>
         </div>
         <div class="field">
           <label>País / región</label>
           <select id="f-pais" disabled><option value="Mexico" selected>México</option></select>
-          <div class="help">Bloqueado: SARA solo prospecta empresas mexicanas.</div>
+          <div class="help">Bloqueado: María solo prospecta empresas mexicanas.</div>
         </div>
         <div class="field">
           <label>Tamaño de empresa</label>
@@ -137,7 +137,7 @@ Director de Supply Chain</textarea>
         <div id="creditos" class="help" style="text-align:center"></div>
       </div>
       <div class="side-sec" id="sidebar-stats">
-        <div class="sp-title">Pipeline SARA</div>
+        <div class="sp-title">Pipeline María</div>
         <div id="pipe-stats"></div>
       </div>
     </aside>
@@ -160,7 +160,7 @@ Director de Supply Chain</textarea>
         <div class="empty">
           <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           <h3>Busca prospectos para empezar</h3>
-          <p>SARA buscará en Apollo.io y Lusha los contactos más relevantes para ABSTORAGES.</p>
+          <p>María buscará en Apollo.io y Lusha los contactos más relevantes para ABSTORAGES.</p>
         </div>
       </div>
     </section>
@@ -360,7 +360,7 @@ async function iniciarSecuencia() {
       body: JSON.stringify({ prospectos: lista }),
     }).then(r => r.json());
 
-    alert(`✅ ${r.nuevos} prospectos añadidos a la secuencia de SARA.\n\nSARA los contactará automáticamente por LinkedIn → Email → WhatsApp → Llamada.`);
+    alert(`✅ ${r.nuevos} prospectos añadidos a la secuencia de María.\n\nMaría los contactará automáticamente por LinkedIn → Email → WhatsApp → Llamada.`);
     deseleccionarTodo();
     cargarStats();
   } catch(e) { alert('Error: ' + e.message); }

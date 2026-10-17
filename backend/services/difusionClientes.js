@@ -1,5 +1,5 @@
 // ── Difusión semanal de disponibilidad a clientes ────────────────────────────
-// Pedido explícito del usuario (06-oct-2026): SARA se adelanta en vez de
+// Pedido explícito del usuario (06-oct-2026): MARÍA (antes SARA) se adelanta en vez de
 // esperar a que el cliente pida carga — una vez por semana le escribe a los
 // clientes que ya cerraron con nosotros antes: "tenemos unidades disponibles
 // para estos próximos días, si requieres servicio podemos atenderte".
@@ -7,9 +7,10 @@
 // Mismo patrón que difusionGeneral.js (la de SOFIA a proveedores), pero:
 //   - destinatarios: contactos tipo 'cliente' de la Base de Datos (no proveedores)
 //   - una vez por SEMANA, no todos los días
-//   - el remitente es SARA, con su propio número y su propio límite diario
+//   - el remitente es MARÍA, con su propio número y su propio límite diario
 //
-// Apagado por default — requiere SARA_DIFUSION_CLIENTES=true en el entorno,
+// Apagado por default — requiere MARIA_DIFUSION_CLIENTES=true (o el nombre viejo
+// SARA_DIFUSION_CLIENTES, que se sigue leyendo como respaldo) en el entorno,
 // mismo criterio que difusionGeneral.js: un envío masivo automático a
 // clientes reales no se activa solo.
 const fs = require('fs');
@@ -20,21 +21,21 @@ const agentPause = require('./agentPause');
 const actividadBus = require('./actividadBus');
 const notifier = require('./notifier');
 
-const HABILITADO = process.env.SARA_DIFUSION_CLIENTES === 'true';
-const DIA_SEMANA = Number(process.env.SARA_DIFUSION_CLIENTES_DIA ?? 1); // 0=domingo … 1=lunes (default)
-const HORA   = Number(process.env.SARA_DIFUSION_CLIENTES_HORA || 9);
-const MINUTO = Number(process.env.SARA_DIFUSION_CLIENTES_MINUTO || 0);
-const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SARA_DIFUSION_CLIENTES_PAUSA_MS || 3000);
-const VENTANA_MIN = Number(process.env.SARA_DIFUSION_CLIENTES_VENTANA_MIN || 90);
+const HABILITADO = (process.env.MARIA_DIFUSION_CLIENTES || process.env.SARA_DIFUSION_CLIENTES) === 'true';
+const DIA_SEMANA = Number(process.env.MARIA_DIFUSION_CLIENTES_DIA ?? process.env.SARA_DIFUSION_CLIENTES_DIA ?? 1); // 0=domingo … 1=lunes (default)
+const HORA   = Number(process.env.MARIA_DIFUSION_CLIENTES_HORA || process.env.SARA_DIFUSION_CLIENTES_HORA || 9);
+const MINUTO = Number(process.env.MARIA_DIFUSION_CLIENTES_MINUTO || process.env.SARA_DIFUSION_CLIENTES_MINUTO || 0);
+const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.MARIA_DIFUSION_CLIENTES_PAUSA_MS || process.env.SARA_DIFUSION_CLIENTES_PAUSA_MS || 3000);
+const VENTANA_MIN = Number(process.env.MARIA_DIFUSION_CLIENTES_VENTANA_MIN || process.env.SARA_DIFUSION_CLIENTES_VENTANA_MIN || 90);
 const CHEQUEO_MS = 15 * 60 * 1000;
 
 // Plantilla pendiente de crear y someter a aprobación en Twilio/Meta (mismo
 // proceso que las de saraProactivo.js) — texto sugerido:
-//   "Hola {{1}}, soy SARA de ABSTORAGES. Tenemos unidades disponibles para
+//   "Hola {{1}}, soy María de ABSTORAGES. Tenemos unidades disponibles para
 //    estos próximos días. Si requieres servicio de transporte, podemos
 //    atenderte — cuéntame qué ruta necesitas."
 const CONTENT_SID = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_CLIENTES || null;
-const TEXTO = 'Hola {nombre}, soy SARA de ABSTORAGES. Tenemos unidades disponibles para estos próximos días — si requieres servicio de transporte, podemos atenderte. ¿Qué ruta necesitas?';
+const TEXTO = 'Hola {nombre}, soy María de ABSTORAGES. Tenemos unidades disponibles para estos próximos días — si requieres servicio de transporte, podemos atenderte. ¿Qué ruta necesitas?';
 
 const ESTADO_FILE = path.join(__dirname, '../../data/difusion-clientes-estado.json');
 function leerUltimaFecha() {
@@ -55,16 +56,16 @@ function horaFechaDiaMTY() {
 }
 
 async function clientesConocidos() {
-  const bd = await contactos.listarPorAgente('SARA', { tipo: 'cliente' });
+  const bd = await contactos.listarPorAgente('MARIA', { tipo: 'cliente' });
   return bd.filter(c => c.telefono && c.telefono !== '—');
 }
 
 const titulo = s => String(s || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
-const feed = e => actividadBus.emitir({ agente: 'SARA', ...e });
+const feed = e => actividadBus.emitir({ agente: 'MARIA', ...e });
 
 async function correrSiToca() {
   if (!HABILITADO) return;
-  if (agentPause.estaPausado('sara')) return;
+  if (agentPause.estaPausado('maria')) return;
   if (!CONTENT_SID) { console.warn('[difusionClientes] Falta TWILIO_CONTENT_SID_DISPONIBILIDAD_CLIENTES — se omite'); return; }
 
   const { fecha, minutosDelDia, diaSemana } = horaFechaDiaMTY();
@@ -84,24 +85,24 @@ async function correrSiToca() {
   let enviados = 0, sinCredito = 0, fallidos = 0;
   for (const c of lista) {
     try {
-      const r = await whatsappProactivo.enviarPlantillaSinCandado('sara', c.telefono, CONTENT_SID, { '1': titulo(c.nombre_completo) });
+      const r = await whatsappProactivo.enviarPlantillaSinCandado('maria', c.telefono, CONTENT_SID, { '1': titulo(c.nombre_completo) });
       if (r?.status === 'rate_limited') { sinCredito = lista.length - enviados - fallidos; break; }
       if (r?.status === 'paused') break;
       enviados++;
-      whatsappProactivo.registrarEnMemoria?.('sara', c.telefono, TEXTO.replace('{nombre}', titulo(c.nombre_completo)));
-      contactos.upsertContacto({ agente: 'sara', tipo: 'cliente', telefono: c.telefono, resumen_interaccion: 'Difusión semanal de disponibilidad', canal: 'whatsapp-plantilla' }).catch(() => {});
+      whatsappProactivo.registrarEnMemoria?.('maria', c.telefono, TEXTO.replace('{nombre}', titulo(c.nombre_completo)));
+      contactos.upsertContacto({ agente: 'maria', tipo: 'cliente', telefono: c.telefono, resumen_interaccion: 'Difusión semanal de disponibilidad', canal: 'whatsapp-plantilla' }).catch(() => {});
     } catch (e) { fallidos++; console.error(`[difusionClientes] Error mandando a ${c.nombre_completo}:`, e.message); }
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }
 
   const resumen = `Difusión semanal a clientes: ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
   feed({ tipo: 'DISPONIBILIDAD_CLIENTES', mensaje: resumen });
-  notifier.notificarAlerta({ title: 'SARA — Difusión semanal de disponibilidad', body: resumen, tipo: 'DISPONIBILIDAD_CLIENTES' }).catch(() => {});
+  notifier.notificarAlerta({ title: 'MARÍA — Difusión semanal de disponibilidad', body: resumen, tipo: 'DISPONIBILIDAD_CLIENTES' }).catch(() => {});
   console.log(`[difusionClientes] ${resumen}`);
 }
 
 function iniciar() {
-  if (!HABILITADO) { console.log('[difusionClientes] Desactivado (SARA_DIFUSION_CLIENTES != "true")'); return; }
+  if (!HABILITADO) { console.log('[difusionClientes] Desactivado (MARIA_DIFUSION_CLIENTES / SARA_DIFUSION_CLIENTES != "true")'); return; }
   setInterval(() => correrSiToca().catch(e => console.error('[difusionClientes]', e.message)), CHEQUEO_MS);
   correrSiToca().catch(() => {}); // por si el server arranca ya pasada la hora
   console.log(`[difusionClientes] Activo — día ${DIA_SEMANA} (0=domingo) a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);

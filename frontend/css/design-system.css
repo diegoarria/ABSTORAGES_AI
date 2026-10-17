@@ -220,7 +220,7 @@
 
 /* ── Avatares con anillo de color por agente ── */
 .ds-avatar { border-radius: 50%; background-position: center; background-size: cover; flex-shrink: 0; }
-.ds-avatar-sara  { border: 1.5px solid var(--brand-green); box-shadow: 0 0 0 3px var(--brand-green-dim); }
+.ds-avatar-sara, .ds-avatar-maria  { border: 1.5px solid var(--brand-green); box-shadow: 0 0 0 3px var(--brand-green-dim); }
 .ds-avatar-sofia { border: 1.5px solid var(--brand-blue);  box-shadow: 0 0 0 3px var(--brand-blue-dim); }
 .ds-avatar-noa   { border: 1.5px solid var(--warn);        box-shadow: 0 0 0 3px var(--warn-dim); }
 

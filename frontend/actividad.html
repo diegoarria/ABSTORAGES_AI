@@ -32,7 +32,8 @@
 .ev .who { font-size:11px; font-weight:700; letter-spacing:.06em; padding:4px 10px; border-radius:20px; text-align:center; text-transform:uppercase; background:var(--ag-soft); color:var(--ag); width:fit-content; }
 .ev .tipo { display:block; font-size:11px; color:var(--tx3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:3px; font-weight:700; }
 .ev .msg { font-size:14px; line-height:1.55; word-break:break-word; }
-.a-SARA { --ag:var(--sara); --ag-soft:var(--sara-soft); } .a-SOFIA { --ag:var(--sofia); --ag-soft:var(--sofia-soft); } .a-NOA { --ag:var(--noa); --ag-soft:var(--noa-soft); } .a-OTRO { --ag:var(--tx2); --ag-soft:var(--surface-3); }
+.a-SARA { --ag:var(--sara); --ag-soft:var(--sara-soft); }
+.a-MARIA  { --ag:var(--maria); --ag-soft:var(--maria-soft); } .a-SOFIA { --ag:var(--sofia); --ag-soft:var(--sofia-soft); } .a-NOA { --ag:var(--noa); --ag-soft:var(--noa-soft); } .a-OTRO { --ag:var(--tx2); --ag-soft:var(--surface-3); }
 @media (max-width:640px) { .page-w { padding:20px 16px 48px; } .ev { grid-template-columns:1fr; gap:6px; } .ev .t { order:3; } .bar .seg { min-width:0; width:100%; } }
 </style>
 </head>
@@ -42,7 +43,7 @@
   <div class="page-head">
     <div>
       <h1>Actividad en vivo</h1>
-      <p>Cada contacto, respuesta y resultado de SARA, SOFIA y NOA en tiempo real. Los textos los arma el sistema con datos reales.</p>
+      <p>Cada contacto, respuesta y resultado de María, SOFIA y NOA en tiempo real. Los textos los arma el sistema con datos reales.</p>
     </div>
     <div class="live"><span class="dot" id="dot"></span><span id="estado">Conectando…</span></div>
   </div>
@@ -50,7 +51,7 @@
   <div class="bar">
     <div class="seg" id="segAg">
       <div class="filter on" data-ag="TODOS">Todos</div>
-      <div class="filter" data-ag="SARA">SARA</div>
+      <div class="filter" data-ag="MARIA">MARÍA</div>
       <div class="filter" data-ag="SOFIA">SOFIA</div>
       <div class="filter" data-ag="NOA">NOA</div>
     </div>
@@ -67,7 +68,7 @@ const ETIQUETA = {
   OFERTA:'Oferta', RECLAMO_PAGO:'Reclamo de pago', DISPONIBILIDAD_FUTURA:'Disponibilidad prometida', CHECKLIST:'Checklist de carga', BUSQUEDA_DETENIDA:'Búsqueda detenida', TARIFA_MENCIONADA:'Tema de tarifa', EN_ESPERA_HORARIO:'En espera de horario', SEGUIMIENTO_UNIDAD:'Seguimiento de unidad', SUGERENCIA:'Sugerencia', RECORDATORIO:'Recordatorio', SIN_RESPUESTA:'Sin respuesta',
   RESULTADO_CONTACTO:'Resultado', NUEVA_ORDEN:'Nueva orden', PROVEEDOR_GANADOR:'Proveedor asignado', SIN_UNIDAD:'Sin unidad',
   LLAMADA_TERMINADA:'Llamada terminada', LLAMADA_VIVO:'Llamada en curso', VAPI_INICIADO:'Llamadas iniciadas', VAPI_RESULTADO:'Resultado de llamada',
-  DISPONIBILIDAD_DIARIA:'Ronda de disponibilidad', ALERTA_CRITICA:'Alerta crítica', MENSAJE_USUARIO:'Mensaje', MENSAJE_SARA:'Respuesta', MENSAJE_SOFIA:'Respuesta', MENSAJE_NOA:'Respuesta',
+  DISPONIBILIDAD_DIARIA:'Ronda de disponibilidad', ALERTA_CRITICA:'Alerta crítica', MENSAJE_USUARIO:'Mensaje', MENSAJE_MARIA:'Respuesta', MENSAJE_SARA:'Respuesta', MENSAJE_SOFIA:'Respuesta', MENSAJE_NOA:'Respuesta',
 };
 let eventos = [];
 let filtroAg = 'TODOS';
@@ -75,17 +76,19 @@ let soloHitos = false;
 
 function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function hora(ts){ try { return new Date(ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); } catch { return ''; } }
-function agClase(a){ a = String(a||'').toUpperCase(); return ['SARA','SOFIA','NOA'].includes(a) ? a : 'OTRO'; }
+// 'SARA' = eventos previos al rename SARA → MARÍA (oct-2026)
+function normAg(a){ a = String(a||'').toUpperCase(); return (a === 'SARA' || a === 'MARÍA') ? 'MARIA' : a; }
+function agClase(a){ a = normAg(a); return ['MARIA','SOFIA','NOA'].includes(a) ? a : 'OTRO'; }
 
 function render(){
   const feed = document.getElementById('feed');
-  const lista = eventos.filter(e => (filtroAg === 'TODOS' || String(e.agente||'').toUpperCase() === filtroAg) && (!soloHitos || HITOS.has(e.tipo)));
+  const lista = eventos.filter(e => (filtroAg === 'TODOS' || normAg(e.agente) === filtroAg) && (!soloHitos || HITOS.has(e.tipo)));
   if (!lista.length){ feed.innerHTML = '<div class="empty-msg">Sin actividad para este filtro por ahora.</div>'; return; }
   feed.innerHTML = lista.map(e => {
     const c = agClase(e.agente);
     return `<div class="ev a-${c} ${HITOS.has(e.tipo) ? 'hito' : ''}">
       <div class="t">${esc(hora(e.timestamp))}</div>
-      <div><span class="who">${esc(e.agente || '—')}</span></div>
+      <div><span class="who">${esc(normAg(e.agente) === 'MARIA' ? 'MARÍA' : (e.agente || '—'))}</span></div>
       <div><span class="tipo">${esc(ETIQUETA[e.tipo] || e.tipo || '')}</span><div class="msg">${esc(e.mensaje || '')}</div></div>
     </div>`;
   }).join('');

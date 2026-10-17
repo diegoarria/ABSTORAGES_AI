@@ -15,10 +15,10 @@ const TEMPLATES = [
   {
     id: 'cotizacion_lista',
     nombre: 'Cotización Lista',
-    agente: 'sara',
+    agente: 'maria',
     descripcion: 'Avisa al prospecto que su cotización está lista',
     variables: ['nombre', 'ruta', 'monto'],
-    preview: 'Hola {nombre}, tu cotización ABSTORAGES está lista. Ruta {ruta} desde ${monto} MXN. ¿Deseas que SARA te llame para detalles?',
+    preview: 'Hola {nombre}, tu cotización ABSTORAGES está lista. Ruta {ruta} desde ${monto} MXN. ¿Deseas que María te llame para detalles?',
   },
   {
     id: 'seguimiento_entrega',
@@ -31,7 +31,7 @@ const TEMPLATES = [
   {
     id: 'recordatorio_pago',
     nombre: 'Recordatorio de Pago',
-    agente: 'sara',
+    agente: 'maria',
     descripcion: 'Recordatorio amistoso de saldo pendiente',
     variables: ['nombre', 'monto', 'vencimiento'],
     preview: 'Hola {nombre}, te recordamos un saldo pendiente de ${monto} MXN con vencimiento el {vencimiento}. Responde para agendar tu pago.',
@@ -39,7 +39,7 @@ const TEMPLATES = [
   {
     id: 'reactivacion_cliente',
     nombre: 'Reactivación de Cliente',
-    agente: 'sara',
+    agente: 'maria',
     descripcion: 'Campaña para clientes inactivos con oferta especial',
     variables: ['nombre', 'descuento'],
     preview: '¡Hola {nombre}! Te extrañamos en ABSTORAGES. Por ser cliente preferente, tenemos un {descuento}% de descuento en tu próximo servicio. ¿Platicamos?',

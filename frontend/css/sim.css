@@ -6,6 +6,7 @@
 :root[data-theme] .h-title { font-size:15px; font-weight:800; letter-spacing:.06em; color:var(--tx); }
 :root[data-theme] .h-agent-pill { padding:6px 14px; font-size:12px; font-weight:700; border-radius:20px; border:none; }
 :root[data-theme] .h-agent-pill.sara { background:var(--sara-soft); color:var(--sara); }
+:root[data-theme] .h-agent-pill.maria  { background:var(--maria-soft); color:var(--maria); }
 :root[data-theme] .h-agent-pill.sofia { background:var(--sofia-soft); color:var(--sofia); }
 :root[data-theme] .h-back { border:1px solid var(--bd-strong); background:var(--surface); color:var(--tx); border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600; }
 :root[data-theme] .h-back:hover { background:var(--surface-3); }
@@ -24,6 +25,7 @@
 :root[data-theme] .p-status-txt { font-family:var(--font-sans); font-size:12px; font-weight:600; }
 :root[data-theme] .p-tag { font-family:var(--font-sans); font-size:10.5px; font-weight:700; letter-spacing:.05em; padding:4px 10px; border-radius:20px; border:none; }
 :root[data-theme] .panel.sara .p-tag { background:var(--sara-soft); color:var(--sara); }
+:root[data-theme] .panel.maria .p-tag  { background:var(--maria-soft); color:var(--maria); }
 :root[data-theme] .panel.sofia .p-tag { background:var(--sofia-soft); color:var(--sofia); }
 :root[data-theme] .msgs { background:var(--surface) !important; padding:22px; gap:18px; }
 :root[data-theme] .msg-name { font-family:var(--font-sans); font-size:11px; font-weight:700; letter-spacing:.07em; color:var(--tx3); text-transform:uppercase; }

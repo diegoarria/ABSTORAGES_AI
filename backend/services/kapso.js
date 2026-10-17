@@ -1,4 +1,4 @@
-// ── WhatsApp de SARA y SOFIA vía Kapso ───────────────────────────────────────
+// ── WhatsApp de MARÍA (antes SARA) y SOFIA vía Kapso ────────────────────────
 // Segunda vía de WhatsApp, independiente de Twilio (ver sendWhatsApp en
 // server-lite.js). Kapso expone la Cloud API de Meta directamente, no una
 // API propia de alto nivel como el Content API de Twilio.
@@ -8,7 +8,10 @@
 // Números conectados y verificados en Kapso (proyecto "Nuvos AI",
 // diego.arria19@gmail.com):
 //   SOFIA — +52 1 81 3590 9778 — phone_number_id 1433231719864226 (06-oct-2026)
-//   SARA  — +52 1 81 8685 8950 — phone_number_id 1457395780780302 (15-oct-2026, re-registrado tras borrar el número viejo de Twilio)
+//   MARÍA — +52 1 81 8685 8950 — phone_number_id 1457395780780302 (15-oct-2026, re-registrado tras borrar el número viejo de Twilio)
+//           (antes "SARA" — renombrada a María Fernández en oct-2026; el identificador
+//           técnico ahora es 'maria'. El env var nuevo es KAPSO_PHONE_NUMBER_ID_MARIA,
+//           con KAPSO_PHONE_NUMBER_ID_SARA como respaldo mientras se renombra en Railway.)
 //   NOA   — +52 1 81 3590 9641 — phone_number_id 1406980499159394 (15-oct-2026)
 // Webhook único (/webhook/kapso en server-lite.js) registrado contra los tres
 // números — el payload entrante trae su propio phone_number_id, con eso se
@@ -22,7 +25,7 @@ const WEBHOOK_SECRET = process.env.KAPSO_WEBHOOK_SECRET; // mismo secret para to
 // phone_number_id por agente.
 const PHONE_IDS = {
   sofia: process.env.KAPSO_PHONE_NUMBER_ID,       // ya existía, se mantiene el nombre del env var para no romper producción
-  sara:  process.env.KAPSO_PHONE_NUMBER_ID_SARA,
+  maria: process.env.KAPSO_PHONE_NUMBER_ID_MARIA || process.env.KAPSO_PHONE_NUMBER_ID_SARA,
   noa:   process.env.KAPSO_PHONE_NUMBER_ID_NOA,
 };
 const LIVE = !!KAPSO_KEY;
@@ -36,7 +39,7 @@ function resolverAgente(phoneNumberId) {
 async function enviarMensaje(to, texto, agente = 'sofia') {
   const destino = String(to || '').replace(/\D/g, '');
   if (!destino) return null;
-  const phoneId = PHONE_IDS[agente];
+  const phoneId = PHONE_IDS[agente === 'sara' ? 'maria' : agente]; // 'sara' = alias heredado de 'maria'
   if (!LIVE || !phoneId) {
     console.log(`[kapso STUB] (${agente}) → ${destino}: ${String(texto || '').slice(0, 80)}`);
     return { status: 'stub', to: destino };

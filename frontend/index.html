@@ -43,14 +43,14 @@
       <div class="header-nav-links">
         <button class="btn-portal" id="btn-open-portal" title="Ver portal completo">Portal</button>
         <a href="/ops-center.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="NOA · HÉCTOR · AI Ops Center">Ops Center</a>
-        <a href="/prospector.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="SARA Prospector">Prospector</a>
+        <a href="/prospector.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="María Prospector">Prospector</a>
         <a href="/historial.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Historial de Conversaciones">Historial</a>
         <a href="/memoria-agentes.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Memoria de Agentes">Memoria</a>
         <a href="/colocaciones.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Ofertas, aprobación y KPIs de SOFIA">Colocaciones</a>
-        <a href="/actividad.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Actividad de SARA, SOFIA y NOA en tiempo real">En vivo</a>
+        <a href="/actividad.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Actividad de María, SOFIA y NOA en tiempo real">En vivo</a>
         <a href="/base-datos.html" class="btn-portal" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;" title="Base de Datos — clientes, proveedores y operadores">Base de Datos</a>
-        <button class="btn-portal admin-only" id="btn-nueva-orden-manual" title="Registrar un cierre de venta hecho por un humano — dispara la búsqueda real de transportista, igual que un cierre de SARA">Nueva Orden Manual</button>
-        <button class="btn-portal admin-only" id="btn-emergencia" title="Apagado de emergencia de SARA/SOFIA/NOA" style="background:#7f1d1d;color:#fff;border-color:#991b1b;">Emergencia</button>
+        <button class="btn-portal admin-only" id="btn-nueva-orden-manual" title="Registrar un cierre de venta hecho por un humano — dispara la búsqueda real de transportista, igual que un cierre de María">Nueva Orden Manual</button>
+        <button class="btn-portal admin-only" id="btn-emergencia" title="Apagado de emergencia de María/SOFIA/NOA" style="background:#7f1d1d;color:#fff;border-color:#991b1b;">Emergencia</button>
       </div>
 
       <!-- Theme toggle -->
@@ -99,22 +99,22 @@
   <div class="cmd-scroll-wrap">
   <main class="command-layout">
 
-    <!-- ── SARA COLUMN ──────────────────────────────────────────────────── -->
-    <div class="cmd-col cmd-sara">
-      <div class="cmd-col-head sara">
-        <div class="cmd-avatar sara">S</div>
+    <!-- ── María COLUMN ──────────────────────────────────────────────────── -->
+    <div class="cmd-col cmd-maria">
+      <div class="cmd-col-head maria">
+        <div class="cmd-avatar maria">M</div>
         <div class="cmd-agent-info">
-          <div class="cmd-name">SARA</div>
+          <div class="cmd-name">María</div>
           <div class="cmd-sub">AI Vendedora · 24/7</div>
         </div>
         <div class="cmd-col-actions">
-          <button class="cmd-action-btn" id="sara-new-session" title="Nueva sesión">
+          <button class="cmd-action-btn" id="maria-new-session" title="Nueva sesión">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="1 4 1 10 7 10"/>
               <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
             </svg>
           </button>
-          <button class="cmd-action-btn" id="sara-clear-chat" title="Limpiar chat">
+          <button class="cmd-action-btn" id="maria-clear-chat" title="Limpiar chat">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polyline points="3 6 5 6 21 6"/>
               <path d="M19 6l-1 14H6L5 6"/>
@@ -124,26 +124,26 @@
           </button>
         </div>
       </div>
-      <span id="sara-session-id" style="display:none;"></span>
+      <span id="maria-session-id" style="display:none;"></span>
 
-      <div class="chat-messages" id="sara-messages">
+      <div class="chat-messages" id="maria-messages">
         <div class="message assistant">
-          <div class="message-avatar sara">S</div>
+          <div class="message-avatar maria">M</div>
           <div class="message-bubble">
-            <p>Hola, soy <strong>SARA</strong> asistente digital de ABSTORAGES.</p>
+            <p>Hola, soy <strong>María</strong> asistente digital de ABSTORAGES.</p>
             <p>¿Cómo puedo ayudarte?</p>
           </div>
         </div>
       </div>
 
       <div class="chat-input-area">
-        <button class="btn-mic" id="sara-mic" title="Llamar a SARA">
+        <button class="btn-mic" id="maria-mic" title="Llamar a María">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/>
           </svg>
         </button>
-        <textarea id="sara-input" class="chat-input" placeholder="Escribe a SARA..." rows="1"></textarea>
-        <button class="btn-send" id="sara-send" aria-label="Enviar">
+        <textarea id="maria-input" class="chat-input" placeholder="Escribe a María..." rows="1"></textarea>
+        <button class="btn-send" id="maria-send" aria-label="Enviar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="22" y1="2" x2="11" y2="13"/>
             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -159,7 +159,7 @@
         <div class="call-avatar-ring"></div>
         <div class="call-avatar-photo"></div>
       </div>
-      <div class="call-name" id="call-name">SARA Garza</div>
+      <div class="call-name" id="call-name">María Fernández</div>
       <div class="call-sub" id="call-sub">Ejecutiva Comercial · ABSTORAGES</div>
       <div class="call-timer" id="call-timer">0:00</div>
 
@@ -427,7 +427,7 @@
 
             <!-- Conversión -->
             <div style="flex:1;min-width:180px;background:var(--bg-panel,#111128);border:1px solid var(--borde,#1e2340);border-radius:12px;padding:14px 16px">
-              <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--texto3);margin-bottom:10px">Embudo SARA</div>
+              <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--texto3);margin-bottom:10px">Embudo María</div>
               <div style="display:flex;flex-direction:column;gap:6px" id="met-embudo">
                 <div style="font-size:11px;color:var(--texto3)">Cargando…</div>
               </div>
@@ -472,52 +472,52 @@
         <!-- KPIs de agentes (solo admin) -->
         <div class="kpi-grid admin-only">
 
-          <!-- SARA KPIs -->
-          <div class="kpi-panel sara kpi-clickable" onclick="KpiDetail.open('sara')" title="Ver detalle de SARA">
+          <!-- María KPIs -->
+          <div class="kpi-panel maria kpi-clickable" onclick="KpiDetail.open('maria')" title="Ver detalle de María">
             <div class="kpi-panel-header">
-              <div class="kpi-agent-avatar sara">S</div>
+              <div class="kpi-agent-avatar maria">M</div>
               <div>
-                <div class="kpi-agent-name">SARA</div>
+                <div class="kpi-agent-name">María</div>
                 <div class="kpi-agent-sub">Performance comercial</div>
               </div>
-              <div class="kpi-live-dot sara"></div>
+              <div class="kpi-live-dot maria"></div>
             </div>
 
             <div class="kpi-cards">
               <div class="kpi-card">
-                <div class="kpi-value green" id="kpi-sara-llamadas">—</div>
+                <div class="kpi-value green" id="kpi-maria-llamadas">—</div>
                 <div class="kpi-label">Llamadas hoy</div>
-                <div class="kpi-sub" id="kpi-sara-llamadas-sub"></div>
+                <div class="kpi-sub" id="kpi-maria-llamadas-sub"></div>
               </div>
               <div class="kpi-card">
-                <div class="kpi-value green" id="kpi-sara-altas">—</div>
+                <div class="kpi-value green" id="kpi-maria-altas">—</div>
                 <div class="kpi-label">Clientes dados de alta</div>
                 <div class="kpi-sub">Este mes</div>
               </div>
               <div class="kpi-card kpi-card-wide">
                 <div class="kpi-venta-row">
                   <div>
-                    <div class="kpi-value green" id="kpi-sara-venta">—</div>
+                    <div class="kpi-value green" id="kpi-maria-venta">—</div>
                     <div class="kpi-label">Venta del mes</div>
                   </div>
                   <div class="kpi-vs">vs</div>
                   <div>
-                    <div class="kpi-value muted" id="kpi-sara-meta">—</div>
+                    <div class="kpi-value muted" id="kpi-maria-meta">—</div>
                     <div class="kpi-label">Meta</div>
                   </div>
-                  <div id="kpi-sara-progreso-wrap">
-                    <div class="kpi-pct" id="kpi-sara-pct">—</div>
+                  <div id="kpi-maria-progreso-wrap">
+                    <div class="kpi-pct" id="kpi-maria-pct">—</div>
                     <div class="kpi-label">Cumplimiento</div>
                   </div>
                 </div>
                 <div class="kpi-bar-track">
-                  <div class="kpi-bar-fill green" id="kpi-sara-bar" style="width:0%"></div>
+                  <div class="kpi-bar-fill green" id="kpi-maria-bar" style="width:0%"></div>
                 </div>
               </div>
             </div>
 
             <div class="kpi-pipeline-title">Estatus de prospectos</div>
-            <div class="kpi-pipeline" id="kpi-sara-pipeline"></div>
+            <div class="kpi-pipeline" id="kpi-maria-pipeline"></div>
           </div>
 
           <!-- SOFIA KPIs -->
@@ -556,10 +556,10 @@
         </div>
 
 
-        <!-- ─── LEADS SARA (solo admin) ──────────────────────────────────────── -->
+        <!-- ─── LEADS María (solo admin) ──────────────────────────────────────── -->
         <div class="ops-section admin-only">
           <div class="ops-header">
-            <span class="panel-title">Leads SARA</span>
+            <span class="panel-title">Leads María</span>
             <div style="display:flex;align-items:center;gap:10px;">
               <span class="ops-refresh" id="ops-refresh-label"></span>
               <button onclick="exportLeadsCsv()" style="
@@ -597,7 +597,7 @@
           <!-- Tarjetas de leads estilo Cliengo -->
           <div id="leads-cards-list" style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
             <div style="text-align:center;color:var(--texto-dim);padding:32px;font-size:.85rem;">
-              SARA capturará leads automáticamente en las conversaciones
+              María capturará leads automáticamente en las conversaciones
             </div>
           </div>
         </div>
@@ -722,7 +722,7 @@
   <div id="lead-chat-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;">
     <div style="background:var(--bg-panel,#1a1a2e);border:1px solid var(--borde,#2a2a4a);border-radius:12px;width:min(680px,95vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">
       <div style="padding:16px 20px;border-bottom:1px solid var(--borde,#2a2a4a);display:flex;align-items:center;gap:12px;">
-        <div id="lcm-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--sara,#6c63ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.85rem;">S</div>
+        <div id="lcm-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--maria,#6c63ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.85rem;">M</div>
         <div style="flex:1;">
           <div id="lcm-nombre" style="font-weight:600;font-size:.95rem;"></div>
           <div id="lcm-meta" style="font-size:.75rem;color:var(--texto-dim,#888);margin-top:2px;"></div>
@@ -735,12 +735,12 @@
 
   <script src="js/app.js"></script>
   <script src="js/kpi-detail.js"></script>
-  <script src="js/sara.js"></script>
+  <script src="js/maria.js"></script>
   <script src="js/sofia.js"></script>
   <script src="js/features.js"></script>
   <script src="js/broadcast.js"></script>
   <script>
-  // ─── Leads SARA — tabla enriquecida + modal de chat ──────────────────────
+  // ─── Leads María — tabla enriquecida + modal de chat ──────────────────────
   const OpsDash = (() => {
     function timeAgo(iso) {
       const s = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -787,7 +787,7 @@
 
         const container = document.getElementById('leads-cards-list');
         if (!leadsRes.length) {
-          container.innerHTML = '<div style="text-align:center;color:var(--texto-dim);padding:32px;font-size:.85rem;">SARA capturará leads automáticamente en las conversaciones</div>';
+          container.innerHTML = '<div style="text-align:center;color:var(--texto-dim);padding:32px;font-size:.85rem;">María capturará leads automáticamente en las conversaciones</div>';
           return;
         }
 
@@ -967,12 +967,12 @@
 
         // Ajustar columnas según rol
         if (me.role === 'transportista') {
-          // Transportista: enfoca columna SOFIA, oculta columna SARA
-          document.querySelector('.cmd-sara')?.classList.add('hidden-role');
+          // Transportista: enfoca columna SOFIA, oculta columna María
+          document.querySelector('.cmd-maria')?.classList.add('hidden-role');
           // Mueve SOFIA al centro lógico expandiendo el grid
           document.querySelector('.command-layout')?.classList.add('layout-single-right');
         } else if (me.role === 'cliente') {
-          // Cliente: enfoca columna SARA, oculta columna SOFIA
+          // Cliente: enfoca columna María, oculta columna SOFIA
           document.querySelector('.cmd-sofia')?.classList.add('hidden-role');
           document.querySelector('.command-layout')?.classList.add('layout-single-left');
         }
@@ -999,7 +999,7 @@
       }
     })();
 
-    // ── Apagado de emergencia de SARA/SOFIA/NOA ──────────────────────────────
+    // ── Apagado de emergencia de María/SOFIA/NOA ──────────────────────────────
     (function() {
       const btn = document.getElementById('btn-emergencia');
       if (!btn) return;
@@ -1009,12 +1009,12 @@
           btn.textContent = '🟢 Reactivar IA';
           btn.style.background = '#14532d';
           btn.style.borderColor = '#166534';
-          btn.title = 'SARA/SOFIA/NOA están APAGADAS — clic para reactivar';
+          btn.title = 'María/SOFIA/NOA están APAGADAS — clic para reactivar';
         } else {
           btn.textContent = '🔴 Emergencia';
           btn.style.background = '#7f1d1d';
           btn.style.borderColor = '#991b1b';
-          btn.title = 'Apagado de emergencia de SARA/SOFIA/NOA';
+          btn.title = 'Apagado de emergencia de María/SOFIA/NOA';
         }
       }
 
@@ -1032,11 +1032,11 @@
         const estado = await r.json();
 
         if (estado.activo) {
-          if (!confirm('¿Reactivar SARA, SOFIA y NOA?\n\nMotivo del apagado: ' + (estado.motivo || '—'))) return;
+          if (!confirm('¿Reactivar María, SOFIA y NOA?\n\nMotivo del apagado: ' + (estado.motivo || '—'))) return;
           await fetch('/api/admin/emergencia/desactivar', { method: 'POST', credentials: 'include' });
           pintar(false);
         } else {
-          const motivo = prompt('¿Por qué apagas SARA, SOFIA y NOA de emergencia?\n(esto queda registrado)');
+          const motivo = prompt('¿Por qué apagas María, SOFIA y NOA de emergencia?\n(esto queda registrado)');
           if (motivo === null) return; // canceló
           if (!confirm('⚠️ Esto apaga las 3 IA de inmediato para TODOS los clientes, en chat y WhatsApp.\n\n¿Confirmas?')) return;
           await fetch('/api/admin/emergencia/activar', {
@@ -1275,7 +1275,7 @@
           const orig = origMatch[1].trim().replace(/\s+$/, '');
           if (orig.length >= 2) { lightDot('origen', orig); EB.emit('field', { field: 'origen', value: orig }); }
         }
-        // If we had a pending field (SARA asked and user just replied)
+        // If we had a pending field (María asked and user just replied)
         if (STATE.pendingField && text.trim().length > 0) {
           lightDot(STATE.pendingField, text.trim().substring(0, 60));
           EB.emit('field', { field: STATE.pendingField, value: text.trim().substring(0, 60) });
@@ -1563,11 +1563,11 @@
 
       // ── Public API ────────────────────────────────────────────────────────
       return {
-        // Called from sara.js before sending user message
+        // Called from maria.js before sending user message
         onUserMessage(text) {
           scanUserMessage(text);
         },
-        // Called from sara.js after SARA response stream completes
+        // Called from maria.js after María response stream completes
         onSaraResponse(text) {
           inferField(text);
           // Frontend fallback: if enough fields + closing signal → lead complete
@@ -1578,7 +1578,7 @@
             }
           }
         },
-        // Called from sara.js when nueva_orden event fires
+        // Called from maria.js when nueva_orden event fires
         onLeadComplete(datos) {
           markLeadComplete(datos || Object.assign({}, STATE.fieldsCollected), datos?.quote || null);
         },
@@ -1735,7 +1735,7 @@
   <div id="nom-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; align-items:center; justify-content:center; padding:20px;">
     <div style="background:var(--ink-900,#10151C); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:12px; padding:22px 24px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto;">
       <h2 style="font-size:15px; font-weight:800; margin:0 0 4px; color:var(--text-100,#EDF1F5);">Nueva orden manual</h2>
-      <p style="font-size:12px; color:var(--text-300,#9BA9B8); margin:0 0 16px;">Para un cierre de venta hecho por un humano (teléfono, en persona) — dispara la misma búsqueda real de transportista que un cierre de SARA.</p>
+      <p style="font-size:12px; color:var(--text-300,#9BA9B8); margin:0 0 16px;">Para un cierre de venta hecho por un humano (teléfono, en persona) — dispara la misma búsqueda real de transportista que un cierre de María.</p>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
         <div><label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Nombre *</label><input id="nom-nombre" style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px;"></div>
@@ -1760,7 +1760,7 @@
       </div>
 
       <div style="margin-bottom:10px;">
-        <label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Notas para SARA, SOFIA y NOA (lo que se está pidiendo)</label>
+        <label style="display:block; font-size:11px; color:var(--text-300,#9BA9B8); margin-bottom:4px;">Notas para María, SOFIA y NOA (lo que se está pidiendo)</label>
         <textarea id="nom-notas" rows="3" placeholder="Ej. Cliente pide unidad con rampa, cita de carga a las 7:00, contacto en planta: Sr. Pérez. Mercancía frágil." style="width:100%; background:var(--ink-800,#161D27); border:1px solid var(--line,rgba(255,255,255,.08)); border-radius:7px; padding:8px 10px; color:var(--text-100,#EDF1F5); font-size:13px; resize:vertical; font-family:inherit;"></textarea>
       </div>
       <div style="margin-bottom:10px;">

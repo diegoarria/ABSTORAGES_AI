@@ -30,15 +30,15 @@ Both serve the same frontend from `frontend/` via Express static middleware afte
 
 Each agent is a system prompt (`backend/agents/*.js`) + a route (`backend/routes/*.js`) that streams Claude responses via SSE.
 
-- **SARA** — Sales AI. Qualifies leads, quotes freight, negotiates price, captures 13-field orders. Emits `NUEVA_ORDEN: {...}` in text when closing a sale; emits `CERRAR_CHAT` / `ESCALAR_HUMANO` as control signals.
-- **SOFIA** — Operations AI. Receives the folio from SARA, looks it up in `ordersStore`, coordinates carriers via Vapi.ai phone calls.
+- **MARÍA** (María Fernández, formerly SARA; technical id `maria`) — Sales AI. Qualifies leads, quotes freight, negotiates price, captures 13-field orders. Emits `NUEVA_ORDEN: {...}` in text when closing a sale; emits `CERRAR_CHAT` / `ESCALAR_HUMANO` as control signals.
+- **SOFIA** — Operations AI. Receives the folio from MARÍA, looks it up in `ordersStore`, coordinates carriers via Vapi.ai phone calls.
 
-Control signals (`CERRAR_CHAT`, `ESCALAR_HUMANO`, `NUEVA_ORDEN`) are plain text tokens that SARA/SOFIA write in their responses. The backend detects them with regex after streaming completes and emits typed SSE events (`cerrar_chat`, `escalar_humano`, `nueva_orden`) to the frontend.
+Control signals (`CERRAR_CHAT`, `ESCALAR_HUMANO`, `NUEVA_ORDEN`) are plain text tokens that MARÍA/SOFIA write in their responses. The backend detects them with regex after streaming completes and emits typed SSE events (`cerrar_chat`, `escalar_humano`, `nueva_orden`) to the frontend.
 
 ### Chat flow (SSE streaming)
 
 ```
-Frontend POST /api/sara/chat
+Frontend POST /api/maria/chat   (legacy alias /api/sara/chat still routed to the same handler)
   → backend builds systemPrompt = agentPrompt + tariff.getContext().prompt
   → chatStream() calls Anthropic SDK messages.stream()
   → chunks sent as SSE { type: 'chunk', text }
@@ -56,11 +56,11 @@ Frontend POST /api/sara/chat
 
 ### Tariff engine
 
-`backend/services/tariff.js` computes freight prices from real route distances + tolls + operating costs (diesel, tires, maintenance, driver, insurance). `tariff.getContext()` returns a formatted prompt block injected into SARA's system prompt so she always quotes real prices.
+`backend/services/tariff.js` computes freight prices from real route distances + tolls + operating costs (diesel, tires, maintenance, driver, insurance). `tariff.getContext()` returns a formatted prompt block injected into MARÍA's system prompt so she always quotes real prices.
 
-### SARA → SOFIA handoff
+### MARÍA → SOFIA handoff
 
-1. SARA emits `NUEVA_ORDEN: { folio, ...13 fields }` in her response text.
+1. MARÍA emits `NUEVA_ORDEN: { folio, ...13 fields }` in her response text.
 2. Backend parses it, calls `ordersStore.guardarOrden()` and publishes to Redis (`nueva_orden` channel).
 3. Backend also fires `lanzarNegociacion()` which contacts all carriers in `data/proveedores.json` via Vapi.ai in parallel.
 4. SOFIA looks up the folio in `ordersStore` to get all order details without asking the customer again.
@@ -84,7 +84,7 @@ PORTAL_USERNAME / PORTAL_PASSWORD  # legacy basic auth (unused in current flow)
 
 ## Key data flows to know
 
-- **Leads** are captured by regex on SARA's full response text (`backend/services/leads.js`). They are in-memory only in server-lite; PostgreSQL in full server.
+- **Leads** are captured by regex on MARÍA's full response text (`backend/services/leads.js`). They are in-memory only in server-lite; PostgreSQL in full server.
 - **Carriers** (`data/proveedores.json`) are loaded once at startup. Empty array = WhatsApp negotiation silently skipped.
-- **Redis** is used for pub/sub between SARA and SOFIA in full-server mode. In server-lite, SOFIA reads `ordersStore` directly.
+- **Redis** is used for pub/sub between MARÍA and SOFIA in full-server mode. In server-lite, SOFIA reads `ordersStore` directly.
 - The frontend uses vanilla JS modules (`frontend/js/`). No build step — files are served as-is.

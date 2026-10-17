@@ -17,7 +17,8 @@ const FILE = path.join(__dirname, '../../data/outbound-rate-limit.json');
 // de los ~100/día que salieron durante el incidente. Ajustable por agente
 // vía env var sin tocar código.
 const LIMITES = {
-  sara:  Number(process.env.OUTBOUND_LIMIT_SARA  || 40),
+  maria: Number(process.env.OUTBOUND_LIMIT_MARIA || process.env.OUTBOUND_LIMIT_SARA || 40),
+  sara:  Number(process.env.OUTBOUND_LIMIT_MARIA || process.env.OUTBOUND_LIMIT_SARA || 40), // alias heredado — mismo techo
   sofia: Number(process.env.OUTBOUND_LIMIT_SOFIA || 40),
   noa:   Number(process.env.OUTBOUND_LIMIT_NOA   || 40),
 };
@@ -36,6 +37,8 @@ function cargar() {
 
 // { [agente]: { fecha: 'YYYY-MM-DD', count: N } }
 const cache = cargar();
+// Contador de hoy guardado bajo 'sara' antes del rename → se hereda en 'maria'.
+if (cache.sara && !cache.maria) cache.maria = cache.sara;
 
 let saveTimer = null;
 function guardar() {
@@ -46,8 +49,17 @@ function guardar() {
   }, 500);
 }
 
-function entrada(agente) {
+// SARA → MARÍA (oct-2026): 'sara' y 'maria' son el mismo agente — comparten
+// UN solo contador (bajo 'maria') para que el techo no se duplique mientras
+// conviven llamadas con el identificador viejo (p. ej. contactos con
+// agente_asignado 'SARA') y el nuevo.
+function clave(agente) {
   const a = (agente || '').toLowerCase();
+  return a === 'sara' ? 'maria' : a;
+}
+
+function entrada(agente) {
+  const a = clave(agente);
   const hoy = fechaMTY();
   if (!cache[a] || cache[a].fecha !== hoy) cache[a] = { fecha: hoy, count: 0 };
   return cache[a];
@@ -56,7 +68,7 @@ function entrada(agente) {
 // Registra un envío real y dice si YA se pasó del límite — se llama justo
 // antes de mandar, así el envío que rompería el techo nunca sale.
 function registrarYVerificar(agente) {
-  const a = (agente || '').toLowerCase();
+  const a = clave(agente);
   const limite = LIMITES[a] ?? 40;
   const e = entrada(a);
   if (e.count >= limite) {
@@ -68,7 +80,7 @@ function registrarYVerificar(agente) {
 }
 
 function estado(agente) {
-  const a = (agente || '').toLowerCase();
+  const a = clave(agente);
   const e = entrada(a);
   return { count: e.count, limite: LIMITES[a] ?? 40, fecha: e.fecha };
 }

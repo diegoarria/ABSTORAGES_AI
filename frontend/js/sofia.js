@@ -122,7 +122,7 @@ const Sofia = (() => {
     tarjeta.innerHTML = `
       <div class="message-avatar sofia"></div>
       <div class="message-bubble" style="border-color: rgba(74,158,255,0.35); background: rgba(74,158,255,0.06)">
-        <p><strong>Handoff de SARA recibido</strong></p>
+        <p><strong>Handoff de María recibido</strong></p>
         <p>Folio <code>${App.escapeHtml(orden.folio)}</code> · ${App.escapeHtml(orden.ruta || '')} · ${App.escapeHtml(orden.tipo_unidad || '')}</p>
         <p style="opacity:.7; font-size:.85em">Cliente: ${App.escapeHtml(orden.cliente || orden.empresa || '—')} · Fecha: ${App.escapeHtml(orden.fecha_carga || '—')}</p>
       </div>
@@ -175,7 +175,7 @@ const Sofia = (() => {
       }
     } catch (err) {
       quitarTyping();
-      agregarMensajeError('Error al recibir handoff de SARA.');
+      agregarMensajeError('Error al recibir handoff de María.');
       console.error('[SOFIA] Error en handoff:', err);
     } finally {
       isStreaming = false;
@@ -184,7 +184,7 @@ const Sofia = (() => {
   }
 
   function formatearHandoff(o) {
-    return `HANDOFF_SARA→SOFIA — Venta cerrada. Tienes TODOS los datos. No preguntes nada que ya esté aquí.
+    return `HANDOFF_MARIA→SOFIA — Venta cerrada. Tienes TODOS los datos. No preguntes nada que ya esté aquí.
 
 Folio: ${o.folio || ''}
 Ruta: ${o.ruta || ''}

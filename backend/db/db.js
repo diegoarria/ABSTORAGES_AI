@@ -142,7 +142,7 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
   return rows[0];
 }
 
-// ─── CONTACTOS (memoria compartida SARA/SOFIA/NOA) ───────────────────────────
+// ─── CONTACTOS (memoria compartida MARÍA/SOFIA/NOA) ──────────────────────────
 
 // Busca por teléfono (o email si no hay teléfono); si existe, actualiza campos
 // no vacíos + fecha_ultimo_contacto y agrega una interacción. Si no existe,
@@ -215,8 +215,11 @@ async function listarContactosPorAgente(agente, { tipo, q } = {}) {
   // NOA no da de alta contactos propios — vigila viajes que arman SARA y
   // SOFIA, así que ve la base completa sin filtrar por agente_asignado
   // (mismo criterio que la versión de archivo en contactos.js).
-  const cond = AGENTE === 'NOA' ? ['1=1'] : [`(agente_asignado = $1 OR id IN (SELECT contacto_id FROM interacciones WHERE agente = $1))`];
-  const vals = AGENTE === 'NOA' ? [] : [AGENTE];
+  // SARA → MARÍA (oct-2026): filas viejas traen 'SARA', las nuevas 'MARIA' —
+  // mismo agente, se buscan ambas (ver aliasAgente en services/contactos.js).
+  const aliases = (AGENTE === 'MARIA' || AGENTE === 'SARA') ? ['MARIA', 'SARA'] : [AGENTE];
+  const cond = AGENTE === 'NOA' ? ['1=1'] : [`(agente_asignado = ANY($1::text[]) OR id IN (SELECT contacto_id FROM interacciones WHERE agente = ANY($1::text[])))`];
+  const vals = AGENTE === 'NOA' ? [] : [aliases];
   if (tipo) { vals.push(tipo); cond.push(`tipo = $${vals.length}`); }
   if (q) {
     vals.push(`%${q}%`);

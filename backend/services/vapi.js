@@ -3,7 +3,14 @@
 // El primero que confirme disponibilidad y mejor precio gana la asignación.
 require('dotenv').config();
 const SOFIA_SYSTEM_PROMPT = require('../agents/sofia-prompt');
-const SARA_SYSTEM_PROMPT  = require('../agents/sara-prompt');
+// SARA → MARÍA (oct-2026): respaldo a sara-prompt.js solo si maria-prompt.js
+// aún no existe — cualquier otro error al cargarlo se propaga.
+let MARIA_SYSTEM_PROMPT;
+try { MARIA_SYSTEM_PROMPT = require('../agents/maria-prompt'); }
+catch (e) {
+  if (e.code !== 'MODULE_NOT_FOUND' || !String(e.message).includes('maria-prompt')) throw e;
+  MARIA_SYSTEM_PROMPT = require('../agents/sara-prompt');
+}
 const NOA_SYSTEM_PROMPT   = require('../agents/noa-prompt');
 const contactos           = require('./contactos');
 const agentPause          = require('./agentPause');
@@ -12,10 +19,10 @@ const monitoringControl   = require('./monitoringControl');
 
 const API_KEY               = process.env.VAPI_API_KEY;
 const PHONE_NUMBER_ID       = process.env.VAPI_PHONE_NUMBER_ID;             // SOFIA
-const PHONE_NUMBER_ID_SARA  = process.env.VAPI_PHONE_NUMBER_ID_SARA || PHONE_NUMBER_ID;
+const PHONE_NUMBER_ID_MARIA = process.env.VAPI_PHONE_NUMBER_ID_MARIA || process.env.VAPI_PHONE_NUMBER_ID_MARIA || PHONE_NUMBER_ID;
 const PHONE_NUMBER_ID_NOA   = process.env.VAPI_PHONE_NUMBER_ID_NOA  || PHONE_NUMBER_ID;
 const ASSISTANT_ID          = process.env.VAPI_ASSISTANT_ID;       // SOFIA
-const ASSISTANT_ID_SARA     = process.env.VAPI_ASSISTANT_ID_SARA;  // SARA (opcional)
+const ASSISTANT_ID_MARIA    = process.env.VAPI_ASSISTANT_ID_MARIA || process.env.VAPI_ASSISTANT_ID_MARIA;  // MARÍA (opcional)
 const ASSISTANT_ID_NOA      = process.env.VAPI_ASSISTANT_ID_NOA;   // NOA (opcional)
 const WEBHOOK_URL           = process.env.VAPI_WEBHOOK_URL; // URL pública del servidor
 const BASE_URL              = 'https://api.vapi.ai';
@@ -40,7 +47,7 @@ const MODO_VOZ =
   `Está bien usar muletillas naturales de conversación real ("mira", "a ver", "oye", pausas breves) con moderación, ` +
   `pero nunca frases de manual de atención al cliente.`;
 
-// Eslogan de marca — solo SOFIA y SARA (llamadas comerciales/operativas), no NOA
+// Eslogan de marca — solo SOFIA y MARÍA (llamadas comerciales/operativas), no NOA
 const ESLOGAN = 'ABSTORAGES, la empresa de logística más confiable del país';
 const CIERRE_ESLOGAN =
   `\n\nAntes de terminar la llamada y despedirte, SIEMPRE di exactamente esta frase de cierre: ` +
@@ -452,15 +459,15 @@ async function iniciarLlamadaSimple(telefono, contexto) {
   return res.json();
 }
 
-// ── Helper compartido: dispara una llamada como SARA (mismo número/assistant) ─
-async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPrompt, logId, tipo }) {
-  if (!API_KEY || !PHONE_NUMBER_ID_SARA) {
-    console.log(`[Vapi STUB] Llamada SARA a ${nombreCliente} (${numero})`);
+// ── Helper compartido: dispara una llamada como MARÍA (mismo número/assistant) ─
+async function _llamarComoMARIA({ numero, nombreCliente, primerMensaje, systemPrompt, logId, tipo }) {
+  if (!API_KEY || !PHONE_NUMBER_ID_MARIA) {
+    console.log(`[Vapi STUB] Llamada MARÍA a ${nombreCliente} (${numero})`);
     return { status: 'stub' };
   }
 
   const payload = {
-    phoneNumberId: PHONE_NUMBER_ID_SARA,
+    phoneNumberId: PHONE_NUMBER_ID_MARIA,
     customer: { number: numero, name: nombreCliente || 'Cliente' },
     assistantOverrides: {
       firstMessage: primerMensaje,
@@ -472,13 +479,13 @@ async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPro
       ...VOZ_TUNING_RAPIDA,
       ...(WEBHOOK_URL && { serverUrl: `${WEBHOOK_URL}/api/vapi/webhook` }),
     },
-    metadata: { agente: 'sara', tipo: tipo || 'seguimiento', nombre: nombreCliente },
+    metadata: { agente: 'maria', tipo: tipo || 'seguimiento', nombre: nombreCliente },
   };
 
-  // Usar el assistant dedicado de SARA (voz/transcriber propios) si está
+  // Usar el assistant dedicado de MARÍA (voz/transcriber propios) si está
   // configurado, pero SIEMPRE con el prompt/contexto de esta llamada arriba.
-  if (ASSISTANT_ID_SARA) {
-    payload.assistantId = ASSISTANT_ID_SARA;
+  if (ASSISTANT_ID_MARIA) {
+    payload.assistantId = ASSISTANT_ID_MARIA;
   }
 
   const res = await fetch(`${BASE_URL}/call/phone`, {
@@ -489,22 +496,22 @@ async function _llamarComoSARA({ numero, nombreCliente, primerMensaje, systemPro
 
   if (!res.ok) throw new Error(`Vapi error ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  console.log(`[Vapi] Llamada SARA a ${logId} iniciada — callId ${data.id}`);
+  console.log(`[Vapi] Llamada MARÍA a ${logId} iniciada — callId ${data.id}`);
   return data;
 }
 
-// ── Llamada de seguimiento al lead capturado por SARA (ya cotizó/en proceso) ──
+// ── Llamada de seguimiento al lead capturado por MARÍA (ya cotizó/en proceso) ──
 async function llamarLead(lead) {
-  if (agentPause.estaPausado('sara')) {
-    console.warn(`[Vapi] SARA pausada — se omite llamada de seguimiento a ${lead?.nombre || lead?.telefono}`);
+  if (agentPause.estaPausado('maria')) {
+    console.warn(`[Vapi] MARÍA pausada — se omite llamada de seguimiento a ${lead?.nombre || lead?.telefono}`);
     return { status: 'paused' };
   }
-  const limite = outboundRateLimit.registrarYVerificar('sara');
+  const limite = outboundRateLimit.registrarYVerificar('maria');
   if (!limite.permitido) {
-    console.error(`[Vapi] 🛑 SARA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de seguimiento a ${lead?.nombre || lead?.telefono}`);
+    console.error(`[Vapi] 🛑 MARÍA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de seguimiento a ${lead?.nombre || lead?.telefono}`);
     return { status: 'rate_limited' };
   }
-  monitoringControl.reportarContactoSaliente({ agente: 'sara', canal: 'llamada', destinatario: lead?.telefono, detalle: { tipo: 'seguimiento', folio: lead?.folio } });
+  monitoringControl.reportarContactoSaliente({ agente: 'maria', canal: 'llamada', destinatario: lead?.telefono, detalle: { tipo: 'seguimiento', folio: lead?.folio } });
   const raw = (lead.telefono || '').replace(/\D/g, '');
   if (raw.length < 10) {
     console.log(`[Vapi] Teléfono inválido para llamada de seguimiento: ${lead.telefono}`);
@@ -513,14 +520,14 @@ async function llamarLead(lead) {
   const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
 
   const primerMensaje =
-    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy SARA. ` +
+    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy María. ` +
     `Estuve platicando contigo sobre tu solicitud de flete. ` +
     `¿Tienes un momento para confirmar los detalles?`;
 
-  // Mismo prompt completo que usa SARA en el chat de texto, + modo voz +
+  // Mismo prompt completo que usa MARÍA en el chat de texto, + modo voz +
   // el contexto específico de este lead (ruta, unidad, precio cotizado).
   let systemPrompt =
-    SARA_SYSTEM_PROMPT +
+    MARIA_SYSTEM_PROMPT +
     MODO_VOZ +
     CIERRE_ESLOGAN +
     `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
@@ -530,25 +537,25 @@ async function llamarLead(lead) {
 
   // ¿Es un cliente recurrente, con historial de servicios previos?
   try {
-    const contactoConocido = await contactos.buscarPorTelefono(lead.telefono, 'sara');
+    const contactoConocido = await contactos.buscarPorTelefono(lead.telefono, 'maria');
     if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
   } catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
 
-  return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `lead ${lead.id}`, tipo: 'seguimiento' });
+  return _llamarComoMARIA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `lead ${lead.id}`, tipo: 'seguimiento' });
 }
 
-// ── Llamada de confirmación — SARA acaba de cerrar la venta (NUEVA_ORDEN) ────
+// ── Llamada de confirmación — MARÍA acaba de cerrar la venta (NUEVA_ORDEN) ────
 async function llamarConfirmacionVenta(lead) {
-  if (agentPause.estaPausado('sara')) {
-    console.warn(`[Vapi] SARA pausada — se omite llamada de confirmación a ${lead?.nombre || lead?.telefono}`);
+  if (agentPause.estaPausado('maria')) {
+    console.warn(`[Vapi] MARÍA pausada — se omite llamada de confirmación a ${lead?.nombre || lead?.telefono}`);
     return { status: 'paused' };
   }
-  const limite = outboundRateLimit.registrarYVerificar('sara');
+  const limite = outboundRateLimit.registrarYVerificar('maria');
   if (!limite.permitido) {
-    console.error(`[Vapi] 🛑 SARA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de confirmación a ${lead?.nombre || lead?.telefono}`);
+    console.error(`[Vapi] 🛑 MARÍA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite llamada de confirmación a ${lead?.nombre || lead?.telefono}`);
     return { status: 'rate_limited' };
   }
-  monitoringControl.reportarContactoSaliente({ agente: 'sara', canal: 'llamada', destinatario: lead?.telefono, detalle: { tipo: 'confirmacion_venta', folio: lead?.folio } });
+  monitoringControl.reportarContactoSaliente({ agente: 'maria', canal: 'llamada', destinatario: lead?.telefono, detalle: { tipo: 'confirmacion_venta', folio: lead?.folio } });
   const raw = (lead.telefono || '').replace(/\D/g, '');
   if (raw.length < 10) {
     console.log(`[Vapi] Teléfono inválido para llamada de confirmación de venta: ${lead.telefono}`);
@@ -557,11 +564,11 @@ async function llamarConfirmacionVenta(lead) {
   const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
 
   const primerMensaje =
-    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy SARA. ` +
+    `${ESLOGAN}. Hola ${lead.nombre || ''}, soy María. ` +
     `Te confirmo que tu servicio quedó registrado con el folio ${lead.folio || ''}. ¿Tienes un segundo?`;
 
   const systemPrompt =
-    SARA_SYSTEM_PROMPT +
+    MARIA_SYSTEM_PROMPT +
     MODO_VOZ +
     CIERRE_ESLOGAN +
     `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
@@ -570,11 +577,11 @@ async function llamarConfirmacionVenta(lead) {
     `Objetivo: confirmarle en voz que el servicio quedó registrado, que el equipo de operaciones ya está buscando transportista, ` +
     `y resolver cualquier duda última que tenga. No renegocies el precio ni cambies datos del folio en esta llamada — si pide un cambio, dile que el equipo lo contacta.`;
 
-  return _llamarComoSARA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `confirmación folio ${lead.folio}`, tipo: 'confirmacion_venta' });
+  return _llamarComoMARIA({ numero, nombreCliente: lead.nombre, primerMensaje, systemPrompt, logId: `confirmación folio ${lead.folio}`, tipo: 'confirmacion_venta' });
 }
 
 // ── Llamada de prospección en frío (día 5 de la secuencia de outreach) ───────
-// A diferencia de llamarLead, este prospecto NUNCA ha hablado con SARA — solo
+// A diferencia de llamarLead, este prospecto NUNCA ha hablado con MARÍA — solo
 // recibió DM de LinkedIn / email / WhatsApp sin responder. No asumas que ya
 // cotizó ni que conoce a ABSTORAGES.
 async function llamarProspecto(prospecto) {
@@ -586,12 +593,12 @@ async function llamarProspecto(prospecto) {
   const numero = raw.startsWith('52') ? `+${raw}` : `+52${raw}`;
 
   const primerMensaje =
-    `${ESLOGAN}. Hola, ¿hablo con ${prospecto.nombre}? Soy SARA, de ABSTORAGES Logistics Solutions. ` +
+    `${ESLOGAN}. Hola, ¿hablo con ${prospecto.nombre}? Soy María, de ABSTORAGES Logistics Solutions. ` +
     `Le escribí hace unos días por LinkedIn y WhatsApp sobre servicios de flete nacional — ` +
     `¿tiene un minuto?`;
 
   const systemPrompt =
-    SARA_SYSTEM_PROMPT +
+    MARIA_SYSTEM_PROMPT +
     MODO_VOZ +
     CIERRE_ESLOGAN +
     `\n\n## CONTEXTO DE ESTA LLAMADA\n` +
@@ -602,7 +609,7 @@ async function llamarProspecto(prospecto) {
     `Si muestra interés, recolecta los datos básicos (qué transporta, rutas, volumen) para que el equipo comercial le dé seguimiento por WhatsApp/correo. ` +
     `Si no tiene interés o no es el momento, agradece y cierra cordialmente sin insistir.`;
 
-  return _llamarComoSARA({
+  return _llamarComoMARIA({
     numero, nombreCliente: prospecto.nombre, primerMensaje, systemPrompt,
     logId: `prospecto ${prospecto.nombre}`, tipo: 'prospeccion',
   });

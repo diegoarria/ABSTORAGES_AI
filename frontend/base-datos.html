@@ -19,7 +19,7 @@
   --tx:#0F172A; --tx2:#475569; --tx3:#64748B;
   --navy:#0B2A5B; --navy-2:#123A7A;
   --acc:#1F5FD1; --acc-soft:#E8F0FE; --acc-tx:#1748A6;
-  --sara:#0B7D57; --sara-soft:#E3F5EE;
+  --sara:#0B7D57; --sara-soft:#E3F5EE; --maria:#0B7D57; --maria-soft:#E3F5EE;
   --sofia:#1F5FD1; --sofia-soft:#E8F0FE;
   --noa:#B45309; --noa-soft:#FEF1DC;
   --ok:#0B7D57; --ok-soft:#E3F5EE; --warn:#B45309; --warn-soft:#FEF1DC; --crit:#C62828; --crit-soft:#FDE8E8;
@@ -34,7 +34,7 @@
   --tx:#E8EEF7; --tx2:#A9B6CA; --tx3:#8090A8;
   --navy:#08111F; --navy-2:#0D1A30;
   --acc:#5B93FF; --acc-soft:rgba(91,147,255,.14); --acc-tx:#8DB4FF;
-  --sara:#34D399; --sara-soft:rgba(52,211,153,.13);
+  --sara:#34D399; --sara-soft:rgba(52,211,153,.13); --maria:#34D399; --maria-soft:rgba(52,211,153,.13);
   --sofia:#5B93FF; --sofia-soft:rgba(91,147,255,.14);
   --noa:#FBBF24; --noa-soft:rgba(251,191,36,.13);
   --ok:#34D399; --ok-soft:rgba(52,211,153,.13); --warn:#FBBF24; --warn-soft:rgba(251,191,36,.13); --crit:#FF7A7A; --crit-soft:rgba(255,122,122,.13);
@@ -425,19 +425,19 @@ document.getElementById('searchIco').innerHTML = ico('search');
 document.getElementById('rutaSearchIco').innerHTML = ico('search');
 
 const AGENTES = {
-  SARA:  { role: "Ventas · Clientes",                              color: "var(--sara)",  soft: "var(--sara-soft)" },
+  MARIA: { role: "Ventas · Clientes",                              color: "var(--maria)", soft: "var(--maria-soft)", nombre: "MARÍA" },
   SOFIA: { role: "Operaciones · Proveedores",                      color: "var(--sofia)", soft: "var(--sofia-soft)" },
   NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--noa)",   soft: "var(--noa-soft)" },
 };
 
 let SOLO_SOFIA = false;
-let activeAgent = "SARA";
+let activeAgent = "MARIA";
 let activeTipo = "todos";
 let activeContactId = null;
 let searchQuery = "";
 let contactosCache = [];
 let plantillasCache = [];
-let counts = { SARA: 0, SOFIA: 0, NOA: 0 };
+let counts = { MARIA: 0, SOFIA: 0, NOA: 0 };
 let _debounce = null;
 
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -530,7 +530,7 @@ function renderTabs(){
   document.getElementById('tabs').innerHTML = agentesVisibles().map(([key,a])=>`
     <button class="agent ${key===activeAgent?'active':''}" style="--ag:${a.color};--ag-soft:${a.soft}" onclick="selectAgent('${key}')" aria-pressed="${key===activeAgent}">
       <span class="agent-av">${key[0]}</span>
-      <span><span class="agent-nm">${key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
+      <span><span class="agent-nm">${a.nombre || key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
       <span class="agent-ct"><b>${counts[key]}</b><span>contactos</span></span>
     </button>
   `).join('');

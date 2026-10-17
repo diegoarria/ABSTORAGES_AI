@@ -19,13 +19,24 @@ function cargar() {
 // { [agente]: { motivo, desde } }
 const pausados = cargar();
 
+// SARA → MARÍA (oct-2026): la pausa de MARÍA se sigue guardando bajo la clave
+// 'sara' — es la que conoce monitoring (registro autoritativo, ver
+// monitoringControl.js) y la que trae el disco actual. Así una pausa ya
+// activa sobre 'sara' sigue frenando a 'maria' y una resincronización
+// desde monitoring nunca la borra. TODO: migrar a 'maria' cuando monitoring
+// ya conozca el agente nuevo.
+function clave(agente) {
+  const a = (agente || '').toLowerCase();
+  return a === 'maria' ? 'sara' : a;
+}
+
 function guardar() {
   try { fs.writeFileSync(FILE, JSON.stringify(pausados, null, 2)); }
   catch (e) { console.error('[agentPause] Error guardando en disco:', e.message); }
 }
 
 function pausar(agente, motivo) {
-  const a = (agente || '').toLowerCase();
+  const a = clave(agente);
   if (!a) return;
   pausados[a] = { motivo: motivo || null, desde: new Date().toISOString() };
   guardar();
@@ -33,7 +44,7 @@ function pausar(agente, motivo) {
 }
 
 function reanudar(agente) {
-  const a = (agente || '').toLowerCase();
+  const a = clave(agente);
   if (!a || !pausados[a]) return;
   delete pausados[a];
   guardar();
@@ -41,11 +52,13 @@ function reanudar(agente) {
 }
 
 function estaPausado(agente) {
-  return !!pausados[(agente || '').toLowerCase()];
+  return !!pausados[clave(agente)];
 }
 
 function listar() {
-  return { ...pausados };
+  const out = { ...pausados };
+  if (out.sara) out.maria = out.sara; // espejo para el panel, que ya pregunta por 'maria'
+  return out;
 }
 
 // Sobreescribe el estado completo desde una fuente externa (monitoringControl,

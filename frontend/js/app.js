@@ -10,7 +10,7 @@ const App = (() => {
       });
     });
 
-    document.getElementById('btn-goto-sara')?.addEventListener('click', () => switchTab('sara'));
+    document.getElementById('btn-goto-maria')?.addEventListener('click', () => switchTab('maria'));
     document.getElementById('btn-goto-sofia')?.addEventListener('click', () => switchTab('sofia'));
   }
 
@@ -83,7 +83,7 @@ const App = (() => {
           agregarActividad(data, true);
           cargarMetricas();
           // Centro de Mando feed
-          const cmTipos = ['MENSAJE_USUARIO','MENSAJE_SARA','MENSAJE_SOFIA','CIERRE_VENTA','NUEVA_ORDEN','FOLIO_ACTUALIZADO'];
+          const cmTipos = ['MENSAJE_USUARIO','MENSAJE_MARIA','MENSAJE_SARA','MENSAJE_SOFIA','CIERRE_VENTA','NUEVA_ORDEN','FOLIO_ACTUALIZADO'];
           if (cmTipos.includes(data.tipo)) {
             window.CentroMando?.addItem(
               data.agente,
@@ -113,8 +113,9 @@ const App = (() => {
     if (empty) empty.remove();
 
     const agente = (evento.agente || 'SISTEMA').toUpperCase();
-    const agenteClass = agente === 'SARA' ? 'sara' : agente === 'SOFIA' ? 'sofia' : 'sistema';
-    const itemClass = agente === 'SARA' ? 'sara' : agente === 'SOFIA' ? 'sofia' : '';
+    const esMaria = agente === 'MARIA' || agente === 'MARÍA' || agente === 'SARA'; // 'SARA' = eventos previos al rename
+    const agenteClass = esMaria ? 'maria' : agente === 'SOFIA' ? 'sofia' : 'sistema';
+    const itemClass = esMaria ? 'maria' : agente === 'SOFIA' ? 'sofia' : '';
     const alertaClass = evento.tipo === 'ALERTA' || evento.tipo === 'ESCALADO' ? 'alerta' : '';
 
     const time = formatTime(evento.timestamp || evento.created_at);
@@ -193,7 +194,7 @@ const App = (() => {
 
   // ─── KPIs ─────────────────────────────────────────────────────────────────
   const KPI_DATA = {
-    sara: {
+    maria: {
       llamadas_hoy    : 14,
       llamadas_meta   : 20,
       clientes_mes    : 3,
@@ -228,22 +229,22 @@ const App = (() => {
   }
 
   function renderKPIs() {
-    const s = KPI_DATA.sara;
+    const s = KPI_DATA.maria;
     const o = KPI_DATA.sofia;
 
-    // SARA
-    set('kpi-sara-llamadas', s.llamadas_hoy);
-    set('kpi-sara-llamadas-sub', `Meta: ${s.llamadas_meta} llamadas`);
-    set('kpi-sara-altas', s.clientes_mes);
-    set('kpi-sara-venta', fmt(s.venta_mes));
-    set('kpi-sara-meta',  fmt(s.meta_mes));
+    // MARÍA
+    set('kpi-maria-llamadas', s.llamadas_hoy);
+    set('kpi-maria-llamadas-sub', `Meta: ${s.llamadas_meta} llamadas`);
+    set('kpi-maria-altas', s.clientes_mes);
+    set('kpi-maria-venta', fmt(s.venta_mes));
+    set('kpi-maria-meta',  fmt(s.meta_mes));
     const pct = Math.round((s.venta_mes / s.meta_mes) * 100);
-    set('kpi-sara-pct', pct + '%');
-    const bar = document.getElementById('kpi-sara-bar');
+    set('kpi-maria-pct', pct + '%');
+    const bar = document.getElementById('kpi-maria-bar');
     if (bar) bar.style.width = Math.min(pct, 100) + '%';
 
-    // Pipeline SARA
-    const pipelineSara = document.getElementById('kpi-sara-pipeline');
+    // Pipeline MARÍA
+    const pipelineSara = document.getElementById('kpi-maria-pipeline');
     if (pipelineSara) pipelineSara.innerHTML = renderPipeline(s.pipeline);
 
     // SOFIA

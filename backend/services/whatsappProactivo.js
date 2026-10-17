@@ -59,7 +59,8 @@ function registrarEnMemoria(agente, telefono, texto) {
 const TWILIO_SID   = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_WA_FROM = {
-  sara:  (process.env.TWILIO_WHATSAPP_NUMBER_SARA  || '').replace(/^whatsapp:/, ''),
+  maria: (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, ''),
+  sara:  (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, ''), // alias heredado (contactos con agente_asignado 'SARA')
   sofia: (process.env.TWILIO_WHATSAPP_NUMBER_SOFIA || '').replace(/^whatsapp:/, ''),
 };
 

@@ -2,7 +2,7 @@
 
 Portal operativo con dos agentes IA conectados para ABSTORAGES Logistics Solutions.
 
-- **SARA** — AI Vendedora: prospecta, cotiza, negocia y cierra contratos 24/7
+- **MARÍA** (María Fernández, antes SARA) — AI Vendedora: prospecta, cotiza, negocia y cierra contratos 24/7
 - **SOFIA** — AI Planner: opera servicios, monitorea viajes, gestiona proveedores y folios 24/7
 
 Comunicación entre agentes vía **Redis Pub/Sub** (`nueva_orden` + `unidades_disponibles`).
@@ -92,7 +92,7 @@ Portal disponible en: **http://localhost:3000**
 └──────────────┬──────────────────┬────────────────┘
                │                  │
     ┌──────────▼──────┐  ┌────────▼──────────┐
-    │      SARA       │  │      SOFIA        │
+    │      MARÍA      │  │      SOFIA        │
     │  AI Vendedora   │  │   AI Planner      │
     │  /api/sara/chat │  │  /api/sofia/chat  │
     └──────────┬──────┘  └────────┬──────────┘
@@ -114,10 +114,10 @@ Portal disponible en: **http://localhost:3000**
 
 ---
 
-## Flujo Sara → Sofia
+## Flujo María → Sofia
 
-1. SARA cierra venta en el chat
-2. SARA publica evento `nueva_orden` en Redis con datos del servicio
+1. MARÍA cierra venta en el chat
+2. MARÍA publica evento `nueva_orden` en Redis con datos del servicio
 3. SOFIA recibe el evento y **ejecuta el flujo de colocación** automáticamente:
    - Busca proveedores disponibles para la ruta
    - Contacta por WhatsApp (360dialog)
@@ -142,7 +142,7 @@ PENDIENTE → EN_BUSQUEDA → PROGRAMADO → EN_PROCESO → ENTREGADO → CONCLU
 |--------|------|-------------|
 | GET | `/api/health` | Estado del servidor |
 | GET | `/api/metricas` | Métricas del dashboard |
-| POST | `/api/sara/chat` | Chat con SARA (SSE streaming) |
+| POST | `/api/sara/chat` | Chat con MARÍA (SSE streaming) |
 | POST | `/api/sara/nueva-orden` | Publicar orden manualmente |
 | GET | `/api/sara/historial/:sessionId` | Historial de conversación |
 | POST | `/api/sofia/chat` | Chat con SOFIA (SSE streaming) |

@@ -45,8 +45,16 @@ async function sincronizar() {
 // Empuja un cambio de pausa/reanudación hacia monitoring — se llama justo
 // después de agentPause.pausar()/reanudar() local, así monitoring queda
 // como el registro autoritativo, no solo un espejo.
+// SARA → MARÍA (oct-2026): monitoring aún conoce a este agente como 'sara'
+// — se le sigue mandando así hasta migrarlo allá también (ver agentPause.js).
+function agenteMonitoring(agente) {
+  const a = String(agente || '').toLowerCase();
+  return a === 'maria' ? 'sara' : agente;
+}
+
 async function empujar(agente, paused, motivo) {
   if (!HABILITADO) return;
+  agente = agenteMonitoring(agente);
   try {
     await fetchConTimeout(`/internal/agent-control/${agente}`, {
       method: 'POST',
@@ -79,7 +87,7 @@ function reportarContactoSaliente({ agente, canal, destinatario, detalle }) {
   if (!HABILITADO) return;
   fetchConTimeout('/internal/outbound-contact', {
     method: 'POST',
-    body: JSON.stringify({ agente, canal, destinatario, detalle }),
+    body: JSON.stringify({ agente: agenteMonitoring(agente), canal, destinatario, detalle }),
   }).catch(e => console.error('[monitoringControl] Error reportando outbound-contact:', e.message));
 }
 

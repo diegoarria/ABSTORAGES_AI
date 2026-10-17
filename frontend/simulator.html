@@ -133,7 +133,7 @@
       border: 1px solid;
       letter-spacing: 0.01em;
     }
-    .h-agent-pill.sara {
+    .h-agent-pill.sara, .h-agent-pill.maria {
       background: var(--g10);
       border-color: var(--g30);
       color: var(--g);
@@ -147,7 +147,7 @@
       width: 6px; height: 6px; border-radius: 50%;
       animation: pillPulse 2s infinite;
     }
-    .sara .pill-dot { background: var(--g); box-shadow: 0 0 5px var(--g); }
+    .sara .pill-dot, .maria .pill-dot { background: var(--g); box-shadow: 0 0 5px var(--g); }
     .sofia .pill-dot { background: var(--b); box-shadow: 0 0 5px var(--b); animation-delay: .4s; }
     @keyframes pillPulse {
       0%,100% { opacity:.7; transform:scale(1); }
@@ -246,7 +246,7 @@
       position: absolute; top:0; left:0; right:0; height:2px;
       z-index:10;
     }
-    .panel.sara::before { background: linear-gradient(90deg, transparent, var(--g), rgba(14,169,104,.4), transparent); }
+    .panel.sara::before, .panel.maria::before { background: linear-gradient(90deg, transparent, var(--g), rgba(14,169,104,.4), transparent); }
     .panel.sofia::before { background: linear-gradient(90deg, transparent, var(--b), rgba(47,111,237,.4), transparent); }
 
     /* ── PANEL HEAD ── */
@@ -256,7 +256,7 @@
       flex-shrink: 0;
       position: relative;
     }
-    .panel.sara .p-head { background: linear-gradient(180deg, rgba(14,169,104,.05) 0%, transparent 100%); }
+    .panel.sara .p-head, .panel.maria .p-head { background: linear-gradient(180deg, rgba(14,169,104,.05) 0%, transparent 100%); }
     .panel.sofia .p-head { background: linear-gradient(180deg, rgba(47,111,237,.05) 0%, transparent 100%); }
 
     .p-head-top { display:flex; align-items:center; gap:12px; margin-bottom: 10px; }
@@ -267,12 +267,12 @@
       font-size: 20px; font-weight: 800; flex-shrink:0;
       position: relative;
     }
-    .panel.sara  .p-avatar { background: var(--g10); color: var(--g); border: 1px solid var(--g30); box-shadow: 0 0 20px rgba(14,169,104,.12); }
+    .panel.sara  .p-avatar, .panel.maria  .p-avatar { background: var(--g10); color: var(--g); border: 1px solid var(--g30); box-shadow: 0 0 20px rgba(14,169,104,.12); }
     .panel.sofia .p-avatar { background: var(--b10); color: var(--b); border: 1px solid var(--b18); box-shadow: 0 0 20px rgba(47,111,237,.12); }
 
     .p-info { flex:1 }
     .p-name { font-size: 17px; font-weight: 800; letter-spacing:0.01em; line-height:1; }
-    .panel.sara  .p-name { color: var(--g); text-shadow: 0 0 20px rgba(14,169,104,.25); }
+    .panel.sara  .p-name, .panel.maria  .p-name { color: var(--g); text-shadow: 0 0 20px rgba(14,169,104,.25); }
     .panel.sofia .p-name { color: var(--b); text-shadow: 0 0 20px rgba(47,111,237,.25); }
 
     .p-role { font-family: var(--mono); font-size: 11px; color: var(--t3); margin-top: 3px; letter-spacing:0.01em; }
@@ -282,7 +282,7 @@
       width: 7px; height: 7px; border-radius: 50%;
       animation: statusPulse 2.5s infinite;
     }
-    .panel.sara  .p-status-dot { background: var(--g); box-shadow: 0 0 8px var(--g); }
+    .panel.sara  .p-status-dot, .panel.maria  .p-status-dot { background: var(--g); box-shadow: 0 0 8px var(--g); }
     .panel.sofia .p-status-dot { background: var(--b); box-shadow: 0 0 8px var(--b); animation-delay: .6s; }
     @keyframes statusPulse {
       0%,100% { opacity:1; transform:scale(1); }
@@ -297,7 +297,7 @@
       padding: 2px 8px; border-radius: 4px;
       letter-spacing:0.01em;
     }
-    .panel.sara  .p-tag { background: var(--g10); color: rgba(14,169,104,.7); border: 1px solid rgba(14,169,104,.12); }
+    .panel.sara  .p-tag, .panel.maria  .p-tag { background: var(--g10); color: rgba(14,169,104,.7); border: 1px solid rgba(14,169,104,.12); }
     .panel.sofia .p-tag { background: var(--b10); color: rgba(47,111,237,.7); border: 1px solid rgba(47,111,237,.12); }
 
     /* ── ORDER NOTIF BANNER ── */
@@ -335,7 +335,7 @@
       font-size: 11px; font-weight: 800; flex-shrink:0;
       margin-top: 2px;
     }
-    .msg-av.sara  { background: var(--g10); color: var(--g); border: 1px solid rgba(14,169,104,.2); }
+    .msg-av.sara, .msg-av.maria  { background: var(--g10); color: var(--g); border: 1px solid rgba(14,169,104,.2); }
     .msg-av.sofia { background: var(--b10); color: var(--b); border: 1px solid rgba(47,111,237,.2); }
     .msg-av.user  { background: var(--s4); color: var(--t2); font-size:11px; border: 1px solid var(--br2); }
 
@@ -346,7 +346,7 @@
       font-family: var(--mono); font-size: 11px; color: var(--t3);
       letter-spacing: 0.01em; padding: 0 4px;
     }
-    .panel.sara  .msg.assistant .msg-name { color: rgba(14,169,104,.5); }
+    .panel.sara  .msg.assistant .msg-name, .panel.maria  .msg.assistant .msg-name { color: rgba(14,169,104,.5); }
     .panel.sofia .msg.assistant .msg-name { color: rgba(47,111,237,.5); }
 
     .bubble {
@@ -360,7 +360,7 @@
       border: 1px solid var(--br2);
       border-top-left-radius: 3px;
     }
-    .panel.sara  .msg.assistant .bubble { border-left: 2px solid rgba(14,169,104,.3); }
+    .panel.sara  .msg.assistant .bubble, .panel.maria  .msg.assistant .bubble { border-left: 2px solid rgba(14,169,104,.3); }
     .panel.sofia .msg.assistant .bubble { border-left: 2px solid rgba(47,111,237,.3); }
 
     .msg.user .bubble {
@@ -395,7 +395,7 @@
       width: 5px; height: 5px; border-radius: 50%;
       animation: bounce 1.3s infinite;
     }
-    .panel.sara  .t-dot { background: var(--g); }
+    .panel.sara  .t-dot, .panel.maria  .t-dot { background: var(--g); }
     .panel.sofia .t-dot { background: var(--b); }
     .t-dot:nth-child(2) { animation-delay:.18s; }
     .t-dot:nth-child(3) { animation-delay:.36s; }
@@ -427,7 +427,7 @@
       max-height: 120px;
       transition: border-color .2s, box-shadow .2s;
     }
-    .panel.sara  .chat-inp:focus { border-color: var(--g30); box-shadow: 0 0 0 3px rgba(14,169,104,.07); }
+    .panel.sara  .chat-inp:focus, .panel.maria  .chat-inp:focus { border-color: var(--g30); box-shadow: 0 0 0 3px rgba(14,169,104,.07); }
     .panel.sofia .chat-inp:focus { border-color: var(--b18); box-shadow: 0 0 0 3px rgba(47,111,237,.07); }
     .chat-inp::placeholder { color: var(--t3); }
 
@@ -444,8 +444,8 @@
     }
     .send-btn:hover::before { opacity:1; }
     .send-btn:active { transform: scale(.93); }
-    .panel.sara  .send-btn { background: var(--g); box-shadow: 0 4px 14px rgba(14,169,104,.3); }
-    .panel.sara  .send-btn:hover { box-shadow: 0 6px 20px rgba(14,169,104,.45); }
+    .panel.sara  .send-btn, .panel.maria  .send-btn { background: var(--g); box-shadow: 0 4px 14px rgba(14,169,104,.3); }
+    .panel.sara  .send-btn:hover, .panel.maria  .send-btn:hover { box-shadow: 0 6px 20px rgba(14,169,104,.45); }
     .panel.sofia .send-btn { background: var(--b); box-shadow: 0 4px 14px rgba(47,111,237,.3); }
     .panel.sofia .send-btn:hover { box-shadow: 0 6px 20px rgba(47,111,237,.45); }
     .send-btn:disabled { background: var(--s4); box-shadow: none; cursor:not-allowed; opacity:.5; }
@@ -606,7 +606,7 @@
   <div class="h-agents">
     <div class="h-agent-pill sara">
       <div class="pill-dot"></div>
-      SARA
+      MARÍA
     </div>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="2">
       <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
@@ -652,7 +652,7 @@
       <div class="p-head-top">
         <div class="p-avatar">S</div>
         <div class="p-info">
-          <div class="p-name">SARA</div>
+          <div class="p-name">MARÍA</div>
           <div class="p-role">AI Vendedora · Operando 24/7</div>
         </div>
         <div class="p-status">
@@ -678,8 +678,8 @@
       <div class="msg assistant">
         <div class="msg-av sara">S</div>
         <div class="msg-body">
-          <span class="msg-name">SARA · AI Vendedora</span>
-          <div class="bubble"><p>¡Hola! Soy <strong>SARA</strong> de ABSTORAGES.</p><p>¿Cómo puedo ayudarte?</p></div>
+          <span class="msg-name">MARÍA · AI Vendedora</span>
+          <div class="bubble"><p>¡Hola! Soy <strong>María</strong> de ABSTORAGES.</p><p>¿Cómo puedo ayudarte?</p></div>
         </div>
       </div>
     </div>
@@ -699,7 +699,7 @@
   <!-- ── EVENT BUS ── -->
   <div class="bus" id="bus">
     <div class="bus-flash" id="bus-flash"></div>
-    <span class="bus-top-label">SARA</span>
+    <span class="bus-top-label">MARÍA</span>
     <div class="bus-center">
       <div class="bus-node" id="bn1"></div>
       <div class="bus-arrow" id="ba1">↓</div>

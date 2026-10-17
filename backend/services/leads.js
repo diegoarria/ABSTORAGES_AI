@@ -83,7 +83,11 @@ function add(lead) {
     existing.precio_cotizado = merge(existing.precio_cotizado, lead.precio_cotizado);
     existing.folio           = merge(existing.folio,           lead.folio);
     if (lead.intent && lead.intent !== 'otro') existing.intent = lead.intent;
-    if (lead.sara_nota)     existing.sara_nota    = lead.sara_nota;
+    // SARA → MARÍA (oct-2026): el campo en disco/DB sigue llamándose sara_nota
+    // (columna real en Postgres), pero aceptamos maria_nota como alias de
+    // entrada para que el código nuevo no tenga que conocer el nombre viejo.
+    const notaNueva = lead.maria_nota || lead.sara_nota;
+    if (notaNueva)          existing.sara_nota    = notaNueva;
     if (lead.primer_mensaje) existing.primer_mensaje = lead.primer_mensaje;
     if (lead.resumen)       existing.resumen      = lead.resumen;
     if (lead.ip)            existing.ip           = lead.ip;
@@ -109,7 +113,7 @@ function add(lead) {
     precio_cotizado: lead.precio_cotizado || '—',
     folio:           lead.folio           || '—',
     intent:          lead.intent          || 'otro',
-    sara_nota:       lead.sara_nota       || null,
+    sara_nota:       (lead.maria_nota || lead.sara_nota) || null,
     primer_mensaje:  lead.primer_mensaje  || null,
     resumen:         lead.resumen         || '',
     sessionId:       sid,

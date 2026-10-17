@@ -14,10 +14,10 @@ function templateEmail(p) {
     html: `
 <div style="font-family:-apple-system,sans-serif;max-width:560px;color:#111;">
   <p>Hola <strong>${p.nombre.split(' ')[0]}</strong>,</p>
-  <p>Soy SARA, asistente comercial de <strong>ABSTORAGES</strong>. Vi tu perfil en LinkedIn y creo que podemos ayudarle a ${p.empresa} a reducir costos logísticos en sus rutas de carga.</p>
+  <p>Soy María, asistente comercial de <strong>ABSTORAGES</strong>. Vi tu perfil en LinkedIn y creo que podemos ayudarle a ${p.empresa} a reducir costos logísticos en sus rutas de carga.</p>
   <p>En ABSTORAGES manejamos carga seca, refrigerada y proyecto en toda la república. Nuestros clientes ahorran entre 15-25% frente a cotizaciones de mercado gracias a nuestra red de carriers verificados.</p>
   <p>¿Tienes 20 minutos esta semana para una llamada rápida?</p>
-  <p style="margin-top:24px;">Saludos,<br><strong>SARA</strong> · ABSTORAGES<br><a href="https://abstorages.com">abstorages.com</a></p>
+  <p style="margin-top:24px;">Saludos,<br><strong>María Fernández</strong> · ABSTORAGES<br><a href="https://abstorages.com">abstorages.com</a></p>
 </div>`,
   };
 }
@@ -25,13 +25,13 @@ function templateEmail(p) {
 function templateWhatsApp(p) {
   return `Hola ${p.nombre.split(' ')[0]} 👋
 
-Soy SARA de *ABSTORAGES*. Te contacto porque creemos que podemos apoyar la logística de ${p.empresa} con nuestras rutas de carga en México.
+Soy María de *ABSTORAGES*. Te contacto porque creemos que podemos apoyar la logística de ${p.empresa} con nuestras rutas de carga en México.
 
 ¿Tienes unos minutos para una llamada rápida esta semana? 🚛`;
 }
 
 function templateLinkedIn(p) {
-  return `Hola ${p.nombre.split(' ')[0]}, soy Sara de ABSTORAGES. Nos especializamos en logística de carga en México y creo que podemos ser un buen socio para ${p.empresa}. ¿Podríamos conectar?`;
+  return `Hola ${p.nombre.split(' ')[0]}, soy María de ABSTORAGES. Nos especializamos en logística de carga en México y creo que podemos ser un buen socio para ${p.empresa}. ¿Podríamos conectar?`;
 }
 
 // ── Ejecutores por canal ──────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ async function enviarEmail(p) {
     auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
   });
   await transport.sendMail({
-    from: `SARA ABSTORAGES <${process.env.GMAIL_USER}>`,
+    from: `María Fernández ABSTORAGES <${process.env.GMAIL_USER}>`,
     to: p.email,
     subject: asunto,
     html,
@@ -107,7 +107,7 @@ async function run(pushActividad) {
         case 'vapi':     await lanzarLlamadaVapi(p);  break;
       }
       outreach.registrarAccion(p.id, paso.canal, 'enviado');
-      push({ agente: 'SARA', tipo: 'OUTREACH', mensaje: `${paso.canal.toUpperCase()} → ${p.nombre} (${p.empresa})`, metadata: { id: p.id, canal: paso.canal } });
+      push({ agente: 'MARIA', tipo: 'OUTREACH', mensaje: `${paso.canal.toUpperCase()} → ${p.nombre} (${p.empresa})`, metadata: { id: p.id, canal: paso.canal } });
       procesados++;
     } catch (e) {
       console.error(`[Outreach] Error ${paso.canal} → ${p.nombre}:`, e.message);

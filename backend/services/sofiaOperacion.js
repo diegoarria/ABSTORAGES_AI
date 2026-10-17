@@ -95,7 +95,7 @@ function avisarOferta(folio, quien) {
   feed({ tipo: 'OFERTA', mensaje: `Folio ${folio}: ${quien} tiene unidad${comp.find(f => f.nombre === quien)?.precio ? ` a ${pesos(comp.find(f => f.nombre === quien).precio)}` : ''} · ${comp.length} oferta(s) en total${rec ? ` · recomendado: ${rec.nombre} (${pesos(rec.precio)})` : ''}`, metadata: { folio } });
   push({ title: `📊 Oferta para el folio ${folio}`, body: `${comp.length} oferta(s)${rec ? ` · recomendado: ${rec.nombre} ${pesos(rec.precio)}` : ''} — entra a aprobar`, tag: 'oferta-' + folio, url: '/colocaciones.html', tipo: 'OFERTA', urgente: comp.length === 1 });
 
-  // Primera oferta usable del folio → se le avisa a SARA/cliente de inmediato
+  // Primera oferta usable del folio → se le avisa a MARÍA/cliente de inmediato
   // (pedido explícito del usuario, 06-oct-2026). Solo una vez por folio.
   if (rec && !c.avisos.clienteAvisado) avisarClientePrimeraOferta(c, rec).catch(e => console.error('[sofiaOperacion] Error avisando al cliente:', e.message));
 }
@@ -155,7 +155,7 @@ function procesarSenales({ telefono, nombre, respuesta }) {
         else colocaciones.marcarHito(c.folio, HITO_DE[est.estado], detalle);
         const etiqueta = { unidad_confirmada: 'confirmó unidad y operador', llego_carga: 'llegó a carga', cargado: 'ya cargó', salio: 'salió y va en ruta', en_ruta: 'va en ruta', llego_destino: 'llegó a destino', entregado: 'entregó', evidencia_recibida: 'mandó evidencia de entrega', retraso: 'REPORTA RETRASO' }[est.estado];
         feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: ${quien} ${etiqueta}${detalle ? ' — ' + detalle.slice(0, 160) : ''}`, metadata: { folio: c.folio, estado: est.estado } });
-        if (est.estado === 'retraso') push({ title: `Retraso — folio ${c.folio}`, body: `${quien}: ${detalle || 'sin detalle'}. Avisa al cliente (SARA/ventas).`, tag: 'retraso-' + c.folio, url: '/actividad.html', tipo: 'RETRASO', urgente: true });
+        if (est.estado === 'retraso') push({ title: `Retraso — folio ${c.folio}`, body: `${quien}: ${detalle || 'sin detalle'}. Avisa al cliente (MARÍA/ventas).`, tag: 'retraso-' + c.folio, url: '/actividad.html', tipo: 'RETRASO', urgente: true });
         if (est.estado === 'entregado') push({ title: `Entregado — folio ${c.folio}`, body: `${quien} reporta entrega. Falta confirmar evidencia.`, tag: 'entregado-' + c.folio, url: '/colocaciones.html', tipo: 'SEGUIMIENTO' });
       }
     }
@@ -333,7 +333,7 @@ async function aprobar(folio, { tel, manual, precio, aprobadoPor }) {
   return { ok: true, folio, ganador: g, mensajeAlGanador: mensaje };
 }
 
-// ── El cliente le confirmó a SARA que sigue necesitando la unidad con urgencia ──
+// ── El cliente le confirmó a MARÍA que sigue necesitando la unidad con urgencia ──
 // Pedido explícito del usuario (06-oct-2026): si ya hay oferta recomendada,
 // se cierra con ese proveedor automático, sin esperar aprobación humana (caso
 // distinto al de colocaciones.html, donde sí la pide). Si todavía no hay
@@ -348,7 +348,7 @@ async function confirmarUrgentePorCliente(folio) {
   const comp = colocaciones.comparativo(c);
   const top = comp.find(x => x.recomendado) || comp[0];
   if (top) {
-    const r = await aprobar(f, { tel: top.tel, precio: top.precio, aprobadoPor: 'Cliente (confirmó urgencia por WhatsApp con SARA)' });
+    const r = await aprobar(f, { tel: top.tel, precio: top.precio, aprobadoPor: 'Cliente (confirmó urgencia por WhatsApp con MARÍA)' });
     feed({ tipo: 'URGENCIA_CLIENTE', mensaje: `Folio ${f}: el cliente confirmó que necesita la unidad ya — se cerró automático con ${top.nombre}` });
     return { ok: true, ...r };
   }

@@ -44,9 +44,9 @@
       "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
     },
     {
-      "name": "SARA · Ventas",
-      "short_name": "SARA",
-      "url": "/#sara",
+      "name": "María · Ventas",
+      "short_name": "María",
+      "url": "/#maria",
       "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
     }
   ],

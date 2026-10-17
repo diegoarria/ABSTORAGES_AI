@@ -1,10 +1,10 @@
 /**
- * SARA Widget — ABSTORAGES Logistics Solutions
+ * MARÍA Widget (antes "SARA Widget") — ABSTORAGES Logistics Solutions
  *
  * Copia este snippet en tu landing page:
  *
  *   <script
- *     src="https://TU_SERVIDOR/sara-widget.js"
+ *     src="https://TU_SERVIDOR/maria-widget.js"   (la URL vieja /sara-widget.js sigue funcionando)
  *     data-color="#1a3a8f"
  *     data-label="Cotiza tu flete"
  *     defer
@@ -15,10 +15,10 @@
  *   data-label  — texto del botón (default "Cotiza aquí")
  */
 (function () {
-  if (window.__saraWidget) return;
-  window.__saraWidget = true;
+  if (window.__mariaWidget || window.__saraWidget) return;
+  window.__mariaWidget = window.__saraWidget = true;
 
-  const s         = document.currentScript || document.querySelector('script[src*="sara-widget"]');
+  const s         = document.currentScript || document.querySelector('script[src*="maria-widget"], script[src*="sara-widget"]');
   const BASE      = s ? new URL(s.src).origin : '';
   const COLOR     = s?.dataset.color    || '#1a3a8f';
   const LABEL     = s?.dataset.label    || 'Cotiza aquí';
@@ -27,7 +27,7 @@
   // ── Estilos ──────────────────────────────────────────────────────────────────
   const style = document.createElement('style');
   style.textContent = `
-    #_sara_btn {
+    #_maria_btn {
       position: fixed; bottom: 24px; right: 24px; z-index: 2147483646;
       background: ${COLOR}; color: #fff;
       border: none; border-radius: 50px;
@@ -38,8 +38,8 @@
       transition: transform .18s, box-shadow .18s;
       line-height: 1;
     }
-    #_sara_btn:hover { transform: translateY(-2px); box-shadow: 0 7px 28px rgba(0,0,0,.45); }
-    #_sara_wrap {
+    #_maria_btn:hover { transform: translateY(-2px); box-shadow: 0 7px 28px rgba(0,0,0,.45); }
+    #_maria_wrap {
       position: fixed; bottom: 8px; right: 24px; z-index: 2147483645;
       width: 320px; height: 480px;
       border-radius: 16px; overflow: hidden;
@@ -48,14 +48,14 @@
       transition: opacity .2s, transform .2s;
       opacity: 0; transform: scale(.95) translateY(8px);
     }
-    #_sara_wrap.open {
+    #_maria_wrap.open {
       display: block; opacity: 1; transform: scale(1) translateY(0);
     }
-    #_sara_wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+    #_maria_wrap iframe { width: 100%; height: 100%; border: none; display: block; }
     @media (max-width: 500px) {
-      #_sara_wrap { width: calc(100vw - 16px); height: 68vh; bottom: 0; right: 0;
+      #_maria_wrap { width: calc(100vw - 16px); height: 68vh; bottom: 0; right: 0;
         border-radius: 16px 16px 0 0; }
-      #_sara_btn  { bottom: 16px; right: 16px; }
+      #_maria_btn  { bottom: 16px; right: 16px; }
     }
   `;
   document.head.appendChild(style);
@@ -65,16 +65,16 @@
   const ICON_X    = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
   const btn = document.createElement('button');
-  btn.id = '_sara_btn';
+  btn.id = '_maria_btn';
   btn.innerHTML = `${ICON_CHAT}${LABEL}`;
-  btn.setAttribute('aria-label', 'Abrir chat SARA');
+  btn.setAttribute('aria-label', 'Abrir chat María');
 
   // ── Iframe ────────────────────────────────────────────────────────────────────
   const wrap   = document.createElement('div');
-  wrap.id = '_sara_wrap';
+  wrap.id = '_maria_wrap';
   const iframe = document.createElement('iframe');
   iframe.src   = `${BASE}/widget`;
-  iframe.title = 'Chat SARA — ABSTORAGES Logistics';
+  iframe.title = 'Chat María — ABSTORAGES Logistics';
   iframe.setAttribute('loading', 'lazy');
   iframe.setAttribute('allow', 'microphone');
   wrap.appendChild(iframe);

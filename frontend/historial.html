@@ -24,13 +24,16 @@
 .af-chip { font-family:inherit; font-size:12px; font-weight:700; padding:6px 13px; border-radius:20px; border:1px solid var(--bd-strong); background:var(--surface); color:var(--tx3); cursor:pointer; transition:all .15s; letter-spacing:.02em; }
 .af-chip:hover { color:var(--tx); }
 .af-chip[data-ag="sara"].on  { background:var(--sara-soft); border-color:var(--sara); color:var(--sara); }
+.af-chip[data-ag="maria"].on   { background:var(--maria-soft); border-color:var(--maria); color:var(--maria); }
 .af-chip[data-ag="sofia"].on { background:var(--sofia-soft); border-color:var(--sofia); color:var(--sofia); }
 .af-chip[data-ag="noa"].on   { background:var(--noa-soft); border-color:var(--noa); color:var(--noa); }
 .count { font-size:12px; color:var(--tx3); }
-.av-ag-sara { background:var(--sara-soft); color:var(--sara); } .av-ag-sofia { background:var(--sofia-soft); color:var(--sofia); } .av-ag-noa { background:var(--noa-soft); color:var(--noa); }
+.av-ag-sara { background:var(--sara-soft); color:var(--sara); }
+.av-ag-maria  { background:var(--maria-soft); color:var(--maria); } .av-ag-sofia { background:var(--sofia-soft); color:var(--sofia); } .av-ag-noa { background:var(--noa-soft); color:var(--noa); }
 .av-ag-hector { background:rgba(124,58,237,.12); color:#7C3AED; } .av-ag-grupo, .av-ag-desconocido { background:var(--surface-3); color:var(--tx2); }
 .av .i { width:18px; height:18px; }
-.ag-sara { background:var(--sara-soft); color:var(--sara); } .ag-sofia { background:var(--sofia-soft); color:var(--sofia); } .ag-noa { background:var(--noa-soft); color:var(--noa); }
+.ag-sara { background:var(--sara-soft); color:var(--sara); }
+.ag-maria  { background:var(--maria-soft); color:var(--maria); } .ag-sofia { background:var(--sofia-soft); color:var(--sofia); } .ag-noa { background:var(--noa-soft); color:var(--noa); }
 .ag-hector { background:rgba(124,58,237,.12); color:#7C3AED; } .ag-grupo, .ag-desconocido { background:var(--surface-3); color:var(--tx2); }
 .pill-neutral { background:var(--surface-3); color:var(--tx2); }
 .row-meta { justify-content:space-between; }
@@ -63,7 +66,7 @@
   <div class="page-head">
     <div>
       <h1>Historial de conversaciones</h1>
-      <p>Todos los chats y llamadas de SARA, SOFIA y NOA, con el detalle completo de cada interacción.</p>
+      <p>Todos los chats y llamadas de María, SOFIA y NOA, con el detalle completo de cada interacción.</p>
     </div>
   </div>
 
@@ -75,7 +78,7 @@
           <div class="filter" id="tab-llamadas" onclick="cambiarModo('llamadas')" role="tab">Llamadas</div>
         </div>
         <div class="chips-row" id="agent-filters">
-          <button class="af-chip on" data-ag="sara" onclick="toggleFiltroAgente('sara')" id="chip-sara">SARA</button>
+          <button class="af-chip on" data-ag="maria" onclick="toggleFiltroAgente('maria')" id="chip-maria">MARÍA</button>
           <button class="af-chip on" data-ag="sofia" onclick="toggleFiltroAgente('sofia')">SOFÍA</button>
           <button class="af-chip on" data-ag="noa" onclick="toggleFiltroAgente('noa')" id="chip-noa">NOA</button>
         </div>
@@ -97,8 +100,8 @@ let MODO = 'chats'; // 'chats' | 'llamadas'
 let LLAMADAS = [];
 let llamadaActual = null;
 
-const AGENTE_LABEL = { sara:'SARA', sofia:'SOFÍA', noa:'NOA', hector:'HÉCTOR', grupo:'GRUPO WA', desconocido:'?' };
-const AGENTES_FILTRABLES = ['sara', 'sofia', 'noa'];
+const AGENTE_LABEL = { maria:'MARÍA', sara:'MARÍA', sofia:'SOFÍA', noa:'NOA', hector:'HÉCTOR', grupo:'GRUPO WA', desconocido:'?' };
+const AGENTES_FILTRABLES = ['maria', 'sofia', 'noa'];
 
 // Filtro de agente en modo Chats — las 3 activas por default.
 // No se permite dejar todas apagadas, para no mostrar una lista vacía sin sentido.
@@ -118,9 +121,9 @@ function toggleFiltroAgente(agente) {
 
 function aplicarFiltroAgente(lista) {
   // Otros agentes (HÉCTOR, grupo de WhatsApp, desconocido) no aplican a este
-  // filtro — solo SARA/SOFIA/NOA se pueden aislar aquí, el resto siempre se
+  // filtro — solo MARÍA/SOFIA/NOA se pueden aislar aquí, el resto siempre se
   // muestra si aparece (un hilo de grupo puede mezclar a más de un agente).
-  return lista.filter(s => !AGENTES_FILTRABLES.includes(s.agente) || FILTRO_AGENTES.has(s.agente));
+  return lista.filter(s => { const ag = s.agente === 'sara' ? 'maria' : s.agente; return !AGENTES_FILTRABLES.includes(ag) || FILTRO_AGENTES.has(ag); });
 }
 
 function vacioDetalle(m) {
@@ -349,7 +352,7 @@ document.getElementById('searchIco').innerHTML = ico('search');
 (window.ABS_ROL_LISTO || Promise.resolve(null)).then(rol => {
   if (rol === 'lector') {
     FILTRO_AGENTES = new Set(['sofia']);
-    document.getElementById('chip-sara').style.display = 'none';
+    document.getElementById('chip-maria').style.display = 'none';
     document.getElementById('chip-noa').style.display = 'none';
   }
   document.getElementById('main').innerHTML = vacioDetalle('chats');

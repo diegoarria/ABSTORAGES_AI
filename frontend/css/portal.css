@@ -4,7 +4,7 @@
   --tx:#0F172A; --tx2:#475569; --tx3:#64748B;
   --navy:#0B2A5B; --navy-2:#123A7A;
   --acc:#1F5FD1; --acc-soft:#E8F0FE; --acc-tx:#1748A6;
-  --sara:#0B7D57; --sara-soft:#E3F5EE;
+  --sara:#0B7D57; --sara-soft:#E3F5EE; --maria:#0B7D57; --maria-soft:#E3F5EE;
   --sofia:#1F5FD1; --sofia-soft:#E8F0FE;
   --noa:#B45309; --noa-soft:#FEF1DC;
   --ok:#0B7D57; --ok-soft:#E3F5EE; --warn:#B45309; --warn-soft:#FEF1DC; --crit:#C62828; --crit-soft:#FDE8E8;
@@ -19,7 +19,7 @@
   --tx:#E8EEF7; --tx2:#A9B6CA; --tx3:#8090A8;
   --navy:#08111F; --navy-2:#0D1A30;
   --acc:#5B93FF; --acc-soft:rgba(91,147,255,.14); --acc-tx:#8DB4FF;
-  --sara:#34D399; --sara-soft:rgba(52,211,153,.13);
+  --sara:#34D399; --sara-soft:rgba(52,211,153,.13); --maria:#34D399; --maria-soft:rgba(52,211,153,.13);
   --sofia:#5B93FF; --sofia-soft:rgba(91,147,255,.14);
   --noa:#FBBF24; --noa-soft:rgba(251,191,36,.13);
   --ok:#34D399; --ok-soft:rgba(52,211,153,.13); --warn:#FBBF24; --warn-soft:rgba(251,191,36,.13); --crit:#FF7A7A; --crit-soft:rgba(255,122,122,.13);
@@ -42,13 +42,14 @@
 :root[data-theme] .cmd-center { background:var(--surface-2) !important; }
 
 /* Encabezado de cada panel */
-:root[data-theme] .cmd-col-head, :root[data-theme] .cmd-col-head.sara, :root[data-theme] .cmd-col-head.sofia { height:auto; padding:16px 20px; background:var(--surface) !important; border-top:none !important; border-bottom:1px solid var(--bd); gap:14px; position:relative; }
-:root[data-theme] .cmd-col-head.sara::after, :root[data-theme] .cmd-col-head.sofia::after { content:""; position:absolute; left:20px; right:20px; bottom:-1px; height:2px; border-radius:2px; }
-:root[data-theme] .cmd-col-head.sara::after { background:var(--sara); } :root[data-theme] .cmd-col-head.sofia::after { background:var(--sofia); }
+:root[data-theme] .cmd-col-head, :root[data-theme] .cmd-col-head.sara, :root[data-theme] .cmd-col-head.sofia, :root[data-theme] .cmd-col-head.maria { height:auto; padding:16px 20px; background:var(--surface) !important; border-top:none !important; border-bottom:1px solid var(--bd); gap:14px; position:relative; }
+:root[data-theme] .cmd-col-head.sara::after, :root[data-theme] .cmd-col-head.sofia::after, :root[data-theme] .cmd-col-head.maria::after { content:""; position:absolute; left:20px; right:20px; bottom:-1px; height:2px; border-radius:2px; }
+:root[data-theme] .cmd-col-head.sara::after { background:var(--sara); }
+:root[data-theme] .cmd-col-head.maria::after  { background:var(--maria); } :root[data-theme] .cmd-col-head.sofia::after { background:var(--sofia); }
 :root[data-theme] .cmd-avatar { width:44px; height:44px; border-radius:50%; border:2px solid var(--surface); box-shadow:0 0 0 1px var(--bd-strong); }
-:root[data-theme] .cmd-name, :root[data-theme] .cmd-col-head.sara .cmd-name, :root[data-theme] .cmd-col-head.sofia .cmd-name { font-size:16px; font-weight:800; letter-spacing:-.01em; color:var(--tx) !important; }
-:root[data-theme] .cmd-sub, :root[data-theme] .cmd-col-head.sara .cmd-sub, :root[data-theme] .cmd-col-head.sofia .cmd-sub { font-size:12.5px; color:var(--tx3) !important; opacity:1; }
-:root[data-theme] .cmd-action-btn, :root[data-theme] .cmd-col-head.sara .cmd-action-btn, :root[data-theme] .cmd-col-head.sofia .cmd-action-btn { width:34px; height:34px; border-radius:9px; background:var(--surface) !important; border:1px solid var(--bd-strong) !important; color:var(--tx2) !important; transform:none; }
+:root[data-theme] .cmd-name, :root[data-theme] .cmd-col-head.sara .cmd-name, :root[data-theme] .cmd-col-head.sofia .cmd-name, :root[data-theme] .cmd-col-head.maria .cmd-name { font-size:16px; font-weight:800; letter-spacing:-.01em; color:var(--tx) !important; }
+:root[data-theme] .cmd-sub, :root[data-theme] .cmd-col-head.sara .cmd-sub, :root[data-theme] .cmd-col-head.sofia .cmd-sub, :root[data-theme] .cmd-col-head.maria .cmd-sub { font-size:12.5px; color:var(--tx3) !important; opacity:1; }
+:root[data-theme] .cmd-action-btn, :root[data-theme] .cmd-col-head.sara .cmd-action-btn, :root[data-theme] .cmd-col-head.sofia .cmd-action-btn, :root[data-theme] .cmd-col-head.maria .cmd-action-btn { width:34px; height:34px; border-radius:9px; background:var(--surface) !important; border:1px solid var(--bd-strong) !important; color:var(--tx2) !important; transform:none; }
 :root[data-theme] .cmd-action-btn:hover { background:var(--surface-3) !important; color:var(--tx) !important; transform:none; }
 
 /* Mensajes */

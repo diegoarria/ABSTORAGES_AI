@@ -20,7 +20,15 @@ const USERS       = require('./backend/data/users.json');
 const { chatStream, chat } = require('./backend/services/claude');
 const memory      = require('./backend/services/memory');
 const tariff      = require('./backend/services/tariff');
-const SARA_PROMPT   = require('./backend/agents/sara-prompt');
+// SARA → MARÍA (oct-2026): el prompt vive ahora en maria-prompt.js. Respaldo a
+// sara-prompt.js SOLO si el archivo nuevo aún no existe (MODULE_NOT_FOUND) —
+// cualquier otro error (p. ej. de sintaxis) se propaga, no se esconde.
+let MARIA_PROMPT;
+try { MARIA_PROMPT = require('./backend/agents/maria-prompt'); }
+catch (e) {
+  if (e.code !== 'MODULE_NOT_FOUND' || !String(e.message).includes('maria-prompt')) throw e;
+  MARIA_PROMPT = require('./backend/agents/sara-prompt');
+}
 const SOFIA_PROMPT  = require('./backend/agents/sofia-prompt');
 const HECTOR_PROMPT = require('./backend/agents/hector-prompt');
 const NOA_PROMPT    = require('./backend/agents/noa-prompt');
@@ -68,14 +76,14 @@ function registrarBaneoParaDeteccionDeAtaque(detalle) {
   console.error(`[ataque] 🔴 EMERGENCIA AUTO-ACTIVADA — ${motivo}`);
 
   sendPush({
-    title: '🔴 EMERGENCIA: SARA/SOFIA/NOA apagadas automáticamente',
+    title: '🔴 EMERGENCIA: MARÍA/SOFIA/NOA apagadas automáticamente',
     body: `${cantidad} baneos en ${ATAQUE_VENTANA_MS / 60000} min — posible ataque. Revisa y reactiva manualmente cuando esté resuelto.`,
     tag: 'emergencia-ataque', url: '/', tipo: 'EMERGENCIA_AUTO', urgente: true,
   }).catch(() => {});
 
   const diego = staffDirectory.buscarPorNombre('Diego');
   if (diego?.telefono) {
-    sendWhatsApp(diego.telefono, `🔴 EMERGENCIA — SARA, SOFIA y NOA se apagaron automáticamente.\n\n${motivo}\n\nRevisa el panel y reactívalas manualmente cuando confirmes que ya no hay riesgo.`, 'noa').catch(() => {});
+    sendWhatsApp(diego.telefono, `🔴 EMERGENCIA — MARÍA, SOFIA y NOA se apagaron automáticamente.\n\n${motivo}\n\nRevisa el panel y reactívalas manualmente cuando confirmes que ya no hay riesgo.`, 'noa').catch(() => {});
   }
 }
 const visitorMemory  = require('./backend/services/visitorMemory');
@@ -221,7 +229,7 @@ actividadBus.conectar(pushActividad);
 
 // ─── ELEVENLABS ────────────────────────────────────────────────────────────
 const EL_KEY         = process.env.ELEVENLABS_API_KEY;
-const EL_VOICE_SARA  = process.env.ELEVENLABS_VOICE_SARA  || 'pFZP5JQG7iQjIQuC4Bku'; // Lily
+const EL_VOICE_MARIA = process.env.ELEVENLABS_VOICE_MARIA || process.env.ELEVENLABS_VOICE_SARA || 'pFZP5JQG7iQjIQuC4Bku'; // Lily
 const EL_VOICE_SOFIA = process.env.ELEVENLABS_VOICE_SOFIA || 'EXAVITQu4vr4xnSDxMaL'; // Bella
 const EL_LIVE = EL_KEY && !EL_KEY.startsWith('xxxx');
 
@@ -240,7 +248,7 @@ const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 // igual que sus números de llamada en Vapi (nunca mezclar personas). NOA no
 // aparece aquí — no tiene número de WhatsApp de Twilio.
 const WA_NUMBERS = {
-  sara:  (process.env.TWILIO_WHATSAPP_NUMBER_SARA  || '').replace(/^whatsapp:/, '') || TWILIO_WA_FROM,
+  maria: (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, '') || TWILIO_WA_FROM,
   sofia: (process.env.TWILIO_WHATSAPP_NUMBER_SOFIA || '').replace(/^whatsapp:/, ''),
 };
 
@@ -250,7 +258,7 @@ function agenteParaNumeroWA(numero) {
   for (const [agente, num] of Object.entries(WA_NUMBERS)) {
     if (num && num === limpio) return agente;
   }
-  return 'sara'; // fallback histórico — TWILIO_WHATSAPP_NUMBER es el número original de SARA antes de separar por agente
+  return 'maria'; // fallback histórico (antes 'sara') — TWILIO_WHATSAPP_NUMBER es el número original de SARA antes de separar por agente
 }
 
 // ── BLOQUEO ABSOLUTO — ningún token de control sale nunca por WhatsApp ──
@@ -310,7 +318,7 @@ async function sendWhatsApp(to, text, agente = 'noa') {
   console.log(`[WA] Enviando a ${to}: ${text.slice(0, 60)}...`);
   try {
     const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
-    const from = WA_NUMBERS[agente] || TWILIO_WA_FROM;
+    const from = WA_NUMBERS[agente === 'sara' ? 'maria' : agente] || TWILIO_WA_FROM; // 'sara' = alias heredado
     const body = new URLSearchParams({
       From: `whatsapp:${from}`,
       To:   `whatsapp:${to.replace(/^whatsapp:/, '')}`,
@@ -576,7 +584,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const agenteU = agente.toUpperCase();
 
     // Apagado de emergencia — máxima prioridad, igual que en el chat web.
-    if (['sara', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
+    if (['maria', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
       console.log(`[WA-IN] ${agenteU} — apagado de emergencia activo, ignorando mensaje de ${phone}`);
       return;
     }
@@ -584,7 +592,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Teléfono baneado permanentemente — se ignora en silencio, ni siquiera
     // se guarda el mensaje. Por orden de Diego: una sola vez que mande
     // cualquiera de las frases bloqueadas, nunca más se le vuelve a responder.
-    if (['sara', 'sofia', 'noa'].includes(agente) && phoneBanlist.estaBaneado(phone)) {
+    if (['maria', 'sofia', 'noa'].includes(agente) && phoneBanlist.estaBaneado(phone)) {
       console.log(`[WA-IN] ${agenteU} — teléfono baneado, ignorando mensaje de ${phone}`);
       return;
     }
@@ -592,7 +600,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Mantenimiento forzado por orden de Diego — mismo corte que en el chat web,
     // aplicado también a WhatsApp. Se ignora el mensaje en silencio, sin
     // responder nada (ni siquiera un aviso de mantenimiento) mientras dure.
-    if (['sara', 'sofia', 'noa'].includes(agente) && Date.now() < MANTENIMIENTO_HASTA.getTime()) {
+    if (['maria', 'sofia', 'noa'].includes(agente) && Date.now() < MANTENIMIENTO_HASTA.getTime()) {
       console.log(`[WA-IN] ${agenteU} en mantenimiento forzado, ignorando mensaje de ${phone}`);
       return;
     }
@@ -632,7 +640,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Excepción — credenciales del TMS + clave privada correcta en el mismo
     // mensaje: no se banea, pero tampoco se revela el secreto real (eso nunca
     // sale por chat, sin importar quién pregunte).
-    if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
+    if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
       memory.addMessage(session, 'user', texto);
       memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
       saveMessage(session, agente, 'user', texto);
@@ -641,7 +649,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       return;
     }
 
-    if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
+    if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
       memory.addMessage(session, 'user', texto);
       memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
       saveMessage(session, agente, 'user', texto);
@@ -662,7 +670,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Lista amplia de palabras de ataque (SQLi, XSS, exploits, jailbreak
     // genérico, phishing, etc.) — más ruidosa que promptLeakGuard, por eso
     // no banea al primer hit: acumula hasta 3 intentos (punto 2 del checklist).
-    if (['sara', 'sofia', 'noa'].includes(agente) && personaEquipo?.nombre !== 'Diego') {
+    if (['maria', 'sofia', 'noa'].includes(agente) && personaEquipo?.nombre !== 'Diego') {
       const palabra = attackWordlist.detectar(texto);
       if (palabra) {
         const telefonoNorm = phoneBanlist.normalizar(phone);
@@ -695,8 +703,8 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       const tmsCtx = await tms.getContextoNOA(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
-    if (agente === 'sara' && tms.ENABLED) {
-      const tmsCtx = await tms.getContextoSARA(texto);
+    if (agente === 'maria' && tms.ENABLED) {
+      const tmsCtx = await tms.getContextoMaria(texto);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
     // Si trae imagen(es)/PDF, se descargan (Twilio exige auth básica para
@@ -768,19 +776,19 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // El cliente le confirmó a SARA que sigue necesitando la unidad con
     // urgencia (tras el aviso de "ya tenemos unidad confirmada, ¿la sigues
     // necesitando?") — se cierra automático con el proveedor recomendado.
-    if (agente === 'sara' && !personaEquipo) {
+    if (agente === 'maria' && !personaEquipo) {
       const cu = respuesta.match(/CONFIRMAR_UNIDAD_URGENTE\s*:\s*(\{[^\n]+\})/i);
       if (cu) {
         let d = {}; try { d = JSON.parse(cu[1]); } catch {}
         if (d.folio) {
           sofiaOperacion.confirmarUrgentePorCliente(d.folio)
-            .catch(e => console.error('[sara] Error confirmando urgencia:', e.message));
+            .catch(e => console.error('[maria] Error confirmando urgencia:', e.message));
         }
       }
     }
 
     // ── Monitoreo en vivo: conversación, respuesta de proveedor y resultado ──
-    if ((agente === 'sofia' || agente === 'sara') && !personaEquipo) {
+    if ((agente === 'sofia' || agente === 'maria') && !personaEquipo) {
       try {
         const conocido = await contactos.buscarPorTelefono(phone, agente).catch(() => null);
         const quien = conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : phone;
@@ -792,7 +800,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
         // por persona, para que una conversación de varios mensajes no llene
         // el correo) — mismo criterio para las dos, cada una a su propia
         // lista de destinatarios (operaciones para SOFIA, comercial para SARA).
-        if (agente === 'sofia' || agente === 'sara') {
+        if (agente === 'sofia' || agente === 'maria') {
           const ahoraMs = Date.now();
           if (ahoraMs - (_ultimoEmailRespuesta.get(phone) || 0) > 10 * 60 * 1000) {
             _ultimoEmailRespuesta.set(phone, ahoraMs);
@@ -845,7 +853,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
     if (metaMatch) memory.updateMeta(session, { empresa: metaMatch[1].trim() });
 
-    if (agente === 'sara') {
+    if (agente === 'maria') {
       // Mismo flujo de captura/cierre que el chat del portal — WhatsApp es
       // otro canal de entrada para SARA, no un agente distinto.
       const hasCierre  = /NUEVA_ORDEN/i.test(respuesta);
@@ -861,15 +869,15 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       const lead = leads.add({ ...datosSara, sara_nota, primer_mensaje, sessionId: session, canal: 'whatsapp' });
 
       if (hasCierre) {
-        pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: session });
+        pushActividad({ agente: 'MARIA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: session });
         sendPush({
-          title: '🚛 Nueva orden — SARA (WhatsApp)',
+          title: '🚛 Nueva orden — MARÍA (WhatsApp)',
           body: `${lead.empresa || lead.nombre || 'Cliente'} · ${lead.origen || ''}→${lead.destino || ''} · Folio ${lead.folio || ''}`,
           tag: 'nueva-orden', url: '/', tipo: 'NUEVA_ORDEN', urgente: true,
         }).catch(() => {});
         await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore WA]', e.message));
         contactos.upsertContacto({
-          agente: 'sara', tipo: 'cliente',
+          agente: 'maria', tipo: 'cliente',
           nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
           empresa: lead.empresa, tipo_carga: lead.tipo_carga, rfc: lead.rfc,
           resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
@@ -1141,17 +1149,20 @@ async function manejarMensajeKapso(phone, texto) {
 // Mismo criterio que manejarMensajeKapso (SOFIA) — duplica la orquestación
 // de SARA del webhook de Twilio en vez de parametrizarla, por el mismo
 // motivo: no tocar el handler de Twilio que ya está en producción.
-const AGENTE_KAPSO_SARA = 'sara';
-async function manejarMensajeKapsoSara(phone, texto) {
-  if (emergencyShutdown.estaActivo()) { console.log(`[Kapso-IN-SARA] apagado de emergencia activo, ignorando mensaje de ${phone}`); return; }
-  if (phoneBanlist.estaBaneado(phone)) { console.log(`[Kapso-IN-SARA] teléfono baneado, ignorando mensaje de ${phone}`); return; }
-  if (Date.now() < MANTENIMIENTO_HASTA.getTime()) { console.log(`[Kapso-IN-SARA] en mantenimiento forzado, ignorando mensaje de ${phone}`); return; }
+const AGENTE_KAPSO_MARIA = 'maria';
+async function manejarMensajeKapsoMaria(phone, texto) {
+  if (emergencyShutdown.estaActivo()) { console.log(`[Kapso-IN-MARIA] apagado de emergencia activo, ignorando mensaje de ${phone}`); return; }
+  if (phoneBanlist.estaBaneado(phone)) { console.log(`[Kapso-IN-MARIA] teléfono baneado, ignorando mensaje de ${phone}`); return; }
+  if (Date.now() < MANTENIMIENTO_HASTA.getTime()) { console.log(`[Kapso-IN-MARIA] en mantenimiento forzado, ignorando mensaje de ${phone}`); return; }
 
-  const session = `wa_sara_${phone}`;
+  // Clave de sesión renombrada wa_sara_ → wa_maria_ (oct-2026).
+  // TODO-MIGRATION: el respaldo para leer historial viejo bajo `wa_sara_${phone}` lo
+  // resuelve memory.js (sesión principal); aquí no se duplica esa lógica.
+  const session = `wa_maria_${phone}`;
   const { contextBlock, history } = memory.buildContext(session);
   const esPrimerMensaje = history.length === 0;
   const tariffCtx = tariff.getContext();
-  let systemPrompt = buildPrompt(AGENTE_KAPSO_SARA, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
+  let systemPrompt = buildPrompt(AGENTE_KAPSO_MARIA, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
   const personaEquipo = staffDirectory.buscarPorTelefono(phone);
   systemPrompt += `\n\nHoy es ${new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeZone: 'America/Monterrey' }).format(new Date())} (hora de Monterrey). Fecha en formato AAAA-MM-DD: ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())}.`;
   if (personaEquipo) {
@@ -1160,24 +1171,24 @@ async function manejarMensajeKapsoSara(phone, texto) {
   } else {
     const foliosPersona = folioContexto.foliosPorTelefono(phone);
     if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
-    const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_SARA);
-    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, AGENTE_KAPSO_SARA);
+    const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_MARIA);
+    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, AGENTE_KAPSO_MARIA);
   }
 
   if (promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
     memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
-    saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto); saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
-    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA, AGENTE_KAPSO_SARA);
+    saveMessage(session, AGENTE_KAPSO_MARIA, 'user', texto); saveMessage(session, AGENTE_KAPSO_MARIA, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA, AGENTE_KAPSO_MARIA);
     return;
   }
   if (promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
     memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
-    saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto); saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
-    pushActividad({ agente: 'SARA', tipo: 'ALERTA_FUGA_PROMPT', mensaje: texto.slice(0, 200), sessionId: session });
-    phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_SARA }).catch(() => {});
+    saveMessage(session, AGENTE_KAPSO_MARIA, 'user', texto); saveMessage(session, AGENTE_KAPSO_MARIA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+    pushActividad({ agente: 'MARIA', tipo: 'ALERTA_FUGA_PROMPT', mensaje: texto.slice(0, 200), sessionId: session });
+    phoneBanlist.banear({ telefono: phone, motivo: `Intento de fuga de proceso/reglas: "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_MARIA }).catch(() => {});
     registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone}`);
-    ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_SARA, motivo: texto.slice(0, 300), severity: 'critical' });
-    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_SARA);
+    ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_MARIA, motivo: texto.slice(0, 300), severity: 'critical' });
+    await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_MARIA);
     return;
   }
   if (personaEquipo?.nombre !== 'Diego') {
@@ -1185,33 +1196,33 @@ async function manejarMensajeKapsoSara(phone, texto) {
     if (palabra) {
       const telefonoNorm = phoneBanlist.normalizar(phone);
       const { count, alcanzoLimite } = attackStrikes.registrar(telefonoNorm, palabra);
-      pushActividad({ agente: 'SARA', tipo: 'ALERTA_INTENTO_ATAQUE', mensaje: `"${palabra}" (intento ${count}/${attackStrikes.LIMITE})`, sessionId: session });
+      pushActividad({ agente: 'MARIA', tipo: 'ALERTA_INTENTO_ATAQUE', mensaje: `"${palabra}" (intento ${count}/${attackStrikes.LIMITE})`, sessionId: session });
       if (alcanzoLimite) {
         memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
-        saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto); saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
-        phoneBanlist.banear({ telefono: phone, motivo: `3 intentos de ataque — último: "${palabra}" en "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_SARA }).catch(() => {});
+        saveMessage(session, AGENTE_KAPSO_MARIA, 'user', texto); saveMessage(session, AGENTE_KAPSO_MARIA, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
+        phoneBanlist.banear({ telefono: phone, motivo: `3 intentos de ataque — último: "${palabra}" en "${texto.slice(0, 200)}"`, agente: AGENTE_KAPSO_MARIA }).catch(() => {});
         registrarBaneoParaDeteccionDeAtaque(`teléfono ${phone} (3 strikes)`);
-        ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_SARA, motivo: `3er intento: "${palabra}"`, severity: 'critical' });
-        sendPush({ title: '🚫 Teléfono baneado — 3 intentos de ataque', body: `SARA · ${phone} · última palabra: "${palabra}"`, tag: 'telefono-baneado', url: '/', tipo: 'ALERTA_INTENTO_ATAQUE', urgente: true }).catch(() => {});
-        await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_SARA);
+        ipIntel.reportarIntento({ telefono: phone, agente: AGENTE_KAPSO_MARIA, motivo: `3er intento: "${palabra}"`, severity: 'critical' });
+        sendPush({ title: '🚫 Teléfono baneado — 3 intentos de ataque', body: `MARÍA · ${phone} · última palabra: "${palabra}"`, tag: 'telefono-baneado', url: '/', tipo: 'ALERTA_INTENTO_ATAQUE', urgente: true }).catch(() => {});
+        await sendWhatsAppKapso(phone, promptLeakGuard.MENSAJE_BLOQUEO, AGENTE_KAPSO_MARIA);
         return;
       }
     }
   }
 
-  if (tms.ENABLED) { const tmsCtx = await tms.getContextoSARA(texto); if (tmsCtx) systemPrompt += tmsCtx; }
+  if (tms.ENABLED) { const tmsCtx = await tms.getContextoMaria(texto); if (tmsCtx) systemPrompt += tmsCtx; }
 
   memory.addMessage(session, 'user', texto);
-  saveMessage(session, AGENTE_KAPSO_SARA, 'user', texto);
+  saveMessage(session, AGENTE_KAPSO_MARIA, 'user', texto);
 
   await humanDelay.esperar(texto);
   let respuesta = '';
   await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
   memory.addMessage(session, 'assistant', respuesta);
-  saveMessage(session, AGENTE_KAPSO_SARA, 'assistant', respuesta);
+  saveMessage(session, AGENTE_KAPSO_MARIA, 'assistant', respuesta);
 
   const textoLimpio = limpiarControlParaCliente(respuesta);
-  for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque, AGENTE_KAPSO_SARA);
+  for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque, AGENTE_KAPSO_MARIA);
 
   // Cliente confirmó que sigue necesitando la unidad con urgencia — se
   // cierra automático con el proveedor recomendado (mismo flujo que Twilio).
@@ -1219,23 +1230,23 @@ async function manejarMensajeKapsoSara(phone, texto) {
     const cu = respuesta.match(/CONFIRMAR_UNIDAD_URGENTE\s*:\s*(\{[^\n]+\})/i);
     if (cu) {
       let d = {}; try { d = JSON.parse(cu[1]); } catch {}
-      if (d.folio) sofiaOperacion.confirmarUrgentePorCliente(d.folio).catch(e => console.error('[sara-kapso] Error confirmando urgencia:', e.message));
+      if (d.folio) sofiaOperacion.confirmarUrgentePorCliente(d.folio).catch(e => console.error('[maria-kapso] Error confirmando urgencia:', e.message));
     }
   }
 
   if (!personaEquipo) {
     try {
-      const conocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_SARA).catch(() => null);
+      const conocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO_MARIA).catch(() => null);
       const quien = conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : phone;
       const corto = t => String(t || '').replace(/\s+/g, ' ').trim().slice(0, 160);
-      pushActividad({ agente: 'SARA', tipo: 'CONVERSACION_WA', mensaje: `${quien}: "${corto(texto)}" → SARA: "${corto(textoLimpio)}"`, sessionId: session, metadata: { telefono: phone, tipoContacto: conocido?.tipo || null, via: 'kapso' } });
+      pushActividad({ agente: 'MARIA', tipo: 'CONVERSACION_WA', mensaje: `${quien}: "${corto(texto)}" → MARÍA: "${corto(textoLimpio)}"`, sessionId: session, metadata: { telefono: phone, tipoContacto: conocido?.tipo || null, via: 'kapso' } });
 
       const ahoraMs = Date.now();
       if (ahoraMs - (_ultimoEmailRespuesta.get(phone) || 0) > 10 * 60 * 1000) {
         _ultimoEmailRespuesta.set(phone, ahoraMs);
         notifier.notificarRespuestaSara({ quien: conocido?.nombre_completo ? `${conocido.nombre_completo}${conocido.empresa ? ' (' + conocido.empresa + ')' : ''}` : 'Un número nuevo', tipo: conocido?.tipo || null, telefono: phone, texto: String(texto || '').slice(0, 800), respuestaSara: textoLimpio.slice(0, 800), sessionId: session }).catch(() => {});
       }
-    } catch (e) { console.error('[Kapso-SARA monitoreo en vivo]', e.message); }
+    } catch (e) { console.error('[Kapso-MARIA monitoreo en vivo]', e.message); }
 
     // Mismo flujo de captura/cierre que el chat del portal y el webhook de Twilio.
     const hasCierre  = /NUEVA_ORDEN/i.test(respuesta);
@@ -1251,15 +1262,15 @@ async function manejarMensajeKapsoSara(phone, texto) {
     const lead = leads.add({ ...datosSara, sara_nota, primer_mensaje, sessionId: session, canal: 'whatsapp' });
 
     if (hasCierre) {
-      pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: session });
+      pushActividad({ agente: 'MARIA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: session });
       sendPush({
-        title: '🚛 Nueva orden — SARA (Kapso)',
+        title: '🚛 Nueva orden — MARÍA (Kapso)',
         body: `${lead.empresa || lead.nombre || 'Cliente'} · ${lead.origen || ''}→${lead.destino || ''} · Folio ${lead.folio || ''}`,
         tag: 'nueva-orden', url: '/', tipo: 'NUEVA_ORDEN', urgente: true,
       }).catch(() => {});
       await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore Kapso]', e.message));
       contactos.upsertContacto({
-        agente: 'sara', tipo: 'cliente',
+        agente: 'maria', tipo: 'cliente',
         nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
         empresa: lead.empresa, tipo_carga: lead.tipo_carga, rfc: lead.rfc,
         resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
@@ -1275,10 +1286,10 @@ async function manejarMensajeKapsoSara(phone, texto) {
     }
   }
 
-  if (esPrimerMensaje) pushActividad({ agente: 'SARA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp vía Kapso: ${phone}`, sessionId: session });
+  if (esPrimerMensaje) pushActividad({ agente: 'MARIA', tipo: 'MENSAJE_NUEVO', mensaje: `Primer contacto WhatsApp vía Kapso: ${phone}`, sessionId: session });
 }
 
-// Mismo criterio que manejarMensajeKapso/manejarMensajeKapsoSara — duplica
+// Mismo criterio que manejarMensajeKapso/manejarMensajeKapsoMaria — duplica
 // la orquestación de NOA del webhook de Twilio en vez de parametrizarla.
 // NOA conserva su clave de sesión histórica (wa_${phone}, sin sufijo de
 // agente) para no romper continuidad con conversaciones ya guardadas desde
@@ -1383,7 +1394,7 @@ app.post('/webhook/kapso', (req, res) => {
       const phoneNumberId = req.body?.phone_number_id || req.body?.conversation?.phone_number_id;
       const agenteDestino = kapso.resolverAgente(phoneNumberId);
       console.log(`[Kapso-IN] (${agenteDestino || 'desconocido'}) de ${phone}: ${texto.slice(0, 200)}`);
-      if (agenteDestino === 'sara') await manejarMensajeKapsoSara(phone, texto);
+      if (agenteDestino === 'maria' || agenteDestino === 'sara') await manejarMensajeKapsoMaria(phone, texto);
       else if (agenteDestino === 'sofia') await manejarMensajeKapso(phone, texto);
       else if (agenteDestino === 'noa') await manejarMensajeKapsoNoa(phone, texto);
       else console.warn(`[Kapso-IN] phone_number_id desconocido (${phoneNumberId}), mensaje ignorado`);
@@ -1422,8 +1433,8 @@ const MODO_2CHAT_COLA =
   `INICIAR_MENSAJE: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre del destinatario]","mensaje":"[el mensaje exacto a enviar, ya redactado, listo para mandar tal cual]"}\n` +
   `Esto manda un WhatsApp real de inmediato a esa persona. Nunca inventes un número. Si el destinatario es alguien del equipo interno de ABSTORAGES (los que reconoces en la sección de equipo), puedes dejar "telefono" vacío ("") — el sistema resuelve su número real automáticamente por su nombre, tú no lo necesitas saber. Si es alguien externo cuyo teléfono no tienes en esta conversación, pregúntalo antes de emitir el token — nunca digas "listo, enviado" sin haber emitido primero el token real; si no tienes el dato, dilo y pide el teléfono, no finjas que ya se mandó. ` +
   `**Si te piden avisar/llamar a VARIAS personas en un solo pedido** (ej. "avísale a Gabriel, Diego y Rafael que...") — emite un token INICIAR_MENSAJE (o INICIAR_LLAMADA) POR CADA PERSONA, cada uno en su propia línea, con los datos de esa persona. Un solo pedido con 3 destinatarios son 3 tokens, no uno. Nunca digas que le avisaste a alguien sin haber emitido su token individual. ` +
-  `**Solo si eres SARA o SOFIA** (NOA no tiene WhatsApp propio de Twilio — si eres NOA y necesitas avisar/dar estatus, usa INICIAR_LLAMADA en vez de esto): para avisos a VARIAS personas del equipo o estatus proactivo a un cliente/proveedor, usa las plantillas seguras de Twilio en vez de INICIAR_MENSAJE — son el canal correcto para esto (no arriesgan que se restrinja el número):\n` +
-  `AVISO_EQUIPO_WA: {"remitente":"[SARA o SOFIA]","mensaje":"[el aviso, corto y claro]","destinatarios":["gabriel","diego","rafael"]}\n` +
+  `**Solo si eres MARÍA o SOFIA** (NOA no tiene WhatsApp propio de Twilio — si eres NOA y necesitas avisar/dar estatus, usa INICIAR_LLAMADA en vez de esto): para avisos a VARIAS personas del equipo o estatus proactivo a un cliente/proveedor, usa las plantillas seguras de Twilio en vez de INICIAR_MENSAJE — son el canal correcto para esto (no arriesgan que se restrinja el número):\n` +
+  `AVISO_EQUIPO_WA: {"remitente":"[MARÍA o SOFIA]","mensaje":"[el aviso, corto y claro]","destinatarios":["gabriel","diego","rafael"]}\n` +
   `(claves válidas de destinatarios: dante, rafael, manuel, gabriel, diego — pon las que apliquen, 1 o varias)\n` +
   `ESTATUS_FOLIO_WA: {"telefono":"+52XXXXXXXXXX","nombre":"[nombre]","folio":"OP-ABS-YY-XXXX","resumen":"[estatus breve]"}\n` +
   `(para avisarle a un cliente o proveedor el estatus de su folio sin que te lo hayan preguntado en este momento)\n` +
@@ -1445,10 +1456,10 @@ const MODO_2CHAT_1A1 =
 const TWOCHAT_NUMEROS = {
   sofia: process.env.TWOCHAT_NUMBER_SOFIA,
   noa:   process.env.TWOCHAT_NUMBER_NOA,
-  sara:  process.env.TWOCHAT_NUMBER_SARA,
+  maria: process.env.TWOCHAT_NUMBER_MARIA || process.env.TWOCHAT_NUMBER_SARA,
 };
-const TWOCHAT_PREFIJO = { sofia: '🟩 SOFIA:', noa: '🟨 NOA:', sara: '🟦 SARA:' };
-const TWOCHAT_PROMPT_BASE = { sofia: SOFIA_PROMPT, noa: NOA_PROMPT, sara: SARA_PROMPT };
+const TWOCHAT_PREFIJO = { sofia: '🟩 SOFIA:', noa: '🟨 NOA:', maria: '🟦 MARÍA:' };
+const TWOCHAT_PROMPT_BASE = { sofia: SOFIA_PROMPT, noa: NOA_PROMPT, maria: MARIA_PROMPT };
 
 // Nombre real de cada grupo de WhatsApp (wa_group_name) — no viaja en los
 // mensajes guardados, se resuelve vía API de 2Chat con caché de 10 min para
@@ -1518,10 +1529,11 @@ function detectarTriggerGrupo(texto, quotedMsgId) {
   const menciones = (t.match(/@(\d+)/g) || []).map(m => m.slice(1));
   if (nombraAgente(t, 'sofia', 'sofía') || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sofia))) return 'sofia';
   if (nombraAgente(t, 'noa')            || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.noa)))   return 'noa';
-  if (nombraAgente(t, 'sara')           || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.sara)))  return 'sara';
+  if (nombraAgente(t, 'maria', 'maría', 'sara') || menciones.some(m => mismoNumero(m, TWOCHAT_NUMEROS.maria))) return 'maria';
   if (quotedMsgId) {
     const agenteReply = grupoWA.agentePorMessageId(quotedMsgId);
-    if (agenteReply === 'sofia' || agenteReply === 'noa' || agenteReply === 'sara') return agenteReply;
+    if (agenteReply === 'sara') return 'maria'; // mensajes viejos registrados como 'sara'
+    if (agenteReply === 'sofia' || agenteReply === 'noa' || agenteReply === 'maria') return agenteReply;
   }
   return null;
 }
@@ -1664,8 +1676,8 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       } else if (agente === 'noa') {
         const tmsCtx = await tms.getContextoNOA(texto);
         if (tmsCtx) systemPrompt += tmsCtx;
-      } else if (agente === 'sara') {
-        const tmsCtx = await tms.getContextoSARA(texto);
+      } else if (agente === 'maria') {
+        const tmsCtx = await tms.getContextoMaria(texto);
         if (tmsCtx) systemPrompt += tmsCtx;
       }
       // 1:1 por 2Chat usa la MISMA sesión de memoria que Twilio (wa_<agente>_<tel>)
@@ -1727,8 +1739,8 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
       // de Twilio propio) y NUNCA limitados por MENSAJES_MASIVOS: van por
       // plantilla aprobada de Meta, que es justo el canal seguro que
       // reemplaza el envío masivo por 2Chat, no el que se quiso pausar.
-      const avisoEquipoMatches  = (agente === 'sara' || agente === 'sofia') ? [...respuesta.matchAll(/AVISO_EQUIPO_WA:\s*(\{[^\n]+\})/g)] : [];
-      const estatusFolioMatches = (agente === 'sara' || agente === 'sofia') ? [...respuesta.matchAll(/ESTATUS_FOLIO_WA:\s*(\{[^\n]+\})/g)] : [];
+      const avisoEquipoMatches  = (agente === 'maria' || agente === 'sofia') ? [...respuesta.matchAll(/AVISO_EQUIPO_WA:\s*(\{[^\n]+\})/g)] : [];
+      const estatusFolioMatches = (agente === 'maria' || agente === 'sofia') ? [...respuesta.matchAll(/ESTATUS_FOLIO_WA:\s*(\{[^\n]+\})/g)] : [];
 
       // Los tokens de alerta/estatus siempre van al final de la respuesta —
       // se corta el texto ahí para también descartar cualquier cosa que el
@@ -1864,16 +1876,21 @@ app.use('/css', express.static(path.join(__dirname, 'frontend', 'css')));
 
 // ─── WIDGET (público — sin auth, para embedding en landing pages) ───────────
 app.get('/widget', (req, res) =>
-  res.sendFile(path.join(__dirname, 'frontend', 'sara-widget.html')));
+  res.sendFile(path.join(__dirname, 'frontend', 'maria-widget.html')));
+app.get('/maria-widget.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.sendFile(path.join(__dirname, 'frontend', 'maria-widget.js'));
+});
+// Ruta heredada — landing pages que ya embeben /sara-widget.js siguen funcionando.
 app.get('/sara-widget.js', (req, res) => {
   res.setHeader('Content-Type', 'application/javascript');
   res.sendFile(path.join(__dirname, 'frontend', 'sara-widget.js'));
 });
 
-// Chat público del widget — misma lógica que /api/sara/chat pero sin auth
-app.post('/api/widget/chat', (req, res) => handleChat('sara', req, res));
+// Chat público del widget — misma lógica que /api/maria/chat pero sin auth
+app.post('/api/widget/chat', (req, res) => handleChat('maria', req, res));
 
-// TTS público para el widget — sin auth, solo voz de SARA
+// TTS público para el widget — sin auth, solo voz de MARÍA
 app.post('/api/widget/tts', async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'text requerido' });
@@ -1889,7 +1906,7 @@ app.post('/api/widget/tts', async (req, res) => {
     await new Promise((resolve, reject) => {
       const r2 = https.request({
         hostname: 'api.elevenlabs.io',
-        path: `/v1/text-to-speech/${EL_VOICE_SARA}/stream`,
+        path: `/v1/text-to-speech/${EL_VOICE_MARIA}/stream`,
         method: 'POST',
         headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
       }, (apiRes) => {
@@ -1984,7 +2001,7 @@ app.get('/api/push/vapid-public-key', (req, res) => {
 // nosotros en llamadas que origina el sistema) — se deduce por assistantId.
 const AGENTE_POR_ASSISTANT_ID = {
   [process.env.VAPI_ASSISTANT_ID]:      'sofia',
-  [process.env.VAPI_ASSISTANT_ID_SARA]: 'sara',
+  [process.env.VAPI_ASSISTANT_ID_MARIA || process.env.VAPI_ASSISTANT_ID_SARA]: 'maria',
   [process.env.VAPI_ASSISTANT_ID_NOA]:  'noa',
 };
 function deducirAgente(call) {
@@ -2005,7 +2022,7 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
         const callVivo = evento.message?.call || evento.call || {};
         const metaVivo = callVivo.metadata || {};
         const agenteVivo = deducirAgente(callVivo);
-        const agenteVivoLabel = agenteVivo === 'sofia' ? 'SOFIA' : agenteVivo === 'sara' ? 'SARA' : agenteVivo === 'noa' ? 'NOA' : String(agenteVivo).toUpperCase();
+        const agenteVivoLabel = agenteVivo === 'sofia' ? 'SOFIA' : (agenteVivo === 'maria' || agenteVivo === 'sara') ? 'MARÍA' : agenteVivo === 'noa' ? 'NOA' : String(agenteVivo).toUpperCase();
 
         if (tipo === 'transcript' && evento.message?.transcriptType === 'final') {
           pushActividad({
@@ -2043,7 +2060,7 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
       const call = evento.message?.call || evento.call || evento;
       const metadata = call.metadata || {};
       const agente = deducirAgente(call);
-      const agenteLabel = agente === 'sofia' ? 'SOFIA' : agente === 'sara' ? 'SARA' : agente === 'noa' ? 'NOA' : String(agente).toUpperCase();
+      const agenteLabel = agente === 'sofia' ? 'SOFIA' : (agente === 'maria' || agente === 'sara') ? 'MARÍA' : agente === 'noa' ? 'NOA' : String(agente).toUpperCase();
       const transcript = call.transcript || '';
       const nombre = call.customer?.name || metadata.proveedor_nombre || metadata.nombre || null;
       const telefono = call.customer?.number || null;
@@ -2292,7 +2309,7 @@ app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
 
   try {
     let resultado;
-    if (agente === 'sara') {
+    if (agente === 'maria' || agente === 'sara') {
       resultado = await vapi.llamarLead({
         id: 'TEST', nombre: nombre || 'Prueba', telefono,
         empresa: 'Empresa de prueba',
@@ -2301,7 +2318,7 @@ app.post('/api/vapi/test-call', soloAdmin, async (req, res) => {
       });
     } else if (agente === 'sofia-normal') {
       resultado = await vapi.llamarNormal(nombre || 'Prueba', telefono);
-    } else if (agente === 'sara-prospeccion') {
+    } else if (agente === 'maria-prospeccion' || agente === 'sara-prospeccion') {
       resultado = await vapi.llamarProspecto({
         nombre: nombre || 'Prueba', telefono, empresa: 'Empresa de prueba', cargo: 'Gerente de Logística',
       });
@@ -2454,7 +2471,7 @@ app.post('/api/admin/nueva-orden-manual', soloAdmin, async (req, res) => {
 
     await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
     contactos.upsertContacto({
-      agente: 'sara', tipo: 'cliente',
+      agente: 'maria', tipo: 'cliente',
       nombre_completo: nombre, telefono, email, empresa, tipo_carga, rfc,
       resumen_interaccion: `Folio ${folio} — ${origen} → ${destino} (orden manual)`,
       canal: 'manual',
@@ -2528,9 +2545,10 @@ app.post('/api/admin/test-orden', soloAdmin, async (req, res) => {
 // ─── CONTACTOS (memoria compartida SARA/SOFIA/NOA) ──────────────────────────
 app.get('/api/contactos', adminUOps, async (req, res) => {
   // Gabriel (rol "lector") solo ve lo de SOFIA — sin importar qué agente pida.
-  const agente = req.user?.role === 'lector' ? 'SOFIA' : (req.query.agente || '').toUpperCase();
-  if (!['SARA', 'SOFIA', 'NOA'].includes(agente)) {
-    return res.status(400).json({ error: 'agente requerido: SARA, SOFIA o NOA' });
+  let agente = req.user?.role === 'lector' ? 'SOFIA' : (req.query.agente || '').toUpperCase();
+  if (agente === 'SARA') agente = 'MARIA'; // alias heredado (contactos.js busca ambos)
+  if (!['MARIA', 'SOFIA', 'NOA'].includes(agente)) {
+    return res.status(400).json({ error: 'agente requerido: MARIA, SOFIA o NOA' });
   }
   const lista = await contactos.listarPorAgente(agente, { tipo: req.query.tipo, q: req.query.q });
   res.json(lista);
@@ -2553,8 +2571,8 @@ app.get('/api/contactos/:id', adminUOps, async (req, res) => {
 app.post('/api/contactos', soloAdmin, async (req, res) => {
   try {
     const { agente, tipo, nombre_completo, puesto, telefono, email, empresa, notas, rutas, unidades } = req.body || {};
-    if (!agente || !['sara', 'sofia', 'noa'].includes(agente.toLowerCase())) {
-      return res.status(400).json({ error: 'agente requerido: sara, sofia o noa' });
+    if (!agente || !['maria', 'sara', 'sofia', 'noa'].includes(agente.toLowerCase())) {
+      return res.status(400).json({ error: 'agente requerido: maria, sofia o noa' });
     }
     if (!nombre_completo) return res.status(400).json({ error: 'nombre_completo requerido' });
     if (!['cliente', 'proveedor', 'operador'].includes(tipo)) {
@@ -2806,7 +2824,7 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
     // mano". Solo se avisa, para que quien la manda lo sepa.
     const yaSeHabiaEnviado = whatsappProactivo.yaSeEnvio(agente, contacto.telefono, contentSid);
 
-    const from = WA_NUMBERS[agente] || TWILIO_WA_FROM;
+    const from = WA_NUMBERS[agente === 'sara' ? 'maria' : agente] || TWILIO_WA_FROM; // 'sara' = alias heredado
     if (!TWILIO_SID || !TWILIO_TOKEN || !from) return res.status(400).json({ error: 'Faltan credenciales de Twilio' });
     const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
     const body = new URLSearchParams({
@@ -2831,7 +2849,7 @@ app.post('/api/contactos/:id/plantilla', soloAdmin, async (req, res) => {
       const d = String(contacto.telefono).replace(/\D/g, '');
       const telSesion = d.length >= 10 ? `+521${d.slice(-10)}` : `+${d}`;
       const textoEnviado = (plantilla.texto || '').replace(/\{\{(\d+)\}\}/g, (m, n) => (variables || {})[n] || '');
-      if (textoEnviado) memory.addMessage(agente === 'noa' ? `wa_${telSesion}` : `wa_${agente}_${telSesion}`, 'assistant', textoEnviado);
+      if (textoEnviado) memory.addMessage(agente === 'noa' ? `wa_${telSesion}` : `wa_${agente === 'sara' ? 'maria' : agente}_${telSesion}`, 'assistant', textoEnviado); // contactos viejos traen agente_asignado 'SARA'
     } catch (e) { console.error('[plantilla manual] No se pudo registrar en memoria:', e.message); }
     await contactos.upsertContacto({
       agente, telefono: contacto.telefono,
@@ -2853,14 +2871,14 @@ const envioMasivo = require('./backend/services/envioMasivo');
 app.post('/api/contactos/masivo/previsualizar', soloAdmin, async (req, res) => {
   try {
     const { agente, ids, contentSid, variables, modoNombre } = req.body || {};
-    if (!['sara', 'sofia', 'noa'].includes(String(agente || '').toLowerCase())) return res.status(400).json({ error: 'agente requerido' });
+    if (!['maria', 'sara', 'sofia', 'noa'].includes(String(agente || '').toLowerCase())) return res.status(400).json({ error: 'agente requerido' });
     res.json(await envioMasivo.previsualizar({ agente: agente.toLowerCase(), ids, contentSid, variables, modoNombre }));
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 app.post('/api/contactos/masivo/enviar', soloAdmin, async (req, res) => {
   try {
     const { agente, ids, contentSid, variables, modoNombre, confirmar } = req.body || {};
-    if (!['sara', 'sofia', 'noa'].includes(String(agente || '').toLowerCase())) return res.status(400).json({ error: 'agente requerido' });
+    if (!['maria', 'sara', 'sofia', 'noa'].includes(String(agente || '').toLowerCase())) return res.status(400).json({ error: 'agente requerido' });
     res.json(await envioMasivo.iniciar({ agente: agente.toLowerCase(), ids, contentSid, variables, modoNombre, confirmar, por: req.user?.nombre || req.user?.email }));
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
@@ -2917,7 +2935,7 @@ app.post('/api/contactos/:id/llamar', soloAdmin, async (req, res) => {
 // depender de que un agente cierre una venta/acuerdo real en una prueba.
 app.post('/api/admin/test-contacto', soloAdmin, async (req, res) => {
   try {
-    const agente = (req.body?.agente || 'sara').toLowerCase();
+    const agente = (req.body?.agente || 'maria').toLowerCase();
     const contacto = await contactos.upsertContacto({
       agente, tipo: req.body?.tipo || 'cliente',
       nombre_completo: 'Contacto de Prueba', telefono: '8199999999',
@@ -2955,7 +2973,8 @@ app.post('/api/admin/test-plantilla', soloAdmin, async (req, res) => {
   try {
     const { to, contentSid, variables, agente } = req.body || {};
     if (!to || !contentSid) return res.status(400).json({ error: 'to y contentSid son requeridos' });
-    const from = WA_NUMBERS[(agente || 'sara').toLowerCase()] || TWILIO_WA_FROM;
+    const agenteTP = (agente || 'maria').toLowerCase();
+    const from = WA_NUMBERS[agenteTP === 'sara' ? 'maria' : agenteTP] || TWILIO_WA_FROM;
     if (!TWILIO_SID || !TWILIO_TOKEN || !from) return res.status(400).json({ error: 'Faltan credenciales de Twilio o número del agente' });
     const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
     const body = new URLSearchParams({
@@ -3296,7 +3315,7 @@ app.get('/api/sessions', (req, res) => res.json(memory.listSessions()));
 
 // ─── HISTORIAL DE CONVERSACIONES (todas las sesiones, sin límite de tiempo) ──
 function detectarAgente(id) {
-  if (/^widget_|^web_sara_|^wa_sara_/.test(id))   return 'sara';
+  if (/^widget_|^web_(maria|sara)_|^wa_(maria|sara)_/.test(id)) return 'maria'; // web_sara_/wa_sara_ = sesiones previas al rename
   if (/^sof_|^web_sofia_|^wa_sofia_/.test(id))    return 'sofia';
   if (/^noa_|^web_noa_|^wa_/.test(id))            return 'noa'; // wa_<phone> sin sufijo de agente = NOA
   if (/^hec_|^web_hector_/.test(id))              return 'hector';
@@ -3474,7 +3493,7 @@ app.post('/api/tts', async (req, res) => {
     return res.status(503).json({ error: 'ElevenLabs no configurado', hint: 'Agrega ELEVENLABS_API_KEY al .env' });
   }
 
-  const voiceId = agente === 'sofia' ? EL_VOICE_SOFIA : EL_VOICE_SARA;
+  const voiceId = agente === 'sofia' ? EL_VOICE_SOFIA : EL_VOICE_MARIA;
   const body = JSON.stringify({
     text: text.slice(0, 2500),
     model_id: 'eleven_multilingual_v2',
@@ -3562,7 +3581,8 @@ function bloqueIpsBaneadas() {
 }
 
 function buildPrompt(agente, contextBlock, tariffCtx) {
-  const base = agente === 'sara'   ? SARA_PROMPT
+  // 'sara' = alias heredado — nunca debe caer al prompt de NOA por default
+  const base = (agente === 'maria' || agente === 'sara') ? MARIA_PROMPT
              : agente === 'sofia'  ? SOFIA_PROMPT
              : agente === 'hector' ? HECTOR_PROMPT
              : NOA_PROMPT;
@@ -3604,7 +3624,7 @@ async function handleChat(agente, req, res) {
   // (mantenimiento, baneos, lo que sea). Se activa a mano desde el panel o
   // solo si el sistema detecta un ataque en curso (ver registrarBaneoPara-
   // DeteccionDeAtaque). Ni siquiera se registra la IP de la sesión.
-  if (['sara', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
+  if (['maria', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -3622,7 +3642,7 @@ async function handleChat(agente, req, res) {
   // IP baneada permanentemente (por un intento previo de sacar el proceso/
   // reglas internas) — se corta de inmediato, ni siquiera se guarda el mensaje
   // en el historial. Por orden de Diego: nunca más se le vuelve a abrir el chat.
-  if (['sara', 'sofia', 'noa'].includes(agente) && ipBanlist.estaBaneada(ip)) {
+  if (['maria', 'sofia', 'noa'].includes(agente) && ipBanlist.estaBaneada(ip)) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -3635,7 +3655,7 @@ async function handleChat(agente, req, res) {
   // Mantenimiento forzado por orden de Diego — SARA, SOFIA y NOA no responden
   // a nadie hasta la fecha/hora indicada (constante MANTENIMIENTO_HASTA arriba
   // del archivo). HÉCTOR no está incluido en el corte.
-  if (['sara', 'sofia', 'noa'].includes(agente) && Date.now() < MANTENIMIENTO_HASTA.getTime()) {
+  if (['maria', 'sofia', 'noa'].includes(agente) && Date.now() < MANTENIMIENTO_HASTA.getTime()) {
     const MENSAJE_MANTENIMIENTO = 'En este momento no estoy disponible. Vuelvo a estar activa pronto — gracias por tu paciencia.';
     memory.addMessage(sid, 'user', message);
     memory.addMessage(sid, 'assistant', MENSAJE_MANTENIMIENTO);
@@ -3653,7 +3673,7 @@ async function handleChat(agente, req, res) {
 
   // Excepción — credenciales del TMS + clave privada correcta en el mismo
   // mensaje: no se banea la IP, pero tampoco se revela el secreto real.
-  if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(message) && promptLeakGuard.tienePassphraseCorrecta(message)) {
+  if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(message) && promptLeakGuard.tienePassphraseCorrecta(message)) {
     memory.addMessage(sid, 'user', message);
     memory.addMessage(sid, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
     saveMessage(sid, agente, 'user', message);
@@ -3672,7 +3692,7 @@ async function handleChat(agente, req, res) {
   // depende de que el modelo "recuerde" bloquearlo. Por orden de Diego: nadie
   // más que él puede pedir esto. En el widget público (sin sesión de staff)
   // esto bloquea a absolutamente todos, sin excepción.
-  if (['sara', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(message) && !req.user) {
+  if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(message) && !req.user) {
     memory.addMessage(sid, 'user', message);
     memory.addMessage(sid, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
     saveMessage(sid, agente, 'user', message);
@@ -3705,7 +3725,7 @@ async function handleChat(agente, req, res) {
   // Lista amplia de palabras de ataque (SQLi, XSS, exploits, jailbreak
   // genérico, phishing, etc.) — más ruidosa que promptLeakGuard, por eso no
   // banea al primer hit: acumula hasta 3 intentos (punto 2 del checklist).
-  if (['sara', 'sofia', 'noa'].includes(agente) && !req.user) {
+  if (['maria', 'sofia', 'noa'].includes(agente) && !req.user) {
     const palabra = attackWordlist.detectar(message);
     if (palabra) {
       const { count, alcanzoLimite } = attackStrikes.registrar(ip, palabra);
@@ -3766,7 +3786,7 @@ async function handleChat(agente, req, res) {
   let systemPrompt = buildPrompt(agente, contextBlock, tariffCtx);
 
   // Inyectar memoria del visitante en SARA para reconocer clientes que regresan
-  if (agente === 'sara' && visitorId) {
+  if (agente === 'maria' && visitorId) {
     const visitorCtx = visitorMemory.buildContext(visitorId);
     if (visitorCtx) systemPrompt += `\n\n${visitorCtx}`;
   }
@@ -3790,8 +3810,8 @@ async function handleChat(agente, req, res) {
   }
 
   // Inyectar contexto TMS para SARA (clientes, rutas principales, tarifas históricas, directorio)
-  if (agente === 'sara' && tms.ENABLED) {
-    const tmsCtx = await tms.getContextoSARA(message);
+  if (agente === 'maria' && tms.ENABLED) {
+    const tmsCtx = await tms.getContextoMaria(message);
     if (tmsCtx) systemPrompt += tmsCtx;
   }
 
@@ -3802,7 +3822,7 @@ async function handleChat(agente, req, res) {
   pushActividad({ agente, tipo: `MENSAJE_USUARIO`, mensaje: message.slice(0, 120), sessionId: sid, ip });
 
   // Garantizar que toda conversación con SARA quede registrada desde el primer mensaje
-  if (agente === 'sara') {
+  if (agente === 'maria') {
     const historial = memory.buildContext(memId).history || [];
     const primer_mensaje = historial.find(m => m.role === 'user')?.content?.slice(0, 160) || message.slice(0, 160);
     const extracted = leads.extractFromText(message, sid, { sara_nota: 'cotizacion_en_proceso', primer_mensaje });
@@ -3835,7 +3855,7 @@ async function handleChat(agente, req, res) {
     );
     memory.addMessage(memId, 'assistant', fullText);
     saveMessage(sid, agente, 'assistant', fullText);
-    const agenteNombre = agente === 'sara' ? 'SARA' : agente === 'sofia' ? 'SOFIA' : agente === 'noa' ? 'NOA' : 'HÉCTOR';
+    const agenteNombre = agente === 'maria' ? 'MARIA' : agente === 'sofia' ? 'SOFIA' : agente === 'noa' ? 'NOA' : 'HÉCTOR';
     pushActividad({ agente: agenteNombre, tipo: `MENSAJE_${agenteNombre}`, mensaje: fullText.replace(/[*_`#>]/g,'').slice(0,120), sessionId: sid });
 
     // Detectar señales de control
@@ -3845,7 +3865,7 @@ async function handleChat(agente, req, res) {
       res.write(`data: ${JSON.stringify({ type: 'escalar_humano' })}\n\n`);
 
     // Detectar lead capturado por SARA
-    if (agente === 'sara') {
+    if (agente === 'maria') {
       const hasCierre  = /NUEVA_ORDEN/i.test(fullText);
       const hasEscalar = /ESCALAR_HUMANO/i.test(fullText);
       const hasCerrar  = /CERRAR_CHAT/i.test(fullText);
@@ -3885,11 +3905,11 @@ async function handleChat(agente, req, res) {
 
       if (hasCierre) {
         res.write(`data: ${JSON.stringify({ type: 'nueva_orden', datos: lead })}\n\n`);
-        pushActividad({ agente: 'SARA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: sid, metadata: { sessionId: sid } });
+        pushActividad({ agente: 'MARIA', tipo: 'NUEVA_ORDEN', mensaje: `Nueva orden ${lead.folio || ''} — ${lead.empresa || lead.nombre || ''}`, sessionId: sid, metadata: { sessionId: sid } });
 
         // Push notification al equipo
         sendPush({
-          title: '🚛 Nueva orden — SARA',
+          title: '🚛 Nueva orden — MARÍA',
           body: `${lead.empresa || lead.nombre || 'Cliente'} · ${lead.origen || ''}→${lead.destino || ''} · Folio ${lead.folio || ''}`,
           tag: 'nueva-orden',
           url: '/',
@@ -3903,7 +3923,7 @@ async function handleChat(agente, req, res) {
         // Memoria compartida cross-agente — solo se guarda porque aquí SÍ hubo
         // cierre de venta real (NUEVA_ORDEN), nunca por un prospecto sin cerrar.
         contactos.upsertContacto({
-          agente: 'sara', tipo: 'cliente',
+          agente: 'maria', tipo: 'cliente',
           nombre_completo: lead.nombre, telefono: lead.telefono, email: lead.email,
           empresa: lead.empresa, tipo_carga: lead.tipo_carga, rfc: lead.rfc,
           resumen_interaccion: lead.resumen || `Folio ${lead.folio} — ${lead.origen} → ${lead.destino}`,
@@ -4023,7 +4043,8 @@ async function handleChat(agente, req, res) {
   res.end();
 }
 
-app.post('/api/sara/chat',   (req, res) => handleChat('sara',   req, res));
+app.post('/api/maria/chat',  (req, res) => handleChat('maria',  req, res));
+app.post('/api/sara/chat',   (req, res) => handleChat('maria',  req, res)); // ruta heredada — apps sin actualizar
 app.post('/api/sofia/chat', (req, res) => handleChat('sofia',  req, res));
 app.post('/api/hector/chat',(req, res) => handleChat('hector', req, res));
 app.post('/api/noa/chat',   (req, res) => handleChat('noa',    req, res));
@@ -4034,9 +4055,10 @@ app.post('/api/noa/chat',   (req, res) => handleChat('noa',    req, res));
 // equipo consulta aquí y copia la respuesta al grupo. A diferencia de
 // handleChat, esto NUNCA dispara leads.add, ordersStore.guardarOrden,
 // llamadas de Vapi, emails ni contactos.upsertContacto — es solo consulta.
-const AGENTES_INTERNOS = ['sara', 'sofia', 'noa'];
+const AGENTES_INTERNOS = ['maria', 'sofia', 'noa'];
 app.post('/api/interno/consultar', adminUOps, async (req, res) => {
-  const { agente, pregunta, historial } = req.body || {};
+  const { pregunta, historial } = req.body || {};
+  const agente = req.body?.agente === 'sara' ? 'maria' : req.body?.agente; // 'sara' = alias heredado
   if (!AGENTES_INTERNOS.includes(agente)) return res.status(400).json({ error: 'agente inválido' });
   if (!pregunta || !pregunta.trim()) return res.status(400).json({ error: 'pregunta requerida' });
   try {
@@ -4050,8 +4072,8 @@ app.post('/api/interno/consultar', adminUOps, async (req, res) => {
       const tmsCtx = await tms.getContextoNOA(pregunta);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
-    if (agente === 'sara' && tms.ENABLED) {
-      const tmsCtx = await tms.getContextoSARA(pregunta);
+    if (agente === 'maria' && tms.ENABLED) {
+      const tmsCtx = await tms.getContextoMaria(pregunta);
       if (tmsCtx) systemPrompt += tmsCtx;
     }
     systemPrompt += `
@@ -4137,7 +4159,7 @@ app.post('/api/admin/agentes/:agente/reanudar', soloAdmin, async (req, res) => {
   res.json(agentPause.listar());
 });
 app.get('/api/admin/agentes/limites', soloAdmin, (req, res) => {
-  res.json({ sara: outboundRateLimit.estado('sara'), sofia: outboundRateLimit.estado('sofia'), noa: outboundRateLimit.estado('noa') });
+  res.json({ maria: outboundRateLimit.estado('maria'), sara: outboundRateLimit.estado('sara'), sofia: outboundRateLimit.estado('sofia'), noa: outboundRateLimit.estado('noa') });
 });
 
 app.get('/api/metricas', soloAdmin, async (req, res) => {
@@ -4229,7 +4251,7 @@ app.post('/api/prospector/iniciar', soloAdmin, (req, res) => {
   const { prospectos } = req.body || {};
   if (!Array.isArray(prospectos)) return res.status(400).json({ error: 'Array de prospectos requerido' });
   const nuevos = outreach.agregarProspectos(prospectos);
-  pushActividad({ agente: 'SARA', tipo: 'PROSPECTOR', mensaje: `${nuevos.length} prospectos añadidos a secuencia`, metadata: { total: nuevos.length } });
+  pushActividad({ agente: 'MARIA', tipo: 'PROSPECTOR', mensaje: `${nuevos.length} prospectos añadidos a secuencia`, metadata: { total: nuevos.length } });
   res.json({ ok: true, nuevos: nuevos.length });
 });
 
@@ -4247,7 +4269,7 @@ app.get('/api/prospector/stats', soloAdmin, (req, res) => {
 app.post('/api/prospector/:id/cita', soloAdmin, (req, res) => {
   const p = outreach.marcarCita(req.params.id);
   if (!p) return res.status(404).json({ error: 'Prospecto no encontrado' });
-  pushActividad({ agente: 'SARA', tipo: 'CITA_AGENDADA', mensaje: `Cita agendada con ${p.nombre} (${p.empresa})`, metadata: { id: p.id } });
+  pushActividad({ agente: 'MARIA', tipo: 'CITA_AGENDADA', mensaje: `Cita agendada con ${p.nombre} (${p.empresa})`, metadata: { id: p.id } });
   res.json({ ok: true, prospecto: p });
 });
 
@@ -4429,7 +4451,7 @@ async function revisarLeadsSinRespuesta() {
   // Este barrido corre solo cada 30 min sobre TODOS los leads pendientes,
   // sin que nadie lo pida en el momento — justo lo que se quiere pausar.
   if (process.env.MENSAJES_MASIVOS !== 'true') {
-    console.warn('[SARA seguimiento] 🔇 Barrido de seguimiento automático suprimido — MENSAJES_MASIVOS no está en "true".');
+    console.warn('[MARIA seguimiento] 🔇 Barrido de seguimiento automático suprimido — MENSAJES_MASIVOS no está en "true".');
     return;
   }
   try {
@@ -4446,15 +4468,15 @@ async function revisarLeadsSinRespuesta() {
         ((lead.origen && lead.origen !== '—' && lead.destino && lead.destino !== '—') ? `${lead.origen} → ${lead.destino}` : 'tu solicitud de flete');
       try {
         await saraProactivo.enviarSeguimientoLead(lead.telefono, lead.nombre !== '—' ? lead.nombre : null, resumenSolicitud);
-        vapi.llamarLead(lead).catch(e => console.error(`[SARA seguimiento] Error llamando a lead ${lead.id}:`, e.message));
+        vapi.llamarLead(lead).catch(e => console.error(`[MARIA seguimiento] Error llamando a lead ${lead.id}:`, e.message));
         leads.marcarSeguimientoEnviado(lead.id);
-        console.log(`[SARA seguimiento] WhatsApp + llamada disparados a lead ${lead.id} (${lead.telefono})`);
+        console.log(`[MARIA seguimiento] WhatsApp + llamada disparados a lead ${lead.id} (${lead.telefono})`);
       } catch (e) {
-        console.error(`[SARA seguimiento] Error con lead ${lead.id}:`, e.message);
+        console.error(`[MARIA seguimiento] Error con lead ${lead.id}:`, e.message);
       }
     }
   } catch (e) {
-    console.error('[SARA seguimiento] Error revisando leads:', e.message);
+    console.error('[MARIA seguimiento] Error revisando leads:', e.message);
   }
 }
 

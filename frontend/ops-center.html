@@ -2674,7 +2674,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <button class="asis-close" onclick="toggleAsistente(false)" aria-label="Cerrar"></button>
     </div>
     <div class="asis-agentes">
-      <button class="asis-ag on" data-ag="sara"  onclick="asisElegirAgente('sara')">SARA</button>
+      <button class="asis-ag on" data-ag="maria" onclick="asisElegirAgente('maria')">MARÍA</button>
       <button class="asis-ag"    data-ag="sofia" onclick="asisElegirAgente('sofia')">SOFÍA</button>
       <button class="asis-ag"    data-ag="noa"   onclick="asisElegirAgente('noa')">NOA</button>
     </div>
@@ -2687,8 +2687,8 @@ document.addEventListener('DOMContentLoaded',function(){
 </div>
 <script>
 (function(){
-  var asisAgente = 'sara';
-  var asisHistorial = { sara: [], sofia: [], noa: [] };
+  var asisAgente = 'maria';
+  var asisHistorial = { maria: [], sofia: [], noa: [] };
 
   window.toggleAsistente = function(force) {
     var ov = document.getElementById('asis-overlay');

@@ -6,6 +6,11 @@
 // agente tiene permitido ofrecerle al equipo. Nunca se manda texto libre
 // inventado en el momento; por orden explícita del usuario (15-sep-2026).
 const PLANTILLAS = {
+  // TODO: nuevas plantillas de Kapso para María — el lead session las está agregando
+  maria: [],
+  // 'sara' — plantillas de Twilio heredadas (pre-rename SARA → MARÍA). Se dejan
+  // como referencia histórica/deprecada; NO borrar (contactos viejos con
+  // agente_asignado 'SARA' todavía las resuelven aquí).
   sara: [
     { sid: 'HXd4594e8561e81c02c8d8f59a635ffdf8', nombre: 'Seguimiento de lead', texto: "Hola {{1}}, soy Sara de ABSTORAGES Logistics. Sigo al pendiente de tu solicitud de flete {{2}}. Cualquier duda, aqui estoy para ayudarte.",
       campos: [{ key: '1', label: 'Nombre' }, { key: '2', label: 'Ruta (ej. Monterrey a Guadalajara)' }] },

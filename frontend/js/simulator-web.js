@@ -252,7 +252,7 @@ const Sim = (() => {
 
   // ─── AUTO REACCION SOFIA ──────────────────────────────────────────────────
   async function autoSofiaReaccion(folio) {
-    const msgSofia = `Acabo de recibir una nueva orden de SARA. Folio: ${folio}. Ejecuta el Paso 1 del Flujo Primario: confirma recepción, nombra al cliente, y describe los próximos 3 pasos concretos que ejecutarás para colocar el servicio.`;
+    const msgSofia = `Acabo de recibir una nueva orden de María. Folio: ${folio}. Ejecuta el Paso 1 del Flujo Primario: confirma recepción, nombra al cliente, y describe los próximos 3 pasos concretos que ejecutarás para colocar el servicio.`;
 
     await delay(400);
     showWarRoomSteps(); // no awaiteamos — corre en paralelo mientras SOFIA piensa
@@ -341,7 +341,7 @@ const Sim = (() => {
     sofiaSession = genId();
     folioCount = 1;
 
-    agregarMsg('sara', 'assistant', '¡Hola! Soy **SARA** de ABSTORAGES. ¿Cómo puedo ayudarte?');
+    agregarMsg('sara', 'assistant', '¡Hola! Soy **María** de ABSTORAGES. ¿Cómo puedo ayudarte?');
     agregarMsg('sofia', 'assistant', '¡Hola! Soy **SOFIA** de ABSTORAGES, del equipo de operaciones. ¿Cómo puedo ayudarte?');
   }
 

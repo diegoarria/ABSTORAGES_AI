@@ -22,7 +22,7 @@
   <div class="page-head">
     <div>
       <h1>Memoria de agentes</h1>
-      <p>Lo que SARA, SOFIA y NOA recuerdan de cada persona: datos de contacto, historial y notas. Es una vista de solo lectura.</p>
+      <p>Lo que María, SOFIA y NOA recuerdan de cada persona: datos de contacto, historial y notas. Es una vista de solo lectura.</p>
       <div class="updated" id="updated"></div>
     </div>
   </div>
@@ -48,18 +48,18 @@
 
 <script>
 const AGENTES = {
-  SARA:  { role: "Ventas · Clientes",                              color: "var(--sara)",  soft: "var(--sara-soft)" },
+  MARIA: { role: "Ventas · Clientes",                              color: "var(--maria)", soft: "var(--maria-soft)", nombre: "MARÍA" },
   SOFIA: { role: "Operaciones · Proveedores",                      color: "var(--sofia)", soft: "var(--sofia-soft)" },
   NOA:   { role: "Monitoreo · Clientes, proveedores y operadores", color: "var(--noa)",   soft: "var(--noa-soft)" },
 };
 
 let SOLO_SOFIA = false;
-let activeAgent = "SARA";
+let activeAgent = "MARIA";
 let activeTipo = "todos";
 let activeContactId = null;
 let searchQuery = "";
 let contactosCache = [];
-let counts = { SARA: 0, SOFIA: 0, NOA: 0 };
+let counts = { MARIA: 0, SOFIA: 0, NOA: 0 };
 let _debounce = null;
 
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -73,7 +73,7 @@ function renderTabs(){
   document.getElementById('tabs').innerHTML = agentesVisibles().map(([key,a])=>`
     <button class="agent ${key===activeAgent?'active':''}" style="--ag:${a.color};--ag-soft:${a.soft}" onclick="selectAgent('${key}')" aria-pressed="${key===activeAgent}">
       <span class="agent-av">${key[0]}</span>
-      <span><span class="agent-nm">${key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
+      <span><span class="agent-nm">${a.nombre || key}</span><span class="agent-rl" style="display:block">${a.role}</span></span>
       <span class="agent-ct"><b>${counts[key]}</b><span>contactos</span></span>
     </button>
   `).join('');

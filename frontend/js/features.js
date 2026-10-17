@@ -84,7 +84,7 @@ const Features = (() => {
       });
     });
 
-    ['sara-messages', 'sofia-messages'].forEach(id => {
+    ['maria-messages', 'sofia-messages'].forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el, { childList: true, subtree: false });
     });
@@ -94,7 +94,7 @@ const Features = (() => {
     if (msgEl.querySelector('.btn-tts')) return; // ya tiene botón
     const bubble = msgEl.querySelector('.message-bubble');
     if (!bubble) return;
-    const agente = msgEl.closest('#sara-messages') ? 'sara' : 'sofia';
+    const agente = msgEl.closest('#maria-messages') ? 'maria' : 'sofia';
     // Esperar a que termine el streaming antes de hacer el botón interactivo
     const ro = new ResizeObserver(() => {
       if (bubble.textContent.trim().length > 20) {
@@ -116,7 +116,7 @@ const Features = (() => {
     const input = document.getElementById(inputId);
     if (!btn || !input) return;
 
-    const agente = btnId.replace('-mic', ''); // 'sara' | 'sofia'
+    const agente = btnId.replace('-mic', ''); // 'maria' | 'sofia'
     const sendBtn = document.getElementById(btnId.replace('-mic', '-send'));
 
     if (!SpeechRecognition) {
@@ -189,7 +189,7 @@ const Features = (() => {
     const utt = new SpeechSynthesisUtterance(clean);
     utt.lang = 'es-MX';
     utt.rate = 1.05;
-    utt.pitch = agente === 'sara' ? 1.1 : 0.95;
+    utt.pitch = (agente === 'maria' || agente === 'sara') ? 1.1 : 0.95;
 
     const loadVoice = () => {
       const voices = window.speechSynthesis.getVoices();
@@ -213,7 +213,7 @@ const Features = (() => {
   let callActive      = false;
   let callSeconds     = 0;
   let callTimer       = null;
-  let callAgente      = 'sara';
+  let callAgente      = 'maria';
   let callState       = 'idle';   // idle | listening | recording | processing | speaking
   let callMuted       = false;
 
@@ -233,7 +233,8 @@ const Features = (() => {
   const CALL_MIN_BYTES= 2000;   // ignore noise clips
 
   const CALL_IDENTITIES = {
-    sara:  { name: 'SARA Garza',   sub: 'Ejecutiva Comercial · ABSTORAGES',         photo: '/img/sara-avatar.png'  },
+    maria: { name: 'María Fernández', sub: 'Ejecutiva Comercial · ABSTORAGES',      photo: '/img/maria-avatar.png' },
+    sara:  { name: 'María Fernández', sub: 'Ejecutiva Comercial · ABSTORAGES',      photo: '/img/maria-avatar.png' }, // alias heredado
     sofia: { name: 'SOFIA Novak',  sub: 'Coordinadora de Operaciones · ABSTORAGES', photo: '/img/sofia-avatar.png' },
     noa:   { name: 'NOA',          sub: 'AI Monitoreo · ABSTORAGES',                photo: '/img/noa-avatar.png'   },
     hector:{ name: 'HÉCTOR',       sub: 'AI Cobranza · ABSTORAGES',                 photo: '/img/hector-avatar.png'},
@@ -333,10 +334,10 @@ const Features = (() => {
 
       // Get AI response (streaming)
       const sessionId = document.getElementById(`${callAgente}-session-id`)?.textContent
-                     || document.getElementById('sara-session-id')?.textContent
+                     || document.getElementById('maria-session-id')?.textContent
                      || 'call-' + Date.now();
       let fullText = '';
-      const id = CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.sara;
+      const id = CALL_IDENTITIES[callAgente] || CALL_IDENTITIES.maria;
       setCallStatus(`${id.name} está respondiendo…`, 'speaking');
       callState = 'speaking';
 
@@ -439,7 +440,7 @@ const Features = (() => {
     const endBtn  = document.getElementById('call-end-btn');
     if (!overlay || !endBtn) return;
 
-    ['sara', 'sofia', 'noa', 'hector'].forEach(ag => {
+    ['maria', 'sofia', 'noa', 'hector'].forEach(ag => {
       document.getElementById(`${ag}-mic`)?.addEventListener('click', () => openCall(ag));
     });
     endBtn.addEventListener('click', closeCall);
@@ -461,13 +462,13 @@ const Features = (() => {
     }
   }
 
-  async function openCall(agente = 'sara') {
+  async function openCall(agente = 'maria') {
     callAgente  = agente;
     callMuted   = false;
     callSeconds = 0;
 
     // Set overlay identity
-    const id      = CALL_IDENTITIES[agente] || CALL_IDENTITIES.sara;
+    const id      = CALL_IDENTITIES[agente] || CALL_IDENTITIES.maria;
     const overlay = document.getElementById('call-overlay');
     if (!overlay) return;
     const nameEl  = document.getElementById('call-name');
@@ -522,12 +523,12 @@ const Features = (() => {
     // Greeting
     setCallStatus(`${id.name} está respondiendo…`, 'speaking');
     const GREETINGS = {
-      sara:  '¡Hola! Soy SARA Garza de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?',
+      maria: '¡Hola! Soy María Fernández de ABSTORAGES. ¿Con quién tengo el gusto y de qué empresa me contactas?',
       sofia: '¡Hola! Soy SOFIA Novak de ABSTORAGES. ¿En qué te puedo ayudar?',
       noa:   '¡Hola! Soy NOA de ABSTORAGES. ¿Qué folio necesitas consultar?',
       hector:'¡Hola! Soy HÉCTOR de ABSTORAGES. ¿En qué te puedo ayudar?',
     };
-    await callPlayTTSWeb(GREETINGS[agente] || GREETINGS.sara);
+    await callPlayTTSWeb(GREETINGS[agente] || GREETINGS.maria);
 
     if (callActive) {
       callState = 'listening';
@@ -661,7 +662,7 @@ const Features = (() => {
   function init() {
     watchBubbles();
     initMic('sofia-input', 'sofia-dictado'); // dictado de voz al textarea de SOFIA
-    initCallMode(); // sara-mic y sofia-mic manejan call mode, no STT directo
+    initCallMode(); // maria-mic y sofia-mic manejan call mode, no STT directo
     loadPredictiveAlerts();
     loadTariff();
 

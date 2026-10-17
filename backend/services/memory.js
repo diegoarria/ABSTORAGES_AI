@@ -20,6 +20,15 @@ function getSession(id) {
   ensureDir();
   const fp = filePath(id);
   if (!fs.existsSync(fp)) {
+    // SARA → MARÍA (oct-2026): si se pide una sesión "...maria..." y el archivo
+    // no existe pero sí existe su equivalente "...sara..." de antes del rename,
+    // se migra el archivo al vuelo para no perder conversaciones viejas.
+    if (id.includes('maria')) {
+      const legacyFp = filePath(id.replace(/maria/g, 'sara'));
+      if (fs.existsSync(legacyFp)) fs.renameSync(legacyFp, fp);
+    }
+  }
+  if (!fs.existsSync(fp)) {
     return { id, history: [], summary: '', meta: {}, createdAt: Date.now(), updatedAt: Date.now() };
   }
   try { return JSON.parse(fs.readFileSync(fp, 'utf8')); }

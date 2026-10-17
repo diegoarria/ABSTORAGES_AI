@@ -1,6 +1,6 @@
-// ── Mensajes proactivos de SARA por WhatsApp — fuera de la ventana de 24h ────
+// ── Mensajes proactivos de MARÍA por WhatsApp — fuera de la ventana de 24h ────
 // Igual que alertasStaff.js: WhatsApp Business exige plantilla aprobada por
-// Meta para que SARA le escriba primero a un lead sin que él le haya escrito
+// Meta para que MARÍA le escriba primero a un lead sin que él le haya escrito
 // antes. Por eso se manda por Content API (ContentSid + variables), no texto
 // libre. Plantillas creadas y enviadas a aprobación el 04-ago-2026:
 //   abstorages_sara_seguimiento_lead → HX74e936db4d3c50c0acc37a95e66f16e3
@@ -34,18 +34,18 @@ function normalizarE164(telefono) {
   return `+${raw}`;
 }
 
-// Sin esto, cuando el cliente responde a un mensaje proactivo, SARA no
+// Sin esto, cuando el cliente responde a un mensaje proactivo, MARÍA no
 // tiene ningún registro de qué le mandó — contesta a ciegas.
 function registrarEnMemoria(telefono, texto) {
   const tel = normalizarE164(telefono);
   if (!tel) return;
-  try { memory.addMessage(`wa_sara_${tel}`, 'assistant', texto); }
+  try { memory.addMessage(`wa_maria_${tel}`, 'assistant', texto); } // wa_sara_ → wa_maria_ (oct-2026), igual que server-lite.js
   catch (e) { console.error('[saraProactivo] Error registrando en memoria:', e.message); }
 }
 
 const TWILIO_SID     = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN   = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WA_FROM = (process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, '');
+const TWILIO_WA_FROM = (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, '');
 const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
 
 const CONTENT_SID_SEGUIMIENTO_LEAD = 'HXd4594e8561e81c02c8d8f59a635ffdf8';
@@ -59,16 +59,16 @@ const CONTENT_SID_VENTA_CERRADA    = 'HXf43876d80588e3323741f01ec3f90f61';
 const CONTENT_SID_UNIDAD_CONFIRMADA = 'HX__PENDIENTE_DE_CREAR__';
 
 async function enviarPlantilla(to, contentSid, variables) {
-  if (agentPause.estaPausado('sara')) {
-    console.warn(`[saraProactivo] SARA pausada — se omite plantilla a ${to}`);
+  if (agentPause.estaPausado('maria')) {
+    console.warn(`[saraProactivo] MARÍA pausada — se omite plantilla a ${to}`);
     return { status: 'paused', to };
   }
-  const limite = outboundRateLimit.registrarYVerificar('sara');
+  const limite = outboundRateLimit.registrarYVerificar('maria');
   if (!limite.permitido) {
-    console.error(`[saraProactivo] 🛑 SARA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite plantilla a ${to}`);
+    console.error(`[saraProactivo] 🛑 MARÍA alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite plantilla a ${to}`);
     return { status: 'rate_limited', to };
   }
-  monitoringControl.reportarContactoSaliente({ agente: 'sara', canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
+  monitoringControl.reportarContactoSaliente({ agente: 'maria', canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
   if (!WA_LIVE) {
     console.log(`[saraProactivo STUB] → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
     return { status: 'stub', to };
@@ -101,7 +101,7 @@ async function enviarSeguimientoLead(telefono, nombre, resumenSolicitud) {
   const resultado = await enviarPlantilla(telefono, CONTENT_SID_SEGUIMIENTO_LEAD, {
     '1': nombre || 'ahí', '2': resumen,
   });
-  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy SARA de ABSTORAGES, te doy seguimiento a ${resumen}.`);
+  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES, te doy seguimiento a ${resumen}.`);
   return resultado;
 }
 
@@ -109,17 +109,17 @@ async function enviarCotizacion(telefono, nombre, ruta, precio) {
   if (!telefonoValido(telefono)) return null;
   console.log(`[saraProactivo] Cotización → ${telefono}`);
   const r = ruta || 'tu ruta';
-  const p = precio || 'consulta el detalle con SARA';
+  const p = precio || 'consulta el detalle con María';
   const resultado = await enviarPlantilla(telefono, CONTENT_SID_COTIZACION, {
     '1': nombre || 'ahí', '2': r, '3': p,
   });
-  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy SARA de ABSTORAGES. Cotización para ${r}: ${p}.`);
+  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES. Cotización para ${r}: ${p}.`);
   return resultado;
 }
 
-// Mensaje proactivo: SOFIA ya encontró proveedor para el folio — SARA le
+// Mensaje proactivo: SOFIA ya encontró proveedor para el folio — MARÍA le
 // avisa al cliente y le pregunta si lo sigue necesitando con esa urgencia.
-// Si el cliente contesta que sí, SARA emite CONFIRMAR_UNIDAD_URGENTE y el
+// Si el cliente contesta que sí, MARÍA emite CONFIRMAR_UNIDAD_URGENTE y el
 // backend cierra automático con ese proveedor (ver sofiaOperacion.js).
 async function enviarUnidadConfirmada(telefono, nombre, folio, proveedorNombre, precio) {
   if (!telefonoValido(telefono)) return null;
@@ -129,7 +129,7 @@ async function enviarUnidadConfirmada(telefono, nombre, folio, proveedorNombre, 
   }
   console.log(`[saraProactivo] Unidad confirmada → ${telefono} — folio ${folio}`);
   const p = precio ? `$${Number(precio).toLocaleString('es-MX')} MXN` : 'tarifa pactada';
-  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy SARA de ABSTORAGES. Ya tenemos unidad confirmada para tu folio ${folio} con ${proveedorNombre || 'un transportista'} (${p}). ¿La sigues necesitando?`);
+  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES. Ya tenemos unidad confirmada para tu folio ${folio} con ${proveedorNombre || 'un transportista'} (${p}). ¿La sigues necesitando?`);
   return enviarPlantilla(telefono, CONTENT_SID_UNIDAD_CONFIRMADA, {
     '1': nombre || 'ahí', '2': folio || '—', '3': proveedorNombre || 'nuestro transportista', '4': p,
   });
@@ -138,7 +138,7 @@ async function enviarUnidadConfirmada(telefono, nombre, folio, proveedorNombre, 
 async function enviarConfirmacionVenta(telefono, nombre, folio) {
   if (!telefonoValido(telefono)) return null;
   console.log(`[saraProactivo] Confirmación de venta → ${telefono} — folio ${folio}`);
-  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy SARA de ABSTORAGES. Tu venta quedó confirmada — folio ${folio || '—'}.`);
+  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES. Tu venta quedó confirmada — folio ${folio || '—'}.`);
   return enviarPlantilla(telefono, CONTENT_SID_VENTA_CERRADA, {
     '1': nombre || 'ahí',
     '2': folio || '—',

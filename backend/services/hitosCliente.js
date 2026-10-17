@@ -28,15 +28,19 @@ const agentPause = require('./agentPause');
 const outboundRateLimit = require('./outboundRateLimit');
 const monitoringControl = require('./monitoringControl');
 
-const HABILITADO = process.env.SARA_HITOS_CLIENTE === 'true'; // apagado por default — son mensajes reales y automáticos a clientes reales
-const TICK_MS = Number(process.env.SARA_HITOS_CLIENTE_TICK_MIN || 10) * 60 * 1000;
+const HABILITADO = (process.env.MARIA_HITOS_CLIENTE || process.env.SARA_HITOS_CLIENTE) === 'true'; // apagado por default — son mensajes reales y automáticos a clientes reales
+const TICK_MS = Number(process.env.MARIA_HITOS_CLIENTE_TICK_MIN || process.env.SARA_HITOS_CLIENTE_TICK_MIN || 10) * 60 * 1000;
 
 const TWILIO_SID   = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WA_FROM_SARA = (process.env.TWILIO_WHATSAPP_NUMBER_SARA || process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, '');
-const LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM_SARA);
+const TWILIO_WA_FROM_MARIA = (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || process.env.TWILIO_WHATSAPP_NUMBER || '').replace(/^whatsapp:/, '');
+const LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM_MARIA);
 
-const PLANTILLA_ESTATUS = plantillasAprobadas.buscarPlantilla('sara', 'HX18bea3252df319e388e9fe33bd568350');
+// SARA → MARÍA (oct-2026): se busca primero bajo 'maria'; mientras esa lista
+// siga vacía (plantillas nuevas de Kapso pendientes), se usa la misma
+// plantilla genérica "Estatus de folio" que ya estaba aprobada bajo 'sara'.
+const PLANTILLA_ESTATUS = plantillasAprobadas.buscarPlantilla('maria', 'HX18bea3252df319e388e9fe33bd568350')
+  || plantillasAprobadas.buscarPlantilla('sara', 'HX18bea3252df319e388e9fe33bd568350');
 
 const FILE = path.join(__dirname, '../../data/hitos-cliente-avisados.json');
 function cargar() { try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch { return {}; } }
@@ -44,12 +48,12 @@ let avisados = cargar(); // { "FOLIO:evento": "2026-10-12T..." }
 function guardar() { try { fs.writeFileSync(FILE, JSON.stringify(avisados, null, 2)); } catch (e) { console.error('[hitosCliente] Error guardando:', e.message); } }
 
 // Busca el teléfono del cliente por nombre de empresa (campo "Cliente" del
-// TMS) contra la cartera real de SARA (contactos.js) — el TMS no trae el
+// TMS) contra la cartera real de MARÍA (contactos.js) — el TMS no trae el
 // teléfono del cliente, solo el del Planner interno que lleva el folio.
 async function telefonoCliente(nombreEmpresa) {
   if (!nombreEmpresa) return null;
   try {
-    const lista = await contactos.listarPorAgente('SARA', { tipo: 'cliente', q: nombreEmpresa });
+    const lista = await contactos.listarPorAgente('MARIA', { tipo: 'cliente', q: nombreEmpresa });
     const q = nombreEmpresa.trim().toLowerCase();
     const exacto = lista.find(c => (c.empresa || '').trim().toLowerCase() === q);
     return (exacto || lista[0])?.telefono || null;
@@ -60,15 +64,15 @@ async function telefonoCliente(nombreEmpresa) {
 }
 
 async function enviarEstatus(telefono, folio, resumen) {
-  if (agentPause.estaPausado('sara')) { console.warn(`[hitosCliente] SARA pausada — se omite aviso a ${telefono} (folio ${folio})`); return; }
-  const limite = outboundRateLimit.registrarYVerificar('sara');
-  if (!limite.permitido) { console.error(`[hitosCliente] 🛑 SARA alcanzó su límite diario — se omite aviso a ${telefono} (folio ${folio})`); return; }
+  if (agentPause.estaPausado('maria')) { console.warn(`[hitosCliente] MARÍA pausada — se omite aviso a ${telefono} (folio ${folio})`); return; }
+  const limite = outboundRateLimit.registrarYVerificar('maria');
+  if (!limite.permitido) { console.error(`[hitosCliente] 🛑 MARÍA alcanzó su límite diario — se omite aviso a ${telefono} (folio ${folio})`); return; }
   if (!PLANTILLA_ESTATUS) { console.error('[hitosCliente] Plantilla "Estatus de folio" no encontrada en plantillasAprobadas.js'); return; }
-  monitoringControl.reportarContactoSaliente({ agente: 'sara', canal: 'whatsapp_plantilla', destinatario: telefono, detalle: { contentSid: PLANTILLA_ESTATUS.sid, folio } });
+  monitoringControl.reportarContactoSaliente({ agente: 'maria', canal: 'whatsapp_plantilla', destinatario: telefono, detalle: { contentSid: PLANTILLA_ESTATUS.sid, folio } });
   if (!LIVE) { console.log(`[hitosCliente STUB] → ${telefono} (folio ${folio}): ${resumen}`); return; }
   const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
   const body = new URLSearchParams({
-    From: `whatsapp:${TWILIO_WA_FROM_SARA}`,
+    From: `whatsapp:${TWILIO_WA_FROM_MARIA}`,
     To: `whatsapp:${telefono.replace(/^whatsapp:/, '')}`,
     ContentSid: PLANTILLA_ESTATUS.sid,
     ContentVariables: JSON.stringify({ '1': 'ahí', '2': folio, '3': resumen }),
@@ -112,7 +116,7 @@ async function tick() {
 }
 
 function iniciar() {
-  if (!HABILITADO) { console.log('[hitosCliente] Desactivado (SARA_HITOS_CLIENTE != "true")'); return; }
+  if (!HABILITADO) { console.log('[hitosCliente] Desactivado (MARIA_HITOS_CLIENTE / SARA_HITOS_CLIENTE != "true")'); return; }
   setInterval(() => tick().catch(e => console.error('[hitosCliente]', e.message)), TICK_MS);
   console.log(`[hitosCliente] Activo — revisa hitos cada ${TICK_MS / 60000} min`);
 }

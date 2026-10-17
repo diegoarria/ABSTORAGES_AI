@@ -1,4 +1,4 @@
-// ── Memoria compartida cross-agente (SARA/SOFIA/NOA) — contactos + interacciones ─
+// ── Memoria compartida cross-agente (MARÍA/SOFIA/NOA) — contactos + interacciones ─
 // Solo se guarda un contacto cuando hay un cierre real (venta/acuerdo confirmado),
 // nunca por un prospecto que no llegó a nada — ver los call sites en server-lite.js.
 //
@@ -127,7 +127,7 @@ async function bloqueDirectorioProveedores() {
 async function bloqueDirectorioNOA() {
   let proveedores = [], clientes = [];
   try { proveedores = await listarPorAgente('SOFIA', { tipo: 'proveedor' }); } catch {}
-  try { clientes = await listarPorAgente('SARA', { tipo: 'cliente' }); } catch {}
+  try { clientes = await listarPorAgente('MARIA', { tipo: 'cliente' }); } catch {}
   if (!proveedores.length && !clientes.length) return '';
   const filaProveedor = c => {
     const partes = [c.nombre_completo];
@@ -155,7 +155,7 @@ async function protegerDatosProveedores(texto) {
     if (Date.now() - _cachePriv.ts > 60000) {
       const [proveedores, clientes] = await Promise.all([
         listarPorAgente('SOFIA', { tipo: 'proveedor' }),
-        listarPorAgente('SARA', { tipo: 'cliente' }),
+        listarPorAgente('MARIA', { tipo: 'cliente' }),
       ]);
       const lista = [...proveedores, ...clientes];
       _cachePriv = { ts: Date.now(), tels: new Set(lista.map(c => normalizarTelefono(c.telefono)).filter(Boolean)), correos: new Set(lista.map(c => (c.email || '').toLowerCase()).filter(Boolean)) };
@@ -186,6 +186,13 @@ async function actualizarCampoProveedor(id, campo, texto) {
 const actualizarRutas = (id, t) => actualizarCampoProveedor(id, 'rutas', t);
 const actualizarUnidades = (id, t) => actualizarCampoProveedor(id, 'unidades', t);
 
+// SARA → MARÍA (oct-2026): mismo agente, dos identificadores. Los contactos
+// ya guardados traen agente_asignado/interacciones 'SARA'; los nuevos traen
+// 'MARIA'. Toda búsqueda por agente acepta ambos para no "olvidar" clientes.
+function aliasAgente(AGENTE) {
+  return (AGENTE === 'MARIA' || AGENTE === 'SARA') ? ['MARIA', 'SARA'] : [AGENTE];
+}
+
 async function listarPorAgente(agente, opts = {}) {
   if (USA_DB) {
     try { return await db.listarContactosPorAgente(agente, opts); }
@@ -195,7 +202,7 @@ async function listarPorAgente(agente, opts = {}) {
   // Mismo criterio de visibilidad cruzada que buscarPorTelefono() — ver nota ahí.
   let rows = AGENTE === 'NOA'
     ? cache.slice()
-    : cache.filter(c => c.agente_asignado === AGENTE || (c.interacciones || []).some(i => i.agente === AGENTE));
+    : cache.filter(c => aliasAgente(AGENTE).includes(c.agente_asignado) || (c.interacciones || []).some(i => aliasAgente(AGENTE).includes(i.agente)));
   if (opts.tipo) rows = rows.filter(c => c.tipo === opts.tipo);
   if (opts.q) {
     const q = opts.q.toLowerCase();
@@ -238,7 +245,7 @@ async function buscarPorTelefono(telefono, agente) {
   if (AGENTE === 'NOA') return cache.find(c => normalizarTelefono(c.telefono) === tel) || null;
   return cache.find(c =>
     normalizarTelefono(c.telefono) === tel &&
-    (!AGENTE || c.agente_asignado === AGENTE || (c.interacciones || []).some(i => i.agente === AGENTE))
+    (!AGENTE || aliasAgente(AGENTE).includes(c.agente_asignado) || (c.interacciones || []).some(i => aliasAgente(AGENTE).includes(i.agente)))
   ) || null;
 }
 
@@ -286,16 +293,16 @@ function bloqueDatosCliente(contacto) {
   );
 }
 
-// Trato de NOA con un contacto conocido — distinto del de SARA (ejecutiva
+// Trato de NOA con un contacto conocido — distinto del de MARÍA (ejecutiva
 // comercial) y SOFIA (amigo de confianza): NOA no vende ni negocia, solo
 // monitorea viajes. Pedido explícito del usuario (12-oct-2026): todo el que
 // ya está en la Base de Datos es alguien conocido para NOA también — nunca
 // tratarlo como si fuera la primera vez, sin importar si es cliente o
-// proveedor (por eso un solo bloque, no dos como con SARA/SOFIA).
+// proveedor (por eso un solo bloque, no dos como con MARÍA/SOFIA).
 const TRATO_NOA_BD =
   `\n\n## 🤝 TRATO CON ESTE CONTACTO — YA LO CONOCES, NO ES ALGUIEN NUEVO\n` +
-  `Esta persona ya está en la Base de Datos de ABSTORAGES — para ti es exactamente igual de conocida que para SARA o SOFIA, aunque tú no hayas hablado antes directamente con ella. Nunca actúes como si fuera la primera vez. ` +
-  `Tu tono es profesional, directo y de monitoreo — no vendes (como SARA) ni platicas relajado (como SOFIA): confirmas estatus, resuelves dudas operativas del viaje, y mantienes informado. ` +
+  `Esta persona ya está en la Base de Datos de ABSTORAGES — para ti es exactamente igual de conocida que para MARÍA o SOFIA, aunque tú no hayas hablado antes directamente con ella. Nunca actúes como si fuera la primera vez. ` +
+  `Tu tono es profesional, directo y de monitoreo — no vendes (como MARÍA) ni platicas relajado (como SOFIA): confirmas estatus, resuelves dudas operativas del viaje, y mantienes informado. ` +
   `Reconócela por su nombre y, si es relevante, por su empresa o el folio en el que participa — nunca le pidas datos que ya tienes.\n`;
 
 function bloqueContactoConocido(contacto, agente) {
@@ -539,9 +546,9 @@ async function cargarClientesConTelefono({ archivo = 'clientes-con-telefono-oct2
   let nuevos = 0, actualizados = 0, fallos = 0;
   for (const cl of clientes) {
     try {
-      const existente = await buscarPorTelefono(cl.telefono, 'sara');
+      const existente = await buscarPorTelefono(cl.telefono, 'maria');
       await upsertContacto({
-        agente: 'sara', tipo: 'cliente',
+        agente: 'maria', tipo: 'cliente',
         nombre_completo: cl.nombre_completo || cl.empresa, telefono: cl.telefono, email: cl.email || null,
         empresa: cl.empresa, rfc: cl.rfc || null, estatus: cl.estatus || null, notas: cl.notas || null,
         resumen_interaccion: `Alta desde cartera de clientes AppSheet (${cl.estatus})`, canal: 'permanente',
@@ -550,7 +557,7 @@ async function cargarClientesConTelefono({ archivo = 'clientes-con-telefono-oct2
     } catch (e) { fallos++; console.error(`[Contactos] Error cargando cliente ${cl.empresa}:`, e.message); }
   }
   if (!fallos) marcarFlag(flag);
-  console.log(`[Contactos] Cartera de clientes SARA: ${nuevos} clientes nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
+  console.log(`[Contactos] Cartera de clientes MARÍA: ${nuevos} clientes nuevos, ${actualizados} existentes actualizados${fallos ? `, ${fallos} con error (se reintenta en el próximo arranque)` : ''}`);
 }
 
 // ── Clientes (destino) del Top 50 de rutas ──────────────────────────────────
@@ -647,7 +654,7 @@ async function limpiarTodasLasRutas() {
   if (leerFlags()[flag]) return;
   let limpiados = 0, fallos = 0;
   for (const tipo of ['proveedor', 'cliente']) {
-    for (const agente of ['SARA', 'SOFIA', 'NOA']) {
+    for (const agente of ['MARIA', 'SOFIA', 'NOA']) {
       let lista;
       try { lista = await listarPorAgente(agente, { tipo }); } catch (e) { console.error(`[Contactos] Error listando ${tipo}/${agente} para limpiar rutas:`, e.message); continue; }
       for (const c of lista) {

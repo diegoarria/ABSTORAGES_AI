@@ -1,4 +1,4 @@
-// Notificaciones al equipo cuando SARA captura un lead
+// Notificaciones al equipo cuando MARÍA (antes SARA) captura un lead
 // Canal principal: Gmail SMTP (nodemailer) — nunca va a spam, sin dominio propio
 // Fallback: Resend (requiere dominio verificado para salir de spam)
 require('dotenv').config();
@@ -10,7 +10,7 @@ const GMAIL_LIVE   = GMAIL_USER && GMAIL_PASS && !GMAIL_PASS.startsWith('xxxx');
 
 const RESEND_KEY   = process.env.RESEND_API_KEY;
 const TEAM_EMAIL   = (process.env.NOTIF_EMAIL || '').split(',').map(e => e.trim()).filter(Boolean);
-const FROM_EMAIL   = process.env.NOTIF_FROM_EMAIL || 'SARA <onboarding@resend.dev>';
+const FROM_EMAIL   = process.env.NOTIF_FROM_EMAIL || 'MARÍA <onboarding@resend.dev>';
 const TEAM_WA      = process.env.NOTIF_WA_NUMBER;
 const PORTAL_URL   = process.env.PORTAL_URL || 'https://abstoragesai-production.up.railway.app';
 const chatViewTokens = require('./chatViewTokens');
@@ -31,7 +31,7 @@ async function sendEmailGmail(asunto, html) {
   if (!gmailTransport || !TEAM_EMAIL.length) return false;
   try {
     await gmailTransport.sendMail({
-      from: `SARA ABSTORAGES <${GMAIL_USER}>`,
+      from: `MARÍA ABSTORAGES <${GMAIL_USER}>`,
       to: TEAM_EMAIL.join(', '),
       subject: asunto,
       html,
@@ -72,7 +72,7 @@ async function sendEmail(lead) {
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
       <div style="background:#0f1d4a;padding:20px 24px;">
-        <div style="color:#fff;font-weight:700;font-size:16px;">SARA · ABSTORAGES</div>
+        <div style="color:#fff;font-weight:700;font-size:16px;">MARÍA · ABSTORAGES</div>
         <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Nuevo lead capturado · ${fecha}</div>
       </div>
 
@@ -107,7 +107,7 @@ async function sendEmail(lead) {
       </div>` : ''}
     </div>`;
 
-  const asunto = `🔔 Lead SARA: ${[lead.nombre, lead.empresa, ruta].filter(v => v && v !== '—').join(' · ') || lead.id}`;
+  const asunto = `🔔 Lead MARÍA: ${[lead.nombre, lead.empresa, ruta].filter(v => v && v !== '—').join(' · ') || lead.id}`;
 
   // Gmail primero (nunca va a spam), Resend como fallback
   const enviado = await sendEmailGmail(asunto, html);
@@ -134,7 +134,7 @@ async function sendWATeam(lead) {
     return;
   }
 
-  const partes = [`🔔 *Nuevo lead SARA*`, `👤 *${lead.nombre}* — ${lead.empresa}`];
+  const partes = [`🔔 *Nuevo lead MARÍA*`, `👤 *${lead.nombre}* — ${lead.empresa}`];
   if (lead.telefono !== '—') partes.push(`📱 ${lead.telefono}`);
   if (lead.email    !== '—') partes.push(`✉️ ${lead.email}`);
   if (lead.origen   !== '—' && lead.destino !== '—') partes.push(`🗺️ ${lead.origen} → ${lead.destino}`);
@@ -206,7 +206,7 @@ async function sendEmailResumen(lead, motivo, historial = []) {
     if (!limpio) return '';
     return `<div style="margin-bottom:8px;display:flex;justify-content:${isUser?'flex-start':'flex-end'};">
       <div style="max-width:85%;background:${isUser?'#f3f4f6':'#eff6ff'};border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.5;color:#111;">
-        <span style="font-size:10px;color:#9ca3af;display:block;margin-bottom:2px;">${isUser?'Cliente':'SARA'}</span>
+        <span style="font-size:10px;color:#9ca3af;display:block;margin-bottom:2px;">${isUser?'Cliente':'MARÍA'}</span>
         ${limpio.replace(/</g,'&lt;').replace(/\n/g,'<br>')}
       </div>
     </div>`;
@@ -216,7 +216,7 @@ async function sendEmailResumen(lead, motivo, historial = []) {
   <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:580px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
     <div style="background:#0f1d4a;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;">
       <div>
-        <div style="color:#fff;font-weight:700;font-size:16px;">SARA · ABSTORAGES</div>
+        <div style="color:#fff;font-weight:700;font-size:16px;">MARÍA · ABSTORAGES</div>
         <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Conversación finalizada · ${fecha}</div>
       </div>
     </div>
@@ -258,7 +258,7 @@ async function sendEmailResumen(lead, motivo, historial = []) {
     </div>
   </div>`;
 
-  const asunto = `SARA: ${estado.label.replace(/[✅🔁📋]/g,'').trim()} — ${[lead.nombre, lead.empresa, ruta].filter(v=>v&&v!=='—').join(' · ') || 'Nuevo contacto'}`;
+  const asunto = `MARÍA: ${estado.label.replace(/[✅🔁📋]/g,'').trim()} — ${[lead.nombre, lead.empresa, ruta].filter(v=>v&&v!=='—').join(' · ') || 'Nuevo contacto'}`;
 
   const enviado = await sendEmailGmail(asunto, html);
   if (!enviado) {
@@ -312,7 +312,7 @@ async function notificarAsignacion(folio, proveedor, precio) {
   if (!enviado) console.log(`[Notifier STUB] Carrier asignado — ${folio} → ${proveedor} @ ${precioStr}`);
 }
 
-const AGENTE_LABEL = { sofia: 'SOFÍA', sara: 'SARA', noa: 'NOA' };
+const AGENTE_LABEL = { sofia: 'SOFÍA', maria: 'María Fernández', sara: 'María Fernández', noa: 'NOA' }; // 'sara' = registros previos al rename
 
 // Aviso de "llamada en curso" — a diferencia de notificarLlamada (que avisa al
 // terminar), esto avisa apenas se conecta, para saber en tiempo real que una
@@ -342,7 +342,7 @@ async function notificarLlamadaIniciada({ agente, nombre, telefono, folio }) {
     return;
   }
   try {
-    await gmailTransport.sendMail({ from: `SARA ABSTORAGES <${GMAIL_USER}>`, to: LLAMADA_INICIADA_EMAILS.join(', '), subject: asunto, html });
+    await gmailTransport.sendMail({ from: `MARÍA ABSTORAGES <${GMAIL_USER}>`, to: LLAMADA_INICIADA_EMAILS.join(', '), subject: asunto, html });
     console.log(`[Gmail] ✅ Aviso de llamada en curso enviado a ${LLAMADA_INICIADA_EMAILS.join(', ')}`);
   } catch (e) {
     console.error('[Gmail] ❌ Error notificando llamada en curso:', e.message);
@@ -369,9 +369,9 @@ const EQUIPO_OPS_EMAILS = [
 ];
 const RESPUESTA_SOFIA_EMAILS = [...ALERT_EMAILS, ...EQUIPO_OPS_EMAILS];
 
-// Equipo comercial — mismo criterio que EQUIPO_OPS_EMAILS pero para SARA
+// Equipo comercial — mismo criterio que EQUIPO_OPS_EMAILS pero para MARÍA
 // (pedido explícito del usuario, 12-oct-2026): avisar cuando alguien le
-// conteste a SARA por WhatsApp, igual que ya se hace con SOFIA.
+// conteste a MARÍA por WhatsApp, igual que ya se hace con SOFIA.
 const EQUIPO_COMERCIAL_EMAILS = [
   'fabiola.perez@abstorages.com',
   'guadalupe.dalera@abstorages.com',
@@ -509,24 +509,24 @@ async function notificarRespuestaSofia({ quien, tipo, telefono, texto, respuesta
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a SOFIA:', e.message); }
 }
 
-// Alguien le contestó a SARA por WhatsApp — mismo formato que
+// Alguien le contestó a MARÍA por WhatsApp — mismo formato que
 // notificarRespuestaSofia (incluye botón "Ver chat en tiempo real"), pero
 // para el equipo comercial en vez del de operaciones.
 async function notificarRespuestaSara({ quien, tipo, telefono, texto, respuestaSara, sessionId }) {
-  const asunto = `SARA — ${quien} le contestó por WhatsApp`;
+  const asunto = `MARÍA — ${quien} le contestó por WhatsApp`;
   const hora = new Date().toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Monterrey' });
   const bloque = (titulo, t) => `<div style="margin:0 0 14px;"><div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">${esc(titulo)}</div><div style="font-size:14px;color:#111;white-space:pre-wrap;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">${esc(t)}</div></div>`;
   const linkChat = sessionId ? `${PORTAL_URL}/ver-chat.html?token=${chatViewTokens.crear(sessionId, { nombre: quien, telefono })}` : null;
   const html = `
   <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
     <div style="background:#0f1d4a;padding:18px 24px;">
-      <div style="color:#fff;font-weight:700;font-size:16px;">SARA · ABSTORAGES</div>
+      <div style="color:#fff;font-weight:700;font-size:16px;">MARÍA · ABSTORAGES</div>
       <div style="color:#93c5fd;font-size:12px;margin-top:2px;">Respuesta por WhatsApp · ${esc(hora)}</div>
     </div>
     <div style="padding:20px 24px;">
-      <p style="margin:0 0 16px;font-size:14px;color:#111;"><strong>${esc(quien)}</strong>${tipo ? ` (${esc(tipo)})` : ''}${telefono ? ` · ${esc(telefono)}` : ''} le contestó a SARA.</p>
+      <p style="margin:0 0 16px;font-size:14px;color:#111;"><strong>${esc(quien)}</strong>${tipo ? ` (${esc(tipo)})` : ''}${telefono ? ` · ${esc(telefono)}` : ''} le contestó a MARÍA.</p>
       ${bloque('Lo que escribió', texto || '(mensaje sin texto — posible imagen o audio)')}
-      ${respuestaSara ? bloque('Lo que respondió SARA', respuestaSara) : ''}
+      ${respuestaSara ? bloque('Lo que respondió MARÍA', respuestaSara) : ''}
       <p style="margin:0;font-size:12px;color:#6b7280;">Puedes ver la conversación completa en Historial.</p>
     </div>
     ${linkChat ? `
@@ -537,9 +537,9 @@ async function notificarRespuestaSara({ quien, tipo, telefono, texto, respuestaS
   </div>`;
   if (!gmailTransport) { console.log(`[Notifier STUB] ${asunto}`); return; }
   try {
-    await gmailTransport.sendMail({ from: `SARA ABSTORAGES <${GMAIL_USER}>`, to: RESPUESTA_SARA_EMAILS.join(', '), subject: asunto, html });
-    console.log(`[Gmail] ✅ Aviso de respuesta a SARA enviado a ${RESPUESTA_SARA_EMAILS.join(', ')}`);
-  } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a SARA:', e.message); }
+    await gmailTransport.sendMail({ from: `MARÍA ABSTORAGES <${GMAIL_USER}>`, to: RESPUESTA_SARA_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Aviso de respuesta a MARÍA enviado a ${RESPUESTA_SARA_EMAILS.join(', ')}`);
+  } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de respuesta a MARÍA:', e.message); }
 }
 
 // Lista completa de proveedores con unidades disponibles — fecha, ruta,

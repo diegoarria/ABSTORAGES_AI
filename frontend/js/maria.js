@@ -1,16 +1,16 @@
-// ─── SARA.JS — Chat con SARA (AI Vendedora) ──────────────────────────────────
+// ─── MARIA.JS — Chat con MARÍA (AI Vendedora, antes María) ──────────────────────────────────
 
-const Sara = (() => {
+const Maria = (() => {
   let sessionId = App.generateSessionId();
   let isStreaming = false;
   let currentStreamDiv = null;
   let chatCerrado = false;
 
   function init() {
-    document.getElementById('sara-session-id').textContent = sessionId;
+    document.getElementById('maria-session-id').textContent = sessionId;
 
-    document.getElementById('sara-send').addEventListener('click', enviarMensaje);
-    document.getElementById('sara-input').addEventListener('keydown', (e) => {
+    document.getElementById('maria-send').addEventListener('click', enviarMensaje);
+    document.getElementById('maria-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         enviarMensaje();
@@ -18,18 +18,18 @@ const Sara = (() => {
     });
 
     // Auto-resize textarea
-    const input = document.getElementById('sara-input');
+    const input = document.getElementById('maria-input');
     input.addEventListener('input', () => {
       input.style.height = 'auto';
       input.style.height = Math.min(input.scrollHeight, 160) + 'px';
     });
 
-    document.getElementById('sara-new-session').addEventListener('click', nuevaSesion);
-    document.getElementById('sara-clear-chat').addEventListener('click', limpiarChat);
+    document.getElementById('maria-new-session').addEventListener('click', nuevaSesion);
+    document.getElementById('maria-clear-chat').addEventListener('click', limpiarChat);
   }
 
   async function enviarMensaje() {
-    const input = document.getElementById('sara-input');
+    const input = document.getElementById('maria-input');
     const mensaje = input.value.trim();
     if (!mensaje || isStreaming || chatCerrado) return;
 
@@ -40,12 +40,12 @@ const Sara = (() => {
     mostrarTyping();
     window.CentroMando?.onUserMessage(mensaje);
 
-    const btnSend = document.getElementById('sara-send');
+    const btnSend = document.getElementById('maria-send');
     btnSend.disabled = true;
     isStreaming = true;
 
     try {
-      const res = await fetch('/api/sara/chat', {
+      const res = await fetch('/api/maria/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: mensaje, sessionId }),
@@ -56,7 +56,7 @@ const Sara = (() => {
       }
 
       quitarTyping();
-      const streamDiv = iniciarBurbujaSara();
+      const streamDiv = iniciarBurbujaMaria();
       currentStreamDiv = streamDiv;
 
       const reader = res.body.getReader();
@@ -86,7 +86,7 @@ const Sara = (() => {
                 .replace(/ESCALAR_HUMANO/gi, '')
                 .trim();
               streamDiv.innerHTML = renderMarkdown(cleanText);
-              scrollToBottom('sara-messages');
+              scrollToBottom('maria-messages');
             }
 
             if (data.type === 'nueva_orden') {
@@ -95,7 +95,7 @@ const Sara = (() => {
               window.CentroMando?.onLeadComplete(d);
               const cleanMsg = textoAcumulado.replace(/NUEVA_ORDEN\s*:\s*\{[\s\S]*?\}/gi, '').trim();
               streamDiv.innerHTML = renderMarkdown(cleanMsg);
-              scrollToBottom('sara-messages');
+              scrollToBottom('maria-messages');
               // Handoff automático: SOFIA recibe todos los datos y arranca operación
               if (data.datos) {
                 document.dispatchEvent(new CustomEvent('nueva_orden_recibida', { detail: data.datos }));
@@ -114,11 +114,11 @@ const Sara = (() => {
         }
       }
       window.CentroMando?.onSaraResponse(textoAcumulado);
-      window.Features?.speakResponse(textoAcumulado, 'sara');
+      window.Features?.speakResponse(textoAcumulado, 'maria');
     } catch (err) {
       quitarTyping();
-      agregarMensajeError('sara', 'No se pudo conectar con SARA. ¿El servidor está corriendo?');
-      console.error('[SARA] Error:', err);
+      agregarMensajeError('maria', 'No se pudo conectar con María. ¿El servidor está corriendo?');
+      console.error('[MARIA] Error:', err);
     } finally {
       isStreaming = false;
       btnSend.disabled = false;
@@ -128,7 +128,7 @@ const Sara = (() => {
   }
 
   function agregarMensajeUsuario(texto) {
-    const messages = document.getElementById('sara-messages');
+    const messages = document.getElementById('maria-messages');
     const div = document.createElement('div');
     div.className = 'message user';
     div.innerHTML = `
@@ -136,16 +136,16 @@ const Sara = (() => {
       <div class="message-bubble">${App.escapeHtml(texto)}</div>
     `;
     messages.appendChild(div);
-    scrollToBottom('sara-messages');
+    scrollToBottom('maria-messages');
   }
 
   function mostrarTyping() {
-    const messages = document.getElementById('sara-messages');
+    const messages = document.getElementById('maria-messages');
     const div = document.createElement('div');
     div.className = 'message assistant';
-    div.id = 'sara-typing';
+    div.id = 'maria-typing';
     div.innerHTML = `
-      <div class="message-avatar sara">S</div>
+      <div class="message-avatar maria">M</div>
       <div class="message-bubble">
         <div class="typing-indicator">
           <div class="typing-dot"></div>
@@ -155,26 +155,26 @@ const Sara = (() => {
       </div>
     `;
     messages.appendChild(div);
-    scrollToBottom('sara-messages');
+    scrollToBottom('maria-messages');
   }
 
   function quitarTyping() {
-    document.getElementById('sara-typing')?.remove();
+    document.getElementById('maria-typing')?.remove();
   }
 
-  function iniciarBurbujaSara() {
-    const messages = document.getElementById('sara-messages');
+  function iniciarBurbujaMaria() {
+    const messages = document.getElementById('maria-messages');
     const div = document.createElement('div');
     div.className = 'message assistant';
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
     const avatar = document.createElement('div');
-    avatar.className = 'message-avatar sara';
-    avatar.textContent = 'S';
+    avatar.className = 'message-avatar maria';
+    avatar.textContent = 'M';
     div.appendChild(avatar);
     div.appendChild(bubble);
     messages.appendChild(div);
-    scrollToBottom('sara-messages');
+    scrollToBottom('maria-messages');
     return bubble;
   }
 
@@ -199,18 +199,18 @@ const Sara = (() => {
       streamDiv.innerHTML = renderMarkdown(cleanText);
     }
     chatCerrado = true;
-    const input = document.getElementById('sara-input');
-    const btnSend = document.getElementById('sara-send');
+    const input = document.getElementById('maria-input');
+    const btnSend = document.getElementById('maria-send');
     if (input) { input.disabled = true; input.placeholder = 'Chat cerrado'; }
     if (btnSend) btnSend.disabled = true;
 
     // Banner de cierre
-    const messages = document.getElementById('sara-messages');
+    const messages = document.getElementById('maria-messages');
     const banner = document.createElement('div');
     banner.style.cssText = 'text-align:center;padding:10px;color:var(--texto-dim);font-size:.8em;border-top:1px solid var(--borde);margin-top:8px;';
     banner.textContent = '— Chat finalizado —';
     messages.appendChild(banner);
-    scrollToBottom('sara-messages');
+    scrollToBottom('maria-messages');
   }
 
   function notificarEscalacion(streamDiv) {
@@ -224,22 +224,22 @@ const Sara = (() => {
   function nuevaSesion() {
     sessionId = App.generateSessionId();
     chatCerrado = false;
-    document.getElementById('sara-session-id').textContent = sessionId;
-    const input = document.getElementById('sara-input');
-    const btnSend = document.getElementById('sara-send');
+    document.getElementById('maria-session-id').textContent = sessionId;
+    const input = document.getElementById('maria-input');
+    const btnSend = document.getElementById('maria-send');
     if (input) { input.disabled = false; input.placeholder = ''; }
     if (btnSend) btnSend.disabled = false;
     limpiarChat();
-    App.toast('Nueva sesión SARA iniciada', 'verde', 2000);
+    App.toast('Nueva sesión María iniciada', 'verde', 2000);
   }
 
   function limpiarChat() {
-    const messages = document.getElementById('sara-messages');
+    const messages = document.getElementById('maria-messages');
     messages.innerHTML = `
       <div class="message assistant">
-        <div class="message-avatar sara">S</div>
+        <div class="message-avatar maria">M</div>
         <div class="message-bubble">
-          <p>¡Hola! Soy <strong>SARA</strong>, ejecutiva comercial de <strong>ABSTORAGES Logistics Solutions</strong>.</p>
+          <p>¡Hola! Soy <strong>María</strong>, ejecutiva comercial de <strong>ABSTORAGES Logistics Solutions</strong>.</p>
           <p>¿Con quién tengo el gusto y de qué empresa me contactas?</p>
         </div>
       </div>

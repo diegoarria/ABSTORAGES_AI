@@ -139,9 +139,9 @@ async function cargarContexto(c) {
   const box = document.getElementById('ctx-' + c.folio); if (!box) return;
   try {
     const r = await fetch('/api/folios/' + encodeURIComponent(c.folio) + '/contexto', { credentials: 'include' });
-    if (!r.ok) return; // folios sin notas ni imágenes (órdenes de SARA) no muestran nada
+    if (!r.ok) return; // folios sin notas ni imágenes (órdenes de María) no muestran nada
     const d = await r.json();
-    box.innerHTML = `<div class="ctx-box"><div class="lbl">Notas e imágenes del folio (las ven SARA, SOFIA y NOA)</div>
+    box.innerHTML = `<div class="ctx-box"><div class="lbl">Notas e imágenes del folio (las ven María, SOFIA y NOA)</div>
       ${d.notas ? `<div>${esc(d.notas).replace(/\n/g, '<br>')}</div>` : '<div style="color:var(--tx3)">Sin notas.</div>'}
       ${d.adjuntos.length ? `<div class="ctx-imgs">${d.adjuntos.map(a => `<a href="/api/folios/${encodeURIComponent(c.folio)}/adjuntos/${a.id}" target="_blank" title="${esc(a.descripcion || a.nombre)}"><img src="/api/folios/${encodeURIComponent(c.folio)}/adjuntos/${a.id}" alt="${esc(a.nombre)}" loading="lazy"></a>`).join('')}</div>` : ''}
       <div class="ctx-add"><input id="nota-${esc(c.folio)}" placeholder="Agregar una nota para las IA"><button class="btn btn-secondary btn-sm" onclick="agregarNota('${esc(c.folio)}')">Agregar</button></div></div>`;
