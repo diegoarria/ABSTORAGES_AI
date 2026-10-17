@@ -39,6 +39,10 @@
       line-height: 1;
     }
     #_maria_btn:hover { transform: translateY(-2px); box-shadow: 0 7px 28px rgba(0,0,0,.45); }
+    #_maria_btn.open {
+      width: 30px; height: 30px; padding: 0; border-radius: 50%;
+      justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,.4);
+    }
     #_maria_wrap {
       position: fixed; bottom: 8px; right: 24px; z-index: 2147483645;
       width: 320px; height: 480px;
@@ -79,29 +83,43 @@
   iframe.setAttribute('allow', 'microphone');
   wrap.appendChild(iframe);
 
+  // Cuando el chat está abierto, el botón se encoge y se pega a la esquina
+  // superior derecha de la caja — si se queda en su lugar original (abajo)
+  // se monta encima del input/enviar del chat.
+  function colocarBotonArriba() {
+    const r = wrap.getBoundingClientRect();
+    btn.style.bottom = `${window.innerHeight - r.top - 15}px`;
+    btn.style.right  = `${window.innerWidth - r.right + 10}px`;
+  }
+  function restaurarBoton() {
+    btn.style.bottom = '';
+    btn.style.right  = '';
+  }
+
   let open = false;
-  btn.addEventListener('click', () => {
-    open = !open;
-    if (open) {
-      wrap.style.display = 'block';
-      requestAnimationFrame(() => wrap.classList.add('open'));
-      btn.innerHTML = `${ICON_X} Cerrar`;
-    } else {
-      wrap.classList.remove('open');
-      wrap.addEventListener('transitionend', () => { if (!open) wrap.style.display = 'none'; }, { once: true });
-      btn.innerHTML = `${ICON_CHAT}${LABEL}`;
-    }
-  });
+  function abrir() {
+    open = true;
+    wrap.style.display = 'block';
+    requestAnimationFrame(() => wrap.classList.add('open'));
+    btn.innerHTML = ICON_X;
+    btn.classList.add('open');
+    btn.setAttribute('aria-label', 'Cerrar chat María');
+    colocarBotonArriba();
+  }
+  function cerrar() {
+    open = false;
+    wrap.classList.remove('open');
+    wrap.addEventListener('transitionend', () => { if (!open) wrap.style.display = 'none'; }, { once: true });
+    btn.innerHTML = `${ICON_CHAT}${LABEL}`;
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', 'Abrir chat María');
+    restaurarBoton();
+  }
+  btn.addEventListener('click', () => { if (open) cerrar(); else abrir(); });
+  window.addEventListener('resize', () => { if (open) colocarBotonArriba(); });
 
   document.body.appendChild(wrap);
   document.body.appendChild(btn);
 
-  if (AUTOOPEN) {
-    setTimeout(() => {
-      open = true;
-      wrap.style.display = 'block';
-      requestAnimationFrame(() => wrap.classList.add('open'));
-      btn.innerHTML = `${ICON_X} Cerrar`;
-    }, 800);
-  }
+  if (AUTOOPEN) setTimeout(abrir, 800);
 })();
