@@ -99,6 +99,7 @@ const noaRiskFeedback = require('./backend/services/noaRiskFeedback');
 const sofiaScheduler = require('./backend/services/sofiaScheduler');
 const difusionGeneral = require('./backend/services/difusionGeneral');
 const difusionClientes = require('./backend/services/difusionClientes');
+const cadenciaSeguimiento = require('./backend/services/cadenciaSeguimiento');
 const db          = require('./backend/db/db');
 const tms         = require('./backend/services/tms');
 const { limpiarFormatoWhatsApp } = require('./backend/services/formatoWA');
@@ -4054,14 +4055,12 @@ async function handleChat(agente, req, res) {
         // Y SARA le marca por teléfono para confirmar en viva voz — sin que
         // nadie tenga que activarlo, dispara sola en cuanto cierra la venta.
         vapi.llamarConfirmacionVenta(lead).catch(e => console.error('[vapi confirmacion-venta]', e.message));
-      } else if (datosSara.precio_cotizado && lead.telefono && lead.telefono !== '—') {
-        // SARA acaba de cotizar un precio en esta respuesta — se lo manda también
-        // por WhatsApp como respaldo, por si el lead sale del chat web.
-        const ruta = (lead.origen && lead.origen !== '—' && lead.destino && lead.destino !== '—')
-          ? `${lead.origen} → ${lead.destino}` : null;
-        saraProactivo.enviarCotizacion(lead.telefono, lead.nombre, ruta, datosSara.precio_cotizado)
-          .catch(e => console.error('[saraProactivo cotizacion]', e.message));
       }
+      // NOTA (19-oct-2026): antes, si LEAD_DATA traía precio_cotizado, se le
+      // mandaba el precio al cliente por WhatsApp como "respaldo". Se quitó
+      // por completo — guardrail anti-fuga de precios: María nunca manda un
+      // precio por ningún canal, ni siquiera como "respaldo". La cotización
+      // real la manda el equipo comercial, nunca el sistema automático.
 
       // Actualizar perfil del visitante con datos capturados en esta sesión
       if (visitorId) {
@@ -4615,5 +4614,6 @@ app.listen(PORT, async () => {
   kpisSofia.iniciar();
   reporteDisponibilidad.iniciar();
   tms.iniciarPrewarmNOA();
-  setInterval(revisarLeadsSinRespuesta, 30 * 60 * 1000);
+  setInterval(revisarLeadsSinRespuesta, 30 * 60 * 1000); // rescate rápido (2-168h de creado, WhatsApp + llamada)
+  cadenciaSeguimiento.iniciar(); // escalera día 2/5/10/20 (ver backend/services/cadenciaSeguimiento.js)
 });

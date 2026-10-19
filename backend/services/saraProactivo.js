@@ -1,24 +1,19 @@
 // ── Mensajes proactivos de MARÍA por WhatsApp — fuera de la ventana de 24h ────
 // Igual que alertasStaff.js: WhatsApp Business exige plantilla aprobada por
 // Meta para que MARÍA le escriba primero a un lead sin que él le haya escrito
-// antes. Por eso se manda por Content API (ContentSid + variables), no texto
-// libre. Plantillas creadas y enviadas a aprobación el 04-ago-2026:
-//   abstorages_sara_seguimiento_lead → HX74e936db4d3c50c0acc37a95e66f16e3
-//   abstorages_sara_cotizacion       → HXdfa3e32db45810b122cd6e285e6c8ae5
-//   abstorages_sara_venta_cerrada    → HX8e4037d3e3ee6464d663c3994a765e07
-// Las 3 quedaron APROBADAS pero HUÉRFANAS — el WABA se volvió a armar
-// después y Twilio siguió mostrando "Approved" aunque Meta ya no las
-// reconociera (error real en vivo: 63027 "Template does not exist for a
-// language and locale"). Recreadas y resometidas el 01-sep-2026, mismo
-// texto, pendientes de aprobación bajo el WABA actual:
-//   abstorages_sara_seguimiento_lead_2 → HXd4594e8561e81c02c8d8f59a635ffdf8
-//   abstorages_sara_cotizacion_2       → HXffc1ba05d5857ff12a3cf56aa9730adf (Marketing)
-//   abstorages_sara_venta_cerrada_2    → HXf43876d80588e3323741f01ec3f90f61
+// antes.
+//
+// Migrado de Twilio a Kapso (oct-2026) — Twilio queda fuera por completo,
+// mismo criterio que whatsappProactivo.js/difusionGeneral.js/difusionClientes.js.
+// Los ContentSid de Twilio de abajo quedan como referencia histórica (nunca
+// llegaron a tener una plantilla viva y aprobada bajo el WABA actual); los
+// nombres de plantilla reales de Kapso están en KAPSO_TEMPLATE_* más abajo.
 require('dotenv').config();
 const memory = require('./memory');
 const agentPause = require('./agentPause');
 const outboundRateLimit = require('./outboundRateLimit');
 const monitoringControl = require('./monitoringControl');
+const kapso = require('./kapso');
 
 // Tiene que coincidir EXACTO con el `phone` que arma el webhook de WhatsApp
 // (server-lite.js, From de Twilio) para que sea la misma sesión cuando la
@@ -43,20 +38,12 @@ function registrarEnMemoria(telefono, texto) {
   catch (e) { console.error('[saraProactivo] Error registrando en memoria:', e.message); }
 }
 
-const TWILIO_SID     = process.env.TWILIO_ACCOUNT_SID;
-const TWILIO_TOKEN   = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WA_FROM = (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, '');
-const WA_LIVE = !!(TWILIO_SID && TWILIO_TOKEN && TWILIO_WA_FROM);
-
-const CONTENT_SID_SEGUIMIENTO_LEAD = 'HXd4594e8561e81c02c8d8f59a635ffdf8';
-const CONTENT_SID_COTIZACION       = 'HXffc1ba05d5857ff12a3cf56aa9730adf';
-const CONTENT_SID_VENTA_CERRADA    = 'HXf43876d80588e3323741f01ec3f90f61';
-// ⚠️ PENDIENTE: esta plantilla todavía no existe en Twilio/Meta — hay que
-// crearla y someterla a aprobación igual que las 3 de arriba (mismo proceso,
-// ver encabezado del archivo) antes de que enviarUnidadConfirmada() mande
-// algo real. Mientras tanto, con WA_LIVE queda en modo STUB (solo log).
-// Variables sugeridas: '1' nombre, '2' folio, '3' proveedor, '4' precio.
-const CONTENT_SID_UNIDAD_CONFIRMADA = 'HX__PENDIENTE_DE_CREAR__';
+// Nombres de plantilla de Kapso/Meta — sometidas oct-2026, pendientes de
+// aprobación (ver comentario al fondo del archivo con los IDs). Mientras no
+// estén APPROVED, kapso.enviarPlantilla() hace fallback a stub (solo log).
+const CONTENT_SID_SEGUIMIENTO_LEAD   = process.env.KAPSO_TEMPLATE_SEGUIMIENTO_LEAD   || 'seguimiento_lead_maria_v2';
+const CONTENT_SID_VENTA_CERRADA      = process.env.KAPSO_TEMPLATE_VENTA_CERRADA      || 'venta_cerrada_maria_v3';
+const CONTENT_SID_UNIDAD_CONFIRMADA  = process.env.KAPSO_TEMPLATE_UNIDAD_CONFIRMADA  || 'unidad_confirmada_maria';
 
 async function enviarPlantilla(to, contentSid, variables) {
   if (agentPause.estaPausado('maria')) {
@@ -69,25 +56,7 @@ async function enviarPlantilla(to, contentSid, variables) {
     return { status: 'rate_limited', to };
   }
   monitoringControl.reportarContactoSaliente({ agente: 'maria', canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
-  if (!WA_LIVE) {
-    console.log(`[saraProactivo STUB] → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
-    return { status: 'stub', to };
-  }
-  const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
-  const body = new URLSearchParams({
-    From: `whatsapp:${TWILIO_WA_FROM}`,
-    To:   `whatsapp:${to.replace(/^whatsapp:/, '')}`,
-    ContentSid: contentSid,
-    ContentVariables: JSON.stringify(variables),
-  });
-  const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${auth}` },
-    body,
-  });
-  const resp = await r.text();
-  if (!r.ok) throw new Error(`Twilio ${r.status}: ${resp.slice(0, 300)}`);
-  return JSON.parse(resp);
+  return kapso.enviarPlantilla(to, 'maria', contentSid, variables);
 }
 
 function telefonoValido(t) {
@@ -97,23 +66,8 @@ function telefonoValido(t) {
 async function enviarSeguimientoLead(telefono, nombre, resumenSolicitud) {
   if (!telefonoValido(telefono)) return null;
   console.log(`[saraProactivo] Seguimiento de lead → ${telefono}`);
-  const resumen = resumenSolicitud || 'tu solicitud de flete';
-  const resultado = await enviarPlantilla(telefono, CONTENT_SID_SEGUIMIENTO_LEAD, {
-    '1': nombre || 'ahí', '2': resumen,
-  });
-  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES, te doy seguimiento a ${resumen}.`);
-  return resultado;
-}
-
-async function enviarCotizacion(telefono, nombre, ruta, precio) {
-  if (!telefonoValido(telefono)) return null;
-  console.log(`[saraProactivo] Cotización → ${telefono}`);
-  const r = ruta || 'tu ruta';
-  const p = precio || 'consulta el detalle con María';
-  const resultado = await enviarPlantilla(telefono, CONTENT_SID_COTIZACION, {
-    '1': nombre || 'ahí', '2': r, '3': p,
-  });
-  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES. Cotización para ${r}: ${p}.`);
+  const resultado = await enviarPlantilla(telefono, CONTENT_SID_SEGUIMIENTO_LEAD, { '1': nombre || 'ahí' });
+  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES. ¿Pudiste revisar lo que platicamos sobre tu ruta?`);
   return resultado;
 }
 
@@ -121,17 +75,16 @@ async function enviarCotizacion(telefono, nombre, ruta, precio) {
 // avisa al cliente y le pregunta si lo sigue necesitando con esa urgencia.
 // Si el cliente contesta que sí, MARÍA emite CONFIRMAR_UNIDAD_URGENTE y el
 // backend cierra automático con ese proveedor (ver sofiaOperacion.js).
+// NUNCA incluye el precio/tarifa pactada con el transportista — guardrail
+// anti-fuga de precios (pedido explícito del usuario, 19-oct-2026): ese dato
+// jamás llega al cliente por este ni ningún otro canal, el parámetro
+// `precio` se recibe solo para log interno, no se usa en el texto de salida.
 async function enviarUnidadConfirmada(telefono, nombre, folio, proveedorNombre, precio) {
   if (!telefonoValido(telefono)) return null;
-  if (CONTENT_SID_UNIDAD_CONFIRMADA.includes('PENDIENTE')) {
-    console.warn(`[saraProactivo] enviarUnidadConfirmada: plantilla aún no creada en Twilio/Meta — no se manda nada a ${telefono} (folio ${folio})`);
-    return { status: 'sin_plantilla', to: telefono };
-  }
-  console.log(`[saraProactivo] Unidad confirmada → ${telefono} — folio ${folio}`);
-  const p = precio ? `$${Number(precio).toLocaleString('es-MX')} MXN` : 'tarifa pactada';
-  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES. Ya tenemos unidad confirmada para tu folio ${folio} con ${proveedorNombre || 'un transportista'} (${p}). ¿La sigues necesitando?`);
+  console.log(`[saraProactivo] Unidad confirmada → ${telefono} — folio ${folio} (tarifa interna: ${precio || 'n/d'}, nunca se le manda al cliente)`);
+  registrarEnMemoria(telefono, `Hola ${nombre || ''}, soy María de ABSTORAGES. Ya tenemos unidad confirmada para tu folio ${folio}. ¿La sigues necesitando?`);
   return enviarPlantilla(telefono, CONTENT_SID_UNIDAD_CONFIRMADA, {
-    '1': nombre || 'ahí', '2': folio || '—', '3': proveedorNombre || 'nuestro transportista', '4': p,
+    '1': nombre || 'ahí', '2': folio || '—',
   });
 }
 
@@ -145,4 +98,4 @@ async function enviarConfirmacionVenta(telefono, nombre, folio) {
   });
 }
 
-module.exports = { enviarSeguimientoLead, enviarCotizacion, enviarConfirmacionVenta, enviarUnidadConfirmada, normalizarE164 };
+module.exports = { enviarSeguimientoLead, enviarConfirmacionVenta, enviarUnidadConfirmada, normalizarE164, enviarPlantilla, registrarEnMemoria };

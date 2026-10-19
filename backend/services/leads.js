@@ -132,6 +132,16 @@ function marcarSeguimientoEnviado(id) {
   scheduleSave();
 }
 
+// Estado de la cadencia de seguimiento de 4 pasos (día 2/5/10/20) — ver
+// cadenciaSeguimiento.js. Cada paso se marca una sola vez por lead, para
+// nunca repetirlo aunque el barrido corra de nuevo.
+function marcarPasoCadencia(id, paso) {
+  const entry = cache.find(l => l.id === id);
+  if (!entry) return;
+  entry.cadencia = { ...(entry.cadencia || {}), [paso]: true };
+  scheduleSave();
+}
+
 async function getById(id) {
   if (pool) {
     try {
@@ -267,4 +277,4 @@ function extractFromText(text, sessionId, extras = {}) {
                precio_cotizado: precio, resumen, sessionId, ...extras });
 }
 
-module.exports = { add, getById, list, stats, exportCsv, extractFromText, marcarSeguimientoEnviado };
+module.exports = { add, getById, list, stats, exportCsv, extractFromText, marcarSeguimientoEnviado, marcarPasoCadencia };
