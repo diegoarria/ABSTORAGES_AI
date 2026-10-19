@@ -282,6 +282,7 @@ async function prepararTextoWA(text, to) {
     .replace(/RECLAMO_PAGO\s*:[\s\S]*$/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA\s*:[\s\S]*$/gi, '')
     .replace(/DISPONIBILIDAD_RUTA\s*:[\s\S]*$/gi, '')
+    .replace(/DIFUSION_RUTA\s*:[\s\S]*$/gi, '')
     .replace(/PROVEEDOR_NUEVO\s*:[\s\S]*$/gi, '')
     .replace(/CHECKLIST_CARGA\s*:[\s\S]*$/gi, '')
     .replace(/REVISION_PENDIENTE\s*:[\s\S]*$/gi, '')
@@ -787,6 +788,21 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       }
     }
 
+    // Cualquiera del equipo (número verificado) pide difusión para una ruta
+    // específica — pedido explícito del usuario (19-oct-2026). Ver sofia-prompt.js.
+    if (agente === 'sofia' && personaEquipo) {
+      const drm = respuesta.match(/DIFUSION_RUTA\s*:\s*(\{[^\n]+\})/i);
+      if (drm) {
+        let d = {}; try { d = JSON.parse(drm[1]); } catch {}
+        if (d.origen && d.destino) {
+          difusionGeneral.dispararPorRuta(d).then(r => {
+            const msg = r?.resumen || (r?.ok ? `Difusión ruta ${d.origen} → ${d.destino}: ${r.enviados || 0} enviados.` : `No se pudo mandar la difusión de ${d.origen} → ${d.destino} (${r?.motivo || 'error'}).`);
+            sendWhatsApp(phone, msg, agente).catch(() => {});
+          }).catch(e => console.error('[DIFUSION_RUTA]', e.message));
+        }
+      }
+    }
+
     // El cliente le confirmó a SARA que sigue necesitando la unidad con
     // urgencia (tras el aviso de "ya tenemos unidad confirmada, ¿la sigues
     // necesitando?") — se cierra automático con el proveedor recomendado.
@@ -1156,6 +1172,19 @@ async function manejarMensajeKapso(phone, texto) {
   if (personaEquipo) {
     const dm = respuesta.match(/DETENER_BUSQUEDA\s*:\s*(\{[^\n]+\})/i);
     if (dm) { let d = {}; try { d = JSON.parse(dm[1]); } catch {} if (d.folio) sofiaOperacion.detenerBusquedaPorEquipo(String(d.folio).toUpperCase(), personaEquipo.nombre); }
+
+    // Cualquiera del equipo (número verificado) pide difusión para una ruta
+    // específica — pedido explícito del usuario (19-oct-2026). Ver sofia-prompt.js.
+    const drm = respuesta.match(/DIFUSION_RUTA\s*:\s*(\{[^\n]+\})/i);
+    if (drm) {
+      let d = {}; try { d = JSON.parse(drm[1]); } catch {}
+      if (d.origen && d.destino) {
+        difusionGeneral.dispararPorRuta(d).then(r => {
+          const msg = r?.resumen || (r?.ok ? `Difusión ruta ${d.origen} → ${d.destino}: ${r.enviados || 0} enviados.` : `No se pudo mandar la difusión de ${d.origen} → ${d.destino} (${r?.motivo || 'error'}).`);
+          sendWhatsAppKapso(phone, msg).catch(() => {});
+        }).catch(e => console.error('[DIFUSION_RUTA]', e.message));
+      }
+    }
   }
 
   if (!personaEquipo) {
@@ -4467,7 +4496,7 @@ app.get('/api/gps/stream', (req, res) => {
 // ── Filtro de tokens de control (LEAD_DATA/NUEVA_ORDEN/CERRAR_CHAT/ESCALAR_HUMANO) ─
 // Estos tokens son solo para que el backend los parsee — JAMÁS deben llegar al
 // cliente final, ni en WhatsApp ni en el chat del portal/widget.
-const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'DISPONIBILIDAD_RUTA:', 'PROVEEDOR_NUEVO:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'DETENER_BUSQUEDA:', 'TARIFA_MENCIONADA:', 'SUGERENCIA_PROVEEDOR:', 'CONFIRMAR_UNIDAD_URGENTE:'];
+const CONTROL_MARKERS = ['LEAD_DATA:', 'NUEVA_ORDEN:', 'CERRAR_CHAT', 'ESCALAR_HUMANO', 'UPSERT_CONTACTO:', 'ALERTA_CRITICA:', 'ESTATUS_SEGUIMIENTO:', 'RESULTADO_CONTACTO:', 'OFERTA_PROVEEDOR:', 'ESTATUS_UNIDAD:', 'OPERADOR_UNIDAD:', 'RECLAMO_PAGO:', 'DISPONIBILIDAD_FUTURA:', 'DISPONIBILIDAD_RUTA:', 'DIFUSION_RUTA:', 'PROVEEDOR_NUEVO:', 'CHECKLIST_CARGA:', 'REVISION_PENDIENTE:', 'DETENER_BUSQUEDA:', 'TARIFA_MENCIONADA:', 'SUGERENCIA_PROVEEDOR:', 'CONFIRMAR_UNIDAD_URGENTE:'];
 const CONTROL_MARKER_MAXLEN = Math.max(...CONTROL_MARKERS.map(m => m.length));
 
 // Limpia texto YA COMPLETO (no streaming) — usado para WhatsApp.
@@ -4485,6 +4514,7 @@ function limpiarControlParaCliente(texto) {
     .replace(/RECLAMO_PAGO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DISPONIBILIDAD_FUTURA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/DISPONIBILIDAD_RUTA:\s*\{[\s\S]*?\}/gi, '')
+    .replace(/DIFUSION_RUTA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/PROVEEDOR_NUEVO:\s*\{[\s\S]*?\}/gi, '')
     .replace(/CHECKLIST_CARGA:\s*\{[\s\S]*?\}/gi, '')
     .replace(/REVISION_PENDIENTE:\s*\{[\s\S]*?\}/gi, '')

@@ -91,6 +91,52 @@ async function proveedoresTop50Rutas() {
   }).map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono }));
 }
 
+// ── Difusión ad-hoc para UNA ruta específica, pedida por el equipo por
+// WhatsApp (pedido explícito del usuario, 19-oct-2026) — "necesito difusión
+// para la ruta X - Y". A diferencia de la difusión general (Top 50, solo
+// Diego), esta la puede pedir cualquiera del equipo verificado, y el universo
+// de proveedores se arma al vuelo según la ruta pedida, no de una lista fija.
+function normalizarTexto(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+async function proveedoresPorRuta(origen, destino) {
+  const o = normalizarTexto(origen), d = normalizarTexto(destino);
+  if (!o || !d) return [];
+  const bd = await contactos.listarPorAgente('SOFIA', { tipo: 'proveedor' });
+  return bd.filter(c => {
+    if (!c.telefono || /Estatus en catálogo: (Baja|Suspendido)/i.test(c.notas || '')) return false;
+    const rutas = String(c.rutas || '').split(/[,;\n]+/).map(normalizarTexto).filter(Boolean);
+    return rutas.some(r => r.includes(o) && r.includes(d));
+  }).map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono }));
+}
+
+// Manda la plantilla de disponibilidad (ya aprobada: disponibilidad_unidad_sofia)
+// a cada proveedor que cubre la ruta pedida, uno tras otro.
+async function dispararPorRuta({ origen, destino, fecha, tipo_carga }) {
+  if (agentPause.estaPausado('sofia')) return { ok: false, motivo: 'pausado' };
+  let lista;
+  try { lista = await proveedoresPorRuta(origen, destino); }
+  catch (e) { console.error('[difusionGeneral] Error armando lista por ruta:', e.message); return { ok: false, motivo: 'error_lista' }; }
+  if (!lista.length) return { ok: true, enviados: 0, total: 0 };
+
+  feed({ tipo: 'DIFUSION_RUTA_EQUIPO', mensaje: `Difusión por ruta ${origen} → ${destino} — empezando con ${lista.length} proveedores` });
+
+  let enviados = 0, fallidos = 0;
+  for (const p of lista) {
+    try {
+      const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_carga, fecha_carga: fecha });
+      if (r?.status === 'rate_limited' || r?.status === 'paused') break;
+      enviados++;
+    } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }
+    await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
+  }
+  const resumen = `Difusión ruta ${origen} → ${destino}: ${enviados} enviados de ${lista.length}${fallidos ? ` · ${fallidos} con error` : ''}.`;
+  feed({ tipo: 'DIFUSION_RUTA_EQUIPO', mensaje: resumen });
+  console.log(`[difusionGeneral] ${resumen}`);
+  return { ok: true, enviados, total: lista.length, fallidos, resumen };
+}
+
 const titulo = s => String(s || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
 const feed = e => actividadBus.emitir({ agente: 'SOFIA', ...e });
 
@@ -168,4 +214,4 @@ function iniciar(pushActividad) {
   console.log(`[difusionGeneral] Activo — proveedores del Top 50 de rutas, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
-module.exports = { iniciar, correrSiToca, proveedoresTop50Rutas, dispararManual };
+module.exports = { iniciar, correrSiToca, proveedoresTop50Rutas, dispararManual, dispararPorRuta, proveedoresPorRuta };
