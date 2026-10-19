@@ -57,8 +57,8 @@
     }
     #_maria_wrap iframe { width: 100%; height: 100%; border: none; display: block; }
     @media (max-width: 500px) {
-      #_maria_wrap { width: calc(100vw - 16px); height: 68vh; bottom: 0; right: 0;
-        border-radius: 16px 16px 0 0; }
+      #_maria_wrap { width: calc(100vw - 24px); height: 58vh; bottom: 14px; right: 12px;
+        border-radius: 16px; }
       #_maria_btn  { bottom: 16px; right: 16px; }
     }
   `;
