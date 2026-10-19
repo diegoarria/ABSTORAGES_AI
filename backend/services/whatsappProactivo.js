@@ -1,26 +1,19 @@
-// ── Mensajes proactivos de SARA/SOFIA por WhatsApp (Twilio, plantilla) ──────
+// ── Mensajes proactivos de MARÍA/SOFIA por WhatsApp (Kapso, plantilla) ──────
 // Mismo motivo que saraProactivo.js/alertasStaff.js: fuera de la ventana de
 // 24h, WhatsApp Business exige plantilla aprobada por Meta — no se puede
-// mandar texto libre inventado en el momento. Estas 3 son nuevas (pedidas
-// 20-ago-2026), pendientes de aprobación — los ContentSid llegan por
-// variable de entorno; mientras no estén configurados, cae a modo stub y
-// no intenta mandar nada.
+// mandar texto libre inventado en el momento.
 //
-// NOA no tiene número de WhatsApp de Twilio propio todavía — para lo
-// equivalente (avisar al equipo, dar estatus) sigue usando llamadas
+// Migrado de Twilio a Kapso (oct-2026) — Twilio queda fuera por completo,
+// todo el envío de plantillas pasa por kapso.enviarPlantilla(). Los
+// identificadores que antes eran ContentSid de Twilio ahora son `name` de
+// plantilla de Kapso/Meta (ver KAPSO_TEMPLATE_* abajo); el formato de
+// `variables` ({'1':valor,...}) se mantuvo igual a propósito para no tener
+// que tocar ningún call site de este módulo.
+//
+// NOA no tiene número de WhatsApp propio todavía — para lo equivalente
+// (avisar al equipo, dar estatus) sigue usando llamadas
 // (alertasStaff.llamarATodos / vapi.llamarStatusChofer·Cliente), no pasa
 // por aquí.
-//
-// Plantillas — texto exacto acordado con el usuario, pendientes de someter
-// a aprobación de Meta vía Twilio Content API:
-//   1. Disponibilidad de unidad (SOFIA → proveedores compatibles):
-//      "Hola {{1}}, soy SOFIA de ABSTORAGES. Buscamos unidad {{2}} para la
-//       ruta {{3}} → {{4}}, salida {{5}}. ¿Tienes disponibilidad?
-//       Contáctanos por este medio."
-//   2. Aviso al equipo (SARA/SOFIA → 1 o varios del staff):
-//      "Aviso de {{1}}: {{2}}"
-//   3. Estatus de folio (SARA/SOFIA → cliente o proveedor):
-//      "Hola {{1}}, este es un estatus de tu envío. Folio {{2}}: {{3}}."
 require('dotenv').config();
 const STAFF = require('../data/staff-contacts.json');
 const memory = require('./memory');
@@ -29,6 +22,7 @@ const outboundRateLimit = require('./outboundRateLimit');
 const fs = require('fs');
 const path = require('path');
 const monitoringControl = require('./monitoringControl');
+const kapso = require('./kapso');
 
 // Normaliza a E.164 (+52XXXXXXXXXX) — tiene que coincidir EXACTO con el
 // `phone` que arma el webhook de WhatsApp (server-lite.js, From de Twilio)
@@ -56,21 +50,15 @@ function registrarEnMemoria(agente, telefono, texto) {
   catch (e) { console.error('[whatsappProactivo] Error registrando en memoria:', e.message); }
 }
 
-const TWILIO_SID   = process.env.TWILIO_ACCOUNT_SID;
-const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WA_FROM = {
-  maria: (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, ''),
-  sara:  (process.env.TWILIO_WHATSAPP_NUMBER_MARIA || process.env.TWILIO_WHATSAPP_NUMBER_SARA || '').replace(/^whatsapp:/, ''), // alias heredado (contactos con agente_asignado 'SARA')
-  sofia: (process.env.TWILIO_WHATSAPP_NUMBER_SOFIA || '').replace(/^whatsapp:/, ''),
-};
-
-// Pendientes de aprobación — se llenan en Railway en cuanto Meta las apruebe.
-const CONTENT_SID_DISPONIBILIDAD = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD || null;
-const CONTENT_SID_AVISO_EQUIPO   = process.env.TWILIO_CONTENT_SID_AVISO_EQUIPO   || null;
-const CONTENT_SID_ESTATUS_FOLIO  = process.env.TWILIO_CONTENT_SID_ESTATUS_FOLIO  || null;
-const CONTENT_SID_RECLAMO_PAGO   = process.env.TWILIO_CONTENT_SID_RECLAMO_PAGO   || null;
-const CONTENT_SID_SEGUIMIENTO_DISP = process.env.TWILIO_CONTENT_SID_SEGUIMIENTO_DISPONIBILIDAD || null;
-const CONTENT_SID_SEGUIMIENTO_REVISION = process.env.TWILIO_CONTENT_SID_SEGUIMIENTO_REVISION || null;
+// Nombres de plantilla de Kapso/Meta — las dos primeras ya están APPROVED
+// (sometidas y verificadas oct-2026), el resto cae a stub hasta que se
+// sometan y Meta las apruebe (mismo comportamiento que antes con Twilio).
+const CONTENT_SID_DISPONIBILIDAD = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD || 'disponibilidad_unidad_sofia';
+const CONTENT_SID_ESTATUS_FOLIO  = process.env.KAPSO_TEMPLATE_ESTATUS_FOLIO  || 'estatus_folio_sofia';
+const CONTENT_SID_AVISO_EQUIPO   = process.env.KAPSO_TEMPLATE_AVISO_EQUIPO   || null;
+const CONTENT_SID_RECLAMO_PAGO   = process.env.KAPSO_TEMPLATE_RECLAMO_PAGO   || null;
+const CONTENT_SID_SEGUIMIENTO_DISP = process.env.KAPSO_TEMPLATE_SEGUIMIENTO_DISPONIBILIDAD || null;
+const CONTENT_SID_SEGUIMIENTO_REVISION = process.env.KAPSO_TEMPLATE_SEGUIMIENTO_REVISION || null;
 
 function telefonoValido(t) {
   return t && t !== '—' && /\d{8,}/.test(String(t));
@@ -149,29 +137,9 @@ async function enviarPlantilla(agente, to, contentSid, variables) {
     return { status: 'rate_limited', to };
   }
   monitoringControl.reportarContactoSaliente({ agente, canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
-  const from = TWILIO_WA_FROM[agente];
-  const live = !!(TWILIO_SID && TWILIO_TOKEN && from);
-  if (!live) {
-    console.log(`[whatsappProactivo STUB] ${agente} → ${to}: ${contentSid} ${JSON.stringify(variables)}`);
-    return { status: 'stub', to };
-  }
-  marcarComoEnviada(agente, to, contentSid); // se marca ANTES del fetch — dos envíos casi simultáneos no se cuelan los dos
+  marcarComoEnviada(agente, to, contentSid); // se marca ANTES del envío — dos envíos casi simultáneos no se cuelan los dos
   marcarContactadoHoy(agente, to);
-  const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
-  const body = new URLSearchParams({
-    From: `whatsapp:${from}`,
-    To:   `whatsapp:${to.replace(/^whatsapp:/, '')}`,
-    ContentSid: contentSid,
-    ContentVariables: JSON.stringify(variables),
-  });
-  const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${auth}` },
-    body,
-  });
-  const resp = await r.text();
-  if (!r.ok) throw new Error(`Twilio ${r.status}: ${resp.slice(0, 300)}`);
-  return JSON.parse(resp);
+  return kapso.enviarPlantilla(to, agente, contentSid, variables);
 }
 
 // ── 1. Disponibilidad de unidad — SOFIA a proveedores compatibles ─────────
@@ -297,16 +265,8 @@ async function enviarPlantillaSinCandado(agente, to, contentSid, variables) {
   const limite = outboundRateLimit.registrarYVerificar(agente);
   if (!limite.permitido) return { status: 'rate_limited', to };
   monitoringControl.reportarContactoSaliente({ agente, canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
-  const from = TWILIO_WA_FROM[agente];
-  const live = !!(TWILIO_SID && TWILIO_TOKEN && from);
-  if (!live) { console.log(`[whatsappProactivo STUB] ${agente} → ${to}: ${contentSid} ${JSON.stringify(variables)}`); return { status: 'stub', to }; }
   marcarContactadoHoy(agente, to);
-  const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
-  const body = new URLSearchParams({ From: `whatsapp:${from}`, To: `whatsapp:${to.replace(/^whatsapp:/, '')}`, ContentSid: contentSid, ContentVariables: JSON.stringify(variables) });
-  const r2 = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: `Basic ${auth}` }, body });
-  const resp = await r2.text();
-  if (!r2.ok) throw new Error(`Twilio ${r2.status}: ${resp.slice(0, 300)}`);
-  return JSON.parse(resp);
+  return kapso.enviarPlantilla(to, agente, contentSid, variables);
 }
 
 module.exports = { enviarPlantillaSinCandado, yaSeEnvio, marcarComoEnviada, enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };

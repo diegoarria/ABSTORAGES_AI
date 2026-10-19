@@ -26,26 +26,25 @@ const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
 // 4 variaciones de texto en vez de una sola plantilla fija — pedido explícito
 // del usuario (05-oct-2026): si siempre es el mismo mensaje, se nota que es un
-// bot y se pierde confianza. Se rota una por proveedor (round-robin), cada una
-// con su propio Content SID aprobado por Meta por separado. Solo se usan las
-// que ya tengan SID configurado — las que falten simplemente no entran a la
-// rotación todavía.
+// bot y se pierde confianza. Se rota una por proveedor (round-robin). Migrado
+// de Twilio a plantillas de Kapso/Meta (oct-2026) — disponibilidad_general_sofia
+// (v1) ya está APPROVED; v2/v3/v4 quedan sometidas a revisión de Meta y entran
+// a la rotación solas en cuanto Meta las apruebe (KAPSO_LIVE lo resuelve el
+// propio kapso.enviarPlantilla intentándolas; si una no está aprobada aún,
+// Meta la rechaza y ese envío puntual falla, pero no tumba la difusión).
 const TEXTO_VARIANTE = [
   'Hola {nombre}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.',
   'Buenos días {nombre}, soy SOFIA de ABSTORAGES. ¿Tendrás unidad disponible hoy? Si tienes algo libre, cuéntame en qué ruta y qué tipo de caja, para avisarte en cuanto tengamos algo para ti.',
-  '{nombre}, buen día — habla SOFIA de ABSTORAGES. ¿Hoy cuentas con unidad disponible? Si es así, dime la ruta y el tipo de caja para tenerte en mente.',
+  'Hola {nombre}, buen día — habla SOFIA de ABSTORAGES. ¿Hoy cuentas con unidad disponible? Si es así, dime la ruta y el tipo de caja para tenerte en mente.',
   'Hola {nombre}, ¿qué tal? Soy SOFIA de ABSTORAGES Logistics. Te escribo para ver si tienes unidad libre hoy — compárteme ruta y tipo de caja para tomarte en cuenta en lo que tengamos disponible.',
 ];
-const VARIANTES = [1, 2, 3, 4]
-  .map(n => ({
-    sid: process.env[`TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL_${n}`] || (n === 1 ? process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_GENERAL : null) || null,
-    texto: TEXTO_VARIANTE[n - 1],
-  }))
-  .filter(v => v.sid);
-// Mientras ninguna plantilla dedicada esté aprobada, cae a la de disponibilidad
-// que ya existe y está aprobada — con valores genéricos, porque esta difusión
-// no es de una ruta ni una carga específica.
-const CONTENT_SID_FALLBACK = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD || null;
+const NOMBRES_PLANTILLA = ['disponibilidad_general_sofia', 'disponibilidad_general_sofia_v2', 'disponibilidad_general_sofia_v3', 'disponibilidad_general_sofia_v4'];
+const VARIANTES = [0, 1, 2, 3].map(i => ({
+  sid: process.env[`KAPSO_TEMPLATE_DISPONIBILIDAD_GENERAL_${i + 1}`] || NOMBRES_PLANTILLA[i],
+  texto: TEXTO_VARIANTE[i],
+}));
+// disponibilidad_general_sofia (v1) siempre está aprobada — nunca se queda sin plantilla.
+const CONTENT_SID_FALLBACK = NOMBRES_PLANTILLA[0];
 const CHEQUEO_MS = 15 * 60 * 1000;
 // Ventana de tolerancia tras la hora programada — solo dentro de este rango se
 // considera "toca mandar hoy". Sin esto, prender la función (o que el server
@@ -95,22 +94,17 @@ async function proveedoresTop50Rutas() {
 const titulo = s => String(s || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
 const feed = e => actividadBus.emitir({ agente: 'SOFIA', ...e });
 
-async function correrSiToca(pushActividad) {
-  if (!HABILITADO) return;
-  if (agentPause.estaPausado('sofia')) return;
+// Arma la lista y manda, uno por uno — usado tanto por la corrida programada
+// (correrSiToca) como por el disparo manual de Diego por WhatsApp
+// (dispararManual, ver server-lite.js: "manda/lanza la difusión general").
+async function ejecutarDifusion() {
+  if (agentPause.estaPausado('sofia')) return { ok: false, motivo: 'pausado' };
   const usaVariantes = VARIANTES.length > 0;
-  if (!usaVariantes && !CONTENT_SID_FALLBACK) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada (ni variantes ni la de siempre) — se omite'); return; }
-
-  const { fecha, minutosDelDia } = horaYFechaMTY();
-  const inicioMin = HORA * 60 + MINUTO;
-  if (minutosDelDia < inicioMin || minutosDelDia > inicioMin + VENTANA_MIN) return;
-  if (ultimaFechaEnviada === fecha) return;
-  ultimaFechaEnviada = fecha; // se marca antes de correr — un fallo a medias no la reintenta en bucle
-  guardarUltimaFecha(fecha);
+  if (!usaVariantes && !CONTENT_SID_FALLBACK) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada — se omite'); return { ok: false, motivo: 'sin_plantilla' }; }
 
   let lista;
-  try { lista = await proveedoresTop50Rutas(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return; }
-  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: ningún proveedor con teléfono cubre alguna de las 50 rutas más importantes hoy' }); return; }
+  try { lista = await proveedoresTop50Rutas(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return { ok: false, motivo: 'error_lista' }; }
+  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: ningún proveedor con teléfono cubre alguna de las 50 rutas más importantes hoy' }); return { ok: true, enviados: 0, total: 0 }; }
 
   feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad (Top 50 rutas) — empezando con ${lista.length} proveedores, uno tras otro` });
 
@@ -132,15 +126,39 @@ async function correrSiToca(pushActividad) {
         ? variante.texto.replace('{nombre}', titulo(p.nombre))
         : `Hola ${titulo(p.nombre)}, buscamos unidad para cualquier ruta hoy. ¿Tienes disponibilidad? Cuéntame qué unidad y para dónde.`;
       whatsappProactivo.registrarEnMemoria?.('sofia', p.telefono, textoEnviado);
-      contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: 'Difusión general de disponibilidad (ronda diaria 5:45 AM)', canal: 'whatsapp-plantilla' }).catch(() => {});
+      contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: 'Difusión general de disponibilidad', canal: 'whatsapp-plantilla' }).catch(() => {});
     } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }
 
-  const resumen = `Difusión general del día: ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
+  const resumen = `Difusión general: ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
   feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: resumen });
   notifier.notificarAlerta({ title: 'SOFIA — Difusión general de disponibilidad', body: resumen, tipo: 'DISPONIBILIDAD_DIARIA' }).catch(() => {});
   console.log(`[difusionGeneral] ${resumen}`);
+  return { ok: true, enviados, total: lista.length, sinCredito, fallidos, resumen };
+}
+
+async function correrSiToca(pushActividad) {
+  if (!HABILITADO) return;
+  const { fecha, minutosDelDia } = horaYFechaMTY();
+  const inicioMin = HORA * 60 + MINUTO;
+  if (minutosDelDia < inicioMin || minutosDelDia > inicioMin + VENTANA_MIN) return;
+  if (ultimaFechaEnviada === fecha) return;
+  ultimaFechaEnviada = fecha; // se marca antes de correr — un fallo a medias no la reintenta en bucle
+  guardarUltimaFecha(fecha);
+  await ejecutarDifusion();
+}
+
+// Disparo manual — pedido explícito del usuario (19-oct-2026): si Diego le
+// escribe a SOFIA por WhatsApp "manda/lanza la difusión general", el handler
+// de Kapso en server-lite.js llama esto (tras pedir confirmación con el
+// número real de proveedores). Marca el día como ya corrido, para que la
+// corrida programada de las 5:30 AM no la repita si cae el mismo día.
+async function dispararManual() {
+  const { fecha } = horaYFechaMTY();
+  ultimaFechaEnviada = fecha;
+  guardarUltimaFecha(fecha);
+  return ejecutarDifusion();
 }
 
 function iniciar(pushActividad) {
@@ -150,4 +168,4 @@ function iniciar(pushActividad) {
   console.log(`[difusionGeneral] Activo — proveedores del Top 50 de rutas, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
-module.exports = { iniciar, correrSiToca, proveedoresTop50Rutas };
+module.exports = { iniciar, correrSiToca, proveedoresTop50Rutas, dispararManual };

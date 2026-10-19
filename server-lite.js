@@ -974,6 +974,52 @@ app.get('/webhook/whatsapp', (req, res) => {
   }
 });
 
+// ─── Disparo de difusión por WhatsApp — solo Diego ──────────────────────────
+// Pedido explícito del usuario (19-oct-2026): si Diego le escribe a SOFIA o a
+// María por WhatsApp pidiendo explícitamente que mande/lance la difusión
+// (general a proveedores, o a clientes), ella pide confirmación con el
+// número real de destinatarios y, si Diego confirma, la dispara ahí mismo —
+// sin que Diego tenga que entrar al portal. Gateado en código (no en el
+// prompt): solo corre si `personaEquipo?.nombre === 'Diego'`, que ya viene
+// verificado del lado del servidor por el número — nunca por lo que alguien
+// escriba. Detección de la orden y de la confirmación es por regex
+// determinístico, no por criterio del modelo, a propósito: es un envío
+// masivo real a gente real, no se presta a interpretación.
+const confirmacionDifusionPendiente = new Map(); // 'sofia'|'maria' -> { ts }
+const TRIGGER_DIFUSION  = /\b(manda|m[aá]ndale|lanza|env[ií]a|dispara)\b[^.!?\n]{0,30}\b(difusi[oó]n|campa[ñn]a)\b/i;
+// Lookahead en vez de \b al final: \b en JS no reconoce vocales acentuadas
+// como carácter de palabra, así que "sí" u "órale" solas nunca hacían match
+// con un \b pegado detrás.
+const CONFIRMA_DIFUSION = /^\s*(s[ií]|sip|simon|sim[oó]n|confirmo|confirmado|dale|adelante|va|hazlo|correcto|ok|[oó]rale)(?=[\s,.!?]|$)/i;
+const CANCELA_DIFUSION  = /^\s*(no|cancela(r)?|mejor no|det[eé]n(te)?|para(le)?|olv[ií]dalo)(?=[\s,.!?]|$)/i;
+const VENTANA_CONFIRMACION_DIFUSION_MS = 10 * 60 * 1000; // 10 min — después expira sola
+
+async function manejarComandoDifusion(agente, texto) {
+  const mod = agente === 'sofia' ? difusionGeneral : difusionClientes;
+  const pendiente = confirmacionDifusionPendiente.get(agente);
+  if (pendiente && (Date.now() - pendiente.ts) < VENTANA_CONFIRMACION_DIFUSION_MS) {
+    if (CONFIRMA_DIFUSION.test(texto)) {
+      confirmacionDifusionPendiente.delete(agente);
+      const r = await mod.dispararManual().catch(e => ({ ok: false, motivo: e.message }));
+      if (!r?.ok) return `No pude mandarla: ${r?.motivo || 'error desconocido'}.`;
+      return r.resumen || `Listo, mandada a ${r.enviados} de ${r.total}.`;
+    }
+    if (CANCELA_DIFUSION.test(texto)) { confirmacionDifusionPendiente.delete(agente); return 'Ok, no la mando.'; }
+    return null; // ni confirmó ni canceló — se deja pendiente y el chat sigue normal
+  }
+  if (TRIGGER_DIFUSION.test(texto)) {
+    let total = 0;
+    try {
+      const lista = agente === 'sofia' ? await mod.proveedoresTop50Rutas() : await mod.clientesConocidos();
+      total = lista.length;
+    } catch (e) { console.error('[difusion] Error contando destinatarios:', e.message); }
+    confirmacionDifusionPendiente.set(agente, { ts: Date.now() });
+    const quienes = agente === 'sofia' ? 'proveedores del Top 50 de rutas' : 'clientes conocidos con teléfono';
+    return `¿Confirmas que mando la difusión a los ${total} ${quienes}? Contesta "sí" para mandarla o "no" para cancelar.`;
+  }
+  return null;
+}
+
 // ─── WhatsApp de SOFIA vía Kapso (número +52 1 81 3590 9778) ────────────────
 // Mismo flujo que el webhook de Twilio (línea ~517) pero recortado para
 // SOFIA únicamente — este número no es de SARA ni de NOA, así que se omiten
@@ -996,6 +1042,17 @@ async function manejarMensajeKapso(phone, texto) {
   const tariffCtx = tariff.getContext();
   let systemPrompt = buildPrompt(AGENTE_KAPSO, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
   const personaEquipo = staffDirectory.buscarPorTelefono(phone);
+
+  if (personaEquipo?.nombre === 'Diego') {
+    const respuestaDifusion = await manejarComandoDifusion('sofia', texto).catch(e => { console.error('[difusion-manual]', e.message); return null; });
+    if (respuestaDifusion) {
+      memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', respuestaDifusion);
+      saveMessage(session, AGENTE_KAPSO, 'user', texto); saveMessage(session, AGENTE_KAPSO, 'assistant', respuestaDifusion);
+      await sendWhatsAppKapso(phone, respuestaDifusion);
+      return;
+    }
+  }
+
   systemPrompt += `\n\nHoy es ${new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeZone: 'America/Monterrey' }).format(new Date())} (hora de Monterrey). Fecha en formato AAAA-MM-DD: ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())}.`;
   if (personaEquipo) {
     systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);
@@ -1164,6 +1221,17 @@ async function manejarMensajeKapsoMaria(phone, texto) {
   const tariffCtx = tariff.getContext();
   let systemPrompt = buildPrompt(AGENTE_KAPSO_MARIA, contextBlock, tariffCtx) + '\n\n' + FORMATO_WHATSAPP;
   const personaEquipo = staffDirectory.buscarPorTelefono(phone);
+
+  if (personaEquipo?.nombre === 'Diego') {
+    const respuestaDifusion = await manejarComandoDifusion('maria', texto).catch(e => { console.error('[difusion-manual]', e.message); return null; });
+    if (respuestaDifusion) {
+      memory.addMessage(session, 'user', texto); memory.addMessage(session, 'assistant', respuestaDifusion);
+      saveMessage(session, AGENTE_KAPSO_MARIA, 'user', texto); saveMessage(session, AGENTE_KAPSO_MARIA, 'assistant', respuestaDifusion);
+      await sendWhatsAppKapso(phone, respuestaDifusion, AGENTE_KAPSO_MARIA);
+      return;
+    }
+  }
+
   systemPrompt += `\n\nHoy es ${new Intl.DateTimeFormat('es-MX', { dateStyle: 'full', timeZone: 'America/Monterrey' }).format(new Date())} (hora de Monterrey). Fecha en formato AAAA-MM-DD: ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())}.`;
   if (personaEquipo) {
     systemPrompt += staffDirectory.bloqueEquipoInterno(personaEquipo);

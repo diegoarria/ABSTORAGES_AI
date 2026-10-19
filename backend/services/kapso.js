@@ -36,6 +36,42 @@ function resolverAgente(phoneNumberId) {
   return entrada ? entrada[0] : null;
 }
 
+// Envía una plantilla aprobada por Meta (requerido para escribir primero a
+// alguien que no te ha escrito en las últimas 24h). `variables` es un objeto
+// {'1': valor, '2': valor, ...} — mismo formato que usaba Twilio ContentVariables,
+// para que ningún call site (whatsappProactivo.js) tuviera que cambiar al migrar
+// de Twilio a Kapso (oct-2026, Twilio queda fuera por completo).
+async function enviarPlantilla(to, agente, templateName, variables = {}, langCode = 'es_MX') {
+  const destino = String(to || '').replace(/\D/g, '');
+  if (!destino || !templateName) return null;
+  const phoneId = PHONE_IDS[agente] || (agente === 'sara' ? PHONE_IDS.maria : null);
+  if (!LIVE || !phoneId) {
+    console.log(`[kapso STUB] plantilla (${agente}) → ${destino}: ${templateName} ${JSON.stringify(variables)}`);
+    return { status: 'stub', to: destino };
+  }
+  const parametros = Object.keys(variables)
+    .map(Number).filter(n => Number.isInteger(n)).sort((a, b) => a - b)
+    .map(n => ({ type: 'text', text: String(variables[n]) }));
+  const r = await fetch(`${API_BASE}/meta/whatsapp/v24.0/${phoneId}/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': KAPSO_KEY },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: destino,
+      type: 'template',
+      template: {
+        name: templateName,
+        language: { code: langCode },
+        components: parametros.length ? [{ type: 'body', parameters: parametros }] : [],
+      },
+    }),
+  });
+  const resp = await r.text();
+  if (!r.ok) throw new Error(`Kapso ${r.status}: ${resp.slice(0, 300)}`);
+  return JSON.parse(resp);
+}
+
 async function enviarMensaje(to, texto, agente = 'sofia') {
   const destino = String(to || '').replace(/\D/g, '');
   if (!destino) return null;
@@ -74,4 +110,4 @@ function verificarFirma(rawBody, firmaHeader) {
   }
 }
 
-module.exports = { enviarMensaje, verificarFirma, resolverAgente, LIVE };
+module.exports = { enviarMensaje, enviarPlantilla, verificarFirma, resolverAgente, LIVE };

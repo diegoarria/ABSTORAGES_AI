@@ -29,12 +29,11 @@ const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.MARIA_DIFUSION_CLIENTES_PAUSA_M
 const VENTANA_MIN = Number(process.env.MARIA_DIFUSION_CLIENTES_VENTANA_MIN || process.env.SARA_DIFUSION_CLIENTES_VENTANA_MIN || 90);
 const CHEQUEO_MS = 15 * 60 * 1000;
 
-// Plantilla pendiente de crear y someter a aprobación en Twilio/Meta (mismo
-// proceso que las de saraProactivo.js) — texto sugerido:
-//   "Hola {{1}}, soy María de ABSTORAGES. Tenemos unidades disponibles para
-//    estos próximos días. Si requieres servicio de transporte, podemos
-//    atenderte — cuéntame qué ruta necesitas."
-const CONTENT_SID = process.env.TWILIO_CONTENT_SID_DISPONIBILIDAD_CLIENTES || null;
+// Plantilla "disponibilidad_clientes_maria" sometida a Meta vía Kapso
+// (oct-2026) — mientras Meta no la apruebe, cualquier intento de envío falla
+// individualmente (capturado por el try/catch del loop de abajo) y no tumba
+// la difusión; en cuanto quede APPROVED funciona sola, sin tocar código.
+const CONTENT_SID = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_CLIENTES || 'disponibilidad_clientes_maria';
 const TEXTO = 'Hola {nombre}, soy María de ABSTORAGES. Tenemos unidades disponibles para estos próximos días — si requieres servicio de transporte, podemos atenderte. ¿Qué ruta necesitas?';
 
 const ESTADO_FILE = path.join(__dirname, '../../data/difusion-clientes-estado.json');
@@ -63,24 +62,17 @@ async function clientesConocidos() {
 const titulo = s => String(s || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
 const feed = e => actividadBus.emitir({ agente: 'MARIA', ...e });
 
-async function correrSiToca() {
-  if (!HABILITADO) return;
-  if (agentPause.estaPausado('maria')) return;
-  if (!CONTENT_SID) { console.warn('[difusionClientes] Falta TWILIO_CONTENT_SID_DISPONIBILIDAD_CLIENTES — se omite'); return; }
-
-  const { fecha, minutosDelDia, diaSemana } = horaFechaDiaMTY();
-  if (diaSemana !== DIA_SEMANA) return;
-  const inicioMin = HORA * 60 + MINUTO;
-  if (minutosDelDia < inicioMin || minutosDelDia > inicioMin + VENTANA_MIN) return;
-  if (ultimaFechaEnviada === fecha) return;
-  ultimaFechaEnviada = fecha; // se marca antes de correr — un fallo a medias no la reintenta en bucle
-  guardarUltimaFecha(fecha);
+// Arma la lista y manda, uno por uno — usado tanto por la corrida programada
+// (correrSiToca) como por el disparo manual de Diego por WhatsApp
+// (dispararManual, ver server-lite.js: "manda/lanza la difusión a clientes").
+async function ejecutarDifusion() {
+  if (agentPause.estaPausado('maria')) return { ok: false, motivo: 'pausado' };
 
   let lista;
-  try { lista = await clientesConocidos(); } catch (e) { console.error('[difusionClientes] Error armando la lista:', e.message); return; }
-  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_CLIENTES', mensaje: 'Difusión semanal a clientes: no hay clientes con teléfono para mandarla hoy' }); return; }
+  try { lista = await clientesConocidos(); } catch (e) { console.error('[difusionClientes] Error armando la lista:', e.message); return { ok: false, motivo: 'error_lista' }; }
+  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_CLIENTES', mensaje: 'Difusión a clientes: no hay clientes con teléfono para mandarla' }); return { ok: true, enviados: 0, total: 0 }; }
 
-  feed({ tipo: 'DISPONIBILIDAD_CLIENTES', mensaje: `Difusión semanal de disponibilidad a clientes — empezando con ${lista.length} clientes, uno tras otro` });
+  feed({ tipo: 'DISPONIBILIDAD_CLIENTES', mensaje: `Difusión de disponibilidad a clientes — empezando con ${lista.length} clientes, uno tras otro` });
 
   let enviados = 0, sinCredito = 0, fallidos = 0;
   for (const c of lista) {
@@ -90,15 +82,40 @@ async function correrSiToca() {
       if (r?.status === 'paused') break;
       enviados++;
       whatsappProactivo.registrarEnMemoria?.('maria', c.telefono, TEXTO.replace('{nombre}', titulo(c.nombre_completo)));
-      contactos.upsertContacto({ agente: 'maria', tipo: 'cliente', telefono: c.telefono, resumen_interaccion: 'Difusión semanal de disponibilidad', canal: 'whatsapp-plantilla' }).catch(() => {});
+      contactos.upsertContacto({ agente: 'maria', tipo: 'cliente', telefono: c.telefono, resumen_interaccion: 'Difusión de disponibilidad', canal: 'whatsapp-plantilla' }).catch(() => {});
     } catch (e) { fallidos++; console.error(`[difusionClientes] Error mandando a ${c.nombre_completo}:`, e.message); }
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }
 
-  const resumen = `Difusión semanal a clientes: ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
+  const resumen = `Difusión a clientes: ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
   feed({ tipo: 'DISPONIBILIDAD_CLIENTES', mensaje: resumen });
-  notifier.notificarAlerta({ title: 'MARÍA — Difusión semanal de disponibilidad', body: resumen, tipo: 'DISPONIBILIDAD_CLIENTES' }).catch(() => {});
+  notifier.notificarAlerta({ title: 'MARÍA — Difusión de disponibilidad a clientes', body: resumen, tipo: 'DISPONIBILIDAD_CLIENTES' }).catch(() => {});
   console.log(`[difusionClientes] ${resumen}`);
+  return { ok: true, enviados, total: lista.length, sinCredito, fallidos, resumen };
+}
+
+async function correrSiToca() {
+  if (!HABILITADO) return;
+  const { fecha, minutosDelDia, diaSemana } = horaFechaDiaMTY();
+  if (diaSemana !== DIA_SEMANA) return;
+  const inicioMin = HORA * 60 + MINUTO;
+  if (minutosDelDia < inicioMin || minutosDelDia > inicioMin + VENTANA_MIN) return;
+  if (ultimaFechaEnviada === fecha) return;
+  ultimaFechaEnviada = fecha; // se marca antes de correr — un fallo a medias no la reintenta en bucle
+  guardarUltimaFecha(fecha);
+  await ejecutarDifusion();
+}
+
+// Disparo manual — pedido explícito del usuario (19-oct-2026): si Diego le
+// escribe a María por WhatsApp "manda/lanza la difusión a clientes", el
+// handler de Kapso en server-lite.js llama esto (tras pedir confirmación con
+// el número real de clientes). Marca la fecha como ya corrida, para que la
+// corrida semanal programada no la repita si cae el mismo día.
+async function dispararManual() {
+  const { fecha } = horaFechaDiaMTY();
+  ultimaFechaEnviada = fecha;
+  guardarUltimaFecha(fecha);
+  return ejecutarDifusion();
 }
 
 function iniciar() {
@@ -108,4 +125,4 @@ function iniciar() {
   console.log(`[difusionClientes] Activo — día ${DIA_SEMANA} (0=domingo) a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
-module.exports = { iniciar, correrSiToca };
+module.exports = { iniciar, correrSiToca, clientesConocidos, dispararManual };
