@@ -38,6 +38,7 @@ const gpsLive     = require('./backend/services/gps-live');
 const leads          = require('./backend/services/leads');
 const sessionIp      = require('./backend/services/sessionIp');
 const promptLeakGuard = require('./backend/services/promptLeakGuard');
+const tarifaGuard = require('./backend/services/tarifaGuard');
 const ipBanlist       = require('./backend/services/ipBanlist');
 const phoneBanlist    = require('./backend/services/phoneBanlist');
 const emergencyShutdown = require('./backend/services/emergencyShutdown');
@@ -753,9 +754,21 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Proveedor sin unidades: solo agradece y pide aviso — nada de "¿algo más en lo que te ayude?"
     const FRASE_SIN_UNIDADES = 'Muchas gracias, avísame cuando cuentes con disponibilidad.';
     const dijoSinUnidades = /OFERTA_PROVEEDOR\s*:\s*\{[^}]*"disponible"\s*:\s*false/i.test(respuesta);
+    // MARÍA — guardrail anti-fuga de precios/tarifas/costos (pedido explícito
+    // del usuario, 19-oct-2026): corte determinístico en código, no depende
+    // de que el modelo obedezca. Si el texto final contiene algo con forma de
+    // precio, se reemplaza TODA la respuesta y se escala al equipo comercial.
+    const intentoTarifaMaria = (agente === 'maria' && !personaEquipo) && tarifaGuard.contienePrecio(limpiarControlParaCliente(respuesta));
+    // Escala al equipo comercial en CUALQUIER caso en que alguien pida tarifa —
+    // no solo cuando el filtro de salida atrapa una fuga real (pedido explícito
+    // del usuario: "en todo caso se escala al equipo comercial").
+    if (agente === 'maria' && !personaEquipo && (intentoTarifaMaria || tarifaGuard.detectarSolicitudPrecio(texto))) {
+      notifier.notificarIntentoTarifa({ canal: 'whatsapp', quien: phone, telefono: phone, texto, sessionId: session }).catch(() => {});
+    }
     const textoSalida = (agente === 'sofia' && !personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO
       : (agente === 'sofia' && !personaEquipo && mencionoTarifa) ? FRASE_TARIFA
       : (agente === 'sofia' && !personaEquipo && dijoSinUnidades) ? FRASE_SIN_UNIDADES
+      : intentoTarifaMaria ? tarifaGuard.MENSAJE_RECHAZO_TARIFA
       : limpiarControlParaCliente(respuesta);
     // Red de seguridad: nunca cerrar con la muletilla de servicio al cliente
     const MULETILLA = /[¿]?\s*(?:hay\s+)?(?:algo|alguna cosa)\s+m[aá]s\s+en\s+(?:lo\s+)?(?:que|qué)\s+(?:te\s+)?(?:pueda|podamos|puedo)\s+ayud(?:arte|ar)[^.?!]*[?.!]?/gi;
@@ -1289,7 +1302,16 @@ async function manejarMensajeKapsoMaria(phone, texto) {
   memory.addMessage(session, 'assistant', respuesta);
   saveMessage(session, AGENTE_KAPSO_MARIA, 'assistant', respuesta);
 
-  const textoLimpio = limpiarControlParaCliente(respuesta);
+  let textoLimpio = limpiarControlParaCliente(respuesta);
+  // MARÍA — guardrail anti-fuga de precios/tarifas/costos (ver tarifaGuard.js).
+  // Escala al equipo comercial en CUALQUIER caso en que alguien pida tarifa —
+  // no solo cuando el filtro de salida atrapa una fuga real.
+  if (!personaEquipo && tarifaGuard.contienePrecio(textoLimpio)) {
+    textoLimpio = tarifaGuard.MENSAJE_RECHAZO_TARIFA;
+    notifier.notificarIntentoTarifa({ canal: 'whatsapp-kapso', quien: phone, telefono: phone, texto, sessionId: session }).catch(() => {});
+  } else if (!personaEquipo && tarifaGuard.detectarSolicitudPrecio(texto)) {
+    notifier.notificarIntentoTarifa({ canal: 'whatsapp-kapso', quien: phone, telefono: phone, texto, sessionId: session }).catch(() => {});
+  }
   for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque, AGENTE_KAPSO_MARIA);
 
   // Cliente confirmó que sigue necesitando la unidad con urgencia — se
@@ -3908,8 +3930,18 @@ async function handleChat(agente, req, res) {
   res.flushHeaders();
 
   let fullText = '';
+  // MARÍA — guardrail anti-fuga de precios/tarifas/costos (pedido explícito
+  // del usuario, 19-oct-2026): para María NO se manda nada en vivo chunk por
+  // chunk (un precio podría salir repartido en varios chunks y colarse antes
+  // de poder revisarlo completo) — se junta todo el texto visible y, hasta
+  // que terminó de generarse completo, se revisa una sola vez; si contiene
+  // algo con forma de precio, se manda el rechazo estándar en vez del texto
+  // real y se escala al equipo comercial por correo.
+  const esMaria = agente === 'maria';
+  let textoVisibleMaria = '';
   const filtroControl = crearFiltroControlStream(visible => {
-    res.write(`data: ${JSON.stringify({ type: 'chunk', text: visible })}\n\n`);
+    if (esMaria) textoVisibleMaria += visible;
+    else res.write(`data: ${JSON.stringify({ type: 'chunk', text: visible })}\n\n`);
   });
   try {
     await chatStream(
@@ -3921,6 +3953,18 @@ async function handleChat(agente, req, res) {
       },
       () => {},
     );
+    if (esMaria) {
+      let salidaMaria = textoVisibleMaria;
+      // Escala al equipo comercial en CUALQUIER caso en que alguien pida
+      // tarifa — no solo cuando el filtro de salida atrapa una fuga real.
+      if (tarifaGuard.contienePrecio(textoVisibleMaria)) {
+        salidaMaria = tarifaGuard.MENSAJE_RECHAZO_TARIFA;
+        notifier.notificarIntentoTarifa({ canal: 'web', quien: sid, texto: message, sessionId: sid }).catch(() => {});
+      } else if (tarifaGuard.detectarSolicitudPrecio(message)) {
+        notifier.notificarIntentoTarifa({ canal: 'web', quien: sid, texto: message, sessionId: sid }).catch(() => {});
+      }
+      if (salidaMaria) res.write(`data: ${JSON.stringify({ type: 'chunk', text: salidaMaria })}\n\n`);
+    }
     memory.addMessage(memId, 'assistant', fullText);
     saveMessage(sid, agente, 'assistant', fullText);
     const agenteNombre = agente === 'maria' ? 'MARIA' : agente === 'sofia' ? 'SOFIA' : agente === 'noa' ? 'NOA' : 'HÉCTOR';

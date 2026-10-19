@@ -404,6 +404,42 @@ async function notificarAlerta({ title, body, tipo }) {
   }
 }
 
+// ── Alerta de intento de sacarle tarifa/precio/costo a MARÍA — directo al
+// equipo comercial (Guadalupe, Fabiola) + Rafael, Gabriel y Diego. Pedido
+// explícito del usuario (19-oct-2026): MARÍA jamás da precios, así que cuando
+// alguien lo pide (o el filtro determinístico atrapa un intento de fuga vía
+// jailbreak), el equipo comercial se entera YA, por correo, para que le den
+// seguimiento con el precio real por su cuenta — nunca por el chat de María.
+function escalarTarifaAsunto(quien) {
+  return `💰 Alguien pidió tarifa/precio a MARÍA — ${quien || 'contacto'}`;
+}
+async function notificarIntentoTarifa({ canal, quien, telefono, texto, sessionId }) {
+  const asunto = escalarTarifaAsunto(quien || telefono);
+  const html = `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+    <div style="background:#92400e;padding:20px 24px;">
+      <div style="color:#fff;font-weight:700;font-size:16px;">Solicitud de tarifa/precio bloqueada</div>
+      <div style="color:#fde68a;font-size:12px;margin-top:2px;">${new Date().toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Monterrey'})} · canal: ${esc(canal || '—')}</div>
+    </div>
+    <div style="padding:20px 24px;">
+      <p style="margin:0 0 8px;font-size:14px;color:#111;"><strong>Contacto:</strong> ${esc(quien || '—')}${telefono ? ` (${esc(telefono)})` : ''}</p>
+      <p style="margin:0 0 8px;font-size:13px;color:#374151;"><strong>Mensaje:</strong> "${esc(String(texto || '').slice(0, 300))}"</p>
+      <p style="margin:12px 0 0;font-size:12px;color:#6b7280;">MARÍA no le dio ningún precio — le dijo que el equipo comercial lo contacta directo. Denle seguimiento con la tarifa real por su cuenta.</p>
+    </div>
+  </div>`;
+
+  if (!gmailTransport) {
+    console.log(`[Notifier STUB] Intento de tarifa bloqueado: ${quien || telefono || 'contacto'} — "${String(texto || '').slice(0, 100)}"`);
+    return;
+  }
+  try {
+    await gmailTransport.sendMail({ from: `MARÍA ABSTORAGES <${GMAIL_USER}>`, to: RESPUESTA_SARA_EMAILS.join(', '), subject: asunto, html });
+    console.log(`[Gmail] ✅ Alerta de tarifa bloqueada enviada a ${RESPUESTA_SARA_EMAILS.join(', ')}`);
+  } catch (e) {
+    console.error('[Gmail] ❌ Error enviando alerta de tarifa bloqueada:', e.message);
+  }
+}
+
 // ── Reporte de la ronda diaria de disponibilidad de SOFIA — a Diego y Rafael,
 // con la lista exacta de a quién SÍ se le contactó de verdad (nunca incluye
 // a quien se omitió por pausa o por límite diario). Pedido explícito del
@@ -661,4 +697,4 @@ async function notificarProveedorNuevo({ nombre, telefono, empresa, unidades, ru
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de proveedor nuevo:', e.message); }
 }
 
-module.exports = { notificarRespuestaSofia, notificarRespuestaSara, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta, notificarProveedorNuevo };
+module.exports = { notificarRespuestaSofia, notificarRespuestaSara, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta, notificarProveedorNuevo, notificarIntentoTarifa };
