@@ -26,12 +26,11 @@ const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
 // 4 variaciones de texto en vez de una sola plantilla fija — pedido explícito
 // del usuario (05-oct-2026): si siempre es el mismo mensaje, se nota que es un
-// bot y se pierde confianza. Se rota una por proveedor (round-robin). Migrado
-// de Twilio a plantillas de Kapso/Meta (oct-2026) — disponibilidad_general_sofia
-// (v1) ya está APPROVED; v2/v3/v4 quedan sometidas a revisión de Meta y entran
-// a la rotación solas en cuanto Meta las apruebe (KAPSO_LIVE lo resuelve el
-// propio kapso.enviarPlantilla intentándolas; si una no está aprobada aún,
-// Meta la rechaza y ese envío puntual falla, pero no tumba la difusión).
+// bot y se pierde confianza. Rotación por DÍA, no por proveedor (pedido
+// explícito del usuario, 20-oct-2026): toda la corrida de un día usa UNA sola
+// variante — hoy v1, mañana v2, pasado v3, v4, y vuelve a v1 — en vez de
+// repartir las 4 entre los proveedores de la misma corrida (ver
+// siguienteVariante() más abajo). Las 4 ya están APPROVED en Meta.
 const TEXTO_VARIANTE = [
   'Hola {nombre}, buenos días. Soy SOFIA de ABSTORAGES. ¿Qué unidad tienes disponible hoy? Cuéntame la ruta y el tipo, para tenerte en cuenta en cuanto tengamos carga que te acomode.',
   'Buenos días {nombre}, soy SOFIA de ABSTORAGES. ¿Tendrás unidad disponible hoy? Si tienes algo libre, cuéntame en qué ruta y qué tipo de caja, para avisarte en cuanto tengamos algo para ti.',
@@ -53,15 +52,33 @@ const CHEQUEO_MS = 15 * 60 * 1000;
 const VENTANA_MIN = Number(process.env.SOFIA_DIFUSION_GENERAL_VENTANA_MIN || 90);
 
 const ESTADO_FILE = path.join(__dirname, '../../data/difusion-general-estado.json');
-function leerUltimaFecha() {
-  try { return JSON.parse(fs.readFileSync(ESTADO_FILE, 'utf8')).ultimaFechaEnviada || null; } catch { return null; }
+function leerEstado() {
+  try { return JSON.parse(fs.readFileSync(ESTADO_FILE, 'utf8')); } catch { return {}; }
 }
-function guardarUltimaFecha(fecha) {
-  try { fs.mkdirSync(path.dirname(ESTADO_FILE), { recursive: true }); fs.writeFileSync(ESTADO_FILE, JSON.stringify({ ultimaFechaEnviada: fecha })); } catch (e) { console.error('[difusionGeneral] no se pudo guardar el estado:', e.message); }
+function guardarEstado(estado) {
+  try { fs.mkdirSync(path.dirname(ESTADO_FILE), { recursive: true }); fs.writeFileSync(ESTADO_FILE, JSON.stringify(estado)); } catch (e) { console.error('[difusionGeneral] no se pudo guardar el estado:', e.message); }
 }
 // 'YYYY-MM-DD' Monterrey — evita doble corrida el mismo día, incluso si el
 // servidor se reinicia (persistido en disco, no solo en memoria).
-let ultimaFechaEnviada = leerUltimaFecha();
+let ultimaFechaEnviada = leerEstado().ultimaFechaEnviada || null;
+function guardarUltimaFecha(fecha) {
+  const estado = leerEstado();
+  estado.ultimaFechaEnviada = fecha;
+  guardarEstado(estado);
+}
+// Índice de la última variante usada — pedido explícito del usuario
+// (20-oct-2026): ya no se rota por proveedor dentro de una misma corrida,
+// se rota por DÍA — toda la corrida usa UNA sola variante, y la siguiente
+// corrida (sea la programada o un disparo manual) usa la que sigue en el
+// ciclo v1 → v2 → v3 → v4 → v1...
+let ultimaVarianteIndex = Number.isInteger(leerEstado().ultimaVarianteIndex) ? leerEstado().ultimaVarianteIndex : -1;
+function siguienteVariante() {
+  ultimaVarianteIndex = (ultimaVarianteIndex + 1) % VARIANTES.length;
+  const estado = leerEstado();
+  estado.ultimaVarianteIndex = ultimaVarianteIndex;
+  guardarEstado(estado);
+  return VARIANTES[ultimaVarianteIndex];
+}
 
 function horaYFechaMTY() {
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
@@ -152,19 +169,21 @@ async function ejecutarDifusion() {
   try { lista = await proveedoresTop50Rutas(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return { ok: false, motivo: 'error_lista' }; }
   if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: ningún proveedor con teléfono cubre alguna de las 50 rutas más importantes hoy' }); return { ok: true, enviados: 0, total: 0 }; }
 
-  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad (Top 50 rutas) — empezando con ${lista.length} proveedores, uno tras otro` });
+  // Una sola variante para TODA la corrida (pedido explícito del usuario,
+  // 20-oct-2026): ya no rota por proveedor dentro de la misma corrida — rota
+  // por DÍA. Esta corrida usa la que sigue en el ciclo v1→v2→v3→v4→v1...,
+  // persistido en disco para que sobreviva un redeploy/reinicio del server.
+  const variante = usaVariantes ? siguienteVariante() : null;
+  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad (Top 50 rutas) — variante "${variante?.sid || CONTENT_SID_FALLBACK}" — empezando con ${lista.length} proveedores, uno tras otro` });
 
   let enviados = 0, sinCredito = 0, fallidos = 0;
-  let i = 0;
   for (const p of lista) {
     try {
-      const variante = usaVariantes ? VARIANTES[i % VARIANTES.length] : null;
       const CONTENT_SID = variante ? variante.sid : CONTENT_SID_FALLBACK;
       const variables = variante
         ? { '1': titulo(p.nombre) }
         : { '1': titulo(p.nombre), '2': 'cualquier tipo de unidad', '3': 'cualquier origen', '4': 'cualquier destino', '5': 'hoy' };
       const r = await whatsappProactivo.enviarPlantillaSinCandado('sofia', p.telefono, CONTENT_SID, variables);
-      i++;
       if (r?.status === 'rate_limited') { sinCredito = lista.length - enviados - fallidos; break; }
       if (r?.status === 'paused') break;
       enviados++;
@@ -177,7 +196,7 @@ async function ejecutarDifusion() {
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }
 
-  const resumen = `Difusión general: ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
+  const resumen = `Difusión general (variante "${variante?.sid || CONTENT_SID_FALLBACK}"): ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
   feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: resumen });
   notifier.notificarAlerta({ title: 'SOFIA — Difusión general de disponibilidad', body: resumen, tipo: 'DISPONIBILIDAD_DIARIA' }).catch(() => {});
   console.log(`[difusionGeneral] ${resumen}`);
