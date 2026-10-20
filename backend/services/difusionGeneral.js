@@ -86,26 +86,31 @@ function horaYFechaMTY() {
   return { fecha: `${p.year}-${p.month}-${p.day}`, minutosDelDia: Number(p.hour) * 60 + Number(p.minute) };
 }
 
-// Las 50 rutas más importantes (ya sembradas en la Base de Datos con el
-// mismo texto "Municipio - Municipio" que trae c.rutas de cada proveedor —
-// ver backend/data/proveedores-top50-rutas.json y contactos.js).
-function rutasTop50() {
-  let lista; try { lista = require('../data/proveedores-top50-rutas.json'); } catch { return new Set(); }
-  return new Set(lista.map(r => String(r.destino || '').trim().toLowerCase()).filter(Boolean));
+// Los 100 proveedores más importantes de la Base de Datos — pedido explícito
+// del usuario (20-oct-2026), reemplaza el criterio anterior (Top 50 rutas).
+// "Importante" = volumen real de servicios colocados con ABSTORAGES, sumado
+// sobre TODAS sus rutas (campo c.tarifas: "Ruta: $X mínimo · N servicio(s)
+// colocados | ..."), mismo criterio ya usado y validado con el usuario para
+// la lista de 50 proveedores que se contactó por el cambio de número de
+// SOFIA (16-oct-2026) — no la cantidad de rutas que cubre, el volumen real.
+function volumenServicios(c) {
+  const tarifas = String(c.tarifas || '');
+  let total = 0;
+  for (const chunk of tarifas.split('|')) {
+    const m = chunk.match(/(\d+)\s*servicio/);
+    if (m) total += Number(m[1]);
+  }
+  return total;
 }
 
-// Proveedores de la Base de Datos que cubren al menos una de esas 50 rutas —
-// deduplicados por teléfono, para que a nadie le llegue más de un mensaje
-// aunque cubra varias rutas del Top 50.
-async function proveedoresTop50Rutas() {
-  const rutas = rutasTop50();
-  if (!rutas.size) return [];
+// Deduplicados por teléfono, ordenados por volumen descendente, top 100.
+async function proveedoresTop100() {
   const bd = await contactos.listarPorAgente('SOFIA', { tipo: 'proveedor' });
-  return bd.filter(c => {
-    if (!c.telefono || /Estatus en catálogo: (Baja|Suspendido)/i.test(c.notas || '')) return false;
-    const susRutas = String(c.rutas || '').split(/[,;\n]+/).map(r => r.trim().toLowerCase()).filter(Boolean);
-    return susRutas.some(r => rutas.has(r));
-  }).map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono }));
+  return bd
+    .filter(c => c.telefono && !/Estatus en catálogo: (Baja|Suspendido)/i.test(c.notas || ''))
+    .map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono, volumen: volumenServicios(c) }))
+    .sort((a, b) => b.volumen - a.volumen)
+    .slice(0, 100);
 }
 
 // ── Difusión ad-hoc para UNA ruta específica, pedida por el equipo por
@@ -166,15 +171,15 @@ async function ejecutarDifusion() {
   if (!usaVariantes && !CONTENT_SID_FALLBACK) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada — se omite'); return { ok: false, motivo: 'sin_plantilla' }; }
 
   let lista;
-  try { lista = await proveedoresTop50Rutas(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return { ok: false, motivo: 'error_lista' }; }
-  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: ningún proveedor con teléfono cubre alguna de las 50 rutas más importantes hoy' }); return { ok: true, enviados: 0, total: 0 }; }
+  try { lista = await proveedoresTop100(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return { ok: false, motivo: 'error_lista' }; }
+  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: no hay proveedores con teléfono en la Base de Datos' }); return { ok: true, enviados: 0, total: 0 }; }
 
   // Una sola variante para TODA la corrida (pedido explícito del usuario,
   // 20-oct-2026): ya no rota por proveedor dentro de la misma corrida — rota
   // por DÍA. Esta corrida usa la que sigue en el ciclo v1→v2→v3→v4→v1...,
   // persistido en disco para que sobreviva un redeploy/reinicio del server.
   const variante = usaVariantes ? siguienteVariante() : null;
-  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad (Top 50 rutas) — variante "${variante?.sid || CONTENT_SID_FALLBACK}" — empezando con ${lista.length} proveedores, uno tras otro` });
+  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad (Top 100 proveedores) — variante "${variante?.sid || CONTENT_SID_FALLBACK}" — empezando con ${lista.length} proveedores, uno tras otro` });
 
   let enviados = 0, sinCredito = 0, fallidos = 0;
   for (const p of lista) {
@@ -230,7 +235,7 @@ function iniciar(pushActividad) {
   if (!HABILITADO) { console.log('[difusionGeneral] Desactivado (SOFIA_DIFUSION_GENERAL != "true")'); return; }
   setInterval(() => correrSiToca(pushActividad).catch(e => console.error('[difusionGeneral]', e.message)), CHEQUEO_MS);
   correrSiToca(pushActividad).catch(() => {}); // por si el server arranca ya pasada la hora
-  console.log(`[difusionGeneral] Activo — proveedores del Top 50 de rutas, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
+  console.log(`[difusionGeneral] Activo — Top 100 proveedores por volumen, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
-module.exports = { iniciar, correrSiToca, proveedoresTop50Rutas, dispararManual, dispararPorRuta, proveedoresPorRuta };
+module.exports = { iniciar, correrSiToca, proveedoresTop100, dispararManual, dispararPorRuta, proveedoresPorRuta };

@@ -1040,11 +1040,11 @@ async function manejarComandoDifusion(agente, texto) {
   if (TRIGGER_DIFUSION.test(texto)) {
     let total = 0;
     try {
-      const lista = agente === 'sofia' ? await mod.proveedoresTop50Rutas() : await mod.clientesConocidos();
+      const lista = agente === 'sofia' ? await mod.proveedoresTop100() : await mod.clientesConocidos();
       total = lista.length;
     } catch (e) { console.error('[difusion] Error contando destinatarios:', e.message); }
     confirmacionDifusionPendiente.set(agente, { ts: Date.now() });
-    const quienes = agente === 'sofia' ? 'proveedores del Top 50 de rutas' : 'clientes conocidos con teléfono';
+    const quienes = agente === 'sofia' ? 'proveedores más importantes' : 'clientes conocidos con teléfono';
     return `¿Confirmas que mando la difusión a los ${total} ${quienes}? Contesta "sí" para mandarla o "no" para cancelar.`;
   }
   return null;
