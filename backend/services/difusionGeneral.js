@@ -134,20 +134,24 @@ async function proveedoresPorRuta(origen, destino) {
 }
 
 // Manda la plantilla de disponibilidad (ya aprobada: disponibilidad_unidad_sofia)
-// a cada proveedor que cubre la ruta pedida, uno tras otro.
-async function dispararPorRuta({ origen, destino, fecha, tipo_carga }) {
+// a cada proveedor que cubre la ruta pedida, uno tras otro. "cliente" es opcional
+// — pedido explícito del usuario (23-oct-2026): si se da, se guarda en la memoria
+// de CADA proveedor contactado (ver whatsappProactivo.preguntarDisponibilidad)
+// para que SOFIA nunca vuelva a preguntar nombre/ruta/fecha/unidad cuando
+// contesten — ya se los dio ella en el mensaje que mandó.
+async function dispararPorRuta({ origen, destino, fecha, tipo_carga, cliente }) {
   if (agentPause.estaPausado('sofia')) return { ok: false, motivo: 'pausado' };
   let lista;
   try { lista = await proveedoresPorRuta(origen, destino); }
   catch (e) { console.error('[difusionGeneral] Error armando lista por ruta:', e.message); return { ok: false, motivo: 'error_lista' }; }
   if (!lista.length) return { ok: true, enviados: 0, total: 0 };
 
-  feed({ tipo: 'DIFUSION_RUTA_EQUIPO', mensaje: `Difusión por ruta ${origen} → ${destino} — empezando con ${lista.length} proveedores` });
+  feed({ tipo: 'DIFUSION_RUTA_EQUIPO', mensaje: `Difusión por ruta ${origen} → ${destino}${cliente ? ` (cliente: ${cliente})` : ''} — empezando con ${lista.length} proveedores` });
 
   let enviados = 0, fallidos = 0;
   for (const p of lista) {
     try {
-      const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_carga, fecha_carga: fecha });
+      const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_carga, fecha_carga: fecha, empresa: cliente });
       if (r?.status === 'rate_limited' || r?.status === 'paused') break;
       enviados++;
     } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }

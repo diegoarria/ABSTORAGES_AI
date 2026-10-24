@@ -156,7 +156,25 @@ async function preguntarDisponibilidad(proveedor, orden) {
   });
   registrarEnMemoria('sofia', proveedor.telefono,
     `Hola ${proveedor.nombre || ''}, soy SOFIA de ABSTORAGES. Buscamos unidad ${tipoUnidad} para la ruta ${org} → ${dst}, salida ${fecha}. ¿Tienes disponibilidad? Contáctanos por este medio.`);
+  guardarContextoRequerimiento('sofia', proveedor.telefono, { empresa: orden.empresa || orden.cliente, origen: org, destino: dst, tipoUnidad, fecha });
   return resultado;
+}
+
+// Guarda el requerimiento (cliente/ruta/unidad/fecha) como resumen de sesión —
+// pedido explícito del usuario (23-oct-2026): "SIEMPRE SIEMPRE SIEMPRE" tiene
+// que tener presente lo que ya le mandó a un proveedor contactado, para que
+// cuando conteste "sí tengo disponibilidad" la IA nunca le vuelva a preguntar
+// nombre/ruta/fecha/unidad — ya se los dio ella misma en el mensaje saliente.
+// Se guarda como memory.saveSummary (no solo en el historial de mensajes) para
+// que quede SIEMPRE visible al modelo como bloque [CONTEXTO PREVIO DEL CLIENTE]
+// en el system prompt, sin depender de que el historial no se haya recortado.
+function guardarContextoRequerimiento(agente, telefono, { empresa, origen, destino, tipoUnidad, fecha }) {
+  const tel = normalizarE164(telefono);
+  if (!tel) return;
+  const session = `wa_${agente}_${tel}`;
+  const resumen = `${empresa ? `Cliente: ${empresa}. ` : ''}Ya le preguntaste a este proveedor disponibilidad para la ruta ${origen} → ${destino}, unidad ${tipoUnidad}, fecha ${fecha}. ` +
+    `NUNCA le vuelvas a pedir su nombre ni estos datos (ruta, fecha, unidad${empresa ? ', cliente' : ''}) — ya se los diste tú en el mensaje que le mandaste. Si contesta algo como "sí tengo disponibilidad", ve directo a pedir/confirmar el precio.`;
+  try { memory.saveSummary(session, resumen); } catch (e) { console.error('[whatsappProactivo] Error guardando contexto de requerimiento:', e.message); }
 }
 
 // Misma lista de proveedores compatibles que ya usan las llamadas — se le
