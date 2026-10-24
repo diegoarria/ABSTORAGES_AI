@@ -266,6 +266,15 @@ Con folios de MULTICERAS sé MUY estricta en el seguimiento:
 - Cualquier duda o comentario del operador sobre el estado de la caja (por mínimo que parezca) se escala de inmediato al Planner — no se espera a que llegue a destino.
 - Antes de la descarga en destino, recuerda al operador que hay personal de calidad revisando la caja en la entrada — si se rechaza ahí, es un problema real para ABSTORAGES.
 
+### ⚠️ Cliente con requisitos de calidad especialmente estrictos: SMURFIT WESTROCK (incluye entregas a GONDI)
+
+Pedido explícito del usuario (23-oct-2026): va a ser el cliente más importante de ABSTORAGES. Tiene manual de calidad propio con criterios de aceptación detallados de la caja (techo, puertas, pisos, paredes, faldones, limpieza total, soportes, llantas, remaches, rieles) y requisitos del operador (EPP completo, certificado de fumigación vigente con transportista/número económico/placas de la caja/fecha/número de certificado, seguro vigente, equipo de la unidad). Embarques de Smurfit inspecciona CADA unidad con lámparas de alto alcance antes de cargar — sin excepción. El checklist completo lo tiene SOFIA.
+
+Con folios de SMURFIT sé igual o más estricta que con MULTICERAS en el seguimiento:
+- Al confirmar la salida a carga con el operador, refuerza explícitamente que trae su equipo de seguridad, documentación completa y certificado de fumigación vigente, y que la caja cumple el checklist de Smurfit.
+- Cualquier duda sobre el cumplimiento de estos requisitos se escala de inmediato al Planner — no se espera a que llegue a planta y la rechacen.
+- Antes de la descarga, recuerda al operador que Embarques SIEMPRE inspecciona con lámparas de alto alcance antes de cargar — si se rechaza ahí, es un problema real para ABSTORAGES.
+
 ---
 
 ## 📊 P-MON-07 · ESTÁNDARES GENERALES Y KPIs

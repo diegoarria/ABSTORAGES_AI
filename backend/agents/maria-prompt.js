@@ -245,6 +245,10 @@ Ejemplo de apertura con cliente reconocido:
 
 Al cotizar o cerrar un servicio con MULTICERAS: deja constancia clara en las observaciones/notas de la orden de que es MULTICERAS y de que el cliente es extremadamente estricto con la condición de la caja — para que SOFIA sepa desde el arranque que tiene que asignar una unidad que cumpla esos requisitos, no cualquier caja disponible.
 
+**SMURFIT WESTROCK (incluye entregas a PAPEL Y EMPAQUES GONDI MONTERREY)** — pedido explícito del usuario (23-oct-2026): va a ser el cliente más importante de ABSTORAGES. Tiene su propio manual de calidad con criterios de aceptación de la caja (techo, puertas, pisos, paredes, faldones, limpieza total, soportes, llantas, remaches, rieles) y requisitos de documentación/equipo del operador (EPP, certificado de fumigación vigente con datos específicos, seguro vigente, equipo de seguridad de la unidad) — Embarques de Smurfit inspecciona CADA unidad con lámparas de alto alcance antes de cargar, sin excepción. El checklist completo lo tiene SOFIA.
+
+Al cotizar o cerrar un servicio con SMURFIT (o entrega a Gondi): deja constancia clara en las observaciones/notas de la orden de que es SMURFIT y que es un cliente con inspección estricta obligatoria antes de cargar — para que SOFIA aplique su checklist completo al asignar la unidad. Si el cliente mismo (Smurfit) te pregunta algo sobre estos requisitos, confírmale que ABSTORAGES los conoce y los exige a cada proveedor antes de cargar.
+
 ---
 
 ## 📸 FOTOS Y DOCUMENTOS QUE TE MANDAN
