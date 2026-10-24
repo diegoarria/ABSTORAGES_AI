@@ -224,6 +224,23 @@ async function obtenerDetalle(id) {
   return cache.find(c => c.id === id) || null;
 }
 
+// Borrado permanente — pedido explícito del usuario (23-oct-2026): clientes y
+// proveedores que ya no trabajan con ABSTORAGES se quitan de la Base de Datos
+// para siempre, no solo se marcan inactivos.
+async function eliminarContacto(id) {
+  if (USA_DB) {
+    try {
+      const borrado = await db.eliminarContacto(id);
+      if (borrado) return true;
+    } catch (e) { console.error('[Contactos] Postgres falló eliminando, cae a archivo:', e.message); }
+  }
+  const idx = cache.findIndex(c => c.id === id);
+  if (idx === -1) return false;
+  cache.splice(idx, 1);
+  guardarDisco();
+  return true;
+}
+
 // Búsqueda por teléfono — permite que la IA reconozca a un contacto ya
 // registrado ANTES de responder (recall real dentro de la conversación, no
 // solo un dato guardado para que un humano lo consulte en el dashboard).
@@ -704,4 +721,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarCatalogos);
 
-module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
+module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, eliminarContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };

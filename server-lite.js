@@ -2724,6 +2724,17 @@ app.put('/api/contactos/:id/unidades', soloAdmin, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Borrado permanente de un cliente/proveedor de la Base de Datos — pedido
+// explícito del usuario (23-oct-2026): para proveedores/clientes que ya no
+// trabajan con ABSTORAGES, no solo marcarlos inactivos.
+app.delete('/api/contactos/:id', soloAdmin, async (req, res) => {
+  try {
+    const borrado = await contactos.eliminarContacto(req.params.id);
+    if (!borrado) return res.status(404).json({ error: 'Contacto no encontrado' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── Colocaciones de SOFIA: ofertas, aprobación, ranking, sugerencias, KPIs ───
 app.get('/api/colocaciones', adminUOps, (req, res) => {
   const lista = colocaciones.todas().sort((a, b) => new Date(b.creada) - new Date(a.creada)).slice(0, 100)

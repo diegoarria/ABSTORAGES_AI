@@ -252,6 +252,12 @@ async function buscarContactoPorTelefono(telefono, agente) {
   return { ...rows[0], interacciones };
 }
 
+async function eliminarContacto(id) {
+  await query('DELETE FROM interacciones WHERE contacto_id = $1', [id]);
+  const { rows } = await query('DELETE FROM contactos WHERE id = $1 RETURNING id', [id]);
+  return rows.length > 0;
+}
+
 // ─── PROVEEDORES ─────────────────────────────────────────────────────────────
 
 async function obtenerProveedoresPorRuta(origen, destino) {
@@ -389,6 +395,7 @@ module.exports = {
   listarContactosPorAgente,
   obtenerContactoDetalle,
   buscarContactoPorTelefono,
+  eliminarContacto,
   obtenerProveedoresPorRuta,
   obtenerProveedoresRecurrentes,
   actualizarClasificacionProveedor,
