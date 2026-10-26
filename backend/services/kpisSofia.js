@@ -16,6 +16,11 @@ const META_ALTAS = Number(process.env.KPI_META_PROVEEDORES_MES || 4);
 const META_MES   = Number(process.env.KPI_META_COLOCADOS_MES || 40);
 const HORA_ENVIO = Number(process.env.KPI_HORA || 19); // hora de Monterrey
 
+// Apagado por pedido explícito del usuario (26-oct-2026): el correo diario no
+// aportaba valor — requiere KPI_SOFIA_HABILITADO=true en el entorno para
+// volver a activarse, mismo criterio que difusionGeneral.js/noaScheduler.js.
+const HABILITADO = process.env.KPI_SOFIA_HABILITADO === 'true';
+
 async function calcular(fecha = colocaciones.fechaMTY()) {
   const mes = fecha.slice(0, 7);
   let altas = 0;
@@ -65,6 +70,7 @@ async function tick() {
 }
 
 function iniciar() {
+  if (!HABILITADO) { console.log('[kpisSofia] Desactivado (KPI_SOFIA_HABILITADO != "true")'); return; }
   setInterval(() => tick().catch(() => {}), 5 * 60 * 1000);
   console.log(`[kpisSofia] Activo — email diario a las ${HORA_ENVIO}:00 (Monterrey)`);
 }

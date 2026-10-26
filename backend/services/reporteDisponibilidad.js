@@ -18,6 +18,11 @@ const HORAS = [
 // del 29-sep-2026, aplicado aquí desde el inicio para no repetirlo).
 const VENTANA_MIN = Number(process.env.REPORTE_DISPONIBILIDAD_VENTANA_MIN || 90);
 
+// Apagado por pedido explícito del usuario (26-oct-2026): "solo se pierde
+// texto ahí sin ningún valor" — requiere REPORTE_DISPONIBILIDAD_HABILITADO=true
+// en el entorno para volver a activarse, mismo criterio que difusionGeneral.js.
+const HABILITADO = process.env.REPORTE_DISPONIBILIDAD_HABILITADO === 'true';
+
 const ESTADO_FILE = path.join(__dirname, '../../data/reporte-disponibilidad-estado.json');
 function leerEstado() { try { return JSON.parse(fs.readFileSync(ESTADO_FILE, 'utf8')); } catch { return {}; } }
 function guardarEstado(e) {
@@ -63,6 +68,7 @@ async function tick() {
 }
 
 function iniciar() {
+  if (!HABILITADO) { console.log('[reporteDisponibilidad] Desactivado (REPORTE_DISPONIBILIDAD_HABILITADO != "true")'); return; }
   setInterval(() => tick().catch(e => console.error('[reporteDisponibilidad]', e.message)), 5 * 60 * 1000);
   console.log('[reporteDisponibilidad] Activo — reportes a las 7:00 AM y 19:05 (Monterrey)');
 }
