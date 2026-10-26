@@ -725,8 +725,14 @@ async function renderDetail(){
               : '<div class="hint">Estándar — sin marcar como top 5. SOFIA lo busca con el ritmo normal.</div>'}
           </div>
           <div class="cover-card">
-            <div class="cover-h"><span>${ico('pin')} Exigencia de calidad</span><button class="btn btn-ghost btn-sm" onclick="editarExigenciaCalidad('${data.id}')">${ico('edit')} Editar</button></div>
-            ${data.exigencia_calidad ? `<div class="notes">${esc(data.exigencia_calidad)}</div>` : '<div class="hint neutral">Sin requisitos especiales capturados.</div>'}
+            <div class="cover-h">
+              <span>${ico('pin')} Exigencia de calidad</span>
+              <span>
+                <button class="btn btn-ghost btn-sm" onclick="subirManualCalidad('${data.id}')">${ico('plus')} Subir manual (PDF)</button>
+                <button class="btn btn-ghost btn-sm" onclick="editarExigenciaCalidad('${data.id}')">${ico('edit')} Editar</button>
+              </span>
+            </div>
+            ${data.exigencia_calidad ? `<div class="notes">${esc(data.exigencia_calidad)}</div>` : '<div class="hint neutral">Sin requisitos especiales capturados. Sube el PDF del manual de calidad del cliente y se procesa solo.</div>'}
           </div>
         </div>
       </section>
@@ -1040,6 +1046,25 @@ async function editarExigenciaCalidad(id){
     const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
     await cargarContactos(); selectContacto(id);
   } catch (e) { alert('No se pudo guardar: ' + e.message); }
+}
+async function subirManualCalidad(id){
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'application/pdf';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') { alert('Solo se acepta PDF.'); return; }
+    if (file.size > 15 * 1024 * 1024) { alert('El PDF pesa más de 15 MB.'); return; }
+    try {
+      const buf = await file.arrayBuffer();
+      const r = await fetch('/api/contactos/' + id + '/manual-calidad', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/pdf' }, body: buf });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+      await cargarContactos(); selectContacto(id);
+      alert('Manual procesado y guardado en la exigencia de calidad del cliente.');
+    } catch (e) { alert('No se pudo procesar el PDF: ' + e.message); }
+  };
+  input.click();
 }
 async function eliminarContacto(id){
   const c = contactosCache.find(x => x.id === id);

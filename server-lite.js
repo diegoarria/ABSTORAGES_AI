@@ -432,7 +432,7 @@ async function procesarRequerimiento(rq, persona) {
   const lead = {
     folio: rq.folio, empresa: rq.cliente, nombre: rq.cliente, origen: rq.origen, destino: rq.destino, tipo_unidad: rq.tipo_unidad,
     fecha_carga: cargaTxt, fecha_descarga: descargaTxt, sara_nota: 'requerimiento_whatsapp', sessionId: `req_${rq.folio}`,
-    urgente: esTop5,
+    urgente: esTop5, exigencia_calidad: perfilCliente?.exigencia_calidad || null,
   };
   await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
   folioContexto.registrar(rq.folio, {
@@ -2754,6 +2754,17 @@ app.put('/api/contactos/:id/sla-urgencia', soloAdmin, async (req, res) => {
     const c = await contactos.actualizarSlaUrgencia(req.params.id, (req.body || {}).sla_urgencia);
     if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
     res.json({ ok: true, sla_urgencia: c.sla_urgencia || null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// Manual de calidad en PDF — pedido explícito del usuario (26-oct-2026): el
+// equipo sube el PDF y Claude lo lee directo, sin que nadie tenga que
+// transcribirlo a mano (ver contactos.js: analizarManualCalidad).
+app.post('/api/contactos/:id/manual-calidad', soloAdmin, express.raw({ type: 'application/pdf', limit: '15mb' }), async (req, res) => {
+  try {
+    if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: 'PDF vacío o formato no soportado (solo application/pdf)' });
+    const r = await contactos.subirManualCalidad(req.params.id, req.body);
+    if (!r.ok) return res.status(r.motivo === 'contacto_no_encontrado' ? 404 : 422).json({ error: r.motivo === 'no_es_manual' ? 'El PDF no parece ser un manual de calidad/requisitos — revísalo y vuelve a intentar' : 'Contacto no encontrado' });
+    res.json(r);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

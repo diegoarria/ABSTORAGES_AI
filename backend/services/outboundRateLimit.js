@@ -23,6 +23,15 @@ const LIMITES = {
   noa:   Number(process.env.OUTBOUND_LIMIT_NOA   || 40),
 };
 
+// Reserva exclusiva para clientes top5 — pedido explícito del usuario
+// (26-oct-2026): el límite diario normal no debe poder dejar a un cliente
+// top5 sin poder contactar proveedores solo porque la difusión general u
+// otro tráfico rutinario ya gastó el cupo del día. Un envío NO urgente nunca
+// puede tocar esta franja (se bloquea en cuanto count >= LIMITES[a]); solo un
+// envío marcado "urgente" puede usarla, así que el cupo de arriba del techo
+// normal queda intacto exclusivamente para top5.
+const RESERVA_URGENTE = Number(process.env.OUTBOUND_RESERVA_URGENTE || 15);
+
 function fechaMTY() {
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' });
   return fmt.format(new Date());
@@ -67,16 +76,19 @@ function entrada(agente) {
 
 // Registra un envío real y dice si YA se pasó del límite — se llama justo
 // antes de mandar, así el envío que rompería el techo nunca sale.
-function registrarYVerificar(agente) {
+// `urgente: true` (cliente top5) puede usar la franja de reserva por encima
+// del límite normal, cuando el tráfico rutinario ya lo agotó.
+function registrarYVerificar(agente, { urgente } = {}) {
   const a = clave(agente);
   const limite = LIMITES[a] ?? 40;
+  const techo = urgente ? limite + RESERVA_URGENTE : limite;
   const e = entrada(a);
-  if (e.count >= limite) {
-    return { permitido: false, count: e.count, limite };
+  if (e.count >= techo) {
+    return { permitido: false, count: e.count, limite: techo };
   }
   e.count += 1;
   guardar();
-  return { permitido: true, count: e.count, limite };
+  return { permitido: true, count: e.count, limite: techo, usoReserva: urgente && e.count > limite };
 }
 
 function estado(agente) {

@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 const contactos = require('./contactos');
+const rutasProveedor = require('./rutasProveedor');
 const whatsappProactivo = require('./whatsappProactivo');
 const agentPause = require('./agentPause');
 const actividadBus = require('./actividadBus');
@@ -118,18 +119,21 @@ async function proveedoresTop100() {
 // para la ruta X - Y". A diferencia de la difusión general (Top 50, solo
 // Diego), esta la puede pedir cualquiera del equipo verificado, y el universo
 // de proveedores se arma al vuelo según la ruta pedida, no de una lista fija.
-function normalizarTexto(s) {
-  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-}
-
+// Pedido explícito del usuario (26-oct-2026): esta difusión ad-hoc usaba un
+// match de texto literal propio (si el proveedor tenía "Santa Catarina"
+// guardado y se pedía "Monterrey", no emparejaba — nadie salía en la lista
+// aunque Santa Catarina SÍ es zona metropolitana de Monterrey). El flujo real
+// de requerimientos (buscarUnidadParaOrden en server-lite.js) ya resuelve
+// esto bien con rutasProveedor.js (agrupa por zona metropolitana/estado) —
+// se unifica aquí para que las dos vías usen el mismo criterio, en vez de
+// mantener dos lógicas de match distintas que pueden desalinearse.
 async function proveedoresPorRuta(origen, destino) {
-  const o = normalizarTexto(origen), d = normalizarTexto(destino);
-  if (!o || !d) return [];
+  if (!String(origen || '').trim() || !String(destino || '').trim()) return [];
   const bd = await contactos.listarPorAgente('SOFIA', { tipo: 'proveedor' });
   return bd.filter(c => {
     if (!c.telefono || /Estatus en catálogo: (Baja|Suspendido)/i.test(c.notas || '')) return false;
-    const rutas = String(c.rutas || '').split(/[,;\n]+/).map(normalizarTexto).filter(Boolean);
-    return rutas.some(r => r.includes(o) && r.includes(d));
+    if (!String(c.rutas || '').trim()) return false;
+    return rutasProveedor.cubreRuta(c.rutas, origen, destino).ok;
   }).map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono }));
 }
 

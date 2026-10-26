@@ -118,7 +118,7 @@ function claveContactoDiario(agente, to) { return `${agente}|${(to || '').replac
 function yaContactadoHoy(agente, to) { return !!contactoDiario[claveContactoDiario(agente, to)]; }
 function marcarContactadoHoy(agente, to) { contactoDiario[claveContactoDiario(agente, to)] = Date.now(); guardarContactoDiario(); }
 
-async function enviarPlantilla(agente, to, contentSid, variables) {
+async function enviarPlantilla(agente, to, contentSid, variables, { urgente } = {}) {
   if (yaContactadoHoy(agente, to)) {
     console.warn(`[whatsappProactivo] 🔁 ${agente} ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
     return { status: 'ya_contactado_hoy', to };
@@ -131,11 +131,15 @@ async function enviarPlantilla(agente, to, contentSid, variables) {
     console.warn(`[whatsappProactivo] ${agente?.toUpperCase()} pausado — se omite plantilla a ${to}`);
     return { status: 'paused', to };
   }
-  const limite = outboundRateLimit.registrarYVerificar(agente);
+  // urgente (cliente top5) — pedido explícito del usuario (26-oct-2026): puede
+  // usar la franja de reserva del límite diario aunque el tráfico rutinario
+  // ya lo haya agotado (ver outboundRateLimit.js).
+  const limite = outboundRateLimit.registrarYVerificar(agente, { urgente });
   if (!limite.permitido) {
-    console.error(`[whatsappProactivo] 🛑 ${agente?.toUpperCase()} alcanzó su límite diario (${limite.count}/${limite.limite}) — se omite plantilla a ${to}`);
+    console.error(`[whatsappProactivo] 🛑 ${agente?.toUpperCase()} alcanzó su límite diario${urgente ? ' (incluida la reserva urgente)' : ''} (${limite.count}/${limite.limite}) — se omite plantilla a ${to}`);
     return { status: 'rate_limited', to };
   }
+  if (limite.usoReserva) console.warn(`[whatsappProactivo] 🔴 ${agente?.toUpperCase()} usó la reserva urgente (top5) para contactar a ${to} — ${limite.count}/${limite.limite}`);
   monitoringControl.reportarContactoSaliente({ agente, canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
   marcarComoEnviada(agente, to, contentSid); // se marca ANTES del envío — dos envíos casi simultáneos no se cuelan los dos
   marcarContactadoHoy(agente, to);
@@ -153,7 +157,7 @@ async function preguntarDisponibilidad(proveedor, orden) {
   const fecha = orden.fecha_carga || 'por confirmar';
   const resultado = await enviarPlantilla('sofia', proveedor.telefono, CONTENT_SID_DISPONIBILIDAD, {
     '1': proveedor.nombre || 'ahí', '2': tipoUnidad, '3': org, '4': dst, '5': fecha,
-  });
+  }, { urgente: orden.prioridad === 'top5' });
   registrarEnMemoria('sofia', proveedor.telefono,
     `Hola ${proveedor.nombre || ''}, soy SOFIA de ABSTORAGES. Buscamos unidad ${tipoUnidad} para la ruta ${org} → ${dst}, salida ${fecha}. ¿Tienes disponibilidad? Contáctanos por este medio.`);
   guardarContextoRequerimiento('sofia', proveedor.telefono, {

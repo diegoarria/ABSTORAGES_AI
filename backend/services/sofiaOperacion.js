@@ -33,6 +33,7 @@ const AVISO_OFERTA_MIN = Number(process.env.SOFIA_AVISO_OFERTA_MIN || 30);
 const SEG_HORAS       = Number(process.env.SOFIA_SEGUIMIENTO_HORAS || 24);   // si no hay fecha de carga legible
 const SEG_ESPERA_H    = Number(process.env.SOFIA_SEGUIMIENTO_ESPERA_H || 3);
 const VIDA_MAX_H      = 72;
+const SLA_URGENTE_MIN = Number(process.env.SOFIA_SLA_URGENTE_MIN || 60); // cliente top5: avisar al equipo si pasa esto sin ninguna oferta
 
 let sendPush = async () => {};
 const feed = e => actividadBus.emitir({ agente: 'SOFIA', ...e });
@@ -42,7 +43,7 @@ const pesos = n => (n == null ? 'sin precio' : '$' + Number(n).toLocaleString('e
 const ruta = c => `${c.origen || '?'} → ${c.destino || '?'}`;
 
 function ordenDe(c) {
-  return { folio: c.folio, empresa: c.empresa, origen: c.origen, destino: c.destino, ruta: ruta(c), tipo_unidad: c.tipo_unidad || 'caja seca', fecha_carga: c.fecha_carga || 'por confirmar' };
+  return { folio: c.folio, empresa: c.empresa, origen: c.origen, destino: c.destino, ruta: ruta(c), tipo_unidad: c.tipo_unidad || 'caja seca', fecha_carga: c.fecha_carga || 'por confirmar', prioridad: c.urgente ? 'top5' : undefined, exigencia_calidad: c.exigencia_calidad };
 }
 
 // ── Alta de una búsqueda de unidad ──────────────────────────────────────────
@@ -55,7 +56,7 @@ function iniciarBusqueda(lead, candidatos) {
   const c = colocaciones.crear({
     folio: lead.folio, origen: lead.origen, destino: lead.destino, tipo_unidad: lead.tipo_unidad,
     fecha_carga: lead.fecha_carga, empresa: lead.empresa || lead.nombre,
-    urgente: !!lead.urgente || /urgente/i.test(String(lead.requisitos || '')), pendientes,
+    urgente: !!lead.urgente || /urgente/i.test(String(lead.requisitos || '')), exigencia_calidad: lead.exigencia_calidad, pendientes,
   });
   if (!c || yaExistia) return c;
   lanzarOla(c.folio);
@@ -161,6 +162,22 @@ function procesarSenales({ telefono, nombre, respuesta }) {
         feed({ tipo: 'SEGUIMIENTO_UNIDAD', mensaje: `Folio ${c.folio}: ${quien} ${etiqueta}${detalle ? ' — ' + detalle.slice(0, 160) : ''}`, metadata: { folio: c.folio, estado: est.estado } });
         if (est.estado === 'retraso') push({ title: `Retraso — folio ${c.folio}`, body: `${quien}: ${detalle || 'sin detalle'}. Avisa al cliente (MARÍA/ventas).`, tag: 'retraso-' + c.folio, url: '/actividad.html', tipo: 'RETRASO', urgente: true });
         if (est.estado === 'entregado') push({ title: `Entregado — folio ${c.folio}`, body: `${quien} reporta entrega. Falta confirmar evidencia.`, tag: 'entregado-' + c.folio, url: '/colocaciones.html', tipo: 'SEGUIMIENTO' });
+        // Desempeño real en campo → Base de Datos — pedido explícito del
+        // usuario (26-oct-2026): el perfil de relación (contactos.js) solo se
+        // alimentaba de conversaciones de chat, nunca de cómo le fue de
+        // verdad al proveedor en el viaje (puntual, con retraso, cumplió).
+        // Esto cierra ese círculo: cada retraso y cada entrega quedan en su
+        // bitácora de interacciones, que es justo lo que el perfil de
+        // relación auto-generado lee para describir su confiabilidad real.
+        if (est.estado === 'retraso' || est.estado === 'entregado') {
+          const huboRetraso = (c.retrasos || []).length > 0;
+          const resumen = est.estado === 'retraso'
+            ? `Reportó retraso en el folio ${c.folio} (${ruta(c)}): ${detalle || 'sin detalle'}.`
+            : `Entregó el folio ${c.folio} (${ruta(c)})${huboRetraso ? `, con ${c.retrasos.length} retraso(s) reportado(s) durante el viaje` : ', sin retrasos reportados'}.`;
+          contactosSvc.buscarPorTelefono(telefono, 'sofia')
+            .then(ct => contactosSvc.upsertContacto({ agente: 'sofia', tipo: ct?.tipo || 'proveedor', nombre_completo: ct?.nombre_completo || quien, telefono, resumen_interaccion: resumen, canal: 'whatsapp' }))
+            .catch(e => console.error('[sofiaOperacion] Error registrando desempeño en Base de Datos:', e.message));
+        }
       }
     }
 
@@ -387,6 +404,18 @@ function tickBusqueda(c) {
       push({ title: `⏰ Ofertas sin aprobar — folio ${c.folio}`, body: `${comp.length} oferta(s) esperando tu decisión`, tag: 'oferta-pend-' + c.folio, url: '/colocaciones.html', tipo: 'OFERTA', urgente: true });
     }
     return;
+  }
+  // Escalamiento por TIEMPO para clientes top5 — pedido explícito del usuario
+  // (26-oct-2026): antes solo se avisaba al equipo cuando TODOS los
+  // proveedores ya habían dicho que no (ver SIN_UNIDAD más abajo). Para un
+  // top5 eso es tarde — si pasó SLA_URGENTE_MIN sin ninguna oferta, se avisa
+  // YA, aunque todavía queden proveedores pendientes de contestar. Un solo
+  // aviso por folio (c.avisos.escaladoUrgente).
+  if (c.urgente && !c.avisos.escaladoUrgente && minDesde(c.creada) >= SLA_URGENTE_MIN) {
+    colocaciones.marcarAviso(c.folio, 'escaladoUrgente');
+    feed({ tipo: 'ESCALADO_URGENTE', mensaje: `🔴 Folio ${c.folio} (${ruta(c)}) — CLIENTE TOP 5: ${SLA_URGENTE_MIN} min sin ninguna oferta, sigue buscando sola pero el equipo ya debería estar al tanto` });
+    push({ title: '🔴 Cliente top 5 sin unidad todavía', body: `Folio ${c.folio} · ${ruta(c)} · ${SLA_URGENTE_MIN} min sin oferta — revísalo`, tag: 'escalado-urgente-' + c.folio, url: '/colocaciones.html', tipo: 'ESCALADO_URGENTE', urgente: true });
+    notifier.notificarAlerta({ title: `SOFIA — Cliente top 5 sin unidad (folio ${c.folio})`, body: `${c.empresa || 'Cliente top5'} — ${ruta(c)} — lleva ${SLA_URGENTE_MIN} minutos sin ninguna oferta de proveedor.`, tipo: 'ESCALADO_URGENTE' }).catch(() => {});
   }
   if (!horario.permitido(c.urgente)) return;
 

@@ -41,12 +41,12 @@ function fechaMTY(d = new Date()) {
 }
 
 // ── Alta / consulta ─────────────────────────────────────────────────────────
-function crear({ folio, origen, destino, tipo_unidad, fecha_carga, empresa, urgente, pendientes }) {
+function crear({ folio, origen, destino, tipo_unidad, fecha_carga, empresa, urgente, exigencia_calidad, pendientes }) {
   if (!folio) return null;
   if (db.colocaciones[folio]) return db.colocaciones[folio]; // idempotente
   db.colocaciones[folio] = {
     folio, origen: origen || '', destino: destino || '', tipo_unidad: tipo_unidad || '', fecha_carga: fecha_carga || '',
-    empresa: empresa || '', urgente: !!urgente,
+    empresa: empresa || '', urgente: !!urgente, exigencia_calidad: exigencia_calidad || null,
     creada: ahora(), estado: 'buscando', ola: 0, ultimaOlaEn: null,
     proveedores: {}, pendientes: pendientes || [],
     ganador: null, colocadoEn: null,

@@ -257,7 +257,10 @@ async function protegerDatosProveedores(texto) {
 // Edita solo las rutas de un proveedor (permite vaciarlas, cosa que el upsert no hace)
 async function actualizarCampoProveedor(id, campo, texto) {
   if (!['rutas', 'unidades', 'tarifas', 'prioridad', 'exigencia_calidad', 'sla_urgencia'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
-  const valor = String(texto || '').trim().slice(0, 500) || null;
+  // exigencia_calidad puede ser un manual completo (ver subirManualCalidad) —
+  // los demás campos son listas cortas, se quedan en 500.
+  const tope = campo === 'exigencia_calidad' ? 4000 : 500;
+  const valor = String(texto || '').trim().slice(0, tope) || null;
   if (USA_DB) {
     try {
       await db.asegurarColumnasContactos();
@@ -275,6 +278,42 @@ const actualizarUnidades = (id, t) => actualizarCampoProveedor(id, 'unidades', t
 const actualizarPrioridad = (id, t) => actualizarCampoProveedor(id, 'prioridad', t);
 const actualizarExigenciaCalidad = (id, t) => actualizarCampoProveedor(id, 'exigencia_calidad', t);
 const actualizarSlaUrgencia = (id, t) => actualizarCampoProveedor(id, 'sla_urgencia', t);
+
+// ── Manual de calidad de un cliente, subido en PDF — se procesa solo ────────
+// Pedido explícito del usuario (26-oct-2026): dar de alta un cliente exigente
+// (como se hizo con Smurfit) no debería requerir que alguien transcriba el
+// manual a mano — el equipo sube el PDF desde Base de Datos y Claude lo lee
+// directo (la API de Anthropic soporta PDF como documento) y devuelve el
+// mismo tipo de checklist estructurado que ya tienen MULTICERAS/SMURFIT en
+// el prompt de SOFIA, listo para guardarse en exigencia_calidad.
+async function analizarManualCalidad(buffer) {
+  const systemPrompt = 'Eres el asistente de operaciones de una empresa de transporte de carga en México (ABSTORAGES). Te dan el manual de calidad/criterios de aceptación de un cliente (qué debe cumplir la caja/unidad y el operador para que no la rechacen en su planta). ' +
+    'Resume el manual en español, en viñetas cortas agrupadas por tema (ej. "Exterior — techo y puertas:", "Interior — pisos y paredes:", "Requisitos del operador:"), igual de concreto y accionable que un checklist que un transportista pueda seguir. ' +
+    'No inventes nada que no esté en el documento. No repitas el documento completo — resume lo esencial, máximo 3500 caracteres. Si el PDF no es un manual de calidad/requisitos de aceptación, responde exactamente: NO_ES_MANUAL.';
+  try {
+    const raw = await claude.chat(systemPrompt, [{
+      role: 'user',
+      content: [
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: buffer.toString('base64') } },
+        { type: 'text', text: 'Resume este manual de calidad en el formato pedido.' },
+      ],
+    }], { maxTokens: 1800 });
+    const limpio = String(raw || '').trim();
+    if (!limpio || limpio.includes('NO_ES_MANUAL')) return null;
+    return limpio.slice(0, 4000);
+  } catch (e) {
+    console.error('[Contactos] Error analizando manual de calidad:', e.message);
+    throw e;
+  }
+}
+
+async function subirManualCalidad(id, buffer) {
+  const texto = await analizarManualCalidad(buffer);
+  if (!texto) return { ok: false, motivo: 'no_es_manual' };
+  const c = await actualizarCampoProveedor(id, 'exigencia_calidad', texto);
+  if (!c) return { ok: false, motivo: 'contacto_no_encontrado' };
+  return { ok: true, exigencia_calidad: c.exigencia_calidad };
+}
 
 // SARA → MARÍA (oct-2026): mismo agente, dos identificadores. Los contactos
 // ya guardados traen agente_asignado/interacciones 'SARA'; los nuevos traen
@@ -835,4 +874,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarCatalogos);
 
-module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, actualizarPrioridad, actualizarExigenciaCalidad, actualizarSlaUrgencia, upsertContacto, eliminarContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido, obtenerPerfilClientePorNombre };
+module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, actualizarPrioridad, actualizarExigenciaCalidad, actualizarSlaUrgencia, subirManualCalidad, upsertContacto, eliminarContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido, obtenerPerfilClientePorNombre };
