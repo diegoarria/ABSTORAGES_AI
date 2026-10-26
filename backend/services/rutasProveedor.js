@@ -14,8 +14,14 @@
 const GRUPOS = [
   ['monterrey', 'mty', 'nuevo leon', 'nl', 'apodaca', 'guadalupe', 'san nicolas', 'san pedro garza garcia', 'santa catarina', 'escobedo', 'garcia', 'juarez nl', 'salinas victoria', 'ciénega de flores', 'cienega de flores'],
   ['guadalajara', 'gdl', 'jalisco', 'zapopan', 'tlaquepaque', 'tonala', 'el salto', 'tlajomulco'],
-  ['cdmx', 'ciudad de mexico', 'df', 'distrito federal', 'mexico df'],
-  ['estado de mexico', 'edomex', 'toluca', 'naucalpan', 'tlalnepantla', 'ecatepec', 'cuautitlan', 'cuautitlan izcalli', 'tultitlan', 'jilotzingo', 'santa ana jilotzingo', 'atizapan', 'atizapan de zaragoza', 'huixquilucan', 'nicolas romero', 'ixtlahuaca'],
+  // CDMX + Estado de México fusionados en un solo grupo — pedido explícito
+  // del usuario (26-oct-2026): en logística real es una sola zona
+  // metropolitana. Antes estaban separados y "Ciudad de México" no
+  // emparejaba con proveedores que tienen Tultitlán/Cuautitlán/Naucalpan/
+  // Ecatepec guardado (sí son zona metropolitana de CDMX, aunque
+  // administrativamente son Edomex) — "Monterrey → Ciudad de México" no
+  // encontraba a casi nadie aunque sí había proveedores que cubren esa ruta.
+  ['cdmx', 'ciudad de mexico', 'df', 'distrito federal', 'mexico df', 'estado de mexico', 'edomex', 'toluca', 'naucalpan', 'tlalnepantla', 'ecatepec', 'cuautitlan', 'cuautitlan izcalli', 'tultitlan', 'jilotzingo', 'santa ana jilotzingo', 'atizapan', 'atizapan de zaragoza', 'huixquilucan', 'nicolas romero', 'ixtlahuaca', 'tecamac', 'tepotzotlan', 'zumpango', 'teoloyucan', 'tultepec', 'coacalco', 'nezahualcoyotl'],
   ['queretaro', 'qro'],
   ['leon', 'guanajuato', 'gto', 'irapuato', 'celaya', 'silao', 'salamanca'],
   ['aguascalientes', 'ags'],
