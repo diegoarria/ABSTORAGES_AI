@@ -146,16 +146,22 @@ async function dispararPorRuta({ origen, destino, fecha, tipo_carga, cliente }) 
   catch (e) { console.error('[difusionGeneral] Error armando lista por ruta:', e.message); return { ok: false, motivo: 'error_lista' }; }
   if (!lista.length) return { ok: true, enviados: 0, total: 0 };
 
-  feed({ tipo: 'DIFUSION_RUTA_EQUIPO', mensaje: `Difusión por ruta ${origen} → ${destino}${cliente ? ` (cliente: ${cliente})` : ''} — empezando con ${lista.length} proveedores` });
+  // Cliente top5 — pedido explícito del usuario (26-oct-2026): búsqueda con
+  // urgencia real, manda más rápido en vez de esperar la pausa normal entre envíos.
+  const perfil = cliente ? await contactos.obtenerPerfilClientePorNombre(cliente).catch(() => null) : null;
+  const esTop5 = perfil?.prioridad === 'top5';
+  const pausaMs = esTop5 ? Math.min(1000, PAUSA_ENTRE_ENVIOS_MS) : PAUSA_ENTRE_ENVIOS_MS;
+
+  feed({ tipo: 'DIFUSION_RUTA_EQUIPO', mensaje: `${esTop5 ? '🔴 URGENTE (cliente top5) — ' : ''}Difusión por ruta ${origen} → ${destino}${cliente ? ` (cliente: ${cliente})` : ''} — empezando con ${lista.length} proveedores` });
 
   let enviados = 0, fallidos = 0;
   for (const p of lista) {
     try {
-      const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_carga, fecha_carga: fecha, empresa: cliente });
+      const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_carga, fecha_carga: fecha, empresa: cliente, prioridad: perfil?.prioridad, exigencia_calidad: perfil?.exigencia_calidad });
       if (r?.status === 'rate_limited' || r?.status === 'paused') break;
       enviados++;
     } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }
-    await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
+    await new Promise(res => setTimeout(res, pausaMs));
   }
   const resumen = `Difusión ruta ${origen} → ${destino}: ${enviados} enviados de ${lista.length}${fallidos ? ` · ${fallidos} con error` : ''}.`;
   feed({ tipo: 'DIFUSION_RUTA_EQUIPO', mensaje: resumen });

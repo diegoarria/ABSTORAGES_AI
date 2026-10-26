@@ -716,6 +716,21 @@ async function renderDetail(){
         </div>
       </section>
       <section>
+        <div class="sec-title">Prioridad del cliente</div>
+        <div class="cover">
+          <div class="cover-card">
+            <div class="cover-h"><span>${ico('pin')} Nivel de prioridad</span><button class="btn btn-ghost btn-sm" onclick="editarPrioridad('${data.id}')">${ico('edit')} Editar</button></div>
+            ${data.prioridad === 'top5'
+              ? `<div class="tags"><span class="tagc" style="background:#e05252;color:#fff;border-color:#e05252">🔴 TOP 5 — PRIORIDAD MÁXIMA</span></div>`
+              : '<div class="hint">Estándar — sin marcar como top 5. SOFIA lo busca con el ritmo normal.</div>'}
+          </div>
+          <div class="cover-card">
+            <div class="cover-h"><span>${ico('pin')} Exigencia de calidad</span><button class="btn btn-ghost btn-sm" onclick="editarExigenciaCalidad('${data.id}')">${ico('edit')} Editar</button></div>
+            ${data.exigencia_calidad ? `<div class="notes">${esc(data.exigencia_calidad)}</div>` : '<div class="hint neutral">Sin requisitos especiales capturados.</div>'}
+          </div>
+        </div>
+      </section>
+      <section>
         <div class="sec-title">Desempeño del servicio (últimos 90 días)</div>
         <div id="desempeno-cliente-box"><div class="empty-msg">Cargando…</div></div>
       </section>` : '')}
@@ -1003,6 +1018,26 @@ async function editarRutas(id){
     if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
     await cargarContactos();
     selectContacto(id);
+  } catch (e) { alert('No se pudo guardar: ' + e.message); }
+}
+async function editarPrioridad(id){
+  const actual = (contactosCache.find(c => c.id === id) || {}).prioridad === 'top5';
+  const nuevo = confirm('¿Marcar este cliente como TOP 5 (prioridad máxima)?\n\nAceptar = sí, top 5 (SOFIA busca proveedores con urgencia real).\nCancelar = no, cliente estándar.') ? 'top5' : 'estandar';
+  if (actual && nuevo === 'estandar' && !confirm('¿Seguro que quieres quitarle la prioridad top 5 a este cliente?')) return;
+  try {
+    const r = await fetch('/api/contactos/' + id + '/prioridad', { method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prioridad: nuevo }) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    await cargarContactos(); selectContacto(id);
+  } catch (e) { alert('No se pudo guardar: ' + e.message); }
+}
+async function editarExigenciaCalidad(id){
+  const actual = (contactosCache.find(c => c.id === id) || {}).exigencia_calidad || '';
+  const nuevo = prompt('Exigencia de calidad de este cliente (requisitos de la caja, del operador, etc. — se le explica tal cual a SOFIA). Vacío = sin requisitos especiales:', actual);
+  if (nuevo === null) return;
+  try {
+    const r = await fetch('/api/contactos/' + id + '/exigencia-calidad', { method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ exigencia_calidad: nuevo }) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    await cargarContactos(); selectContacto(id);
   } catch (e) { alert('No se pudo guardar: ' + e.message); }
 }
 async function eliminarContacto(id){

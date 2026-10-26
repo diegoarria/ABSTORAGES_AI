@@ -156,7 +156,10 @@ async function preguntarDisponibilidad(proveedor, orden) {
   });
   registrarEnMemoria('sofia', proveedor.telefono,
     `Hola ${proveedor.nombre || ''}, soy SOFIA de ABSTORAGES. Buscamos unidad ${tipoUnidad} para la ruta ${org} → ${dst}, salida ${fecha}. ¿Tienes disponibilidad? Contáctanos por este medio.`);
-  guardarContextoRequerimiento('sofia', proveedor.telefono, { empresa: orden.empresa || orden.cliente, origen: org, destino: dst, tipoUnidad, fecha });
+  guardarContextoRequerimiento('sofia', proveedor.telefono, {
+    empresa: orden.empresa || orden.cliente, origen: org, destino: dst, tipoUnidad, fecha,
+    prioridad: orden.prioridad, exigencia_calidad: orden.exigencia_calidad,
+  });
   return resultado;
 }
 
@@ -168,12 +171,17 @@ async function preguntarDisponibilidad(proveedor, orden) {
 // Se guarda como memory.saveSummary (no solo en el historial de mensajes) para
 // que quede SIEMPRE visible al modelo como bloque [CONTEXTO PREVIO DEL CLIENTE]
 // en el system prompt, sin depender de que el historial no se haya recortado.
-function guardarContextoRequerimiento(agente, telefono, { empresa, origen, destino, tipoUnidad, fecha }) {
+// "prioridad"/"exigencia_calidad" (pedido explícito del usuario, 26-oct-2026):
+// si el cliente es top5, SOFIA negocia con urgencia real, no "ahí se va".
+function guardarContextoRequerimiento(agente, telefono, { empresa, origen, destino, tipoUnidad, fecha, prioridad, exigencia_calidad }) {
   const tel = normalizarE164(telefono);
   if (!tel) return;
   const session = `wa_${agente}_${tel}`;
+  const esTop5 = prioridad === 'top5';
   const resumen = `${empresa ? `Cliente: ${empresa}. ` : ''}Ya le preguntaste a este proveedor disponibilidad para la ruta ${origen} → ${destino}, unidad ${tipoUnidad}, fecha ${fecha}. ` +
-    `NUNCA le vuelvas a pedir su nombre ni estos datos (ruta, fecha, unidad${empresa ? ', cliente' : ''}) — ya se los diste tú en el mensaje que le mandaste. Si contesta algo como "sí tengo disponibilidad", ve directo a pedir/confirmar el precio.`;
+    `NUNCA le vuelvas a pedir su nombre ni estos datos (ruta, fecha, unidad${empresa ? ', cliente' : ''}) — ya se los diste tú en el mensaje que le mandaste. Si contesta algo como "sí tengo disponibilidad", ve directo a pedir/confirmar el precio.` +
+    (esTop5 ? ' 🔴 CLIENTE TOP 5 — PRIORIDAD MÁXIMA: negocia con urgencia real, cierra rápido, no dejes este hilo esperando.' : '') +
+    (exigencia_calidad ? ` Exigencia de calidad de este cliente (no negociable): ${exigencia_calidad}` : '');
   try { memory.saveSummary(session, resumen); } catch (e) { console.error('[whatsappProactivo] Error guardando contexto de requerimiento:', e.message); }
 }
 

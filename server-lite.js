@@ -424,14 +424,22 @@ async function procesarRequerimiento(rq, persona) {
   const existente = colocaciones.obtener(rq.folio);
   if (existente) return `El folio ${rq.folio} ya está en el sistema (estado: ${existente.estado.replace('_', ' ')}). No lo volví a lanzar para no molestar dos veces a los proveedores.`;
   const cargaTxt = requerimiento.cuando(rq.carga), descargaTxt = requerimiento.cuando(rq.descarga);
+  // Perfil de prioridad del cliente — pedido explícito del usuario (26-oct-2026):
+  // un cliente "top5" dispara búsqueda de proveedores con urgencia real, no
+  // "ahí se va" (afecta la escalera de SOFIA — ver sofiaOperacion.js).
+  const perfilCliente = await contactos.obtenerPerfilClientePorNombre(rq.cliente).catch(() => null);
+  const esTop5 = perfilCliente?.prioridad === 'top5';
   const lead = {
     folio: rq.folio, empresa: rq.cliente, nombre: rq.cliente, origen: rq.origen, destino: rq.destino, tipo_unidad: rq.tipo_unidad,
     fecha_carga: cargaTxt, fecha_descarga: descargaTxt, sara_nota: 'requerimiento_whatsapp', sessionId: `req_${rq.folio}`,
+    urgente: esTop5,
   };
   await ordersStore.guardarOrden(lead).catch(e => console.error('[ordersStore]', e.message));
   folioContexto.registrar(rq.folio, {
-    notas: `Requerimiento recibido por WhatsApp de ${por}. Cita de carga: ${cargaTxt}. Cita de descarga: ${descargaTxt}. Origen completo: ${rq.origenCompleto}. Destino completo: ${rq.destinoCompleto}.`,
-    resumen: { empresa: rq.cliente, origen: rq.origen, destino: rq.destino, tipo_unidad: rq.tipo_unidad }, por,
+    notas: `Requerimiento recibido por WhatsApp de ${por}. Cita de carga: ${cargaTxt}. Cita de descarga: ${descargaTxt}. Origen completo: ${rq.origenCompleto}. Destino completo: ${rq.destinoCompleto}.` +
+      (esTop5 ? ' 🔴 CLIENTE TOP 5 — PRIORIDAD MÁXIMA, buscar unidad con urgencia real.' : '') +
+      (perfilCliente?.exigencia_calidad ? ` Exigencia de calidad (no negociable): ${perfilCliente.exigencia_calidad}` : ''),
+    resumen: { empresa: rq.cliente, origen: rq.origen, destino: rq.destino, tipo_unidad: rq.tipo_unidad, prioridad: perfilCliente?.prioridad || null }, por,
   });
   pushActividad({ agente: 'SOFIA', tipo: 'NUEVA_ORDEN', mensaje: `Requerimiento ${rq.folio} recibido de ${por} — ${rq.cliente}: ${rq.origen} → ${rq.destino} (${rq.tipo_unidad}), carga ${cargaTxt}`, metadata: { folio: rq.folio } });
 
@@ -2721,6 +2729,31 @@ app.put('/api/contactos/:id/unidades', soloAdmin, async (req, res) => {
     const c = await contactos.actualizarUnidades(req.params.id, (req.body || {}).unidades);
     if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
     res.json({ ok: true, unidades: c.unidades || null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Perfil de prioridad/urgencia de un cliente — pedido explícito del usuario
+// (26-oct-2026): marcar clientes "top5" para que SOFIA busque proveedores
+// con urgencia real, no "ahí se va" (ver sofiaOperacion.js/contactos.js).
+app.put('/api/contactos/:id/prioridad', soloAdmin, async (req, res) => {
+  try {
+    const c = await contactos.actualizarPrioridad(req.params.id, (req.body || {}).prioridad);
+    if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
+    res.json({ ok: true, prioridad: c.prioridad || null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+app.put('/api/contactos/:id/exigencia-calidad', soloAdmin, async (req, res) => {
+  try {
+    const c = await contactos.actualizarExigenciaCalidad(req.params.id, (req.body || {}).exigencia_calidad);
+    if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
+    res.json({ ok: true, exigencia_calidad: c.exigencia_calidad || null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+app.put('/api/contactos/:id/sla-urgencia', soloAdmin, async (req, res) => {
+  try {
+    const c = await contactos.actualizarSlaUrgencia(req.params.id, (req.body || {}).sla_urgencia);
+    if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
+    res.json({ ok: true, sla_urgencia: c.sla_urgencia || null });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

@@ -37,7 +37,7 @@ function normalizarTelefono(t) {
   return (t || '').replace(/\D/g, '').slice(-10);
 }
 
-function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas, unidades, rfc, estatus }) {
+function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas, unidades, rfc, estatus, prioridad, exigencia_calidad, sla_urgencia }) {
   const AGENTE = (agente || '').toUpperCase();
   const tel = normalizarTelefono(telefono);
   let existente = null;
@@ -59,6 +59,9 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
     existente.unidades        = unidades || existente.unidades;
     existente.rfc             = rfc || existente.rfc;
     existente.estatus         = estatus || existente.estatus || (tipo === 'cliente' || existente.tipo === 'cliente' ? 'Activo' : existente.estatus);
+    existente.prioridad       = prioridad || existente.prioridad;
+    existente.exigencia_calidad = exigencia_calidad || existente.exigencia_calidad;
+    existente.sla_urgencia    = sla_urgencia || existente.sla_urgencia;
     existente.fecha_ultimo_contacto = ahora;
     contacto = existente;
   } else {
@@ -68,6 +71,11 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
       nombre_completo: nombre_completo || 'Sin nombre', puesto: puesto || null, telefono: telefono || null,
       email: email || null, empresa: empresa || null, tipo_carga: tipo_carga || null, notas: notas || null, rutas: rutas || null, unidades: unidades || null,
       rfc: rfc || null, estatus: estatus || (tipo === 'cliente' ? 'Activo' : null),
+      // Perfil de cliente — pedido explícito del usuario (26-oct-2026): "top5"
+      // dispara búsqueda de proveedores con urgencia (ver sofiaOperacion.js);
+      // exigencia_calidad es el manual de calidad en texto libre (ej. Smurfit);
+      // sla_urgencia es una nota libre de cómo manejarlo (ej. "nunca dejarlo esperando").
+      prioridad: prioridad || null, exigencia_calidad: exigencia_calidad || null, sla_urgencia: sla_urgencia || null,
       fecha_primer_contacto: ahora, fecha_ultimo_contacto: ahora, created_at: ahora,
     };
     cache.push(contacto);
@@ -169,7 +177,7 @@ async function protegerDatosProveedores(texto) {
 
 // Edita solo las rutas de un proveedor (permite vaciarlas, cosa que el upsert no hace)
 async function actualizarCampoProveedor(id, campo, texto) {
-  if (!['rutas', 'unidades', 'tarifas'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
+  if (!['rutas', 'unidades', 'tarifas', 'prioridad', 'exigencia_calidad', 'sla_urgencia'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
   const valor = String(texto || '').trim().slice(0, 500) || null;
   if (USA_DB) {
     try {
@@ -185,6 +193,9 @@ async function actualizarCampoProveedor(id, campo, texto) {
 }
 const actualizarRutas = (id, t) => actualizarCampoProveedor(id, 'rutas', t);
 const actualizarUnidades = (id, t) => actualizarCampoProveedor(id, 'unidades', t);
+const actualizarPrioridad = (id, t) => actualizarCampoProveedor(id, 'prioridad', t);
+const actualizarExigenciaCalidad = (id, t) => actualizarCampoProveedor(id, 'exigencia_calidad', t);
+const actualizarSlaUrgencia = (id, t) => actualizarCampoProveedor(id, 'sla_urgencia', t);
 
 // SARA → MARÍA (oct-2026): mismo agente, dos identificadores. Los contactos
 // ya guardados traen agente_asignado/interacciones 'SARA'; los nuevos traen
@@ -299,6 +310,7 @@ const TRATO_CLIENTE_BD =
 // pedírselo — ya se le identifica por teléfono, eso basta.
 function bloqueDatosCliente(contacto) {
   const campo = (label, valor) => `- **${label}:** ${valor || 'no disponible — no se lo pidas, sigue la conversación normal'}`;
+  const top5 = contacto.prioridad === 'top5';
   return (
     `\n**Datos del cliente en la Base de Datos:**\n` +
     `${campo('Cliente / Razón social', contacto.empresa)}\n` +
@@ -306,9 +318,31 @@ function bloqueDatosCliente(contacto) {
     `${campo('Estatus', contacto.estatus)}\n` +
     `${campo('Nombre de contacto', contacto.nombre_completo)}\n` +
     `${campo('Correo electrónico', contacto.email)}\n` +
-    `${campo('Teléfono', contacto.telefono)}\n`
+    `${campo('Teléfono', contacto.telefono)}\n` +
+    (top5 ? `\n🔴 **CLIENTE TOP 5 — PRIORIDAD MÁXIMA.** Este cliente es de los más importantes de ABSTORAGES. Nunca lo trates como "uno más" — trátalo con urgencia real, no "ahí se va": respuestas rápidas, sin fricciones, y si algo se complica (unidad, retraso, calidad) escálalo al equipo de inmediato en vez de dejarlo pendiente.\n` : '') +
+    (contacto.exigencia_calidad ? `\n**Exigencia de calidad de este cliente (no negociable):** ${contacto.exigencia_calidad}\n` : '') +
+    (contacto.sla_urgencia ? `\n**Cómo manejar la urgencia con este cliente:** ${contacto.sla_urgencia}\n` : '')
   );
 }
+
+// Perfil de prioridad/urgencia de un cliente, buscado por nombre de empresa —
+// para cuando SOFIA está negociando con PROVEEDORES por un folio de este
+// cliente (no hablando con el cliente directamente, donde ya aplica
+// bloqueContactoConocido). Búsqueda difusa: coincide si el nombre de empresa
+// del contacto contiene (o está contenido en) el texto buscado.
+async function obtenerPerfilClientePorNombre(nombreEmpresa) {
+  const q = normalizarTexto(nombreEmpresa);
+  if (!q) return null;
+  let clientes = [];
+  try { clientes = await listarPorAgente('MARIA', { tipo: 'cliente' }); } catch { return null; }
+  const match = clientes.find(c => {
+    const e = normalizarTexto(c.empresa || c.nombre_completo);
+    return e && (e.includes(q) || q.includes(e));
+  });
+  if (!match) return null;
+  return { empresa: match.empresa || match.nombre_completo, prioridad: match.prioridad || null, exigencia_calidad: match.exigencia_calidad || null, sla_urgencia: match.sla_urgencia || null };
+}
+function normalizarTexto(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); }
 
 // Trato de NOA con un contacto conocido — distinto del de MARÍA (ejecutiva
 // comercial) y SOFIA (amigo de confianza): NOA no vende ni negocia, solo
@@ -721,4 +755,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarCatalogos);
 
-module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, upsertContacto, eliminarContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido };
+module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, actualizarPrioridad, actualizarExigenciaCalidad, actualizarSlaUrgencia, upsertContacto, eliminarContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido, obtenerPerfilClientePorNombre };

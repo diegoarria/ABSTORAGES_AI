@@ -74,11 +74,15 @@ function lanzarOla(folio) {
     return false;
   }
   const ola = c.ola + 1;
-  const siguientes = [...c.pendientes].sort((a, b) => colocaciones.puntaje(b.telefono) - colocaciones.puntaje(a.telefono)).slice(0, OLA_TAM);
+  // Cliente urgente (top5) — pedido explícito del usuario (26-oct-2026): "no
+  // al ahí se va, a lograrlo" — en vez de contactar OLA_TAM proveedores por
+  // ola, contacta al doble de golpe para cerrar más rápido.
+  const tamOla = c.urgente ? OLA_TAM * 2 : OLA_TAM;
+  const siguientes = [...c.pendientes].sort((a, b) => colocaciones.puntaje(b.telefono) - colocaciones.puntaje(a.telefono)).slice(0, tamOla);
   siguientes.forEach(p => colocaciones.marcarContactado(folio, p, ola));
   const orden = ordenDe(c);
-  feed({ tipo: 'CONTACTANDO_PROVEEDORES', mensaje: `Folio ${folio} (${ruta(c)}) — ola ${ola}: SOFIA contactó a ${siguientes.map(p => p.nombre).join(', ')}${c.pendientes.length ? ` · quedan ${c.pendientes.length} en espera` : ''}`, metadata: { folio, ola } });
-  if (ola === 1) push({ title: '🚚 SOFIA está contactando proveedores', body: `Folio ${folio} · ${ruta(c)} · ${siguientes.map(p => p.nombre).join(', ')}`, tag: 'sofia-contactando', url: '/actividad.html', tipo: 'CONTACTANDO_PROVEEDORES' });
+  feed({ tipo: 'CONTACTANDO_PROVEEDORES', mensaje: `${c.urgente ? '🔴 URGENTE — ' : ''}Folio ${folio} (${ruta(c)}) — ola ${ola}: SOFIA contactó a ${siguientes.map(p => p.nombre).join(', ')}${c.pendientes.length ? ` · quedan ${c.pendientes.length} en espera` : ''}`, metadata: { folio, ola, urgente: c.urgente } });
+  if (ola === 1) push({ title: c.urgente ? '🔴 SOFIA — búsqueda URGENTE (cliente top 5)' : '🚚 SOFIA está contactando proveedores', body: `Folio ${folio} · ${ruta(c)} · ${siguientes.map(p => p.nombre).join(', ')}`, tag: 'sofia-contactando', url: '/actividad.html', tipo: 'CONTACTANDO_PROVEEDORES', urgente: c.urgente });
   const provs = siguientes.map(p => ({ id: p.id, nombre: p.nombre, telefono: p.telefono, rutas: [], tipos_unidad: [], activo: true }));
   vapi.lanzarLlamadasProveedores(orden, provs)
     .then(r => feed({ tipo: 'VAPI_INICIADO', mensaje: `Folio ${folio} — ${r.llamadas} llamada(s) iniciada(s) en la ola ${ola}`, metadata: { folio, ...r } }))
@@ -397,12 +401,17 @@ function tickBusqueda(c) {
     }
     if (p.estado !== 'esperando') continue;
     const edad = minDesde(p.contactadoEn);
-    if (edad >= SIN_RESP_MIN) {
+    // Cliente urgente (top5): se da por "sin respuesta" y se manda el
+    // recordatorio en la mitad del tiempo — pedido explícito del usuario
+    // (26-oct-2026), sin dejarlo esperando igual que a un cliente estándar.
+    const sinRespEsperado = c.urgente ? SIN_RESP_MIN / 2 : SIN_RESP_MIN;
+    const recordEsperado = c.urgente ? RECORD_MIN / 2 : RECORD_MIN;
+    if (edad >= sinRespEsperado) {
       p.estado = 'sin_respuesta'; colocaciones.guardarCambios();
       feed({ tipo: 'SIN_RESPUESTA', mensaje: `Folio ${c.folio}: ${p.nombre} no respondió` });
     } else if (p.marcoRevisando) {
       continue; // ya tiene su propio seguimiento amable — no se le manda el recordatorio genérico
-    } else if (edad >= RECORD_MIN && !p.recordatorioEn) {
+    } else if (edad >= recordEsperado && !p.recordatorioEn) {
       p.recordatorioEn = new Date().toISOString(); colocaciones.guardarCambios();
       whatsappProactivo.preguntarDisponibilidad({ nombre: p.nombre, telefono: p.tel }, ordenDe(c)).catch(e => console.error('[sofiaOperacion] Error en recordatorio:', e.message));
       feed({ tipo: 'RECORDATORIO', mensaje: `Folio ${c.folio}: recordatorio único a ${p.nombre} (no había respondido)` });
@@ -412,7 +421,11 @@ function tickBusqueda(c) {
   if (c.pendientes.length) {
     const ultimaOla = provs.filter(p => p.ola === c.ola);
     const nadieActivo = ultimaOla.length && ultimaOla.every(p => ['rechazo', 'sin_respuesta'].includes(p.estado));
-    if (!c.ultimaOlaEn || nadieActivo || minDesde(c.ultimaOlaEn) >= ESPERA_OLA_MIN) lanzarOla(c.folio);
+    // Cliente urgente (top5): siguiente ola a la mitad del tiempo de espera —
+    // pedido explícito del usuario (26-oct-2026), no esperar lo mismo que a
+    // un cliente estándar.
+    const esperaOla = c.urgente ? ESPERA_OLA_MIN / 2 : ESPERA_OLA_MIN;
+    if (!c.ultimaOlaEn || nadieActivo || minDesde(c.ultimaOlaEn) >= esperaOla) lanzarOla(c.folio);
   } else if (provs.length && provs.every(p => ['rechazo', 'sin_respuesta'].includes(p.estado))) {
     colocaciones.cambiarEstado(c.folio, 'sin_unidad');
     feed({ tipo: 'SIN_UNIDAD', mensaje: `Folio ${c.folio} (${ruta(c)}): ningún proveedor tiene unidad — revisar manualmente` });
