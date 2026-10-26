@@ -11904,7 +11904,7 @@
   },
   {
     "id": "CT-MV5INXWL5OGL",
-    "agente_asignado": "SARA",
+    "agente_asignado": "MARIA",
     "tipo": "cliente",
     "nombre_completo": "ERIKA GUILLERMO / JORGE MEDINA",
     "puesto": null,
@@ -13411,6 +13411,36 @@
         "canal": "importacion-pdf",
         "resumen": "Importado desde Proveedores_por_Rutas.pdf (base histórica de rutas)",
         "fecha": "2026-10-23T20:42:42.090Z"
+      }
+    ]
+  },
+  {
+    "id": "CT-MVPQ02470XKY",
+    "agente_asignado": "MARIA",
+    "tipo": "cliente",
+    "nombre_completo": "Cliente Prueba Manual",
+    "puesto": null,
+    "telefono": "5218100000222",
+    "email": null,
+    "empresa": null,
+    "tipo_carga": null,
+    "notas": null,
+    "rutas": null,
+    "unidades": null,
+    "rfc": null,
+    "estatus": "Activo",
+    "prioridad": null,
+    "exigencia_calidad": null,
+    "sla_urgencia": null,
+    "fecha_primer_contacto": "2026-10-26T20:39:49.678Z",
+    "fecha_ultimo_contacto": "2026-10-26T20:39:49.678Z",
+    "created_at": "2026-10-26T20:39:49.678Z",
+    "interacciones": [
+      {
+        "agente": "MARIA",
+        "canal": "test",
+        "resumen": "test",
+        "fecha": "2026-10-26T20:39:49.678Z"
       }
     ]
   }
