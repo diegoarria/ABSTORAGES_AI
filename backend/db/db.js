@@ -155,7 +155,7 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
 let columnasContactos = null;
 function asegurarColumnasContactos() {
   if (!columnasContactos) {
-    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT, ADD COLUMN IF NOT EXISTS tarifas TEXT, ADD COLUMN IF NOT EXISTS rfc TEXT, ADD COLUMN IF NOT EXISTS estatus TEXT, ADD COLUMN IF NOT EXISTS prioridad TEXT, ADD COLUMN IF NOT EXISTS exigencia_calidad TEXT, ADD COLUMN IF NOT EXISTS sla_urgencia TEXT')
+    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT, ADD COLUMN IF NOT EXISTS tarifas TEXT, ADD COLUMN IF NOT EXISTS rfc TEXT, ADD COLUMN IF NOT EXISTS estatus TEXT, ADD COLUMN IF NOT EXISTS prioridad TEXT, ADD COLUMN IF NOT EXISTS exigencia_calidad TEXT, ADD COLUMN IF NOT EXISTS sla_urgencia TEXT, ADD COLUMN IF NOT EXISTS perfil_relacion TEXT, ADD COLUMN IF NOT EXISTS perfil_actualizado TIMESTAMPTZ')
       .catch(e => { columnasContactos = null; throw e; });
   }
   return columnasContactos;
@@ -253,6 +253,12 @@ async function buscarContactoPorTelefono(telefono, agente) {
     [rows[0].id]
   );
   return { ...rows[0], interacciones };
+}
+
+async function actualizarPerfilRelacion(id, texto) {
+  await asegurarColumnasContactos();
+  const { rows } = await query('UPDATE contactos SET perfil_relacion = $1, perfil_actualizado = NOW() WHERE id = $2 RETURNING *', [texto, id]);
+  return rows[0] || null;
 }
 
 async function eliminarContacto(id) {
@@ -398,6 +404,7 @@ module.exports = {
   listarContactosPorAgente,
   obtenerContactoDetalle,
   buscarContactoPorTelefono,
+  actualizarPerfilRelacion,
   eliminarContacto,
   obtenerProveedoresPorRuta,
   obtenerProveedoresRecurrentes,

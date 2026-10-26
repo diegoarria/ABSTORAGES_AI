@@ -10,6 +10,7 @@
 const fs   = require('fs');
 const path = require('path');
 const db = require('../db/db');
+const claude = require('./claude');
 
 const USA_DB = !!process.env.DATABASE_URL;
 const FILE = path.join(__dirname, '../../data/contactos.json');
@@ -62,6 +63,8 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
     existente.prioridad       = prioridad || existente.prioridad;
     existente.exigencia_calidad = exigencia_calidad || existente.exigencia_calidad;
     existente.sla_urgencia    = sla_urgencia || existente.sla_urgencia;
+    // perfil_relacion/perfil_actualizado NO se tocan aquí — los escribe
+    // únicamente actualizarPerfilSiCorresponde() (ver abajo), nunca un upsert normal.
     existente.fecha_ultimo_contacto = ahora;
     contacto = existente;
   } else {
@@ -95,6 +98,11 @@ async function upsertContacto(datos) {
     try {
       const contacto = await db.upsertContacto(datos);
       console.log(`[Contactos] Upsert (Postgres) ${datos.agente} → ${contacto.nombre_completo} (${contacto.id})`);
+      // db.upsertContacto() no regresa las interacciones (están en otra tabla) —
+      // se piden aparte solo para decidir si toca regenerar el perfil.
+      db.obtenerContactoDetalle(contacto.id)
+        .then(detalle => actualizarPerfilSiCorresponde(detalle || contacto))
+        .catch(e => console.error('[Contactos] Error actualizando perfil de relación:', e.message));
       return contacto;
     } catch (e) {
       console.error('[Contactos] Postgres falló en upsert, cae a archivo:', e.message);
@@ -102,7 +110,78 @@ async function upsertContacto(datos) {
   }
   const contacto = upsertEnMemoria(datos);
   console.log(`[Contactos] Upsert (archivo) ${datos.agente} → ${contacto.nombre_completo} (${contacto.id})`);
+  actualizarPerfilSiCorresponde(contacto).catch(e => console.error('[Contactos] Error actualizando perfil de relación:', e.message));
   return contacto;
+}
+
+// ── Perfil de relación — se auto-genera solo, nadie lo escribe a mano ───────
+// Pedido explícito del usuario (26-oct-2026): "que tengan en memoria TOOODO
+// sobre clientes y proveedores" y se les dé un trato MUY personalizado. Cada
+// vez que se registra una interacción nueva con un contacto, en segundo plano
+// (nunca bloquea la respuesta al usuario) se manda el historial reciente a
+// Claude (modelo barato, el mismo que ya usa negociacion-wa.js) y se le pide
+// un resumen corto de PATRONES DE COMPORTAMIENTO — no datos que ya están en
+// otros campos (eso sería redundante), sino cómo es tratar con esta persona:
+// estilo de comunicación, confiabilidad, forma de negociar, preferencias,
+// focos rojos. Se guarda reemplazando el anterior (no se acumula sin límite)
+// y se inyecta en bloqueContactoConocido() cada vez que la IA habla con ella.
+//
+// Throttle: no se regenera en cada upsert (serían demasiadas llamadas si hay
+// varias interacciones seguidas en minutos) — solo si pasaron al menos
+// PERFIL_MIN_MINUTOS desde la última vez, y solo si ya hay al menos 2
+// interacciones registradas (con 1 sola no hay patrón que resumir).
+const PERFIL_MIN_MINUTOS = Number(process.env.PERFIL_RELACION_MIN_MINUTOS || 15);
+
+async function actualizarPerfilSiCorresponde(contacto) {
+  if (!contacto || !contacto.id) return;
+  const interacciones = contacto.interacciones || [];
+  if (interacciones.length < 2) return; // nada que resumir todavía
+  if (contacto.perfil_actualizado) {
+    const minDesde = (Date.now() - new Date(contacto.perfil_actualizado).getTime()) / 60000;
+    if (minDesde < PERFIL_MIN_MINUTOS) return;
+  }
+  const texto = await generarPerfilRelacion(contacto);
+  if (texto === null) return; // la IA no encontró patrón suficiente — no se sobreescribe con vacío
+  await guardarPerfilRelacion(contacto.id, texto);
+}
+
+async function generarPerfilRelacion(contacto) {
+  const interacciones = (contacto.interacciones || []).slice(0, 15)
+    .map(i => `- ${new Date(i.fecha).toLocaleDateString('es-MX')} (${i.canal || 'otro'}, ${i.agente}): ${i.resumen || 'sin detalle'}`)
+    .join('\n');
+  const systemPrompt = `Analizas el historial de interacciones de un ${contacto.tipo || 'contacto'} de una empresa de logística (ABSTORAGES) para generar un perfil de relación que otra IA va a leer antes de hablar con esta persona, para darle un trato personalizado.
+
+Responde SOLO con 3 a 6 viñetas cortas (una línea cada una, empezando con "- "), en español, sobre PATRONES DE COMPORTAMIENTO observables en el historial — nunca inventes nada que no esté respaldado por las interacciones:
+- Estilo de comunicación (formal/relajado, rápido/lento para responder, por texto o llamada)
+- Confiabilidad (cumple lo que promete, es puntual, cancela seguido)
+- Forma de negociar o de pedir las cosas (flexible, exigente, regatea, va directo al grano)
+- Preferencias detectadas (horarios, forma de contacto, tipo de unidad, rutas que prefiere)
+- Focos rojos si los hay (quejas recurrentes, pagos tardíos, cancelaciones) — en tono profesional, nunca ofensivo
+
+Si el historial no tiene suficiente información para ninguno de estos puntos, responde exactamente: SIN_PATRON
+Nunca repitas datos que ya estarían en otros campos (nombre, empresa, rutas, teléfono) — solo comportamiento.`;
+
+  try {
+    const raw = await claude.chat(systemPrompt, [{ role: 'user', content: `Historial de interacciones:\n${interacciones}` }], { maxTokens: 400 });
+    const limpio = raw.trim();
+    if (!limpio || limpio.includes('SIN_PATRON')) return null;
+    return limpio.slice(0, 1500);
+  } catch (e) {
+    console.error('[Contactos] Error generando perfil de relación:', e.message);
+    return null;
+  }
+}
+
+async function guardarPerfilRelacion(id, texto) {
+  if (USA_DB) {
+    try { await db.actualizarPerfilRelacion(id, texto); return; }
+    catch (e) { console.error('[Contactos] Postgres falló guardando perfil de relación, cae a archivo:', e.message); }
+  }
+  const c = cache.find(x => x.id === id);
+  if (!c) return;
+  c.perfil_relacion = texto;
+  c.perfil_actualizado = new Date().toISOString();
+  guardarDisco();
 }
 
 // ── Directorio de proveedores para la memoria de SOFIA ──────────────────────
@@ -367,6 +446,7 @@ function bloqueContactoConocido(contacto, agente) {
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
     (esNOA ? TRATO_NOA_BD : contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : contacto.tipo === 'cliente' ? TRATO_CLIENTE_BD : '') +
     (contacto.tipo === 'cliente' ? bloqueDatosCliente(contacto) : '') +
+    (contacto.perfil_relacion ? `\n**🧠 Así es tratar con esta persona (generado de su historial real — úsalo para un trato personalizado, nunca lo repitas textual ni lo menciones de forma robótica):**\n${contacto.perfil_relacion}\n\n` : '') +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
     (interacciones ? `Interacciones previas relevantes:\n${interacciones}\n\n` : '\n') +
     `IMPORTANTE: esta persona YA está registrada en la Base de Datos de ABSTORAGES — NO le pidas nombre completo, teléfono ni correo (aunque el correo esté vacío, NO se lo pidas: ya lo identificas por teléfono), y NO apliques la regla de "PRIMER MENSAJE" con ella (esa regla es solo para desconocidos). Si te saluda, salúdala por su nombre y sigue la conversación normal.\n` +

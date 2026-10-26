@@ -736,6 +736,7 @@ async function renderDetail(){
       </section>` : '')}
 
       ${esProv && data.tarifas ? `<section><div class="sec-title">Tarifas históricas</div><div class="notes">${esc(data.tarifas)}</div></section>` : ''}
+      ${data.perfil_relacion ? `<section><div class="sec-title">🧠 Perfil de relación (generado automático — se actualiza solo con cada interacción)</div><div class="notes">${esc(data.perfil_relacion).replace(/\n/g,'<br>')}</div></section>` : ''}
       ${data.notas ? `<section><div class="sec-title">Notas</div><div class="notes">${esc(data.notas)}</div></section>` : ''}
 
       <section>
