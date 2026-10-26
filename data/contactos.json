@@ -11910,7 +11910,7 @@
     "puesto": null,
     "telefono": "8130954756",
     "email": "erika.guillermo@smurfitwestrock.mx",
-    "empresa": "PAPEL Y EMPAQUES GONDI MONTERREY",
+    "empresa": "SMURFIT WESTROCK MEXICO (PAPEL Y EMPAQUES GONDI MONTERREY)",
     "tipo_carga": null,
     "notas": null,
     "rutas": null,
@@ -11918,16 +11918,25 @@
     "rfc": "PEG170907426",
     "estatus": "Potencial",
     "fecha_primer_contacto": "2026-10-12T17:19:03.525Z",
-    "fecha_ultimo_contacto": "2026-10-12T17:19:03.525Z",
+    "fecha_ultimo_contacto": "2026-10-26T20:06:53.934Z",
     "created_at": "2026-10-12T17:19:03.525Z",
     "interacciones": [
+      {
+        "agente": "MARIA",
+        "canal": "alta-manual",
+        "resumen": "Alta de cliente — Smurfit Westrock México / Papel y Empaques Gondi Monterrey, marcado prioridad top5 por el usuario (26-oct-2026).",
+        "fecha": "2026-10-26T20:06:53.934Z"
+      },
       {
         "agente": "SARA",
         "canal": "permanente",
         "resumen": "Alta desde cartera de clientes AppSheet (Potencial)",
         "fecha": "2026-10-12T17:19:03.525Z"
       }
-    ]
+    ],
+    "prioridad": "top5",
+    "exigencia_calidad": "Manual de calidad oficial de Smurfit — exterior: techo sin orificios/óxido, puertas completas con empaques que cierren bien; interior: pisos y paredes sin humedad/orificios/astillas, tablas completas; faldones bien sujetos; caja limpia sin basura/vidrios/grasa/olores/plaga; soportes en buen estado y estables; llantas completas sin rasgaduras y que recarguen hasta la sección trasera; remaches sin faltantes (máx 7 por hoja), piso exterior sin agujeros, rieles inferior/superior sin fracturas ni grietas. Requisitos del operador: EPP completo (camisa manga larga, pantalón sin rasgaduras, zapatos de seguridad, chaleco naranja, casco), documentación (gafete, IFE, licencia federal, IMSS vigente, seguro de unidad vigente), Certificado de Fumigación vigente en hoja membretada (transportista, número económico, placas de la caja, fecha, número de certificado), equipo de unidad (extintor 2kg+, alarma de reversa, matachispas, triángulos/conos). Embarques inspecciona CADA unidad con lámparas de alto alcance antes de cargar, sin excepción.",
+    "sla_urgencia": "Cliente más importante de ABSTORAGES — búsqueda de proveedores con urgencia real, nunca \"ahí se va\". Cualquier problema (unidad, calidad, retraso) se escala de inmediato al equipo, no se espera a que se resuelva solo."
   },
   {
     "id": "CT-MV5INXWL6T6V",
