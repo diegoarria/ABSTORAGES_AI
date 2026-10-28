@@ -10,6 +10,7 @@
 // en memoria + guardado con debounce.
 const fs = require('fs');
 const path = require('path');
+const rutasProveedor = require('./rutasProveedor');
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const FILE = path.join(DATA_DIR, 'sofia-operacion.json');
@@ -305,6 +306,24 @@ function agregarDisponibilidad({ telefono, nombre, fecha, ruta, unidad, detalle 
 const disponibilidades = () => db.disponibilidades.slice();
 function actualizarDisponibilidad(id, parche) { const d = db.disponibilidades.find(x => x.id === id); if (!d) return null; Object.assign(d, parche); guardar(); return d; }
 
+// Dashboard de disponibilidad por ruta — pedido explícito del usuario
+// (27-oct-2026): "filtro por ruta y automáticamente me dice qué proveedores
+// tienen disponibilidad", en vez de tener que preguntar 1:1 a cada uno.
+// Reusa el mismo motor de zonas metropolitanas de rutasProveedor.js (el que
+// ya corrige Monterrey↔CDMX) para que un proveedor que dijo "tengo
+// disponibilidad para Tultitlán" aparezca si buscas "Ciudad de México".
+// Solo cuenta lo vigente: pendiente/recordada y, si tiene fecha, que no
+// haya pasado ya (mismo criterio que reporteDisponibilidad.js).
+function buscarDisponibilidadPorRuta(origen, destino) {
+  const hoy = fechaMTY();
+  return db.disponibilidades.filter(d => {
+    if (!['pendiente', 'recordada'].includes(d.estado)) return false;
+    if (d.fecha && d.fecha < hoy) return false;
+    if (!d.ruta) return false;
+    return rutasProveedor.cubreRuta(d.ruta, origen, destino).ok;
+  });
+}
+
 // ── Base de los KPIs ────────────────────────────────────────────────────────
 function kpiBase(fecha = fechaMTY()) {
   const mes = fecha.slice(0, 7);
@@ -323,6 +342,6 @@ module.exports = {
   CHECKLIST, estadoChecklist, checklistCompleto, marcarChecklist,
   HITOS, hitoAlcanzado, marcarHito, registrarRetraso, guardarOperador, marcarChequeo, marcarAlertaSeg,
   detenerBusqueda, asignar, cambiarEstado, marcarAviso, marcarUrgente, actualizarSeguimiento, actualizarMonitoreoNOA, guardarCambios, estadisticas, puntaje, comparativo, ranking,
-  agregarDisponibilidad, disponibilidades, actualizarDisponibilidad,
+  agregarDisponibilidad, disponibilidades, actualizarDisponibilidad, buscarDisponibilidadPorRuta,
   agregarSugerencia, sugerencias, resolverSugerencia, kpiBase, kpiMeta, kpiGuardar,
 };

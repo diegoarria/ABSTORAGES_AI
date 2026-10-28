@@ -2624,6 +2624,32 @@ app.post('/api/disponibilidades/:id/cancelar', soloAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+// Dashboard de disponibilidad por ruta — pedido explícito del usuario
+// (27-oct-2026): filtras por ruta y te dice qué proveedores tienen
+// disponibilidad YA, con calificación y perfil de relación, en vez de
+// escribirle 1:1 a cada uno para preguntar. La lista sale de lo que los
+// proveedores ya le avisaron a SOFIA (DISPONIBILIDAD_RUTA/DISPONIBILIDAD_FUTURA).
+app.get('/api/disponibilidades/buscar', adminUOps, async (req, res) => {
+  try {
+    const origen = String(req.query.origen || '').trim();
+    const destino = String(req.query.destino || '').trim();
+    if (!origen || !destino) return res.status(400).json({ error: 'origen y destino requeridos' });
+    const encontradas = colocaciones.buscarDisponibilidadPorRuta(origen, destino);
+    const lista = await Promise.all(encontradas.map(async d => {
+      const ct = await contactos.buscarPorTelefono(d.telefono, 'sofia').catch(() => null);
+      return {
+        id: d.id, telefono: d.telefono, nombre: d.nombre || ct?.nombre_completo || 'Sin nombre',
+        empresa: ct?.empresa || null, ruta: d.ruta, unidad: d.unidad || ct?.unidades || null,
+        fecha: d.fecha || null, reportadoEn: d.creada,
+        puntaje: colocaciones.puntaje(d.telefono), perfilRelacion: ct?.perfil_relacion || null,
+        contactoId: ct?.id || null,
+      };
+    }));
+    lista.sort((a, b) => b.puntaje - a.puntaje);
+    res.json(lista);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── Contexto del folio: notas e imágenes que SARA, SOFIA y NOA ven ──────────
 app.post('/api/folios/:folio/adjuntos', soloAdmin, express.raw({ type: 'image/*', limit: '9mb' }), async (req, res) => {
   try {

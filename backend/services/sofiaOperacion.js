@@ -215,7 +215,13 @@ function procesarSenales({ telefono, nombre, respuesta }) {
     // inmediato. Pedido explícito del usuario (01-oct-2026).
     const dr = json(respuesta, 'DISPONIBILIDAD_RUTA');
     if (dr && dr.ruta) {
-      feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} ofrece ruta ${dr.ruta}${dr.fecha && dr.fecha !== 'hoy' ? ' el ' + textoFecha(dr.fecha) : ' (hoy)'}${dr.unidad ? ' — ' + dr.unidad : ''} — se avisó al equipo por correo` });
+      // Pedido explícito del usuario (27-oct-2026): antes esto SOLO se
+      // emailaba y se perdía — ahora también queda guardado en el mismo
+      // store de disponibilidades (colocaciones.agregarDisponibilidad), para
+      // que el dashboard de disponibilidad por ruta tenga datos reales en
+      // vez de depender de que alguien lea el correo a tiempo.
+      const d = colocaciones.agregarDisponibilidad({ telefono, nombre: quien, fecha: dr.fecha === 'hoy' ? '' : dr.fecha, ruta: dr.ruta, unidad: dr.unidad, detalle: null });
+      feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} ofrece ruta ${dr.ruta}${dr.fecha && dr.fecha !== 'hoy' ? ' el ' + textoFecha(dr.fecha) : ' (hoy)'}${dr.unidad ? ' — ' + dr.unidad : ''} — se avisó al equipo por correo y ya está en el dashboard de disponibilidad`, metadata: { id: d?.id } });
       notifier.notificarDisponibilidadRuta({ nombre: quien, telefono, ruta: dr.ruta, unidad: dr.unidad, fecha: dr.fecha })
         .catch(e => console.error('[sofiaOperacion] Error avisando disponibilidad de ruta:', e.message));
     }

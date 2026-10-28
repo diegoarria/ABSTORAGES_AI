@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Disponibilidad — ABSTORAGES</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B2A5B">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/design-system.css">
+<style>
+:root, :root[data-theme="light"] {
+  --bg:#F3F5F9; --surface:#FFFFFF; --surface-2:#F8FAFC; --surface-3:#EEF2F7;
+  --bd:#E2E8F0; --bd-strong:#CBD5E1;
+  --tx:#0F172A; --tx2:#475569; --tx3:#64748B;
+  --acc:#1F5FD1; --acc-soft:#E8F0FE; --acc-tx:#1748A6;
+  --ok:#0B7D57; --ok-soft:#E3F5EE; --warn:#B45309; --warn-soft:#FEF1DC; --crit:#C62828; --crit-soft:#FDE8E8;
+  --shadow-1:0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
+  --focus:0 0 0 3px rgba(31,95,209,.28);
+}
+:root[data-theme="dark"] {
+  --bg:#0A101C; --surface:#111A2B; --surface-2:#152036; --surface-3:#1B2942;
+  --bd:rgba(255,255,255,.09); --bd-strong:rgba(255,255,255,.18);
+  --tx:#E8EEF7; --tx2:#A9B6CA; --tx3:#8090A8;
+  --acc:#5B93FF; --acc-soft:rgba(91,147,255,.14); --acc-tx:#8DB4FF;
+  --ok:#34D399; --ok-soft:rgba(52,211,153,.13); --warn:#FBBF24; --warn-soft:rgba(251,191,36,.13); --crit:#FF7A7A; --crit-soft:rgba(255,122,122,.13);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4);
+  --focus:0 0 0 3px rgba(91,147,255,.35);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--tx); font-family:var(--font-sans); font-size:14px; line-height:1.5; min-height:100vh; -webkit-font-smoothing:antialiased; }
+svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.page { max-width:1100px; margin:0 auto; padding:28px 28px 72px; }
+.crumbs { font-size:12px; color:var(--tx3); margin-bottom:10px; display:flex; gap:7px; align-items:center; }
+.crumbs a { color:var(--tx3); text-decoration:none; } .crumbs a:hover { color:var(--acc); }
+.page-head h1 { font-size:28px; font-weight:800; letter-spacing:-.025em; line-height:1.15; }
+.page-head p { color:var(--tx2); font-size:14px; margin-top:6px; max-width:680px; }
+
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:8px; font-size:13px; font-weight:600; padding:10px 18px; cursor:pointer; border:1px solid transparent; transition:background .15s,border-color .15s; white-space:nowrap; }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+.btn-primary { background:var(--acc); color:#fff; }
+.btn-primary:hover:not(:disabled) { background:#1A52B8; }
+:root[data-theme="dark"] .btn-primary { color:#08111F; } :root[data-theme="dark"] .btn-primary:hover:not(:disabled) { background:#7BA8FF; }
+.btn-ghost { background:transparent; color:var(--acc-tx); border-color:var(--bd); }
+.btn-ghost:hover:not(:disabled) { background:var(--acc-soft); }
+.btn-sm { padding:6px 11px; font-size:12px; border-radius:7px; }
+
+.filtro { background:var(--surface); border:1px solid var(--bd); border-radius:14px; padding:20px; margin:22px 0; box-shadow:var(--shadow-1); display:flex; gap:12px; align-items:end; flex-wrap:wrap; }
+.campo { flex:1; min-width:180px; }
+.campo label { display:block; font-size:12px; font-weight:600; color:var(--tx2); margin-bottom:6px; }
+.campo input { width:100%; background:var(--surface-2); border:1px solid var(--bd); border-radius:9px; padding:10px 12px; color:var(--tx); font-size:14px; outline:none; font-family:inherit; }
+.campo input:focus { border-color:var(--acc); box-shadow:var(--focus); background:var(--surface); }
+
+.resumen { font-size:13px; color:var(--tx2); margin:18px 0 10px; }
+.resumen b { color:var(--tx); }
+.lista { display:flex; flex-direction:column; gap:10px; }
+.tarjeta { background:var(--surface); border:1px solid var(--bd); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow-1); display:flex; gap:16px; align-items:flex-start; }
+.av { width:42px; height:42px; border-radius:50%; background:var(--acc-soft); color:var(--acc-tx); display:grid; place-items:center; font-weight:700; font-size:14px; flex-shrink:0; }
+.t-main { flex:1; min-width:0; }
+.t-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.t-nombre { font-weight:700; font-size:15px; }
+.t-empresa { font-size:12.5px; color:var(--tx3); }
+.t-score { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; }
+.score-alto { background:var(--ok-soft); color:var(--ok); }
+.score-medio { background:var(--warn-soft); color:var(--warn); }
+.score-bajo { background:var(--surface-3); color:var(--tx3); }
+.t-detalles { display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; font-size:13px; color:var(--tx2); }
+.t-detalles span b { color:var(--tx); font-weight:600; }
+.t-perfil { margin-top:10px; font-size:12.5px; color:var(--tx2); background:var(--surface-2); border-radius:8px; padding:10px 12px; white-space:pre-wrap; }
+.t-perfil b { color:var(--acc-tx); }
+.t-acciones { display:flex; gap:8px; margin-top:12px; }
+.empty-msg { text-align:center; padding:48px 20px; color:var(--tx3); font-size:14px; }
+.empty-msg b { display:block; font-size:16px; color:var(--tx); margin-bottom:6px; }
+
+@media (max-width:640px) {
+  .page { padding:16px 16px 60px; }
+  .t-score { margin-left:0; }
+}
+</style>
+<script src="/js/shell.js"></script>
+</head>
+<body data-shell-title="Disponibilidad">
+
+<main class="page">
+  <div class="crumbs"><a href="/">Portal</a><span>/</span><span>Disponibilidad</span></div>
+  <div class="page-head">
+    <h1>Disponibilidad por ruta</h1>
+    <p>Filtra por origen y destino y te decimos qué proveedores YA avisaron que tienen unidad disponible — con su calificación y perfil de relación — sin tener que escribirle a cada uno por su cuenta.</p>
+  </div>
+
+  <div class="filtro">
+    <div class="campo">
+      <label for="fOrigen">Origen</label>
+      <input id="fOrigen" placeholder="ej. Monterrey" autocomplete="off">
+    </div>
+    <div class="campo">
+      <label for="fDestino">Destino</label>
+      <input id="fDestino" placeholder="ej. Ciudad de México" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" id="btnBuscar" onclick="buscar()">Buscar disponibilidad</button>
+  </div>
+
+  <div id="resultados"></div>
+</main>
+
+<script>
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+function iniciales(n) { return String(n || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase(); }
+function tiempoDesde(iso) {
+  if (!iso) return '';
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 60) return `hace ${min} min`;
+  if (min < 1440) return `hace ${Math.round(min / 60)} h`;
+  return `hace ${Math.round(min / 1440)} d`;
+}
+function claseScore(p) { return p >= 0.7 ? 'score-alto' : p >= 0.4 ? 'score-medio' : 'score-bajo'; }
+
+async function buscar() {
+  const origen = document.getElementById('fOrigen').value.trim();
+  const destino = document.getElementById('fDestino').value.trim();
+  const box = document.getElementById('resultados');
+  if (!origen || !destino) { box.innerHTML = '<div class="empty-msg"><b>Falta origen o destino</b>Escribe ambos para buscar.</div>'; return; }
+  const btn = document.getElementById('btnBuscar');
+  btn.disabled = true; btn.textContent = 'Buscando…';
+  box.innerHTML = '<div class="empty-msg">Buscando disponibilidad…</div>';
+  try {
+    const r = await fetch('/api/disponibilidades/buscar?origen=' + encodeURIComponent(origen) + '&destino=' + encodeURIComponent(destino), { credentials: 'include' });
+    const lista = await r.json();
+    if (!r.ok) throw new Error(lista.error || ('HTTP ' + r.status));
+    render(lista, origen, destino);
+  } catch (e) {
+    box.innerHTML = '<div class="empty-msg"><b>No se pudo buscar</b>' + esc(e.message) + '</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Buscar disponibilidad';
+  }
+}
+
+function render(lista, origen, destino) {
+  const box = document.getElementById('resultados');
+  if (!lista.length) {
+    box.innerHTML = `<div class="resumen">0 proveedores con disponibilidad reportada para <b>${esc(origen)} → ${esc(destino)}</b> ahorita.</div>` +
+      '<div class="empty-msg"><b>Nadie ha avisado disponibilidad para esta ruta todavía</b>Prueba con una difusión por ruta, o espera a que alguien reporte — en cuanto un proveedor le diga a SOFIA que tiene unidad libre, aparece aquí solo.</div>';
+    return;
+  }
+  box.innerHTML = `<div class="resumen">${lista.length} proveedor${lista.length === 1 ? '' : 'es'} con disponibilidad reportada para <b>${esc(origen)} → ${esc(destino)}</b>, ordenados por calificación:</div>` +
+    '<div class="lista">' + lista.map(p => {
+      const pct = Math.round((p.puntaje || 0) * 100);
+      return `<div class="tarjeta">
+        <div class="av">${esc(iniciales(p.nombre))}</div>
+        <div class="t-main">
+          <div class="t-head">
+            <span class="t-nombre">${esc(p.nombre)}</span>
+            ${p.empresa ? `<span class="t-empresa">${esc(p.empresa)}</span>` : ''}
+            <span class="t-score ${claseScore(p.puntaje || 0)}">★ ${pct}%</span>
+          </div>
+          <div class="t-detalles">
+            <span><b>Ruta reportada:</b> ${esc(p.ruta || '—')}</span>
+            ${p.unidad ? `<span><b>Unidad:</b> ${esc(p.unidad)}</span>` : ''}
+            <span><b>Disponible:</b> ${p.fecha ? esc(p.fecha) : 'ya / sin fecha fija'}</span>
+            <span>${tiempoDesde(p.reportadoEn)}</span>
+          </div>
+          ${p.perfilRelacion ? `<div class="t-perfil"><b>Así es tratar con este proveedor:</b><br>${esc(p.perfilRelacion)}</div>` : ''}
+          <div class="t-acciones">
+            <a class="btn btn-ghost btn-sm" href="tel:${esc(p.telefono)}">${window.ico ? window.ico('phone') : ''} Llamar</a>
+            ${p.contactoId ? `<a class="btn btn-ghost btn-sm" href="/base-datos.html?id=${esc(p.contactoId)}">Ver en Base de Datos</a>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+document.getElementById('fDestino').addEventListener('keydown', e => { if (e.key === 'Enter') buscar(); });
+document.getElementById('fOrigen').addEventListener('keydown', e => { if (e.key === 'Enter') buscar(); });
+</script>
+</body>
+</html>
