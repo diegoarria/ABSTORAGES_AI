@@ -39,6 +39,7 @@ const leads          = require('./backend/services/leads');
 const sessionIp      = require('./backend/services/sessionIp');
 const promptLeakGuard = require('./backend/services/promptLeakGuard');
 const tarifaGuard = require('./backend/services/tarifaGuard');
+const datoInventadoGuard = require('./backend/services/datoInventadoGuard');
 const ipBanlist       = require('./backend/services/ipBanlist');
 const phoneBanlist    = require('./backend/services/phoneBanlist');
 const emergencyShutdown = require('./backend/services/emergencyShutdown');
@@ -766,6 +767,10 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Proveedor sin unidades: solo agradece y pide aviso — nada de "¿algo más en lo que te ayude?"
     const FRASE_SIN_UNIDADES = 'Muchas gracias, avísame cuando cuentes con disponibilidad.';
     const dijoSinUnidades = /OFERTA_PROVEEDOR\s*:\s*\{[^}]*"disponible"\s*:\s*false/i.test(respuesta);
+    // Guardrail contra toneladas inventadas (incidente verificado 30-oct-2026,
+    // ver datoInventadoGuard.js) — corte determinístico, no depende de que el
+    // prompt obedezca.
+    const inventoToneladas = (agente === 'sofia' && !personaEquipo) && datoInventadoGuard.tieneToneladasInventadas(respuesta, systemPrompt);
     // MARÍA — guardrail anti-fuga de precios/tarifas/costos (pedido explícito
     // del usuario, 19-oct-2026): corte determinístico en código, no depende
     // de que el modelo obedezca. Si el texto final contiene algo con forma de
@@ -780,6 +785,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const textoSalida = (agente === 'sofia' && !personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO
       : (agente === 'sofia' && !personaEquipo && mencionoTarifa) ? FRASE_TARIFA
       : (agente === 'sofia' && !personaEquipo && dijoSinUnidades) ? FRASE_SIN_UNIDADES
+      : inventoToneladas ? datoInventadoGuard.MENSAJE_DATO_SIN_CONFIRMAR
       : intentoTarifaMaria ? tarifaGuard.MENSAJE_RECHAZO_TARIFA
       : limpiarControlParaCliente(respuesta);
     // Red de seguridad: nunca cerrar con la muletilla de servicio al cliente
@@ -1172,9 +1178,14 @@ async function manejarMensajeKapso(phone, texto) {
   const mencionoTarifa = !SOFIA_NEGOCIA_TARIFA && /TARIFA_MENCIONADA\s*:/i.test(respuesta);
   const FRASE_SIN_UNIDADES = 'Muchas gracias, avísame cuando cuentes con disponibilidad.';
   const dijoSinUnidades = /OFERTA_PROVEEDOR\s*:\s*\{[^}]*"disponible"\s*:\s*false/i.test(respuesta);
+  // Guardrail contra toneladas inventadas (incidente verificado 30-oct-2026,
+  // ver datoInventadoGuard.js) — corte determinístico, no depende de que el
+  // prompt obedezca.
+  const inventoToneladas = !personaEquipo && datoInventadoGuard.tieneToneladasInventadas(respuesta, systemPrompt);
   const textoSalida = (!personaEquipo && /RECLAMO_PAGO\s*:/i.test(respuesta)) ? FRASE_RECLAMO_PAGO
     : (!personaEquipo && mencionoTarifa) ? FRASE_TARIFA
     : (!personaEquipo && dijoSinUnidades) ? FRASE_SIN_UNIDADES
+    : inventoToneladas ? datoInventadoGuard.MENSAJE_DATO_SIN_CONFIRMAR
     : limpiarControlParaCliente(respuesta);
   const MULETILLA = /[¿]?\s*(?:hay\s+)?(?:algo|alguna cosa)\s+m[aá]s\s+en\s+(?:lo\s+)?(?:que|qué)\s+(?:te\s+)?(?:pueda|podamos|puedo)\s+ayud(?:arte|ar)[^.?!]*[?.!]?/gi;
   const textoLimpio = !personaEquipo ? (textoSalida.replace(MULETILLA, '').replace(/\s{2,}/g, ' ').trim() || textoSalida) : textoSalida;
