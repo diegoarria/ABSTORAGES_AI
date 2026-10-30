@@ -29,10 +29,14 @@ function getSession(id) {
     }
   }
   if (!fs.existsSync(fp)) {
-    return { id, history: [], summary: '', meta: {}, createdAt: Date.now(), updatedAt: Date.now() };
+    return { id, history: [], summary: '', hechos: [], meta: {}, createdAt: Date.now(), updatedAt: Date.now() };
   }
-  try { return JSON.parse(fs.readFileSync(fp, 'utf8')); }
-  catch { return { id, history: [], summary: '', meta: {}, createdAt: Date.now(), updatedAt: Date.now() }; }
+  try {
+    const s = JSON.parse(fs.readFileSync(fp, 'utf8'));
+    if (!Array.isArray(s.hechos)) s.hechos = []; // sesiones viejas, de antes de que existiera este campo
+    return s;
+  }
+  catch { return { id, history: [], summary: '', hechos: [], meta: {}, createdAt: Date.now(), updatedAt: Date.now() }; }
 }
 
 function saveSession(id, session) {
@@ -63,13 +67,16 @@ function getHistory(id) {
   return session.history.slice(-MAX_CONTEXT_MSGS).map(m => ({ role: m.role, content: m.content }));
 }
 
-// Devuelve el contexto completo: resumen anterior + historial reciente
+// Devuelve el contexto completo: resumen anterior + hechos aprendidos + historial reciente
 function buildContext(id) {
   const session = getSession(id);
   const parts = [];
 
   if (session.summary) {
     parts.push(`[CONTEXTO PREVIO DEL CLIENTE]\n${session.summary}\n[FIN CONTEXTO]`);
+  }
+  if (session.hechos?.length) {
+    parts.push(`[HECHOS APRENDIDOS SOBRE ESTA PERSONA EN CONVERSACIONES ANTERIORES]\n${session.hechos.map(h => `- ${h}`).join('\n')}\n[FIN HECHOS]`);
   }
 
   return {
@@ -94,6 +101,32 @@ function saveSummary(id, summary) {
   saveSession(id, session);
 }
 
+// Máximo de hechos aprendidos que se guardan por sesión — un número chico a
+// propósito: esto es para patrones/preferencias/comportamiento de la
+// RELACIÓN con esta persona (ej. "siempre contesta de noche", "tiende a
+// regatear fuerte y luego acepta"), no un historial completo — ver
+// reflexionMemoria.js, que es quien llama a esta función.
+const MAX_HECHOS = 15;
+const MAX_CHARS_HECHO = 220;
+
+// Agrega un hecho aprendido sobre la persona de esta sesión — a diferencia
+// de saveSummary (que SOBREESCRIBE un resumen puntual, ej. "ya le preguntaste
+// disponibilidad para esta ruta"), esto ACUMULA hechos de relación a lo
+// largo de muchas conversaciones distintas. Deduplicado por texto exacto
+// (normalizado) para no repetir el mismo hecho dicho con las mismas
+// palabras varias veces; recorta el más viejo cuando se pasa de MAX_HECHOS.
+function agregarHecho(id, hecho) {
+  const texto = String(hecho || '').trim().slice(0, MAX_CHARS_HECHO);
+  if (!texto) return null;
+  const session = getSession(id);
+  const normalizado = texto.toLowerCase();
+  if (session.hechos.some(h => h.toLowerCase() === normalizado)) return session; // ya existe, no duplicar
+  session.hechos.push(texto);
+  if (session.hechos.length > MAX_HECHOS) session.hechos.shift(); // el más viejo se va primero
+  saveSession(id, session);
+  return session;
+}
+
 // Fusiona el historial completo de `fromId` dentro de `intoId` (orden
 // cronológico por ts) y deja a `fromId` marcada como fusionada, para no
 // repetir la fusión en llamadas futuras. No borra `fromId` — queda como
@@ -107,6 +140,8 @@ function mergeInto(fromId, intoId) {
   if (from.meta?.mergedInto === intoId) return getSession(intoId); // ya fusionada, no repetir
   const into = getSession(intoId);
   into.history = [...into.history, ...from.history].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  const hechosFusionados = [...(from.hechos || []), ...(into.hechos || [])];
+  into.hechos = [...new Set(hechosFusionados.map(h => h.toLowerCase()))].map(h => hechosFusionados.find(x => x.toLowerCase() === h)).slice(-MAX_HECHOS);
   into.meta = { ...from.meta, ...into.meta }; // lo de intoId (si ya existía) pisa lo de fromId
   delete into.meta.canonicalId; // intoId es el id canónico, no apunta a sí mismo
   delete into.meta.mergedInto;
@@ -146,4 +181,4 @@ function listSessions() {
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, listSessions, deleteSession, mergeInto };
+module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, agregarHecho, listSessions, deleteSession, mergeInto };

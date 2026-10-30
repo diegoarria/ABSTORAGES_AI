@@ -40,6 +40,7 @@ const sessionIp      = require('./backend/services/sessionIp');
 const promptLeakGuard = require('./backend/services/promptLeakGuard');
 const tarifaGuard = require('./backend/services/tarifaGuard');
 const datoInventadoGuard = require('./backend/services/datoInventadoGuard');
+const reflexionMemoria = require('./backend/services/reflexionMemoria');
 const ipBanlist       = require('./backend/services/ipBanlist');
 const phoneBanlist    = require('./backend/services/phoneBanlist');
 const emergencyShutdown = require('./backend/services/emergencyShutdown');
@@ -793,6 +794,11 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const textoLimpio = (agente === 'sofia' && !personaEquipo) ? (textoSalida.replace(MULETILLA, '').replace(/\s{2,}/g, ' ').trim() || textoSalida) : textoSalida;
     const bloques = splitForWhatsApp(textoLimpio);
     for (const bloque of bloques) await sendWhatsApp(phone, bloque, agente);
+    // Reflexión de memoria (apagada por default, REFLEXION_MEMORIA=true) —
+    // nunca bloquea la respuesta real, corre aparte y en silencio.
+    if (!personaEquipo && (agente === 'maria' || agente === 'sofia')) {
+      reflexionMemoria.reflexionar(session, texto, textoLimpio).catch(() => {});
+    }
 
     // El equipo (número verificado) avisa que ya consiguió unidad por su cuenta
     // para un folio — se detiene toda búsqueda activa de proveedores para ese folio.
@@ -1190,6 +1196,7 @@ async function manejarMensajeKapso(phone, texto) {
   const MULETILLA = /[¿]?\s*(?:hay\s+)?(?:algo|alguna cosa)\s+m[aá]s\s+en\s+(?:lo\s+)?(?:que|qué)\s+(?:te\s+)?(?:pueda|podamos|puedo)\s+ayud(?:arte|ar)[^.?!]*[?.!]?/gi;
   const textoLimpio = !personaEquipo ? (textoSalida.replace(MULETILLA, '').replace(/\s{2,}/g, ' ').trim() || textoSalida) : textoSalida;
   for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque);
+  if (!personaEquipo) reflexionMemoria.reflexionar(session, texto, textoLimpio).catch(() => {});
 
   if (personaEquipo) {
     const dm = respuesta.match(/DETENER_BUSQUEDA\s*:\s*(\{[^\n]+\})/i);
@@ -1365,6 +1372,7 @@ async function manejarMensajeKapsoMaria(phone, texto) {
     notifier.notificarIntentoTarifa({ canal: 'whatsapp-kapso', quien: phone, telefono: phone, texto, sessionId: session }).catch(() => {});
   }
   for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque, AGENTE_KAPSO_MARIA);
+  if (!personaEquipo) reflexionMemoria.reflexionar(session, texto, textoLimpio).catch(() => {});
 
   // Cliente confirmó que sigue necesitando la unidad con urgencia — se
   // cierra automático con el proveedor recomendado (mismo flujo que Twilio).
