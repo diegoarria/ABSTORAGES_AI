@@ -43,6 +43,20 @@ const VARIANTES = [0, 1, 2, 3].map(i => ({
   sid: process.env[`KAPSO_TEMPLATE_DISPONIBILIDAD_GENERAL_${i + 1}`] || NOMBRES_PLANTILLA[i],
   texto: TEXTO_VARIANTE[i],
 }));
+// Variante v5 — pregunta binaria con botones de respuesta rápida (pedido
+// explícito del usuario, 30-oct-2026: bajar la fricción de contestar, las 4
+// variantes de arriba piden escribir ruta+unidad a cambio de nada concreto).
+// Texto de la plantilla a someter en Kapso/Meta: "Hola {{1}}, soy SOFIA de
+// ABSTORAGES. ¿Tienes unidad disponible hoy?" con dos botones de respuesta
+// rápida: "Sí, tengo" y "Hoy no". NO se agrega a VARIANTES hasta que la
+// plantilla esté aprobada y el nombre real esté en esta env var — someterla
+// es un paso del usuario en Kapso/Meta, no algo que el código pueda hacer.
+if (process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_SINO) {
+  VARIANTES.push({
+    sid: process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_SINO,
+    texto: 'Hola {nombre}, soy SOFIA de ABSTORAGES. ¿Tienes unidad disponible hoy? [Sí, tengo / Hoy no]',
+  });
+}
 // disponibilidad_general_sofia (v1) siempre está aprobada — nunca se queda sin plantilla.
 const CONTENT_SID_FALLBACK = NOMBRES_PLANTILLA[0];
 const CHEQUEO_MS = 15 * 60 * 1000;

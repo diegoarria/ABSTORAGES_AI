@@ -1554,7 +1554,13 @@ app.post('/webhook/kapso', (req, res) => {
       const evento = req.headers['x-webhook-event'];
       const msg = req.body?.message;
       if (evento !== 'whatsapp.message.received' || !msg) return;
-      const texto = (msg.text?.body || '').trim();
+      // Botón de respuesta rápida de una plantilla (ej. "Sí, tengo" / "Hoy
+      // no") NO llega como msg.text — llega como msg.button.text (Meta
+      // Cloud API) o msg.interactive.button_reply.title. Antes de esto se
+      // ignoraba en silencio ("sin from/texto, ignorando") — un proveedor
+      // tocando el botón no pasaba nada. Se trata igual que un mensaje de
+      // texto normal: el modelo ya sabe seguir la conversación desde ahí.
+      const texto = (msg.text?.body || msg.button?.text || msg.interactive?.button_reply?.title || '').trim();
       const from = msg.from;
       if (!from || !texto) { console.log('[Kapso-IN] sin from/texto, ignorando'); return; }
       const phone = `+${String(from).replace(/\D/g, '')}`;
