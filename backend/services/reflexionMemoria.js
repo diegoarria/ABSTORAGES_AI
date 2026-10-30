@@ -22,6 +22,7 @@
 // API en cada mensaje no se activa solo.
 const memory = require('./memory');
 const claude = require('./claude');
+const embeddings = require('./embeddings');
 
 const HABILITADO = process.env.REFLEXION_MEMORIA === 'true';
 // Mensajes muy cortos ("ok", "va", "gracias") casi nunca dejan un hecho
@@ -43,7 +44,13 @@ Ejemplos de lo que NO cuenta (ignóralos, responde NADA):
 - Saludos, confirmaciones simples, agradecimientos
 - Cualquier cosa que ya es obvia o no aporta nada nuevo
 
-Responde con UNA sola frase corta y factual (máximo 25 palabras), en español, sin opiniones ni adornos — o responde exactamente "NADA" si no hay nada que valga la pena guardar. Nunca expliques tu razonamiento, nunca agregues nada más que la frase o "NADA".`;
+Responde con UNA sola frase corta y factual (máximo 25 palabras), en español, sin opiniones ni adornos — o responde exactamente "NADA" si no hay nada que valga la pena guardar. Nunca uses el nombre de la persona ni de su empresa en la frase — redáctala en impersonal ("solo revisa WhatsApp de noche", nunca "Luis solo revisa..."), porque este hecho puede llegar a usarse como contexto general en otra conversación distinta, nunca debe identificar a nadie. Nunca expliques tu razonamiento, nunca agregues nada más que la frase o "NADA".`;
+
+// wa_sofia_+52..., wa_maria_+52... → 'sofia'/'maria'; wa_+52... (legacy NOA) → 'noa'
+function agenteDeSession(session) {
+  const m = String(session || '').match(/^wa_(sofia|maria|noa)_/);
+  return m ? m[1] : 'noa';
+}
 
 async function reflexionar(session, textoUsuario, textoRespuesta) {
   if (!HABILITADO) return;
@@ -57,6 +64,9 @@ async function reflexionar(session, textoUsuario, textoRespuesta) {
     const limpio = String(r || '').trim().replace(/^["']|["']$/g, '');
     if (!limpio || /^nada\.?$/i.test(limpio)) return;
     memory.agregarHecho(session, limpio);
+    // Memoria semántica (#7, apagada por default aparte de esto) — indexa
+    // el mismo hecho para que pueda informar OTRAS conversaciones.
+    embeddings.indexarHecho({ session, agente: agenteDeSession(session), texto: limpio }).catch(() => {});
   } catch (e) {
     console.error('[reflexionMemoria] Error:', e.message);
   }

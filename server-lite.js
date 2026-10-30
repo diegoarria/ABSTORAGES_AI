@@ -41,6 +41,7 @@ const promptLeakGuard = require('./backend/services/promptLeakGuard');
 const tarifaGuard = require('./backend/services/tarifaGuard');
 const datoInventadoGuard = require('./backend/services/datoInventadoGuard');
 const reflexionMemoria = require('./backend/services/reflexionMemoria');
+const embeddings = require('./backend/services/embeddings');
 const ipBanlist       = require('./backend/services/ipBanlist');
 const phoneBanlist    = require('./backend/services/phoneBanlist');
 const emergencyShutdown = require('./backend/services/emergencyShutdown');
@@ -754,6 +755,12 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
         return;
       }
     }
+    // Memoria semántica (#7, apagada por default) — patrones de OTRAS
+    // conversaciones que pueden ser contexto útil, nunca atribuibles a esta persona.
+    if (!personaEquipo && (agente === 'maria' || agente === 'sofia') && embeddings.HABILITADO) {
+      const patrones = await embeddings.buscarHechosRelevantes(texto, { excluirSession: session, agente }).catch(() => []);
+      if (patrones.length) systemPrompt += `\n\n---\n## PATRONES SIMILARES DE OTRAS CONVERSACIONES (contexto general — NO es sobre esta persona)\n${patrones.map(p => `- ${p}`).join('\n')}\nEsto es contexto general de la operación, aprendido de OTRAS conversaciones — NUNCA se lo atribuyas a la persona con la que hablas ahora, nunca lo repitas como si fuera sobre ella ni lo menciones directo. Úsalo solo para tu propio criterio interno.\n---\n`;
+    }
     await humanDelay.esperar(texto); // simula tiempo de lectura/escritura humano — punto 12 del checklist
     let respuesta = '';
     await chatStream(systemPrompt, [...history, { role: 'user', content: contenidoParaClaude }], (c) => { respuesta += c; }, () => {});
@@ -1173,6 +1180,12 @@ async function manejarMensajeKapso(phone, texto) {
     }
   }
 
+  // Memoria semántica (#7, apagada por default) — patrones de OTRAS
+  // conversaciones que pueden ser contexto útil, nunca atribuibles a esta persona.
+  if (!personaEquipo && embeddings.HABILITADO) {
+    const patrones = await embeddings.buscarHechosRelevantes(texto, { excluirSession: session, agente: AGENTE_KAPSO }).catch(() => []);
+    if (patrones.length) systemPrompt += `\n\n---\n## PATRONES SIMILARES DE OTRAS CONVERSACIONES (contexto general — NO es sobre esta persona)\n${patrones.map(p => `- ${p}`).join('\n')}\nEsto es contexto general de la operación, aprendido de OTRAS conversaciones — NUNCA se lo atribuyas a la persona con la que hablas ahora, nunca lo repitas como si fuera sobre ella ni lo menciones directo. Úsalo solo para tu propio criterio interno.\n---\n`;
+  }
   await humanDelay.esperar(texto);
   let respuesta = '';
   await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
@@ -1355,6 +1368,12 @@ async function manejarMensajeKapsoMaria(phone, texto) {
   memory.addMessage(session, 'user', texto);
   saveMessage(session, AGENTE_KAPSO_MARIA, 'user', texto);
 
+  // Memoria semántica (#7, apagada por default) — patrones de OTRAS
+  // conversaciones que pueden ser contexto útil, nunca atribuibles a esta persona.
+  if (!personaEquipo && embeddings.HABILITADO) {
+    const patrones = await embeddings.buscarHechosRelevantes(texto, { excluirSession: session, agente: AGENTE_KAPSO_MARIA }).catch(() => []);
+    if (patrones.length) systemPrompt += `\n\n---\n## PATRONES SIMILARES DE OTRAS CONVERSACIONES (contexto general — NO es sobre esta persona)\n${patrones.map(p => `- ${p}`).join('\n')}\nEsto es contexto general de la operación, aprendido de OTRAS conversaciones — NUNCA se lo atribuyas a la persona con la que hablas ahora, nunca lo repitas como si fuera sobre ella ni lo menciones directo. Úsalo solo para tu propio criterio interno.\n---\n`;
+  }
   await humanDelay.esperar(texto);
   let respuesta = '';
   await chatStream(systemPrompt, [...history, { role: 'user', content: texto }], (c) => { respuesta += c; }, () => {});
