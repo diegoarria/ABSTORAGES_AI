@@ -575,7 +575,11 @@ function bloqueBusquedasAbiertas() {
 
   const filas = [...filasFolio, ...filasRuta];
   if (!filas.length) return '';
-  return `\n\n---\n## BÚSQUEDAS ACTIVAS DE UNIDAD AHORITA (cualquier proveedor puede preguntar por cualquiera de estas)\n${filas.join('\n')}\nSi quien te escribe pregunta por una ruta, fecha, tipo de unidad, carga o toneladas que coincida con alguna de estas — aunque no sea uno de los proveedores que ya contactaste para ese folio o difusión — respóndele directo con esos datos reales (ej. "sale mañana a las 8am", "carga 24 toneladas"). NUNCA le preguntes algo que ya está en esta lista. Si dice que tiene disponibilidad para alguna, pídele precio; si tiene folio, avísaselo, si es un sondeo sin folio, dile que lo tomas en cuenta y lo conectas con el equipo.\n---\n`;
+  return `\n\n---\n## BÚSQUEDAS ACTIVAS DE UNIDAD AHORITA (cualquier proveedor puede preguntar por cualquiera de estas)\n${filas.join('\n')}\n` +
+    `Si quien te escribe pregunta por una ruta, fecha, tipo de unidad o carga que coincida con alguna de estas — aunque no sea uno de los proveedores que ya contactaste para ese folio o difusión — respóndele directo con el dato real que SÍ aparece arriba (ej. si dice "salida 2026-10-31" y te preguntan cuándo sale, contesta con esa fecha). ` +
+    `NUNCA le preguntes algo que ya está en esta lista. ` +
+    `CRÍTICO — NUNCA inventes ni completes un dato que NO aparece en esta lista (ej. toneladas, peso, dirección exacta, hora exacta): si no está escrito arriba, no lo tienes — dile que no lo tienes confirmado todavía y que lo checas con el equipo, jamás des un número o dato que no viene literal en esta lista. ` +
+    `Si dice que tiene disponibilidad para alguna, pídele precio; si tiene folio, avísaselo, si es un sondeo sin folio, dile que lo tomas en cuenta y lo conectas con el equipo.\n---\n`;
 }
 
 function tick() {

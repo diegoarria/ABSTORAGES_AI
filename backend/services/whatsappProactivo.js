@@ -184,8 +184,9 @@ function guardarContextoRequerimiento(agente, telefono, { empresa, origen, desti
   if (!tel) return;
   const session = `wa_${agente}_${tel}`;
   const esTop5 = prioridad === 'top5';
+  const datosDados = ['ruta', 'fecha', 'unidad', toneladas ? 'toneladas' : null, tipoCarga ? 'tipo de carga' : null, empresa ? 'cliente' : null].filter(Boolean).join(', ');
   const resumen = `${empresa ? `Cliente: ${empresa}. ` : ''}Ya le preguntaste a este proveedor disponibilidad para la ruta ${origen} → ${destino}, unidad ${tipoUnidad}, fecha ${fecha}${toneladas ? `, ${toneladas} toneladas` : ''}${tipoCarga ? `, carga: ${tipoCarga}` : ''}. ` +
-    `NUNCA le vuelvas a pedir su nombre ni estos datos (ruta, fecha, unidad, toneladas, tipo de carga${empresa ? ', cliente' : ''}) — ya se los diste tú en el mensaje que le mandaste. Si pregunta cualquiera de estos datos (ej. "¿cuándo sale?", "¿cuántas toneladas?", "¿de qué es la carga?"), respóndele directo con el dato real que ya tienes, nunca le preguntes a él. Si contesta algo como "sí tengo disponibilidad", ve directo a pedir/confirmar el precio.` +
+    `NUNCA le vuelvas a pedir su nombre ni estos datos que ya le diste (${datosDados}) — ya se los diste tú en el mensaje que le mandaste. Si pregunta por alguno de ESOS datos (ej. "¿cuándo sale?"), respóndele directo con el dato real de arriba. Si pregunta por un dato que NO está en esa lista (ej. toneladas, si no se mencionaron arriba), NUNCA lo inventes — dile que no lo tienes confirmado todavía y que lo checas con el equipo. Si contesta algo como "sí tengo disponibilidad", ve directo a pedir/confirmar el precio.` +
     (esTop5 ? ' 🔴 CLIENTE TOP 5 — PRIORIDAD MÁXIMA: negocia con urgencia real, cierra rápido, no dejes este hilo esperando.' : '') +
     (exigencia_calidad ? ` Exigencia de calidad de este cliente (no negociable): ${exigencia_calidad}` : '');
   try { memory.saveSummary(session, resumen); } catch (e) { console.error('[whatsappProactivo] Error guardando contexto de requerimiento:', e.message); }
