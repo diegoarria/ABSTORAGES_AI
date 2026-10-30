@@ -22,6 +22,7 @@ const notifier = require('./notifier');
 const ordersStore = require('./ordersStore');
 const saraProactivo = require('./saraProactivo');
 const folioContexto = require('./folioContexto');
+const difusionGeneral = require('./difusionGeneral');
 let _ultimoAvisoTarifa = new Map(); // teléfono → ts, evita mandar 5 correos si el proveedor insiste en varios mensajes seguidos
 
 const OLA_TAM         = Number(process.env.SOFIA_ESCALERA_TAMANO || 3);
@@ -43,7 +44,7 @@ const pesos = n => (n == null ? 'sin precio' : '$' + Number(n).toLocaleString('e
 const ruta = c => `${c.origen || '?'} → ${c.destino || '?'}`;
 
 function ordenDe(c) {
-  return { folio: c.folio, empresa: c.empresa, origen: c.origen, destino: c.destino, ruta: ruta(c), tipo_unidad: c.tipo_unidad || 'caja seca', fecha_carga: c.fecha_carga || 'por confirmar', prioridad: c.urgente ? 'top5' : undefined, exigencia_calidad: c.exigencia_calidad };
+  return { folio: c.folio, empresa: c.empresa, origen: c.origen, destino: c.destino, ruta: ruta(c), tipo_unidad: c.tipo_unidad || 'caja seca', fecha_carga: c.fecha_carga || 'por confirmar', peso_toneladas: c.peso_toneladas || '', tipo_carga: c.tipo_carga || '', descripcion_carga: c.descripcion_carga || '', prioridad: c.urgente ? 'top5' : undefined, exigencia_calidad: c.exigencia_calidad };
 }
 
 // ── Alta de una búsqueda de unidad ──────────────────────────────────────────
@@ -56,6 +57,7 @@ function iniciarBusqueda(lead, candidatos) {
   const c = colocaciones.crear({
     folio: lead.folio, origen: lead.origen, destino: lead.destino, tipo_unidad: lead.tipo_unidad,
     fecha_carga: lead.fecha_carga, empresa: lead.empresa || lead.nombre,
+    peso_toneladas: lead.peso_toneladas, tipo_carga: lead.tipo_carga, descripcion_carga: lead.descripcion_carga,
     urgente: !!lead.urgente || /urgente/i.test(String(lead.requisitos || '')), exigencia_calidad: lead.exigencia_calidad, pendientes,
   });
   if (!c || yaExistia) return c;
@@ -543,7 +545,37 @@ function bloqueChecklist(telefono) {
     .sort((a, b) => new Date(b.colocadoEn) - new Date(a.colocadoEn))[0];
   if (!c) return '';
   const est = colocaciones.estadoChecklist(c);
-  return `\n\n---\n## CHECKLIST DE CARGA DEL FOLIO ${c.folio} (estado actual)\nYa recibidos: ${est.filter(i => i.recibido).map(i => i.clave).join(', ') || 'ninguno'}.\nPendientes: ${est.filter(i => !i.recibido).map(i => `${i.clave} (${i.label})`).join('; ') || 'ninguno — checklist completo'}.\nPide solo lo pendiente. Marca cada punto con la señal CHECKLIST_CARGA únicamente cuando el proveedor u operador ya mandó esa evidencia real.\n---\n`;
+  return `\n\n---\n## CHECKLIST DE CARGA DEL FOLIO ${c.folio} (estado actual)\nYa recibidos: ${est.filter(i => i.recibido).map(i => i.clave).join(', ') || 'ninguno'}.\nPendientes: ${est.filter(i => !i.recibido).map(i => `${i.clave} (${i.label})`).join('; ') || 'ninguno — completo'}.\nPide solo lo pendiente. Marca cada punto con la señal CHECKLIST_CARGA únicamente cuando el proveedor u operador ya mandó esa evidencia real.\n---\n`;
+}
+
+// Texto para la instrucción de SOFIA con TODAS las búsquedas activas (folios en
+// estado "buscando"), sin importar si a ESTE proveedor ya se le contactó o no.
+// Pedido explícito del usuario (30-oct-2026): si un proveedor escribe de
+// vuelta preguntando por una ruta ("¿sale de Monterrey? ¿para cuándo? ¿cuántas
+// toneladas?") y esa ruta coincide con una búsqueda activa, SOFIA tiene que
+// contestar con los datos reales de una vez — nunca actuar como si no supiera
+// nada y volver a preguntar ruta/fecha/toneladas, aunque ese proveedor en
+// particular no haya sido uno de los contactados en la escalera de esa orden.
+function bloqueBusquedasAbiertas() {
+  // Órdenes reales (con folio, escalera, SLA) ya en colocaciones.
+  const abiertas = colocaciones.abiertas();
+  const filasFolio = abiertas.map(c =>
+    `- Folio ${c.folio}: ${ruta(c)}, unidad ${c.tipo_unidad || 'caja seca'}, salida ${c.fecha_carga || 'por confirmar'}` +
+    `${c.peso_toneladas ? `, ${c.peso_toneladas} ton` : ''}${c.tipo_carga || c.descripcion_carga ? `, carga: ${c.tipo_carga || c.descripcion_carga}` : ''}${c.urgente ? ' 🔴 URGENTE' : ''}`
+  );
+  // Difusiones ad-hoc por ruta (sin folio real, pedidas por el equipo por
+  // WhatsApp — "necesito difusión para la ruta X-Y") — mismo criterio,
+  // vigentes 72h (ver difusionGeneral.js).
+  let filasRuta = [];
+  try {
+    filasRuta = difusionGeneral.difusionesRutaActivas().map(d =>
+      `- Sondeo de disponibilidad (sin folio): ${d.origen} → ${d.destino}${d.fecha ? `, salida ${d.fecha}` : ''}${d.tipo_carga ? `, carga: ${d.tipo_carga}` : ''}${d.cliente ? `, cliente: ${d.cliente}` : ''}`
+    );
+  } catch (e) { console.error('[sofiaOperacion] Error leyendo difusiones por ruta:', e.message); }
+
+  const filas = [...filasFolio, ...filasRuta];
+  if (!filas.length) return '';
+  return `\n\n---\n## BÚSQUEDAS ACTIVAS DE UNIDAD AHORITA (cualquier proveedor puede preguntar por cualquiera de estas)\n${filas.join('\n')}\nSi quien te escribe pregunta por una ruta, fecha, tipo de unidad, carga o toneladas que coincida con alguna de estas — aunque no sea uno de los proveedores que ya contactaste para ese folio o difusión — respóndele directo con esos datos reales (ej. "sale mañana a las 8am", "carga 24 toneladas"). NUNCA le preguntes algo que ya está en esta lista. Si dice que tiene disponibilidad para alguna, pídele precio; si tiene folio, avísaselo, si es un sondeo sin folio, dile que lo tomas en cuenta y lo conectas con el equipo.\n---\n`;
 }
 
 function tick() {
@@ -563,4 +595,4 @@ function iniciar({ sendPush: sp } = {}) {
   console.log(`[sofiaOperacion] Activo — escalera de ${OLA_TAM}, horario ${horario.INICIO}:00–${horario.FIN}:00`);
 }
 
-module.exports = { detenerBusquedaPorEquipo, bloqueChecklist, iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, confirmarUrgentePorCliente, tick };
+module.exports = { detenerBusquedaPorEquipo, bloqueChecklist, bloqueBusquedasAbiertas, iniciar, iniciarBusqueda, lanzarOla, procesarSenales, ofertaPorLlamada, aprobar, confirmarUrgentePorCliente, tick };

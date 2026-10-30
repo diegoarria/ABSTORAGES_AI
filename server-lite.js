@@ -97,6 +97,7 @@ const hitosCliente = require('./backend/services/hitosCliente');
 const noaMonitoreo = require('./backend/services/noaMonitoreo');
 const noaRiskFeedback = require('./backend/services/noaRiskFeedback');
 const sofiaScheduler = require('./backend/services/sofiaScheduler');
+const mariaTmsWatch = require('./backend/services/mariaTmsWatch');
 const difusionGeneral = require('./backend/services/difusionGeneral');
 const difusionClientes = require('./backend/services/difusionClientes');
 const cadenciaSeguimiento = require('./backend/services/cadenciaSeguimiento');
@@ -638,6 +639,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
       if (agente === 'sofia') systemPrompt += await bloqueTarifaRutaProveedor(phone);
       if (agente === 'sofia') systemPrompt += sofiaOperacion.bloqueChecklist(phone);
+      if (agente === 'sofia') systemPrompt += sofiaOperacion.bloqueBusquedasAbiertas();
       // No es equipo interno — ¿ya es un contacto conocido (proveedor/cliente
       // con quien ya se cerró algo antes)? Si sí, se le da continuidad real.
       const contactoConocido = await contactos.buscarPorTelefono(phone, agente);
@@ -1101,6 +1103,7 @@ async function manejarMensajeKapso(phone, texto) {
     if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
     systemPrompt += await bloqueTarifaRutaProveedor(phone);
     systemPrompt += sofiaOperacion.bloqueChecklist(phone);
+    systemPrompt += sofiaOperacion.bloqueBusquedasAbiertas();
     const contactoConocido = await contactos.buscarPorTelefono(phone, AGENTE_KAPSO);
     if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido, AGENTE_KAPSO);
   }
@@ -1789,6 +1792,7 @@ app.post('/webhook/2chat', express.json(), (req, res) => {
         const foliosPersona = [...folioContexto.foliosPorTelefono(remitentePhone), ...(agente === 'sofia' ? colocaciones.porTelefono(remitentePhone, false).map(c => c.folio) : [])];
         if (foliosPersona.length) systemPrompt += folioContexto.bloque({ alcance: 'folios', folios: foliosPersona });
         if (agente === 'sofia') systemPrompt += await bloqueTarifaRutaProveedor(remitentePhone);
+        if (agente === 'sofia') systemPrompt += sofiaOperacion.bloqueBusquedasAbiertas();
       }
       if (!esGrupo && !personaEquipo) {
         const contactoConocido = await contactos.buscarPorTelefono(remitentePhone, agente);
@@ -4719,6 +4723,7 @@ app.listen(PORT, async () => {
   noaMonitoreo.iniciar();
   hitosCliente.iniciar();
   sofiaScheduler.iniciar(pushActividad);
+  mariaTmsWatch.iniciar();
   difusionGeneral.iniciar(pushActividad);
   difusionClientes.iniciar();
   sofiaOperacion.iniciar({ sendPush });

@@ -114,6 +114,34 @@ async function proveedoresTop100() {
     .slice(0, 100);
 }
 
+// ── Registro de difusiones ad-hoc por ruta — para que SOFIA sepa qué está
+// buscando aunque el proveedor que pregunte no haya sido de los contactados
+// ─────────────────────────────────────────────────────────────────────────
+// Pedido explícito del usuario (30-oct-2026): una difusión por ruta no tiene
+// folio real ni vive en `colocaciones` (no es una orden con escalera/SLA/
+// checklist — es solo un sondeo de disponibilidad), así que se guarda aparte,
+// con vigencia corta, solo para que SOFIA pueda contestar con los datos
+// reales si CUALQUIER proveedor le pregunta por esa ruta — no sólo a quien
+// se le mandó el mensaje. No dispara seguimientos, recordatorios ni alertas
+// de SLA — eso es exclusivo de `colocaciones` (órdenes reales).
+const DIFUSIONES_RUTA_FILE = path.join(__dirname, '../../data/difusiones-ruta.json');
+const VIGENCIA_DIFUSION_RUTA_MS = 72 * 60 * 60 * 1000; // 72h — un sondeo de disponibilidad no debe vivir para siempre
+let difusionesRuta = [];
+try { if (fs.existsSync(DIFUSIONES_RUTA_FILE)) difusionesRuta = JSON.parse(fs.readFileSync(DIFUSIONES_RUTA_FILE, 'utf8')); } catch (e) { console.error('[difusionGeneral] No se pudo leer difusiones-ruta.json:', e.message); }
+function guardarDifusionesRuta() {
+  try { fs.mkdirSync(path.dirname(DIFUSIONES_RUTA_FILE), { recursive: true }); fs.writeFileSync(DIFUSIONES_RUTA_FILE, JSON.stringify(difusionesRuta)); }
+  catch (e) { console.error('[difusionGeneral] Error guardando difusiones-ruta.json:', e.message); }
+}
+function registrarDifusionRuta({ origen, destino, fecha, tipo_carga, cliente }) {
+  difusionesRuta.push({ origen, destino, fecha: fecha || null, tipo_carga: tipo_carga || null, cliente: cliente || null, creado: Date.now() });
+  guardarDifusionesRuta();
+}
+// Solo las vigentes (no vencidas) — expuesto para que SOFIA las liste en su prompt.
+function difusionesRutaActivas() {
+  const limite = Date.now() - VIGENCIA_DIFUSION_RUTA_MS;
+  return difusionesRuta.filter(d => d.creado > limite);
+}
+
 // ── Difusión ad-hoc para UNA ruta específica, pedida por el equipo por
 // WhatsApp (pedido explícito del usuario, 19-oct-2026) — "necesito difusión
 // para la ruta X - Y". A diferencia de la difusión general (Top 50, solo
@@ -149,6 +177,10 @@ async function dispararPorRuta({ origen, destino, fecha, tipo_carga, cliente }) 
   try { lista = await proveedoresPorRuta(origen, destino); }
   catch (e) { console.error('[difusionGeneral] Error armando lista por ruta:', e.message); return { ok: false, motivo: 'error_lista' }; }
   if (!lista.length) return { ok: true, enviados: 0, total: 0 };
+
+  // Para que SOFIA pueda contestar con los datos reales si CUALQUIER
+  // proveedor pregunta por esta ruta, no solo a quien se le mande el mensaje.
+  registrarDifusionRuta({ origen, destino, fecha, tipo_carga, cliente });
 
   // Cliente top5 — pedido explícito del usuario (26-oct-2026): búsqueda con
   // urgencia real, manda más rápido en vez de esperar la pausa normal entre envíos.
@@ -252,4 +284,4 @@ function iniciar(pushActividad) {
   console.log(`[difusionGeneral] Activo — Top 100 proveedores por volumen, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
-module.exports = { iniciar, correrSiToca, proveedoresTop100, dispararManual, dispararPorRuta, proveedoresPorRuta };
+module.exports = { iniciar, correrSiToca, proveedoresTop100, dispararManual, dispararPorRuta, proveedoresPorRuta, difusionesRutaActivas };
