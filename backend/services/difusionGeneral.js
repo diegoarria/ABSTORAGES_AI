@@ -132,8 +132,12 @@ function guardarDifusionesRuta() {
   try { fs.mkdirSync(path.dirname(DIFUSIONES_RUTA_FILE), { recursive: true }); fs.writeFileSync(DIFUSIONES_RUTA_FILE, JSON.stringify(difusionesRuta)); }
   catch (e) { console.error('[difusionGeneral] Error guardando difusiones-ruta.json:', e.message); }
 }
-function registrarDifusionRuta({ origen, destino, fecha, tipo_carga, cliente }) {
-  difusionesRuta.push({ origen, destino, fecha: fecha || null, tipo_carga: tipo_carga || null, cliente: cliente || null, creado: Date.now() });
+function registrarDifusionRuta({ origen, destino, fecha, tipo_unidad, tipo_carga, cliente }) {
+  // "cliente" se guarda SOLO para uso interno de SOFIA (prioridad, calidad) —
+  // nunca se le dice a un proveedor (ver sofia-prompt.js, regla de
+  // confidencialidad del cliente). bloqueBusquedasAbiertas() debe seguir
+  // marcándolo como interno al armar el bloque para el prompt.
+  difusionesRuta.push({ origen, destino, fecha: fecha || null, tipo_unidad: tipo_unidad || null, tipo_carga: tipo_carga || null, cliente: cliente || null, creado: Date.now() });
   guardarDifusionesRuta();
 }
 // Solo las vigentes (no vencidas) — expuesto para que SOFIA las liste en su prompt.
@@ -171,7 +175,7 @@ async function proveedoresPorRuta(origen, destino) {
 // de CADA proveedor contactado (ver whatsappProactivo.preguntarDisponibilidad)
 // para que SOFIA nunca vuelva a preguntar nombre/ruta/fecha/unidad cuando
 // contesten — ya se los dio ella en el mensaje que mandó.
-async function dispararPorRuta({ origen, destino, fecha, tipo_carga, cliente }) {
+async function dispararPorRuta({ origen, destino, fecha, tipo_unidad, tipo_carga, cliente }) {
   if (agentPause.estaPausado('sofia')) return { ok: false, motivo: 'pausado' };
   let lista;
   try { lista = await proveedoresPorRuta(origen, destino); }
@@ -180,7 +184,7 @@ async function dispararPorRuta({ origen, destino, fecha, tipo_carga, cliente }) 
 
   // Para que SOFIA pueda contestar con los datos reales si CUALQUIER
   // proveedor pregunta por esta ruta, no solo a quien se le mande el mensaje.
-  registrarDifusionRuta({ origen, destino, fecha, tipo_carga, cliente });
+  registrarDifusionRuta({ origen, destino, fecha, tipo_unidad, tipo_carga, cliente });
 
   // Cliente top5 — pedido explícito del usuario (26-oct-2026): búsqueda con
   // urgencia real, manda más rápido en vez de esperar la pausa normal entre envíos.
@@ -193,7 +197,7 @@ async function dispararPorRuta({ origen, destino, fecha, tipo_carga, cliente }) 
   let enviados = 0, fallidos = 0;
   for (const p of lista) {
     try {
-      const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_carga, fecha_carga: fecha, empresa: cliente, prioridad: perfil?.prioridad, exigencia_calidad: perfil?.exigencia_calidad });
+      const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_unidad || 'caja seca', tipo_carga, fecha_carga: fecha, empresa: cliente, prioridad: perfil?.prioridad, exigencia_calidad: perfil?.exigencia_calidad });
       if (r?.status === 'rate_limited' || r?.status === 'paused') break;
       enviados++;
     } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }

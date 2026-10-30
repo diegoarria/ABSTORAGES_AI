@@ -569,7 +569,7 @@ function bloqueBusquedasAbiertas() {
   let filasRuta = [];
   try {
     filasRuta = difusionGeneral.difusionesRutaActivas().map(d =>
-      `- Sondeo de disponibilidad (sin folio): ${d.origen} → ${d.destino}${d.fecha ? `, salida ${d.fecha}` : ''}${d.tipo_carga ? `, carga: ${d.tipo_carga}` : ''}${d.cliente ? `, cliente: ${d.cliente}` : ''}`
+      `- Sondeo de disponibilidad (sin folio): ${d.origen} → ${d.destino}${d.fecha ? `, salida ${d.fecha}` : ''}, unidad ${d.tipo_unidad || 'caja seca'}${d.tipo_carga ? `, carga: ${d.tipo_carga}` : ''}${d.cliente ? ` [USO INTERNO, NO DECIRLO AL PROVEEDOR — cliente: ${d.cliente}]` : ''}`
     );
   } catch (e) { console.error('[sofiaOperacion] Error leyendo difusiones por ruta:', e.message); }
 
@@ -579,6 +579,7 @@ function bloqueBusquedasAbiertas() {
     `Si quien te escribe pregunta por una ruta, fecha, tipo de unidad o carga que coincida con alguna de estas — aunque no sea uno de los proveedores que ya contactaste para ese folio o difusión — respóndele directo con el dato real que SÍ aparece arriba (ej. si dice "salida 2026-10-31" y te preguntan cuándo sale, contesta con esa fecha). ` +
     `NUNCA le preguntes algo que ya está en esta lista. ` +
     `CRÍTICO — NUNCA inventes ni completes un dato que NO aparece en esta lista (ej. toneladas, peso, dirección exacta, hora exacta): si no está escrito arriba, no lo tienes — dile que no lo tienes confirmado todavía y que lo checas con el equipo, jamás des un número o dato que no viene literal en esta lista. ` +
+    `CRÍTICO — el "cliente" marcado como USO INTERNO es solo para que tú sepas de qué servicio se trata (prioridad, calidad) — JAMÁS se lo digas al proveedor que te escribe, ni aunque te pregunte directamente para quién es el servicio; contesta genérico ("un cliente nuestro") sin el nombre. ` +
     `Si dice que tiene disponibilidad para alguna, pídele precio; si tiene folio, avísaselo, si es un sondeo sin folio, dile que lo tomas en cuenta y lo conectas con el equipo.\n---\n`;
 }
 

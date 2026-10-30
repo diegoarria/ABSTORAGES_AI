@@ -184,9 +184,12 @@ function guardarContextoRequerimiento(agente, telefono, { empresa, origen, desti
   if (!tel) return;
   const session = `wa_${agente}_${tel}`;
   const esTop5 = prioridad === 'top5';
-  const datosDados = ['ruta', 'fecha', 'unidad', toneladas ? 'toneladas' : null, tipoCarga ? 'tipo de carga' : null, empresa ? 'cliente' : null].filter(Boolean).join(', ');
-  const resumen = `${empresa ? `Cliente: ${empresa}. ` : ''}Ya le preguntaste a este proveedor disponibilidad para la ruta ${origen} → ${destino}, unidad ${tipoUnidad}, fecha ${fecha}${toneladas ? `, ${toneladas} toneladas` : ''}${tipoCarga ? `, carga: ${tipoCarga}` : ''}. ` +
-    `NUNCA le vuelvas a pedir su nombre ni estos datos que ya le diste (${datosDados}) — ya se los diste tú en el mensaje que le mandaste. Si pregunta por alguno de ESOS datos (ej. "¿cuándo sale?"), respóndele directo con el dato real de arriba. Si pregunta por un dato que NO está en esa lista (ej. toneladas, si no se mencionaron arriba), NUNCA lo inventes — dile que no lo tienes confirmado todavía y que lo checas con el equipo. Si contesta algo como "sí tengo disponibilidad", ve directo a pedir/confirmar el precio.` +
+  // "cliente" NUNCA entra a datosDados — eso es la lista de datos que SÍ se
+  // le mandaron al proveedor en el mensaje saliente; el cliente jamás se le
+  // dice (ver regla de confidencialidad en sofia-prompt.js).
+  const datosDados = ['ruta', 'fecha', 'unidad', toneladas ? 'toneladas' : null, tipoCarga ? 'tipo de carga' : null].filter(Boolean).join(', ');
+  const resumen = `${empresa ? `[USO INTERNO, NUNCA SE LO DIGAS AL PROVEEDOR] Cliente: ${empresa}. ` : ''}Ya le preguntaste a este proveedor disponibilidad para la ruta ${origen} → ${destino}, unidad ${tipoUnidad}, fecha ${fecha}${toneladas ? `, ${toneladas} toneladas` : ''}${tipoCarga ? `, carga: ${tipoCarga}` : ''} — esto SÍ se lo dijiste en el mensaje que le mandaste. ` +
+    `NUNCA le vuelvas a pedir su nombre ni estos datos que ya le diste (${datosDados}). Si pregunta por alguno de ESOS datos (ej. "¿cuándo sale?"), respóndele directo con el dato real de arriba. Si pregunta por un dato que NO está en esa lista (ej. toneladas, si no se mencionaron arriba), NUNCA lo inventes — dile que no lo tienes confirmado todavía y que lo checas con el equipo. Si pregunta para quién es el servicio o qué cliente, NUNCA le digas el nombre del cliente — contesta genérico ("es para un cliente nuestro"). Si contesta algo como "sí tengo disponibilidad", ve directo a pedir/confirmar el precio.` +
     (esTop5 ? ' 🔴 CLIENTE TOP 5 — PRIORIDAD MÁXIMA: negocia con urgencia real, cierra rápido, no dejes este hilo esperando.' : '') +
     (exigencia_calidad ? ` Exigencia de calidad de este cliente (no negociable): ${exigencia_calidad}` : '');
   try { memory.saveSummary(session, resumen); } catch (e) { console.error('[whatsappProactivo] Error guardando contexto de requerimiento:', e.message); }
