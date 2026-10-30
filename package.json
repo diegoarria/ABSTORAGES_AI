@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server-lite.js",
     "dev": "nodemon server-lite.js",
+    "smoke": "node scripts/smoke-test.js",
     "monitoring": "node monitoring/index.js",
     "monitoring:migrate": "node monitoring/db/migrate.js",
     "monitoring:panel": "node monitoring/admin-server.js",
