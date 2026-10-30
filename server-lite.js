@@ -2982,6 +2982,32 @@ app.post('/api/colocaciones/:folio/detener', soloAdmin, async (req, res) => {
 });
 app.get('/api/proveedores/ranking', adminUOps, (req, res) => res.json(colocaciones.ranking()));
 app.get('/api/proveedores/:telefono/desempeno', adminUOps, (req, res) => res.json(colocaciones.estadisticas(req.params.telefono)));
+// Historial real de WhatsApp con SOFIA para este proveedor — pedido explícito
+// del usuario (30-oct-2026): al dar clic en las tarjetas de desempeño, ver
+// fecha y texto exacto de cada intercambio, no solo el número agregado.
+// El teléfono guardado en cada contacto puede venir en distintos formatos
+// (Twilio normaliza con "521...", Kapso con "52..." tal cual) — se prueban
+// las dos llaves de sesión posibles y se fusiona lo que haya en cada una.
+app.get('/api/proveedores/:telefono/historial-sofia', adminUOps, (req, res) => {
+  const crudo = String(req.params.telefono || '').replace(/\D/g, '');
+  const diez = crudo.slice(-10);
+  const candidatos = [
+    `wa_sofia_${whatsappProactivo.normalizarE164(crudo)}`, // formato Twilio: +521XXXXXXXXXX
+    `wa_sofia_+52${diez}`,                                  // formato Kapso: +52XXXXXXXXXX
+  ];
+  const vistos = new Set();
+  let historial = [];
+  for (const id of candidatos) {
+    for (const m of memory.getFullHistory(id)) {
+      const clave = m.ts + '|' + m.role;
+      if (vistos.has(clave)) continue;
+      vistos.add(clave);
+      historial.push(m);
+    }
+  }
+  historial.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  res.json({ historial });
+});
 // Scorecard de cliente — % de entregas a tiempo, sacado del TMS real
 // (Cita de Descarga vs. Llegada a descarga de servicios ya concluidos).
 app.get('/api/clientes/:empresa/desempeno', adminUOps, async (req, res) => {

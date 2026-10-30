@@ -305,4 +305,4 @@ async function enviarPlantillaSinCandado(agente, to, contentSid, variables) {
   return kapso.enviarPlantilla(to, agente, contentSid, variables);
 }
 
-module.exports = { enviarPlantillaSinCandado, yaSeEnvio, marcarComoEnviada, enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio };
+module.exports = { enviarPlantillaSinCandado, yaSeEnvio, marcarComoEnviada, enviarSeguimientoRevision, enviarSeguimientoDisponibilidad, enviarPlantilla, registrarEnMemoria, avisarReclamoPago, preguntarDisponibilidad, preguntarDisponibilidadATodos, avisarEquipo, enviarEstatusFolio, normalizarE164 };

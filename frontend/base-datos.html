@@ -182,6 +182,15 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
 .stat-v .unit { font-size:13px; font-weight:600; color:var(--tx3); letter-spacing:0; }
 .stat-l { font-size:12px; color:var(--tx2); font-weight:600; margin-top:6px; }
 .stat-s { font-size:11.5px; color:var(--tx3); margin-top:2px; }
+.stat-click { cursor:pointer; transition:border-color .15s, background .15s; }
+.stat-click:hover { border-color:var(--sofia); background:var(--surface-3); }
+.hist-item { border-bottom:1px solid var(--bd); padding:10px 0; }
+.hist-item:last-child { border-bottom:none; }
+.hist-fecha { font-size:11px; color:var(--tx3); font-weight:600; margin-bottom:3px; }
+.hist-rol { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; margin-right:6px; }
+.hist-rol.rol-sofia { color:var(--sofia); }
+.hist-rol.rol-proveedor { color:var(--tx2); }
+.hist-texto { font-size:13.5px; color:var(--tx); white-space:pre-wrap; margin-top:2px; }
 .callout { border:1px solid var(--warn); background:var(--warn-soft); border-radius:12px; padding:14px 16px; }
 .callout-t { font-size:12.5px; font-weight:700; color:var(--warn); margin-bottom:8px; }
 .sug { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; padding:7px 0; font-size:13px; }
@@ -339,6 +348,14 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
     <div class="modal-h"><h2 id="mmTitulo">Enviar plantilla a varios contactos</h2><div class="sub" id="mmSub"></div></div>
     <div class="modal-b" id="mmBody"></div>
     <div class="modal-actions" id="mmAcciones"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlayHistorialSofia">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="hsTitulo">
+    <div class="modal-h"><h2 id="hsTitulo">Historial con SOFIA</h2><div class="sub" id="hsSub"></div></div>
+    <div class="modal-b" id="hsBody"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="cerrarHistorialSofia()">Cerrar</button></div>
   </div>
 </div>
 
@@ -964,7 +981,9 @@ async function cargarDesempeno(data){
     const box = document.getElementById('desempeno-box');
     if (box) {
       const nuevo = !st.contactado;
-      const tile = (v, l, s) => `<div class="stat"><div class="stat-v">${v}</div><div class="stat-l">${l}</div>${s ? `<div class="stat-s">${s}</div>` : ''}</div>`;
+      const telJs = JSON.stringify(data.telefono || '');
+      const nombreJs = JSON.stringify(data.nombre_completo || data.empresa || 'este proveedor');
+      const tile = (v, l, s) => `<div class="stat stat-click" onclick="abrirHistorialSofia(${telJs}, ${nombreJs})" title="Ver fecha y texto de cada mensaje con SOFIA"><div class="stat-v">${v}</div><div class="stat-l">${l}</div>${s ? `<div class="stat-s">${s}</div>` : ''}</div>`;
       box.innerHTML = `<div class="stats">
         ${tile(Math.round(st.puntaje*100) + '<span class="unit">/100</span>', 'Puntaje SOFIA', nuevo ? 'Sin historial · inicia en 50' : '')}
         ${tile(st.contactado, 'Veces contactado', st.respondio + ' respondió')}
@@ -980,6 +999,35 @@ async function cargarDesempeno(data){
        <span class="sug-b"><button class="btn btn-primary btn-sm" onclick="resolverSugerencia('${x.id}',true)">Aprobar</button><button class="btn btn-ghost btn-sm" onclick="resolverSugerencia('${x.id}',false)">Descartar</button></span></div>`).join('') + '</div>';
   } catch (e) { /* el desempeño es informativo — nunca rompe la ficha */ }
 }
+async function abrirHistorialSofia(telefono, nombre){
+  document.getElementById('hsTitulo').textContent = 'Historial con SOFIA — ' + nombre;
+  document.getElementById('hsSub').textContent = '';
+  const body = document.getElementById('hsBody');
+  body.innerHTML = '<div class="empty-msg">Cargando…</div>';
+  document.getElementById('overlayHistorialSofia').classList.add('open');
+  try {
+    const r = await fetch('/api/proveedores/' + encodeURIComponent(telefono || 'x') + '/historial-sofia', { credentials: 'include' });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+    const historial = data.historial || [];
+    if (!historial.length) {
+      body.innerHTML = '<div class="empty-msg">Sin mensajes registrados con SOFIA todavía.</div>';
+      return;
+    }
+    const fmt = ts => new Date(ts).toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
+    body.innerHTML = historial.map(m => `
+      <div class="hist-item">
+        <div class="hist-fecha">${fmt(m.ts)}</div>
+        <span class="hist-rol ${m.role === 'assistant' ? 'rol-sofia' : 'rol-proveedor'}">${m.role === 'assistant' ? 'SOFIA respondió' : 'Proveedor'}</span>
+        <div class="hist-texto">${esc(typeof m.content === 'string' ? m.content : JSON.stringify(m.content))}</div>
+      </div>`).join('');
+  } catch (e) {
+    body.innerHTML = '<div class="empty-msg">No se pudo cargar el historial: ' + esc(e.message) + '</div>';
+  }
+}
+function cerrarHistorialSofia(){ document.getElementById('overlayHistorialSofia').classList.remove('open'); }
+document.getElementById('overlayHistorialSofia').addEventListener('click', (e) => { if (e.target.id === 'overlayHistorialSofia') cerrarHistorialSofia(); });
+
 async function cargarDesempenoCliente(data){
   const box = document.getElementById('desempeno-cliente-box');
   if (!box || !data.empresa) return;
