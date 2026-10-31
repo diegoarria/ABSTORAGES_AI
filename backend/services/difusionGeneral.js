@@ -25,6 +25,11 @@ const HABILITADO = process.env.SOFIA_DIFUSION_GENERAL === 'true';
 const HORA   = Number(process.env.SOFIA_DIFUSION_GENERAL_HORA || 5);
 const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
+// Ronda diaria al piloto de confianza — apagador PROPIO, independiente de
+// SOFIA_DIFUSION_GENERAL (pedido explícito del usuario, 30-oct-2026).
+const HABILITADO_PILOTO = process.env.SOFIA_RONDA_PILOTO === 'true';
+const HORA_PILOTO   = Number(process.env.SOFIA_RONDA_PILOTO_HORA || 6);
+const MINUTO_PILOTO = Number(process.env.SOFIA_RONDA_PILOTO_MINUTO || 0);
 // 4 variaciones de texto en vez de una sola plantilla fija — pedido explícito
 // del usuario (05-oct-2026): si siempre es el mismo mensaje, se nota que es un
 // bot y se pierde confianza. Rotación por DÍA, no por proveedor (pedido
@@ -81,6 +86,14 @@ function guardarUltimaFecha(fecha) {
   estado.ultimaFechaEnviada = fecha;
   guardarEstado(estado);
 }
+// Candado de fecha PROPIO para la ronda del piloto — independiente del de
+// arriba, para que una corra sin afectar el "ya corrió hoy" de la otra.
+let ultimaFechaEnviadaPiloto = leerEstado().ultimaFechaEnviadaPiloto || null;
+function guardarUltimaFechaPiloto(fecha) {
+  const estado = leerEstado();
+  estado.ultimaFechaEnviadaPiloto = fecha;
+  guardarEstado(estado);
+}
 // Índice de la última variante usada — pedido explícito del usuario
 // (20-oct-2026): ya no se rota por proveedor dentro de una misma corrida,
 // se rota por DÍA — toda la corrida usa UNA sola variante, y la siguiente
@@ -126,6 +139,25 @@ async function proveedoresTop100() {
     .map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono, volumen: volumenServicios(c) }))
     .sort((a, b) => b.volumen - a.volumen)
     .slice(0, 100);
+}
+
+// Lista de confianza del piloto — pedido explícito del usuario (30-oct-2026):
+// "todos los días a las 6AM mandas ese piloto a los 20 proveedores de
+// confianza" — pregunta general, sin ligarse a un folio (a diferencia de
+// sofiaScheduler.js, que usa esta MISMA lista pero solo cuando hay carga
+// real próxima sin cubrir). Mismo SOFIA_PILOTO_PROVEEDORES, dos
+// comportamientos distintos, cada uno con su propio apagador.
+const PILOTO_TELEFONOS = new Set(
+  (process.env.SOFIA_PILOTO_PROVEEDORES || '')
+    .split(',').map(t => t.replace(/\D/g, '').slice(-10)).filter(Boolean)
+);
+async function proveedoresPiloto() {
+  if (!PILOTO_TELEFONOS.size) return [];
+  const bd = await contactos.listarPorAgente('SOFIA', { tipo: 'proveedor' });
+  return bd
+    .filter(c => c.telefono && PILOTO_TELEFONOS.has(c.telefono.replace(/\D/g, '').slice(-10)))
+    .filter(c => !/Estatus en catálogo: (Baja|Suspendido)/i.test(c.notas || ''))
+    .map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono }));
 }
 
 // ── Registro de difusiones ad-hoc por ruta — para que SOFIA sepa qué está
@@ -226,24 +258,22 @@ async function dispararPorRuta({ origen, destino, fecha, tipo_unidad, tipo_carga
 const titulo = s => String(s || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
 const feed = e => actividadBus.emitir({ agente: 'SOFIA', ...e });
 
-// Arma la lista y manda, uno por uno — usado tanto por la corrida programada
-// (correrSiToca) como por el disparo manual de Diego por WhatsApp
-// (dispararManual, ver server-lite.js: "manda/lanza la difusión general").
-async function ejecutarDifusion() {
+// Arma la lista y manda, uno por uno — núcleo compartido por la difusión
+// general (Top 100) y la ronda del piloto (30-oct-2026): mismo mecanismo de
+// envío, rotación de variante y candados, solo cambia de dónde sale la lista
+// de proveedores y el texto que va al feed "En vivo" y a la notificación.
+async function ejecutarRonda(lista, etiquetaFeed, tipoActividad) {
   if (agentPause.estaPausado('sofia')) return { ok: false, motivo: 'pausado' };
   const usaVariantes = VARIANTES.length > 0;
   if (!usaVariantes && !CONTENT_SID_FALLBACK) { console.warn('[difusionGeneral] Ninguna plantilla de disponibilidad configurada — se omite'); return { ok: false, motivo: 'sin_plantilla' }; }
-
-  let lista;
-  try { lista = await proveedoresTop100(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return { ok: false, motivo: 'error_lista' }; }
-  if (!lista.length) { feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: 'Difusión general: no hay proveedores con teléfono en la Base de Datos' }); return { ok: true, enviados: 0, total: 0 }; }
+  if (!lista.length) { feed({ tipo: tipoActividad, mensaje: `${etiquetaFeed}: no hay proveedores con teléfono en la Base de Datos` }); return { ok: true, enviados: 0, total: 0 }; }
 
   // Una sola variante para TODA la corrida (pedido explícito del usuario,
   // 20-oct-2026): ya no rota por proveedor dentro de la misma corrida — rota
   // por DÍA. Esta corrida usa la que sigue en el ciclo v1→v2→v3→v4→v1...,
   // persistido en disco para que sobreviva un redeploy/reinicio del server.
   const variante = usaVariantes ? siguienteVariante() : null;
-  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: `Difusión general de disponibilidad (Top 100 proveedores) — variante "${variante?.sid || CONTENT_SID_FALLBACK}" — empezando con ${lista.length} proveedores, uno tras otro` });
+  feed({ tipo: tipoActividad, mensaje: `${etiquetaFeed} — variante "${variante?.sid || CONTENT_SID_FALLBACK}" — empezando con ${lista.length} proveedores, uno tras otro` });
 
   let enviados = 0, sinCredito = 0, fallidos = 0;
   for (const p of lista) {
@@ -260,16 +290,34 @@ async function ejecutarDifusion() {
         ? variante.texto.replace('{nombre}', titulo(p.nombre))
         : `Hola ${titulo(p.nombre)}, buscamos unidad para cualquier ruta hoy. ¿Tienes disponibilidad? Cuéntame qué unidad y para dónde.`;
       whatsappProactivo.registrarEnMemoria?.('sofia', p.telefono, textoEnviado);
-      contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: 'Difusión general de disponibilidad', canal: 'whatsapp-plantilla' }).catch(() => {});
+      contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: etiquetaFeed, canal: 'whatsapp-plantilla' }).catch(() => {});
     } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }
 
-  const resumen = `Difusión general (variante "${variante?.sid || CONTENT_SID_FALLBACK}"): ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
-  feed({ tipo: 'DISPONIBILIDAD_DIARIA', mensaje: resumen });
-  notifier.notificarAlerta({ title: 'SOFIA — Difusión general de disponibilidad', body: resumen, tipo: 'DISPONIBILIDAD_DIARIA' }).catch(() => {});
+  const resumen = `${etiquetaFeed} (variante "${variante?.sid || CONTENT_SID_FALLBACK}"): ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
+  feed({ tipo: tipoActividad, mensaje: resumen });
+  notifier.notificarAlerta({ title: `SOFIA — ${etiquetaFeed}`, body: resumen, tipo: tipoActividad }).catch(() => {});
   console.log(`[difusionGeneral] ${resumen}`);
   return { ok: true, enviados, total: lista.length, sinCredito, fallidos, resumen };
+}
+
+// Usado tanto por la corrida programada (correrSiToca) como por el disparo
+// manual de Diego por WhatsApp (dispararManual).
+async function ejecutarDifusion() {
+  let lista;
+  try { lista = await proveedoresTop100(); } catch (e) { console.error('[difusionGeneral] Error armando la lista:', e.message); return { ok: false, motivo: 'error_lista' }; }
+  return ejecutarRonda(lista, 'Difusión general de disponibilidad (Top 100 proveedores)', 'DISPONIBILIDAD_DIARIA');
+}
+
+// Ronda diaria SOLO al piloto de confianza (SOFIA_PILOTO_PROVEEDORES) — pedido
+// explícito del usuario (30-oct-2026): todos los días, sin importar si hay
+// carga pendiente o no (a diferencia de sofiaScheduler.js, que usa la misma
+// lista pero solo cuando hay un folio real próximo sin cubrir).
+async function ejecutarRondaPiloto() {
+  let lista;
+  try { lista = await proveedoresPiloto(); } catch (e) { console.error('[difusionGeneral] Error armando la lista del piloto:', e.message); return { ok: false, motivo: 'error_lista' }; }
+  return ejecutarRonda(lista, 'Ronda diaria al piloto de confianza', 'RONDA_PILOTO');
 }
 
 async function correrSiToca(pushActividad) {
@@ -281,6 +329,20 @@ async function correrSiToca(pushActividad) {
   ultimaFechaEnviada = fecha; // se marca antes de correr — un fallo a medias no la reintenta en bucle
   guardarUltimaFecha(fecha);
   await ejecutarDifusion();
+}
+
+// Mismo criterio que correrSiToca, candado de fecha propio — para que las
+// dos rondas (Top 100 y piloto) puedan tener horarios distintos sin
+// pisarse una a la otra.
+async function correrRondaPilotoSiToca() {
+  if (!HABILITADO_PILOTO) return;
+  const { fecha, minutosDelDia } = horaYFechaMTY();
+  const inicioMin = HORA_PILOTO * 60 + MINUTO_PILOTO;
+  if (minutosDelDia < inicioMin || minutosDelDia > inicioMin + VENTANA_MIN) return;
+  if (ultimaFechaEnviadaPiloto === fecha) return;
+  ultimaFechaEnviadaPiloto = fecha;
+  guardarUltimaFechaPiloto(fecha);
+  await ejecutarRondaPiloto();
 }
 
 // Disparo manual — pedido explícito del usuario (19-oct-2026): si Diego le
@@ -296,10 +358,24 @@ async function dispararManual() {
 }
 
 function iniciar(pushActividad) {
-  if (!HABILITADO) { console.log('[difusionGeneral] Desactivado (SOFIA_DIFUSION_GENERAL != "true")'); return; }
-  setInterval(() => correrSiToca(pushActividad).catch(e => console.error('[difusionGeneral]', e.message)), CHEQUEO_MS);
-  correrSiToca(pushActividad).catch(() => {}); // por si el server arranca ya pasada la hora
-  console.log(`[difusionGeneral] Activo — Top 100 proveedores por volumen, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
+  if (HABILITADO) {
+    setInterval(() => correrSiToca(pushActividad).catch(e => console.error('[difusionGeneral]', e.message)), CHEQUEO_MS);
+    correrSiToca(pushActividad).catch(() => {}); // por si el server arranca ya pasada la hora
+    console.log(`[difusionGeneral] Activo — Top 100 proveedores por volumen, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
+  } else {
+    console.log('[difusionGeneral] Desactivado (SOFIA_DIFUSION_GENERAL != "true")');
+  }
+  if (HABILITADO_PILOTO) {
+    if (!PILOTO_TELEFONOS.size) {
+      console.warn('[difusionGeneral] SOFIA_RONDA_PILOTO activo pero SOFIA_PILOTO_PROVEEDORES está vacía — no se puede correr sin lista, se omite.');
+    } else {
+      setInterval(() => correrRondaPilotoSiToca().catch(e => console.error('[difusionGeneral]', e.message)), CHEQUEO_MS);
+      correrRondaPilotoSiToca().catch(() => {});
+      console.log(`[difusionGeneral] Ronda piloto activa — ${PILOTO_TELEFONOS.size} proveedores, a partir de las ${HORA_PILOTO}:${String(MINUTO_PILOTO).padStart(2, '0')} (Monterrey)`);
+    }
+  } else {
+    console.log('[difusionGeneral] Ronda piloto desactivada (SOFIA_RONDA_PILOTO != "true")');
+  }
 }
 
-module.exports = { iniciar, correrSiToca, proveedoresTop100, dispararManual, dispararPorRuta, proveedoresPorRuta, difusionesRutaActivas };
+module.exports = { iniciar, correrSiToca, correrRondaPilotoSiToca, proveedoresTop100, proveedoresPiloto, dispararManual, dispararPorRuta, proveedoresPorRuta, difusionesRutaActivas };
