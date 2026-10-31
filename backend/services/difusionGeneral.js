@@ -19,15 +19,20 @@ const agentPause = require('./agentPause');
 const actividadBus = require('./actividadBus');
 const notifier = require('./notifier');
 
-// Reactivada a pedido explícito del usuario (06-oct-2026) — ya no se detiene
-// aquí; el único apagador real es SOFIA_DIFUSION_GENERAL en el entorno.
-const HABILITADO = process.env.SOFIA_DIFUSION_GENERAL === 'true';
+// PARADA DE EMERGENCIA — pedido explícito del usuario (30-oct-2026, "detén
+// estas difusiones ya"): forzado a false en código, sin importar la env var
+// SOFIA_DIFUSION_GENERAL — un apagador por env var no corta nada hasta el
+// próximo redeploy, y ya se mandaron rondas reales a proveedores. Para
+// reactivar, hay que quitar este `false &&` a propósito.
+const HABILITADO = false && process.env.SOFIA_DIFUSION_GENERAL === 'true';
 const HORA   = Number(process.env.SOFIA_DIFUSION_GENERAL_HORA || 5);
 const MINUTO = Number(process.env.SOFIA_DIFUSION_GENERAL_MINUTO || 30);
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_GENERAL_PAUSA_MS || 3000);
 // Ronda diaria al piloto de confianza — apagador PROPIO, independiente de
 // SOFIA_DIFUSION_GENERAL (pedido explícito del usuario, 30-oct-2026).
-const HABILITADO_PILOTO = process.env.SOFIA_RONDA_PILOTO === 'true';
+// PARADA DE EMERGENCIA (mismo pedido, mismo día, unas horas después — "detén
+// estas difusiones ya"): forzado a false en código, mismo motivo que arriba.
+const HABILITADO_PILOTO = false && process.env.SOFIA_RONDA_PILOTO === 'true';
 const HORA_PILOTO   = Number(process.env.SOFIA_RONDA_PILOTO_HORA || 6);
 const MINUTO_PILOTO = Number(process.env.SOFIA_RONDA_PILOTO_MINUTO || 0);
 // 4 variaciones de texto en vez de una sola plantilla fija — pedido explícito

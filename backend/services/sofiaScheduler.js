@@ -16,7 +16,12 @@ const agentPause        = require('./agentPause');
 const notifier          = require('./notifier');
 const contactos         = require('./contactos');
 
-const HABILITADO     = process.env.SOFIA_DISPONIBILIDAD_DIARIA === 'true';
+// PARADA DE EMERGENCIA — pedido explícito del usuario (30-oct-2026, "detén
+// estas difusiones ya"): forzado a false en código, sin importar la env var,
+// porque el apagador por env var no alcanza a tiempo (requiere redeploy) y
+// ya se mandaron rondas reales a proveedores. Para reactivar, hay que
+// quitar este `false &&` a propósito — nunca basta con tocar la env var.
+const HABILITADO     = false && process.env.SOFIA_DISPONIBILIDAD_DIARIA === 'true';
 const HORA_ENVIO      = Number(process.env.SOFIA_DISPONIBILIDAD_HORA || 8); // 8am hora Monterrey
 const VENTANA_HORAS   = Number(process.env.SOFIA_DISPONIBILIDAD_VENTANA_HORAS || 72);
 const CHEQUEO_MS      = 15 * 60 * 1000; // revisa cada 15 min si ya toca correr hoy
