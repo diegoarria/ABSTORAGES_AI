@@ -115,8 +115,18 @@ async function render() {
   try {
     if (filtro === 'disp') {
       const ds = await api('/api/disponibilidades');
-      const fmt = iso => { const [y, m, d] = iso.split('-').map(Number); return new Intl.DateTimeFormat('es-MX', { weekday:'long', day:'numeric', month:'long', timeZone:'UTC' }).format(new Date(Date.UTC(y, m - 1, d, 12))); };
-      cont.innerHTML = ds.length ? `<div class="card"><h3>Disponibilidades prometidas</h3><div class="sub">Proveedores que dijeron que tendrán unidad otro día. SOFIA les escribe ese día por la mañana (plantilla aprobada) para confirmar.</div><div class="tbl-w"><table><tr><th>Día</th><th>Proveedor</th><th>Ruta</th><th>Unidad</th><th>Estado</th><th></th></tr>${ds.map(d => `<tr><td><b>${esc(fmt(d.fecha))}</b></td><td>${esc(d.nombre || d.telefono)}</td><td>${esc(d.ruta || '—')}</td><td>${esc(d.unidad || '—')}${d.detalle ? `<div class="sub">${esc(d.detalle)}</div>` : ''}</td><td>${d.estado === 'recordada' ? 'Ya se le escribió hoy' : 'Pendiente'}</td><td>${d.estado === 'pendiente' ? `<button class="btn btn-secondary btn-sm" onclick="cancelarDisp('${esc(d.id)}')">Cancelar</button>` : ''}</td></tr>`).join('')}</table></div></div>` : '<div class="empty-msg">No hay disponibilidades prometidas por ahora.</div>';
+      const fmt = iso => iso ? (() => { const [y, m, d] = iso.split('-').map(Number); return new Intl.DateTimeFormat('es-MX', { weekday:'long', day:'numeric', month:'long', timeZone:'UTC' }).format(new Date(Date.UTC(y, m - 1, d, 12))); })() : 'sin fecha fija';
+      cont.innerHTML = ds.length ? `<div class="card"><h3>Disponibilidades prometidas</h3><div class="sub">Proveedores que dijeron que tendrán unidad otro día. SOFIA les escribe ese día por la mañana (plantilla aprobada) para confirmar. Si SOFIA entendió mal algo, corrígelo aquí.</div><div class="tbl-w"><table><tr><th>Día</th><th>Proveedor</th><th>Ruta</th><th>Unidad</th><th>Estado</th><th></th></tr>${ds.map(d => `
+        <tr id="disp-${esc(d.id)}"><td><b>${esc(fmt(d.fecha))}</b></td><td>${esc(d.nombre || d.telefono)}</td><td>${esc(d.ruta || '—')}</td><td>${esc(d.unidad || '—')}${d.detalle ? `<div class="sub">${esc(d.detalle)}</div>` : ''}</td><td>${d.estado === 'recordada' ? 'Ya se le escribió hoy' : 'Pendiente'}</td>
+        <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="editarDisp('${esc(d.id)}')">Editar</button><button class="btn btn-danger btn-sm" onclick="cancelarDisp('${esc(d.id)}')">Cancelar</button></div></td></tr>
+        <tr id="edit-${esc(d.id)}" style="display:none"><td colspan="6"><div class="man" style="border-top:none;padding-top:0;margin-top:0">
+          <input id="ed-fecha-${esc(d.id)}" type="date" value="${esc(d.fecha || '')}" min="${esc(hoyISO())}" style="max-width:160px">
+          <input id="ed-ruta-${esc(d.id)}" placeholder="Ruta" value="${esc(d.ruta || '')}">
+          <input id="ed-unidad-${esc(d.id)}" placeholder="Unidad" value="${esc(d.unidad || '')}">
+          <input id="ed-detalle-${esc(d.id)}" placeholder="Detalle" value="${esc(d.detalle || '')}">
+          <button class="btn btn-primary btn-sm" onclick="guardarDisp('${esc(d.id)}')">Guardar</button>
+          <button class="btn btn-secondary btn-sm" onclick="editarDisp('${esc(d.id)}')">Cancelar edición</button>
+        </div></td></tr>`).join('')}</table></div></div>` : '<div class="empty-msg">No hay disponibilidades prometidas por ahora.</div>';
       return;
     }
     if (filtro === 'ranking') {
@@ -170,8 +180,23 @@ async function manual(folio) {
   catch (e) { alert('No se pudo: ' + e.message); }
 }
 async function cancelarDisp(id) {
-  if (!confirm('¿Cancelar este seguimiento? SOFIA ya no le escribirá ese día.')) return;
+  if (!confirm('¿Quitar esta disponibilidad de la lista? Si tenía fecha, SOFIA ya no le escribirá ese día. Esto no se puede deshacer — si el proveedor sigue disponible, tendría que decírselo de nuevo a SOFIA.')) return;
   try { await api('/api/disponibilidades/' + encodeURIComponent(id) + '/cancelar', { method:'POST' }); render(); } catch (e) { alert('No se pudo: ' + e.message); }
+}
+function hoyISO() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date()); }
+function editarDisp(id) {
+  const fila = document.getElementById('edit-' + id);
+  if (fila) fila.style.display = fila.style.display === 'none' ? 'table-row' : 'none';
+}
+async function guardarDisp(id) {
+  const fecha = document.getElementById('ed-fecha-' + id).value.trim();
+  const ruta = document.getElementById('ed-ruta-' + id).value.trim();
+  const unidad = document.getElementById('ed-unidad-' + id).value.trim();
+  const detalle = document.getElementById('ed-detalle-' + id).value.trim();
+  try {
+    await api('/api/disponibilidades/' + encodeURIComponent(id) + '/editar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ fecha, ruta, unidad, detalle }) });
+    render();
+  } catch (e) { alert('No se pudo: ' + e.message); }
 }
 async function enviarKpis() {
   if (!confirm('¿Enviar los KPIs de hoy por email a Diego y Rafael?')) return;

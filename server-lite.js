@@ -2671,6 +2671,34 @@ app.post('/api/disponibilidades/:id/cancelar', soloAdmin, (req, res) => {
   if (!d) return res.status(404).json({ error: 'No encontrada' });
   res.json({ ok: true });
 });
+// Corrección manual — pedido explícito del usuario (31-oct-2026): si SOFIA
+// entendió mal la fecha/ruta/unidad que le dio un proveedor, se puede
+// corregir aquí en vez de dejarlo mal en el reporte o tener que cancelarlo
+// y esperar a que el proveedor lo repita.
+app.post('/api/disponibilidades/:id/editar', soloAdmin, (req, res) => {
+  const existente = colocaciones.disponibilidades().find(d => d.id === req.params.id);
+  if (!existente) return res.status(404).json({ error: 'No encontrada' });
+  const { fecha, ruta, unidad, detalle } = req.body || {};
+  const parche = {};
+  if (fecha !== undefined) {
+    if (fecha === '' || fecha === null) parche.fecha = '';
+    else {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(fecha))) return res.status(400).json({ error: 'Fecha inválida, usa AAAA-MM-DD' });
+      if (fecha < colocaciones.fechaMTY()) return res.status(400).json({ error: 'Esa fecha ya pasó' });
+      parche.fecha = fecha;
+    }
+  }
+  if (ruta !== undefined) parche.ruta = String(ruta || '').slice(0, 120);
+  if (unidad !== undefined) parche.unidad = String(unidad || '').slice(0, 80);
+  if (detalle !== undefined) parche.detalle = String(detalle || '').slice(0, 200);
+  // Si se corrige la fecha a una nueva, vuelve a quedar pendiente de
+  // recordatorio ese día aunque ya se le hubiera avisado por la vieja.
+  if (parche.fecha !== undefined && parche.fecha !== existente.fecha) {
+    parche.estado = 'pendiente'; parche.recordatorioEn = null; parche.recordatorioPreviaEn = null;
+  }
+  const d = colocaciones.actualizarDisponibilidad(req.params.id, parche);
+  res.json({ ok: true, disponibilidad: d });
+});
 
 // Dashboard de disponibilidad por ruta — pedido explícito del usuario
 // (27-oct-2026): filtras por ruta y te dice qué proveedores tienen
