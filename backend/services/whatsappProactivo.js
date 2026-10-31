@@ -78,13 +78,17 @@ function telefonoValido(t) {
 const CANDADO_FILE = path.join(__dirname, '../../data/plantilla-enviada.json');
 let plantillasEnviadas = {};
 try { if (fs.existsSync(CANDADO_FILE)) plantillasEnviadas = JSON.parse(fs.readFileSync(CANDADO_FILE, 'utf8')); } catch (e) { console.error('[whatsappProactivo] No se pudo leer el candado de plantillas:', e.message); }
-let guardarTimer = null;
+// Escritura SÍNCRONA e inmediata (sin debounce) — pedido explícito del
+// usuario (30-oct-2026): un debounce de 300ms deja una ventana real en la
+// que, si el proceso se reinicia (nodemon, redeploy, crash) justo después de
+// marcar un envío, la marca nunca llega a disco y el próximo arranque vuelve
+// a mandarle la misma plantilla al mismo proveedor — pasó varias veces en
+// una sola tarde durante el desarrollo de la ronda del piloto. Este candado
+// es protección anti-spam/anti-bloqueo de WhatsApp, no una ruta sensible a
+// rendimiento — nunca debe poder perder una marca de envío ya hecho.
 function guardarCandado() {
-  clearTimeout(guardarTimer);
-  guardarTimer = setTimeout(() => {
-    try { fs.mkdirSync(path.dirname(CANDADO_FILE), { recursive: true }); fs.writeFileSync(CANDADO_FILE, JSON.stringify(plantillasEnviadas)); }
-    catch (e) { console.error('[whatsappProactivo] Error guardando el candado de plantillas:', e.message); }
-  }, 300);
+  try { fs.mkdirSync(path.dirname(CANDADO_FILE), { recursive: true }); fs.writeFileSync(CANDADO_FILE, JSON.stringify(plantillasEnviadas)); }
+  catch (e) { console.error('[whatsappProactivo] Error guardando el candado de plantillas:', e.message); }
 }
 function claveCandado(agente, to, contentSid) { return `${agente}|${(to || '').replace(/\D/g, '').slice(-10)}|${contentSid}`; }
 function yaSeEnvio(agente, to, contentSid) { return !!plantillasEnviadas[claveCandado(agente, to, contentSid)]; }
@@ -103,16 +107,16 @@ function marcarComoEnviada(agente, to, contentSid) { plantillasEnviadas[claveCan
 const CONTACTO_DIARIO_FILE = path.join(__dirname, '../../data/contacto-diario.json');
 let contactoDiario = {};
 try { if (fs.existsSync(CONTACTO_DIARIO_FILE)) contactoDiario = JSON.parse(fs.readFileSync(CONTACTO_DIARIO_FILE, 'utf8')); } catch (e) { console.error('[whatsappProactivo] No se pudo leer el candado diario:', e.message); }
-let guardarDiarioTimer = null;
 function fechaMTY() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date()); }
+// Síncrona e inmediata — mismo motivo que guardarCandado() arriba: este
+// candado es lo único que evita un segundo contacto real al mismo proveedor
+// el mismo día, y un debounce aquí pierde la marca si el proceso se reinicia
+// justo después del envío.
 function guardarContactoDiario() {
-  clearTimeout(guardarDiarioTimer);
-  guardarDiarioTimer = setTimeout(() => {
-    const hoy = fechaMTY();
-    for (const k of Object.keys(contactoDiario)) if (!k.endsWith('|' + hoy)) delete contactoDiario[k]; // solo se conserva el día de hoy
-    try { fs.mkdirSync(path.dirname(CONTACTO_DIARIO_FILE), { recursive: true }); fs.writeFileSync(CONTACTO_DIARIO_FILE, JSON.stringify(contactoDiario)); }
-    catch (e) { console.error('[whatsappProactivo] Error guardando el candado diario:', e.message); }
-  }, 300);
+  const hoy = fechaMTY();
+  for (const k of Object.keys(contactoDiario)) if (!k.endsWith('|' + hoy)) delete contactoDiario[k]; // solo se conserva el día de hoy
+  try { fs.mkdirSync(path.dirname(CONTACTO_DIARIO_FILE), { recursive: true }); fs.writeFileSync(CONTACTO_DIARIO_FILE, JSON.stringify(contactoDiario)); }
+  catch (e) { console.error('[whatsappProactivo] Error guardando el candado diario:', e.message); }
 }
 function claveContactoDiario(agente, to) { return `${agente}|${(to || '').replace(/\D/g, '').slice(-10)}|${fechaMTY()}`; }
 function yaContactadoHoy(agente, to) { return !!contactoDiario[claveContactoDiario(agente, to)]; }

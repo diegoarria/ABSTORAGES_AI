@@ -599,7 +599,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const agenteU = agente.toUpperCase();
 
     // Apagado de emergencia — máxima prioridad, igual que en el chat web.
-    if (['maria', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
+    if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && emergencyShutdown.estaActivo()) {
       console.log(`[WA-IN] ${agenteU} — apagado de emergencia activo, ignorando mensaje de ${phone}`);
       return;
     }
@@ -607,7 +607,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Teléfono baneado permanentemente — se ignora en silencio, ni siquiera
     // se guarda el mensaje. Por orden de Diego: una sola vez que mande
     // cualquiera de las frases bloqueadas, nunca más se le vuelve a responder.
-    if (['maria', 'sofia', 'noa'].includes(agente) && phoneBanlist.estaBaneado(phone)) {
+    if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && phoneBanlist.estaBaneado(phone)) {
       console.log(`[WA-IN] ${agenteU} — teléfono baneado, ignorando mensaje de ${phone}`);
       return;
     }
@@ -656,7 +656,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Excepción — credenciales del TMS + clave privada correcta en el mismo
     // mensaje: no se banea, pero tampoco se revela el secreto real (eso nunca
     // sale por chat, sin importar quién pregunte).
-    if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
+    if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && promptLeakGuard.esCredencialTMS(texto) && promptLeakGuard.tienePassphraseCorrecta(texto)) {
       memory.addMessage(session, 'user', texto);
       memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
       saveMessage(session, agente, 'user', texto);
@@ -665,7 +665,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
       return;
     }
 
-    if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
+    if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && promptLeakGuard.detectar(texto) && personaEquipo?.nombre !== 'Diego') {
       memory.addMessage(session, 'user', texto);
       memory.addMessage(session, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
       saveMessage(session, agente, 'user', texto);
@@ -686,7 +686,7 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Lista amplia de palabras de ataque (SQLi, XSS, exploits, jailbreak
     // genérico, phishing, etc.) — más ruidosa que promptLeakGuard, por eso
     // no banea al primer hit: acumula hasta 3 intentos (punto 2 del checklist).
-    if (['maria', 'sofia', 'noa'].includes(agente) && personaEquipo?.nombre !== 'Diego') {
+    if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && personaEquipo?.nombre !== 'Diego') {
       const palabra = attackWordlist.detectar(texto);
       if (palabra) {
         const telefonoNorm = phoneBanlist.normalizar(phone);
@@ -3899,7 +3899,7 @@ async function handleChat(agente, req, res) {
   // (mantenimiento, baneos, lo que sea). Se activa a mano desde el panel o
   // solo si el sistema detecta un ataque en curso (ver registrarBaneoPara-
   // DeteccionDeAtaque). Ni siquiera se registra la IP de la sesión.
-  if (['maria', 'sofia', 'noa'].includes(agente) && emergencyShutdown.estaActivo()) {
+  if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && emergencyShutdown.estaActivo()) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -3917,7 +3917,7 @@ async function handleChat(agente, req, res) {
   // IP baneada permanentemente (por un intento previo de sacar el proceso/
   // reglas internas) — se corta de inmediato, ni siquiera se guarda el mensaje
   // en el historial. Por orden de Diego: nunca más se le vuelve a abrir el chat.
-  if (['maria', 'sofia', 'noa'].includes(agente) && ipBanlist.estaBaneada(ip)) {
+  if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && ipBanlist.estaBaneada(ip)) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -3948,7 +3948,7 @@ async function handleChat(agente, req, res) {
 
   // Excepción — credenciales del TMS + clave privada correcta en el mismo
   // mensaje: no se banea la IP, pero tampoco se revela el secreto real.
-  if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.esCredencialTMS(message) && promptLeakGuard.tienePassphraseCorrecta(message)) {
+  if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && promptLeakGuard.esCredencialTMS(message) && promptLeakGuard.tienePassphraseCorrecta(message)) {
     memory.addMessage(sid, 'user', message);
     memory.addMessage(sid, 'assistant', promptLeakGuard.MENSAJE_CREDENCIAL_RECONOCIDA);
     saveMessage(sid, agente, 'user', message);
@@ -3967,7 +3967,7 @@ async function handleChat(agente, req, res) {
   // depende de que el modelo "recuerde" bloquearlo. Por orden de Diego: nadie
   // más que él puede pedir esto. En el widget público (sin sesión de staff)
   // esto bloquea a absolutamente todos, sin excepción.
-  if (['maria', 'sofia', 'noa'].includes(agente) && promptLeakGuard.detectar(message) && !req.user) {
+  if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && promptLeakGuard.detectar(message) && !req.user) {
     memory.addMessage(sid, 'user', message);
     memory.addMessage(sid, 'assistant', promptLeakGuard.MENSAJE_BLOQUEO);
     saveMessage(sid, agente, 'user', message);
@@ -4000,7 +4000,7 @@ async function handleChat(agente, req, res) {
   // Lista amplia de palabras de ataque (SQLi, XSS, exploits, jailbreak
   // genérico, phishing, etc.) — más ruidosa que promptLeakGuard, por eso no
   // banea al primer hit: acumula hasta 3 intentos (punto 2 del checklist).
-  if (['maria', 'sofia', 'noa'].includes(agente) && !req.user) {
+  if (['maria', 'sofia', 'noa', 'hector'].includes(agente) && !req.user) {
     const palabra = attackWordlist.detectar(message);
     if (palabra) {
       const { count, alcanzoLimite } = attackStrikes.registrar(ip, palabra);
@@ -4775,6 +4775,27 @@ async function revisarLeadsSinRespuesta() {
     console.error('[MARIA seguimiento] Error revisando leads:', e.message);
   }
 }
+
+// ─── RED DE SEGURIDAD GLOBAL ────────────────────────────────────────────────
+// Pedido explícito del usuario (30-oct-2026): hoy una excepción no atrapada
+// en CUALQUIER punto del proceso lo tumba por completo — los 4 agentes a la
+// vez, sin ninguna alerta, dependiendo de que alguien note que el portal
+// dejó de responder. Esto no evita el crash (Node ya quedó en estado
+// inconsistente tras un uncaughtException; seguir corriendo sería más
+// riesgoso que reiniciar), pero asegura que SIEMPRE quede un registro y un
+// intento de alerta antes de salir, en vez de un silencio total.
+function manejarFatal(tipo, err) {
+  console.error(`[FATAL] ${tipo} no capturado — el proceso va a reiniciar:`, err);
+  notifier.notificarAlerta({
+    title: `🔴 ABSTORAGES AI — ${tipo} fatal`,
+    body: `${err?.message || err}\n\n${err?.stack || ''}`.slice(0, 2000),
+    tipo: 'ERROR_FATAL',
+  }).catch(() => {}).finally(() => process.exit(1));
+  // Si notificarAlerta se queda colgado (p. ej. SMTP caído), no esperar para siempre.
+  setTimeout(() => process.exit(1), 5000);
+}
+process.on('uncaughtException', (err) => manejarFatal('uncaughtException', err));
+process.on('unhandledRejection', (err) => manejarFatal('unhandledRejection', err));
 
 // ─── START ────────────────────────────────────────────────────────────────
 app.listen(PORT, async () => {

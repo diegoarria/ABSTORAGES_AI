@@ -4,10 +4,18 @@ const { chatStream } = require('../services/claude');
 const { publicarNuevaOrden, publicarActividad } = require('../services/redis');
 const { guardarMensaje, obtenerHistorialConversacion, registrarActividad } = require('../db/db');
 const mem = require('../services/sessionMemory');
-const tariff = require('../services/tariff');
 const ordersStore = require('../services/ordersStore');
 const { lanzarNegociacion } = require('../services/negociacion-wa');
-const SARA_SYSTEM_PROMPT = require('../agents/sara-prompt');
+// Pedido explícito del usuario (30-oct-2026): este route es una implementación
+// paralela más vieja del chat de MARÍA, sin ninguno de los guardrails
+// (promptLeakGuard/tarifaGuard/moderacion/banlists) que sí tiene server-lite.js
+// — mientras no se decide si eliminarlo por completo o unificarlo con
+// server-lite.js, se corrige al menos el riesgo de negocio más grave: usaba
+// el prompt VIEJO de SARA (que sí instruye a cotizar precio en el chat) y le
+// inyectaba la tabla completa de tarifas — justo lo que la política vigente
+// prohíbe. MARIA_SYSTEM_PROMPT nunca recibe tarifa (ver server-lite.js,
+// bloque de tarifa es solo para SOFIA).
+const MARIA_SYSTEM_PROMPT = require('../agents/maria-prompt');
 
 const PROVEEDORES = (() => {
   try { return require('../data/proveedores.json'); } catch { return []; }
@@ -45,7 +53,7 @@ router.post('/chat', async (req, res) => {
 
     let respuestaCompleta = '';
 
-    const systemPrompt = SARA_SYSTEM_PROMPT + tariff.getContext().prompt;
+    const systemPrompt = MARIA_SYSTEM_PROMPT;
 
     await chatStream(
       systemPrompt,

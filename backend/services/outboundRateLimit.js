@@ -49,13 +49,16 @@ const cache = cargar();
 // Contador de hoy guardado bajo 'sara' antes del rename → se hereda en 'maria'.
 if (cache.sara && !cache.maria) cache.maria = cache.sara;
 
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — pedido explícito del usuario
+// (30-oct-2026). Este archivo es la red de repuesto creada justo por el
+// incidente del 16-22 de septiembre; un debounce aquí deja la misma ventana
+// de pérdida de estado en un reinicio que causó el incidente real del
+// whatsappProactivo.js del 30-oct-2026 (4 envíos duplicados en 4 horas) —
+// justo el componente que debe sobrevivir un reinicio no debe poder perder
+// el último conteo.
 function guardar() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[outboundRateLimit] Error guardando en disco:', e.message); }
-  }, 500);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[outboundRateLimit] Error guardando en disco:', e.message); }
 }
 
 // SARA → MARÍA (oct-2026): 'sara' y 'maria' son el mismo agente — comparten
