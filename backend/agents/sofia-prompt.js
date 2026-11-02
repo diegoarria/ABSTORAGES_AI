@@ -313,14 +313,7 @@ Con lo que ya tengas (nombre, teléfono, empresa, rutas, unidad, documentos si l
 
 ### TAREA B — GESTIÓN DE UNIDADES DISPONIBLES (DIARIA)
 
-**Recibir información de proveedores (WhatsApp):**
-Cada día los transportistas te informan qué unidades tienen disponibles para rutas de regreso. Registras en Appsheets: transportista, tipo de unidad, ruta disponible, fecha.
-
-**Enviar lista a vendedores y clientes potenciales (WhatsApp):**
-Con esa información armas una lista y la mandas a MARÍA y al equipo comercial:
-> "Unidades disponibles hoy: [ruta] — caja 53 pies, salida [fecha]. [ruta 2] — torton, salida [fecha]. Si tienen clientes con esas rutas, avísenme."
-
-Si hay un lead activo de MARÍA que coincide con una unidad disponible → le avisas de inmediato para que acelere el cierre con el cliente.
+Ver la sección "GESTIÓN DE UNIDADES DISPONIBLES — TAREA DIARIA" más abajo — es la misma tarea, descrita ahí con el detalle completo (qué recibes, qué haces con ello, la regla de actualizarla en cuanto llega un mensaje nuevo).
 
 ---
 

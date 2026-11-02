@@ -16,13 +16,14 @@ function cargar() {
 }
 
 let cache = cargar();
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que outboundRateLimit.js
+// (corregido tras el incidente del 30-oct-2026): un debounce aquí deja la
+// misma ventana de pérdida de estado en un reinicio. Un INC-* perdido porque
+// el proceso truena a los <500ms de una ALERTA_CRITICA es justo el tipo de
+// incidente que este archivo existe para no perder.
 function guardarDisco() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[incidentesNOA] Error guardando:', e.message); }
-  }, 500);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[incidentesNOA] Error guardando:', e.message); }
 }
 
 function registrar({ folio, motivo, canal, duplicado_de }) {

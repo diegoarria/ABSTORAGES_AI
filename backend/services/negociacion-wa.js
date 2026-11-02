@@ -2,6 +2,15 @@
 // State machine completo: SOFIA contacta a todos los carriers en paralelo,
 // negocia con cada uno, el primero en aceptar dentro del margen gana,
 // a los demás se les cierra de forma amistosa.
+//
+// ⚠️ MOTOR LEGACY — pertenece a backend/server.js (modo con PostgreSQL+Redis),
+// NO a server-lite.js (el que de verdad corre en producción hoy — ver
+// package.json "start"). SOFIA en producción negocia por sofiaOperacion.js +
+// whatsappProactivo.js/Kapso, que sí persisten a disco. Si algún día se
+// activa backend/server.js, ojo: `negociaciones`/`telefonoAFolio` abajo son
+// Map() en memoria pura, sin respaldo a disco — un reinicio del proceso en
+// medio de una negociación la pierde por completo. Antes de reconectar este
+// archivo a producción, dale la misma persistencia que ya tiene colocaciones.js.
 
 const { enviarMensaje } = require('./whatsapp');
 const { chat } = require('./claude');

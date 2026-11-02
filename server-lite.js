@@ -778,7 +778,9 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     // Guardrail contra toneladas inventadas (incidente verificado 30-oct-2026,
     // ver datoInventadoGuard.js) — corte determinístico, no depende de que el
     // prompt obedezca.
-    const inventoToneladas = (agente === 'sofia' && !personaEquipo) && datoInventadoGuard.tieneToneladasInventadas(respuesta, systemPrompt);
+    // MARÍA incluida (no solo SOFIA): ella también le da pesos/toneladas a
+    // clientes reales al cotizar, mismo riesgo que ya se vio en SOFIA.
+    const inventoToneladas = (agente === 'sofia' || agente === 'maria') && !personaEquipo && datoInventadoGuard.tieneToneladasInventadas(respuesta, systemPrompt);
     // MARÍA — guardrail anti-fuga de precios/tarifas/costos (pedido explícito
     // del usuario, 19-oct-2026): corte determinístico en código, no depende
     // de que el modelo obedezca. Si el texto final contiene algo con forma de
@@ -802,8 +804,10 @@ app.post('/webhook/whatsapp', express.urlencoded({ extended: false }), async (re
     const bloques = splitForWhatsApp(textoLimpio);
     for (const bloque of bloques) await sendWhatsApp(phone, bloque, agente);
     // Reflexión de memoria (apagada por default, REFLEXION_MEMORIA=true) —
-    // nunca bloquea la respuesta real, corre aparte y en silencio.
-    if (!personaEquipo && (agente === 'maria' || agente === 'sofia')) {
+    // nunca bloquea la respuesta real, corre aparte y en silencio. NOA incluida
+    // (30-oct-2026): también habla seguido con choferes/proveedores, no solo
+    // con el equipo interno, mismo riesgo/beneficio que MARÍA y SOFIA.
+    if (!personaEquipo && (agente === 'maria' || agente === 'sofia' || agente === 'noa')) {
       reflexionMemoria.reflexionar(session, texto, textoLimpio).catch(() => {});
     }
 
@@ -1381,6 +1385,12 @@ async function manejarMensajeKapsoMaria(phone, texto) {
   saveMessage(session, AGENTE_KAPSO_MARIA, 'assistant', respuesta);
 
   let textoLimpio = limpiarControlParaCliente(respuesta);
+  // Guardrail contra toneladas inventadas (mismo criterio que SOFIA, ver
+  // datoInventadoGuard.js) — MARÍA también le da pesos/toneladas a clientes
+  // reales al cotizar, así que corre el mismo riesgo que ya se vio en SOFIA.
+  if (!personaEquipo && datoInventadoGuard.tieneToneladasInventadas(textoLimpio, systemPrompt)) {
+    textoLimpio = datoInventadoGuard.MENSAJE_DATO_SIN_CONFIRMAR;
+  }
   // MARÍA — guardrail anti-fuga de precios/tarifas/costos (ver tarifaGuard.js).
   // Escala al equipo comercial en CUALQUIER caso en que alguien pida tarifa —
   // no solo cuando el filtro de salida atrapa una fuga real.
@@ -1535,6 +1545,9 @@ async function manejarMensajeKapsoNoa(phone, texto) {
 
   const textoLimpio = limpiarControlParaCliente(respuesta);
   for (const bloque of splitForWhatsApp(textoLimpio)) await sendWhatsAppKapso(phone, bloque, AGENTE_KAPSO_NOA);
+  // Reflexión de memoria (ver manejarMensajeKapso/manejarMensajeKapsoMaria) —
+  // NOA también habla con choferes/proveedores, no solo con el equipo.
+  if (!personaEquipo) reflexionMemoria.reflexionar(session, texto, textoLimpio).catch(() => {});
 
   const metaMatch = respuesta.match(/empresa[:\s]+([^\n,.]+)/i);
   if (metaMatch) memory.updateMeta(session, { empresa: metaMatch[1].trim() });
@@ -2206,6 +2219,17 @@ app.post('/api/vapi/webhook', express.json(), (req, res) => {
             mensaje: `${evento.message.role === 'assistant' ? agenteVivoLabel : (callVivo.customer?.name || metaVivo.proveedor_nombre || metaVivo.nombre || 'Contacto')}: ${evento.message.transcript}`,
             metadata: { callId: callVivo.id, folio: metaVivo.folio || null, role: evento.message.role, texto: evento.message.transcript },
           });
+          // Fuga de prompt dicha por voz — a diferencia de WhatsApp, aquí Vapi
+          // ya generó y dijo la respuesta de ese turno antes de que este
+          // webhook se entere (no pasa por nuestro servidor turno a turno),
+          // así que esto no puede bloquear nada: solo alerta de inmediato para
+          // que el equipo pueda colgar/monitorear, igual que el candado de
+          // texto hace con bloqueo + aviso.
+          if (evento.message.role === 'user' && promptLeakGuard.detectar(evento.message.transcript)) {
+            const nombreContacto = callVivo.customer?.name || metaVivo.proveedor_nombre || metaVivo.nombre || callVivo.customer?.number || 'contacto';
+            pushActividad({ agente: agenteVivoLabel, tipo: 'ALERTA_FUGA_PROMPT', mensaje: `🚨 Posible intento de fuga de prompt POR VOZ de ${nombreContacto}: "${evento.message.transcript.slice(0, 200)}"`, metadata: { callId: callVivo.id, folio: metaVivo.folio || null } });
+            sendPush({ title: '🚨 Fuga de prompt por voz', body: `${agenteVivoLabel} en llamada con ${nombreContacto} — revisa de inmediato`, tag: 'fuga-voz-' + callVivo.id, url: '/actividad.html', tipo: 'ALERTA_FUGA_PROMPT', urgente: true }).catch(() => {});
+          }
         } else if (tipo === 'status-update') {
           const nombreContacto = callVivo.customer?.name || metaVivo.proveedor_nombre || metaVivo.nombre || callVivo.customer?.number || 'contacto';
           pushActividad({
