@@ -361,11 +361,9 @@ const ALERT_EMAILS = [DIEGO_EMAIL, RAFAEL_EMAIL, GABRIEL_EMAIL];
 // y el reporte de proveedores con unidad disponible (7:00 AM y 19:05). Nada
 // de KPIs ni ninguna otra alerta.
 const EQUIPO_OPS_EMAILS = [
-  'jazmin.ruiz@abstorages.com',
   'abigail.dianzo@abstorages.com',
-  'braian.gonzalez@abstorages.com',
-  'maria.rosas@abstorages.com',
   'yamilet.gamez@abstorages.com',
+  'claudia.beltran@abstorages.com',
 ];
 const RESPUESTA_SOFIA_EMAILS = [...ALERT_EMAILS, ...EQUIPO_OPS_EMAILS];
 
