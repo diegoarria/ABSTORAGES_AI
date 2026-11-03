@@ -155,7 +155,7 @@ async function buscarOCrearCliente({ razon_social, rfc, telefono, email }) {
 let columnasContactos = null;
 function asegurarColumnasContactos() {
   if (!columnasContactos) {
-    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT, ADD COLUMN IF NOT EXISTS tarifas TEXT, ADD COLUMN IF NOT EXISTS rfc TEXT, ADD COLUMN IF NOT EXISTS estatus TEXT, ADD COLUMN IF NOT EXISTS prioridad TEXT, ADD COLUMN IF NOT EXISTS exigencia_calidad TEXT, ADD COLUMN IF NOT EXISTS sla_urgencia TEXT, ADD COLUMN IF NOT EXISTS perfil_relacion TEXT, ADD COLUMN IF NOT EXISTS perfil_actualizado TIMESTAMPTZ')
+    columnasContactos = query('ALTER TABLE contactos ADD COLUMN IF NOT EXISTS rutas TEXT, ADD COLUMN IF NOT EXISTS unidades TEXT, ADD COLUMN IF NOT EXISTS tarifas TEXT, ADD COLUMN IF NOT EXISTS rfc TEXT, ADD COLUMN IF NOT EXISTS estatus TEXT, ADD COLUMN IF NOT EXISTS prioridad TEXT, ADD COLUMN IF NOT EXISTS exigencia_calidad TEXT, ADD COLUMN IF NOT EXISTS sla_urgencia TEXT, ADD COLUMN IF NOT EXISTS perfil_relacion TEXT, ADD COLUMN IF NOT EXISTS perfil_actualizado TIMESTAMPTZ, ADD COLUMN IF NOT EXISTS planner_asignado TEXT')
       .catch(e => { columnasContactos = null; throw e; });
   }
   return columnasContactos;
