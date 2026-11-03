@@ -23,7 +23,8 @@
     ],
     "rutas": "Tlajomulco de Zuñiga - Escobedo, Cuautitlan Izcalli - Ramos Arizpe, Santa Catarina - El Salto, Zapopan - San Nicolas de los Garza, Santa Catarina - Mexicali, Santa Catarina - Hermosillo",
     "tarifas": "Monterrey-Guadalajara: $19,333 promedio · 3 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - San Nicolas de los Garza: $2,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Mexicali: $2,500 mínimo (R",
-    "unidades": "caja seca 53"
+    "unidades": "caja seca 53",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUFUK8JZ",
@@ -104,7 +105,8 @@
         "resumen": "Alta con rutas iniciales",
         "fecha": "2026-09-28T01:23:20.562Z"
       }
-    ]
+    ],
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGUPQZ2",
@@ -130,7 +132,8 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,683 promedio · 30 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 25 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Gomez Palacio: $3,300 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - San Nicolas de los Garza: $7,000 mínimo (Ru"
+    "tarifas": "Monterrey-Gómez Palacio: $14,683 promedio · 30 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 25 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Santa Catarina: $5,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Gomez Palacio: $3,300 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - San Nicolas de los Garza: $7,000 mínimo (Ru",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGUF617",
@@ -156,7 +159,8 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $13,111 promedio · 10 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $12,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San "
+    "tarifas": "Monterrey-Gómez Palacio: $13,111 promedio · 10 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $12,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San ",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGUQ2IN",
@@ -241,7 +245,8 @@
         "fecha": "2026-09-28T01:23:20.574Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,833 promedio · 6 servicio(s) en la ruta | Guadalupe - Torreon: $14,000 mínimo · 77 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $15,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Monterrey: $5,500 mínimo (Rutas 51-100 ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $5,500 mínimo (Rutas"
+    "tarifas": "Monterrey-Gómez Palacio: $15,833 promedio · 6 servicio(s) en la ruta | Guadalupe - Torreon: $14,000 mínimo · 77 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $15,500 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Monterrey: $5,500 mínimo (Rutas 51-100 ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $5,500 mínimo (Rutas",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGVR29C",
@@ -385,7 +390,8 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,500 promedio · 2 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Juarez: $2,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $14,500 promedio · 2 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Juarez: $2,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGVLRAU",
@@ -437,7 +443,8 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $18,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $27,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tijuana: $1,500 mínimo · 21 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $1,798 mínimo · 16 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis R"
+    "tarifas": "Monterrey-Gómez Palacio: $18,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $27,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tijuana: $1,500 mínimo · 21 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $1,798 mínimo · 16 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis R",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGVMZ5L",
@@ -463,7 +470,8 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Gomez Palacio: $3,300 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $15,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $26,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Gomez Palacio: $3,300 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUKKCYGVDNDE",
@@ -489,7 +497,8 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $14,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $14,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Gomez Palacio: $14,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Yamilet Gamez"
   },
   {
     "id": "CT-MUKKCYGVHSNE",
@@ -522,7 +531,8 @@
       }
     ],
     "tarifas": "Monterrey-Gómez Palacio: $15,500 promedio · 1 servicio(s) en la ruta | Monterrey-Guadalajara: $20,000 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s)",
-    "estatus": "Intermitente"
+    "estatus": "Intermitente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGVA4G3",
@@ -548,7 +558,8 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $17,500 promedio · 1 servicio(s) en la ruta | Monterrey-Guadalajara: $19,750 promedio · 4 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $15,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,500 mínimo · 1 servicio(s) coloca"
+    "tarifas": "Monterrey-Gómez Palacio: $17,500 promedio · 1 servicio(s) en la ruta | Monterrey-Guadalajara: $19,750 promedio · 4 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Torreon: $15,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,500 mínimo · 1 servicio(s) coloca",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGVINEM",
@@ -633,7 +644,8 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $24,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Apodaca: $8,000 mínimo (Rutas 51-100 ene-sep 2026) | Monterrey - Santa Catarina: $2,500 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $24,000 promedio · 1 servicio(s) en la ruta | Guadalupe - Torreon: $13,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Cienega de Flores: $8,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Escobedo - Guadalupe: $3,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Apodaca: $8,000 mínimo (Rutas 51-100 ene-sep 2026) | Monterrey - Santa Catarina: $2,500 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Yamilet Gamez"
   },
   {
     "id": "CT-MUKKCYGVS2GI",
@@ -659,7 +671,8 @@
         "fecha": "2026-09-28T01:23:20.575Z"
       }
     ],
-    "tarifas": "Monterrey-Gómez Palacio: $11,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Santa Catarina: $24,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Monterrey-Gómez Palacio: $11,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Santa Catarina: $24,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGWS43F",
@@ -711,7 +724,8 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $17,667 promedio · 30 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $23,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19"
+    "tarifas": "Monterrey-Guadalajara: $17,667 promedio · 30 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $23,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGWS1PO",
@@ -815,7 +829,8 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,556 promedio · 9 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $2,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $23,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadal"
+    "tarifas": "Monterrey-Guadalajara: $19,556 promedio · 9 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $2,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $23,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $20,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadal",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUKKCYGW95HU",
@@ -933,7 +948,8 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,833 promedio · 6 servicio(s) en la ruta | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Zapopan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Monterrey-Guadalajara: $18,833 promedio · 6 servicio(s) en la ruta | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Zapopan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGW9G0B",
@@ -1018,7 +1034,8 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 4 servicio(s) en la ruta | Santa Catarina - Tijuana: $2,120 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $2,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $65,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Hermosillo: $48,00"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 4 servicio(s) en la ruta | Santa Catarina - Tijuana: $2,120 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $2,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $65,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Hermosillo: $48,00",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGWOYXZ",
@@ -1070,7 +1087,8 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepo"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepo",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUKKCYGWTV2M",
@@ -1122,7 +1140,8 @@
         "fecha": "2026-09-28T01:23:20.576Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $18,333 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos"
+    "tarifas": "Monterrey-Guadalajara: $18,333 promedio · 3 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGWQ9AH",
@@ -1259,7 +1278,8 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | Santa Catarina - Tultitlan: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $27,300 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebl"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 2 servicio(s) en la ruta | Santa Catarina - Tultitlan: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $27,300 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebl",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGXEN6I",
@@ -1377,7 +1397,8 @@
       }
     ],
     "tarifas": "Monterrey-Guadalajara: $17,000 promedio · 2 servicio(s) en la ruta",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGX0SZ9",
@@ -1559,7 +1580,8 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,800 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catari"
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,800 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catari",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGX4SE1",
@@ -1644,7 +1666,8 @@
       }
     ],
     "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca: $21,00",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUKKCYGXAXHI",
@@ -1703,7 +1726,8 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: "
+    "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Santa Catarina - Tultitlan: $19,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: ",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGXJGJR",
@@ -1736,7 +1760,8 @@
       }
     ],
     "tarifas": "Monterrey-Guadalajara: $19,000 promedio · 1 servicio(s) en la ruta | Ramos Arizpe - Tultitlan de Mariano Escobedo: $19,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tlajomulco de Zuñiga: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Oriental: $26,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGXPSVG",
@@ -1788,7 +1813,8 @@
         "fecha": "2026-09-28T01:23:20.577Z"
       }
     ],
-    "tarifas": "Monterrey-Guadalajara: $21,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $5,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - Santa Catarina: $25,"
+    "tarifas": "Monterrey-Guadalajara: $21,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $5,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - Santa Catarina: $25,",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUKKCYGXW4PS",
@@ -1913,7 +1939,8 @@
       }
     ],
     "tarifas": "Monterrey-Guadalajara: $18,000 promedio · 1 servicio(s) en la ruta | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tamuin: $20,000 mínimo (Rutas 51-100 ene-sep 2026)",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUKKCYGXT8ZL",
@@ -2200,7 +2227,8 @@
         "fecha": "2026-10-01T20:57:28.481Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 27 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 9 servicio(s) colocados (Top 50 "
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 27 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 9 servicio(s) colocados (Top 50 ",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF5KXKN",
@@ -2226,7 +2254,8 @@
         "fecha": "2026-10-01T20:57:28.481Z"
       }
     ],
-    "tarifas": "Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $62,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Hermosillo: $3,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Cordoba: $32,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $62,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Hermosillo: $3,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Cordoba: $32,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF6ZP14",
@@ -2259,7 +2288,8 @@
       }
     ],
     "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $3,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $18,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Oriental: $26,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Chalco: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tiz",
-    "estatus": "Intermitente"
+    "estatus": "Intermitente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF6LZVX",
@@ -2285,7 +2315,8 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Escobedo - Guadalupe: $6,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $6,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - San Nicolas de los Garza: $6,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Escobedo - Guadalupe: $6,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Gral Escobedo - San Nicolas de los Garza: $6,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - San Nicolas de los Garza: $6,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Yamilet Gamez"
   },
   {
     "id": "CT-MUQ0MGF6K3FR",
@@ -2311,7 +2342,8 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Santa Catarina - Puebla: $1,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca: $21,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla de Zaragoza: $23,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Santa Catarina - Puebla: $1,500 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Tizayuca: $21,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla de Zaragoza: $23,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF61I9O",
@@ -2337,7 +2369,8 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $26,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Irapuato: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarin"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $26,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Irapuato: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarin",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF66GCX",
@@ -2363,7 +2396,8 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 10 servicio(s) colocados (Top 50 "
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 10 servicio(s) colocados (Top 50 ",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF6ZT9F",
@@ -2389,7 +2423,8 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026"
+    "tarifas": "Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF6SSHZ",
@@ -2415,7 +2450,8 @@
         "fecha": "2026-10-01T20:57:28.482Z"
       }
     ],
-    "tarifas": "Escobedo - Cd Juarez: $2,500 mínimo (Rutas 51-100 ene-sep 2026) | Ramos Arizpe - Juarez: $33,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Escobedo - Cd Juarez: $2,500 mínimo (Rutas 51-100 ene-sep 2026) | Ramos Arizpe - Juarez: $33,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF6H7WJ",
@@ -2474,7 +2510,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 4 servicio(s) coloca"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 7 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 4 servicio(s) coloca",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF7FQ5Q",
@@ -2500,7 +2537,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 15 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas"
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 15 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $22,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF704SV",
@@ -2584,7 +2622,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF7KIJB",
@@ -2635,7 +2674,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep "
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 8 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep ",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF7UZSP",
@@ -2693,7 +2733,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 "
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 ",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF77IJ1",
@@ -2719,7 +2760,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 17 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Chalco: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 17 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $18,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Chalco: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF73Q8H",
@@ -2752,7 +2794,8 @@
       }
     ],
     "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 11 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF7UYUF",
@@ -2784,7 +2827,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "estatus": "Intermitente"
+    "estatus": "Intermitente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF7SDHZ",
@@ -2868,7 +2912,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $2,555 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 202"
+    "tarifas": "Santa Catarina - Tultitlan: $2,555 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 202",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF7I6TJ",
@@ -2894,7 +2939,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Hermosillo: $45,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Cd Valles: $18,000 mínimo (Rutas 51-100 ene-sep 2026) | Escobedo - Tampico: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Hermosillo: $45,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Guadalupe - Torreon: $13,000 mínimo · 5 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Hermosillo: $45,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Cd Valles: $18,000 mínimo (Rutas 51-100 ene-sep 2026) | Escobedo - Tampico: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Santa Catarina - Hermosillo: $45,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF7YMTH",
@@ -2920,7 +2966,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF7UDTR",
@@ -3004,7 +3051,8 @@
         "fecha": "2026-10-01T20:57:28.483Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Azcapotzalco: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Monterrey - Pedro Escobedo: $17,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Tecamac: $19,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $2,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Azcapotzalco: $19,000 mínimo (Rutas 51-100 ene-sep 2026) | Monterrey - Pedro Escobedo: $17,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Tecamac: $19,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF77MFB",
@@ -3069,7 +3117,8 @@
       }
     ],
     "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Puebla: $1,500 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-s",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Yamilet Gamez"
   },
   {
     "id": "CT-MUQ0MGF87FR6",
@@ -3095,7 +3144,8 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "Guadalupe - Reynosa: $17,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Guadalupe - Reynosa: $17,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGF85S6M",
@@ -3121,7 +3171,8 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $22,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF8I135",
@@ -3153,7 +3204,8 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "estatus": "Intermitente"
+    "estatus": "Intermitente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGF8JMYR",
@@ -3179,7 +3231,8 @@
         "fecha": "2026-10-01T20:57:28.484Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUQ0MGF8IONS",
@@ -3278,7 +3331,8 @@
       }
     ],
     "tarifas": "Guadalupe - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGFA20DP",
@@ -3304,7 +3358,8 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalajara - Doctor Gonzalez: $25,000 mínimo (Rutas 51-100 ene-sep 2026) | Apodaca - Azcapotzalco: $19,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 10 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalupe - Tultitlan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Guadalajara - Doctor Gonzalez: $25,000 mínimo (Rutas 51-100 ene-sep 2026) | Apodaca - Azcapotzalco: $19,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUQ0MGFANJO7",
@@ -3387,7 +3442,8 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tecamac - El Salto: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUQ0MGFADXCA",
@@ -3495,7 +3551,8 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "Santa Catarina - Puebla: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Puebla: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGFAM4AP",
@@ -3521,7 +3578,8 @@
         "fecha": "2026-10-01T20:57:28.486Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - San Nicolas de los Garza: $25,000 mínimo (Rutas 51-100 ene-sep 2026) | Tlajomulco de Zuñiga - Santa Catarina: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Zapopan - San Nicolas de los Garza: $25,000 mínimo (Rutas 51-100 ene-sep 2026) | Tlajomulco de Zuñiga - Santa Catarina: $25,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGFACFS1",
@@ -3663,7 +3721,8 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Tepotzotlan - Ciudad Guzman: $21,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $37,000 mínimo (Rutas 51-100 ene-sep 2026) | Zapopan - Santa Catarina: $24,500 mínimo (Rutas 51-100 ene-sep 2026) | Guadalajara - Doctor Gonzalez: $25,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Tepotzotlan - Ciudad Guzman: $21,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Tultitlan: $17,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $37,000 mínimo (Rutas 51-100 ene-sep 2026) | Zapopan - Santa Catarina: $24,500 mínimo (Rutas 51-100 ene-sep 2026) | Guadalajara - Doctor Gonzalez: $25,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGFBHMPR",
@@ -3721,7 +3780,8 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tijuana: $2,330 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $5,615 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Tijuana: $70,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $2,330 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $5,615 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Tijuana: $70,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGFBN1PB",
@@ -3747,7 +3807,8 @@
         "fecha": "2026-10-01T20:57:28.487Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $63,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,400 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Tijuana: $68,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tijuana: $68,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - Mexicali: $63,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $4,400 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Apodaca - Tijuana: $68,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Yamilet Gamez"
   },
   {
     "id": "CT-MUQ0MGFB4DU6",
@@ -4018,7 +4079,8 @@
       }
     ],
     "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - Ciudad Guzman: $20,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Ramos Arizpe: $25,000 mínimo (Rutas 51-100 ene-sep 2026)",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUQ0MGFB7UPV",
@@ -4462,7 +4524,8 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $26,150 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $26,150 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Monterrey - Cuautitlan Izcalli: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGFCX5G9",
@@ -4592,7 +4655,8 @@
       }
     ],
     "tarifas": "Tultitlan - Cancun: $65,500 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Santa Catarina - San Luis Rio Colorado: $3,200 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $45,000 mínimo (Rutas 51-100 ene-sep 2026) | Apodaca - Tijuana: $69,500 mínimo (Rutas 51-100 ene-sep 2026)",
-    "estatus": "Intermitente"
+    "estatus": "Intermitente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGFCURMA",
@@ -4778,7 +4842,8 @@
         "fecha": "2026-10-01T20:57:28.488Z"
       }
     ],
-    "tarifas": "Ramos Arizpe - Tamuin: $20,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Cd Valles: $19,350 mínimo (Rutas 51-100 ene-sep 2026) | Escobedo - Tampico: $18,200 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Ramos Arizpe - Tamuin: $20,000 mínimo (Rutas 51-100 ene-sep 2026) | Guadalupe - Cd Valles: $19,350 mínimo (Rutas 51-100 ene-sep 2026) | Escobedo - Tampico: $18,200 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGFC2TTU",
@@ -4811,7 +4876,8 @@
       }
     ],
     "tarifas": "Santa Catarina - Irapuato: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGFCYZDY",
@@ -5029,7 +5095,8 @@
       }
     ],
     "tarifas": "Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUQ0MGFD5M9M",
@@ -9132,7 +9199,8 @@
         "fecha": "2026-10-01T20:57:28.495Z"
       }
     ],
-    "estatus": "Recurrente"
+    "estatus": "Recurrente",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGFJ4D3O",
@@ -9342,7 +9410,8 @@
         "fecha": "2026-10-01T20:57:28.496Z"
       }
     ],
-    "tarifas": "Ramos Arizpe - Cienega de Flores: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Ramos Arizpe - Cienega de Flores: $5,500 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUQ0MGFKVMT4",
@@ -10195,7 +10264,8 @@
         "fecha": "2026-10-06T03:48:40.233Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $40,000 mínimo (Rutas 51-100 ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $19,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Teoloyucan: $19,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tepotzotlan - San Nicolas de los Garza: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Piedras Negras: $40,000 mínimo (Rutas 51-100 ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUW52NXMQEVZ",
@@ -10221,7 +10291,8 @@
         "fecha": "2026-10-06T03:48:40.234Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas"
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $1,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 4 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $3,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUW52NXMXCD3",
@@ -10273,7 +10344,8 @@
         "fecha": "2026-10-06T03:48:40.234Z"
       }
     ],
-    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Santa Catarina - Tultitlan: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUW52NXNWZ1A",
@@ -10325,7 +10397,8 @@
         "fecha": "2026-10-06T03:48:40.235Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUW52NXN3N4B",
@@ -10403,7 +10476,8 @@
         "fecha": "2026-10-06T03:48:40.236Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-se"
+    "tarifas": "Tlajomulco de Zuñiga - Escobedo: $24,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Apodaca: $23,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-se",
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MUW52NXOTDMH",
@@ -10429,7 +10503,8 @@
         "fecha": "2026-10-06T03:48:40.236Z"
       }
     ],
-    "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 19 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene"
+    "tarifas": "Ramos Arizpe - Tultitlan de Mariano Escobedo: $18,000 mínimo · 19 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 6 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - San Nicolas de los Garza: $25,000 mínimo · 9 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Tecamac - Monterrey: $25,000 mínimo · 3 servicio(s) colocados (Top 50 Rutas ene-sep 2026) | Toluca - Escobedo: $25,000 mínimo · 2 servicio(s) colocados (Top 50 Rutas ene",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUW52NXPBNCG",
@@ -10481,7 +10556,8 @@
         "fecha": "2026-10-06T03:48:40.238Z"
       }
     ],
-    "tarifas": "Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Cuautitlan Izcalli - Ramos Arizpe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Abigail Dianzo"
   },
   {
     "id": "CT-MUW52NXX52V0",
@@ -10507,7 +10583,8 @@
         "fecha": "2026-10-06T03:48:40.245Z"
       }
     ],
-    "tarifas": "Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)"
+    "tarifas": "Tlajomulco de Zuñiga - Guadalupe: $25,000 mínimo · 1 servicio(s) colocados (Top 50 Rutas ene-sep 2026)",
+    "planner_asignado": "Claudia Beltran"
   },
   {
     "id": "CT-MUW52NY2XSEA",
@@ -13277,7 +13354,8 @@
         "resumen": "Importado desde Proveedores_por_Rutas.pdf (base histórica de rutas)",
         "fecha": "2026-10-23T20:42:42.084Z"
       }
-    ]
+    ],
+    "planner_asignado": "Gabriel Diaz"
   },
   {
     "id": "CT-MVLFS750QFFQ",

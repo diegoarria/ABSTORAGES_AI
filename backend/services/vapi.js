@@ -115,8 +115,18 @@ async function llamarProveedor(proveedor, orden) {
     return { status: 'rate_limited', proveedor: proveedor?.id };
   }
   monitoringControl.reportarContactoSaliente({ agente: 'sofia', canal: 'llamada', destinatario: proveedor?.telefono, detalle: { folio: orden?.folio, proveedor: proveedor?.nombre } });
+
+  // ¿Ya es un proveedor conocido, con historial de negociaciones previas?
+  // Se busca ANTES del primer mensaje (no solo para el system prompt) para
+  // poder presentarse como "asistente de [planner]" desde el saludo inicial
+  // — pedido explícito del usuario (03-nov-2026).
+  let contactoConocido = null;
+  try { contactoConocido = await contactos.buscarPorTelefono(proveedor.telefono, 'sofia'); }
+  catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
+  const presentacionPlanner = contactoConocido?.planner_asignado ? `, asistente de ${contactoConocido.planner_asignado}` : '';
+
   const primerMensaje =
-    `${ESLOGAN}. Hola ${proveedor.nombre}, soy SOFIA. ` +
+    `${ESLOGAN}. Hola ${proveedor.nombre}, soy SOFIA${presentacionPlanner}. ` +
     `Tenemos un servicio urgente — folio ${orden.folio}. ` +
     `Necesitamos una ${orden.tipo_unidad} de ${orden.ruta} ` +
     `para el ${orden.fecha_carga}, carga de ${orden.tipo_carga || 'mercancía general'}, ` +
@@ -140,11 +150,7 @@ async function llamarProveedor(proveedor, orden) {
   // Notas e imágenes que el equipo dejó de ESTE folio (solo este folio)
   try { systemPrompt += require('./folioContexto').bloque({ alcance: 'folios', folios: [orden.folio] }); } catch (e) { console.error('[Vapi] Error leyendo contexto del folio:', e.message); }
 
-  // ¿Ya es un proveedor conocido, con historial de negociaciones previas?
-  try {
-    const contactoConocido = await contactos.buscarPorTelefono(proveedor.telefono, 'sofia');
-    if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
-  } catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
+  if (contactoConocido) systemPrompt += contactos.bloqueContactoConocido(contactoConocido);
 
   const payload = {
     phoneNumberId: PHONE_NUMBER_ID,

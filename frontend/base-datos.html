@@ -321,6 +321,9 @@ svg.i { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.
             <option value="menos">Menos rutas primero</option>
             <option value="nombre">Nombre A–Z</option>
           </select>
+          <select id="plannerSel" aria-label="Filtrar por planner" onchange="cambiarPlanner(this.value)">
+            <option value="todos">Todos los planners</option>
+          </select>
           <div class="combo" id="rutaCombo">
             <button type="button" class="combo-btn" id="rutaBtn" onclick="toggleRutaPop()" aria-haspopup="listbox" aria-expanded="false"><span id="rutaTxt">Todas las rutas</span><span class="combo-chev"></span></button>
             <div class="combo-pop" id="rutaPop">
@@ -465,7 +468,7 @@ function tipoLabel(t) { return t==='cliente' ? 'Cliente' : t==='proveedor' ? 'Pr
 function iniciales(n) { const p = String(n || '?').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?')[0] + (p.length > 1 ? p[p.length-1][0] : '')).toUpperCase(); }
 function partes(t) { return String(t || '').split(/[,;\n]+/).map(x => x.trim()).filter(Boolean); }
 
-let sortModo = 'reciente', filtroRuta = 'todas';
+let sortModo = 'reciente', filtroRuta = 'todas', filtroPlanner = 'todos';
 const seleccion = new Set();
 let rutasConocidas = new Map(); // ruta → cuántos contactos la tienen
 
@@ -517,6 +520,8 @@ function vistaLista(){
   let l = contactosCache.slice();
   if (filtroRuta === '__sin') l = l.filter(c => !partes(c.rutas).length);
   else if (filtroRuta !== 'todas') l = l.filter(c => partes(c.rutas).some(r => r.toLowerCase() === filtroRuta.toLowerCase()));
+  if (filtroPlanner === '__sin') l = l.filter(c => !c.planner_asignado);
+  else if (filtroPlanner !== 'todos') l = l.filter(c => (c.planner_asignado || '') === filtroPlanner);
   const n = c => partes(c.rutas).length;
   if (sortModo === 'mas') l.sort((a, b) => n(b) - n(a) || a.nombre_completo.localeCompare(b.nombre_completo, 'es'));
   else if (sortModo === 'menos') l.sort((a, b) => n(a) - n(b) || a.nombre_completo.localeCompare(b.nombre_completo, 'es'));
@@ -525,6 +530,19 @@ function vistaLista(){
 }
 function cambiarOrden(v){ sortModo = v; renderList(); }
 function cambiarRuta(v){ filtroRuta = v; pintarRutas(); renderList(); }
+function cambiarPlanner(v){ filtroPlanner = v; renderList(); }
+function recalcularPlanners(){
+  const sel = document.getElementById('plannerSel');
+  const planners = [...new Set(contactosCache.map(c => c.planner_asignado).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+  const hayPlanners = planners.length > 0;
+  const conSin = contactosCache.some(c => !c.planner_asignado);
+  if (!filtroPlanner) filtroPlanner = 'todos';
+  sel.innerHTML = '<option value="todos">Todos los planners</option>' +
+    planners.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('') +
+    (conSin ? '<option value="__sin">Sin planner asignado</option>' : '');
+  sel.style.display = hayPlanners ? '' : 'none';
+  sel.value = planners.includes(filtroPlanner) || filtroPlanner === 'todos' || (filtroPlanner === '__sin' && conSin) ? filtroPlanner : 'todos';
+}
 function actualizarSeleccionUI(){
   const n = seleccion.size, vis = vistaLista();
   document.getElementById('selInfo').textContent = n ? `${n} seleccionado${n === 1 ? '' : 's'}` : `${vis.length} contacto${vis.length === 1 ? '' : 's'}`;
@@ -575,7 +593,7 @@ async function renderPermitido(){
 }
 
 async function selectAgent(key){
-  activeAgent = key; activeTipo = "todos"; activeContactId = null; searchQuery = ""; seleccion.clear(); filtroRuta = 'todas';
+  activeAgent = key; activeTipo = "todos"; activeContactId = null; searchQuery = ""; seleccion.clear(); filtroRuta = 'todas'; filtroPlanner = 'todos';
   document.getElementById('searchInput').value = "";
   renderTabs(); renderFilters();
   await renderPermitido();
@@ -604,6 +622,7 @@ async function cargarContactos() {
     document.getElementById('updated').textContent = 'Actualizado a las ' + new Date().toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
     renderTabs();
     recalcularRutas();
+    recalcularPlanners();
     renderList();
   } catch (e) {
     list.innerHTML = '<div class="empty-msg">No se pudo cargar (' + esc(e.message) + ')</div>';
@@ -629,6 +648,7 @@ function renderList(){
         <div class="empresa">${esc([c.puesto, c.empresa].filter(Boolean).join(' · ') || '—')}</div>
         <div class="row-meta">
           <span class="tipo-tag tipo-${c.tipo}">${tipoLabel(c.tipo)}</span>
+          ${c.tipo === 'proveedor' && c.planner_asignado ? `<span class="pill pill-ok" title="Planner asignado">${esc(c.planner_asignado)}</span>` : ''}
           ${c.tipo === 'proveedor' ? (c.rutas ? `<span class="pill pill-ok">${ico('pin')} ${partes(c.rutas).length} ruta${partes(c.rutas).length === 1 ? '' : 's'}</span>` : `<span class="pill pill-warn">${ico('pin')} Sin rutas</span>`) : ''}
           ${c.tipo === 'cliente' && c.rutas ? `<span class="pill pill-ok">${ico('pin')} ${partes(c.rutas).length} ruta${partes(c.rutas).length === 1 ? '' : 's'}</span>` : ''}
           <span class="tel">${esc(c.telefono || '—')}</span>
@@ -715,6 +735,10 @@ async function renderDetail(){
           <div class="cover-card">
             <div class="cover-h"><span>${ico('truck')} Unidades y capacidad</span><button class="btn btn-ghost btn-sm" onclick="editarUnidades('${data.id}')">${ico('edit')} Editar</button></div>
             ${unidades.length ? `<div class="tags">${unidades.map(u => `<span class="tagc">${esc(u)}</span>`).join('')}</div>` : '<div class="hint neutral">Sin capturar. No se filtra por tipo de unidad.</div>'}
+          </div>
+          <div class="cover-card">
+            <div class="cover-h"><span>Planner asignado</span><button class="btn btn-ghost btn-sm" onclick="editarPlanner('${data.id}')">${ico('edit')} Editar</button></div>
+            ${data.planner_asignado ? `<div class="tags"><span class="tagc">${esc(data.planner_asignado)}</span></div>` : '<div class="hint neutral">Sin planner asignado. SOFIA no se presenta como asistente de nadie con este proveedor.</div>'}
           </div>
         </div>
       </section>
@@ -1069,6 +1093,18 @@ async function editarRutas(id){
   if (nuevo === null) return;
   try {
     const r = await fetch('/api/contactos/' + id + '/rutas', { method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ rutas: nuevo }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    await cargarContactos();
+    selectContacto(id);
+  } catch (e) { alert('No se pudo guardar: ' + e.message); }
+}
+async function editarPlanner(id){
+  const actual = (contactosCache.find(c => c.id === id) || {}).planner_asignado || '';
+  const nuevo = prompt('Planner asignado a este proveedor (ej. Claudia Beltran, Gabriel Diaz, Yamilet Gamez, Abigail Dianzo). Vacío = ninguno:', actual);
+  if (nuevo === null) return;
+  try {
+    const r = await fetch('/api/contactos/' + id + '/planner', { method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ planner_asignado: nuevo }) });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
     await cargarContactos();

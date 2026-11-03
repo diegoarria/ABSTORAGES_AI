@@ -25,20 +25,21 @@ function cargar() {
 
 let cache = cargar();
 
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que outboundRateLimit.js
+// e incidentesNOA.js (corregidos tras el incidente del 30-oct-2026): un
+// debounce aquí pierde el guardado si el proceso termina/truena antes de que
+// el timer dispare (incluido un script corto que haga varios upserts seguidos
+// y termine en menos de 500ms).
 function guardarDisco() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[Contactos] Error guardando en disco:', e.message); }
-  }, 500);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[Contactos] Error guardando en disco:', e.message); }
 }
 
 function normalizarTelefono(t) {
   return (t || '').replace(/\D/g, '').slice(-10);
 }
 
-function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas, unidades, rfc, estatus, prioridad, exigencia_calidad, sla_urgencia }) {
+function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, email, empresa, tipo_carga, resumen_interaccion, canal, notas, rutas, unidades, rfc, estatus, prioridad, exigencia_calidad, sla_urgencia, planner_asignado }) {
   const AGENTE = (agente || '').toUpperCase();
   const tel = normalizarTelefono(telefono);
   let existente = null;
@@ -63,6 +64,7 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
     existente.prioridad       = prioridad || existente.prioridad;
     existente.exigencia_calidad = exigencia_calidad || existente.exigencia_calidad;
     existente.sla_urgencia    = sla_urgencia || existente.sla_urgencia;
+    existente.planner_asignado = planner_asignado || existente.planner_asignado;
     // perfil_relacion/perfil_actualizado NO se tocan aquí — los escribe
     // únicamente actualizarPerfilSiCorresponde() (ver abajo), nunca un upsert normal.
     existente.fecha_ultimo_contacto = ahora;
@@ -79,6 +81,10 @@ function upsertEnMemoria({ agente, tipo, nombre_completo, puesto, telefono, emai
       // exigencia_calidad es el manual de calidad en texto libre (ej. Smurfit);
       // sla_urgencia es una nota libre de cómo manejarlo (ej. "nunca dejarlo esperando").
       prioridad: prioridad || null, exigencia_calidad: exigencia_calidad || null, sla_urgencia: sla_urgencia || null,
+      // Planner humano de ABSTORAGES (Claudia/Gabriel/Yamilet/Abigail) dueño de
+      // este proveedor — pedido explícito del usuario (03-nov-2026): SOFIA se
+      // presenta como "asistente de [planner]" con los proveedores de cada uno.
+      planner_asignado: planner_asignado || null,
       fecha_primer_contacto: ahora, fecha_ultimo_contacto: ahora, created_at: ahora,
     };
     cache.push(contacto);
@@ -256,7 +262,7 @@ async function protegerDatosProveedores(texto) {
 
 // Edita solo las rutas de un proveedor (permite vaciarlas, cosa que el upsert no hace)
 async function actualizarCampoProveedor(id, campo, texto) {
-  if (!['rutas', 'unidades', 'tarifas', 'prioridad', 'exigencia_calidad', 'sla_urgencia'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
+  if (!['rutas', 'unidades', 'tarifas', 'prioridad', 'exigencia_calidad', 'sla_urgencia', 'planner_asignado'].includes(campo)) return null; // lista blanca: el nombre de columna nunca viene del cliente
   // exigencia_calidad puede ser un manual completo (ver subirManualCalidad) —
   // los demás campos son listas cortas, se quedan en 500.
   const tope = campo === 'exigencia_calidad' ? 4000 : 500;
@@ -278,6 +284,18 @@ const actualizarUnidades = (id, t) => actualizarCampoProveedor(id, 'unidades', t
 const actualizarPrioridad = (id, t) => actualizarCampoProveedor(id, 'prioridad', t);
 const actualizarExigenciaCalidad = (id, t) => actualizarCampoProveedor(id, 'exigencia_calidad', t);
 const actualizarSlaUrgencia = (id, t) => actualizarCampoProveedor(id, 'sla_urgencia', t);
+// Planner humano (Claudia/Gabriel/Yamilet/Abigail) dueño de este proveedor —
+// ver bloqueContactoConocido() y el "primer mensaje" de sofia-prompt.js, que
+// usan este campo para que SOFIA se presente como su asistente.
+const actualizarPlanner = (id, t) => actualizarCampoProveedor(id, 'planner_asignado', t);
+
+// Todos los proveedores asignados a un planner (coincidencia exacta,
+// insensible a mayúsculas) — para cuando el equipo pide "dame los de Gabriel".
+function porPlanner(planner) {
+  const p = String(planner || '').trim().toLowerCase();
+  if (!p) return [];
+  return cache.filter(c => String(c.planner_asignado || '').trim().toLowerCase() === p);
+}
 
 // ── Manual de calidad de un cliente, subido en PDF — se procesa solo ────────
 // Pedido explícito del usuario (26-oct-2026): dar de alta un cliente exigente
@@ -484,6 +502,7 @@ function bloqueContactoConocido(contacto, agente) {
     `**${contacto.nombre_completo}**${contacto.empresa ? ` — ${contacto.empresa}` : ''} (${contacto.tipo || 'contacto'}). ` +
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
     (esNOA ? TRATO_NOA_BD : contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : contacto.tipo === 'cliente' ? TRATO_CLIENTE_BD : '') +
+    (contacto.planner_asignado ? `**Planner asignado a este proveedor: ${contacto.planner_asignado}.** Preséntate como "asistente de ${contacto.planner_asignado}" la primera vez que le escribas en una conversación nueva (ej. "Hola, soy SOFIA de ABSTORAGES, asistente de ${contacto.planner_asignado}"). En el resto de la conversación ya no hace falta repetirlo cada mensaje, solo si él pregunta con quién trabaja o similar.\n\n` : '') +
     (contacto.tipo === 'cliente' ? bloqueDatosCliente(contacto) : '') +
     (contacto.perfil_relacion ? `\n**🧠 Así es tratar con esta persona (generado de su historial real — úsalo para un trato personalizado, nunca lo repitas textual ni lo menciones de forma robótica):**\n${contacto.perfil_relacion}\n\n` : '') +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
@@ -874,4 +893,4 @@ async function sembrarContactosPermanentes() {
 }
 sembrarContactosPermanentes().then(sembrarRutasIniciales).then(sembrarCatalogos);
 
-module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, actualizarPrioridad, actualizarExigenciaCalidad, actualizarSlaUrgencia, subirManualCalidad, upsertContacto, eliminarContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido, obtenerPerfilClientePorNombre };
+module.exports = { bloqueDirectorioProveedores, bloqueDirectorioNOA, protegerDatosProveedores, actualizarRutas, actualizarUnidades, actualizarPrioridad, actualizarExigenciaCalidad, actualizarSlaUrgencia, actualizarPlanner, porPlanner, subirManualCalidad, upsertContacto, eliminarContacto, listarPorAgente, obtenerDetalle, buscarPorTelefono, bloqueContactoConocido, obtenerPerfilClientePorNombre };

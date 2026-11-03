@@ -2882,6 +2882,16 @@ app.put('/api/contactos/:id/sla-urgencia', soloAdmin, async (req, res) => {
     res.json({ ok: true, sla_urgencia: c.sla_urgencia || null });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
+// Planner humano (Claudia/Gabriel/Yamilet/Abigail) dueño de este proveedor —
+// pedido explícito del usuario (03-nov-2026): SOFIA se presenta como
+// "asistente de [planner]" — ver bloqueContactoConocido() en contactos.js.
+app.put('/api/contactos/:id/planner', soloAdmin, async (req, res) => {
+  try {
+    const c = await contactos.actualizarPlanner(req.params.id, (req.body || {}).planner_asignado);
+    if (!c) return res.status(404).json({ error: 'Contacto no encontrado' });
+    res.json({ ok: true, planner_asignado: c.planner_asignado || null });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 // Manual de calidad en PDF — pedido explícito del usuario (26-oct-2026): el
 // equipo sube el PDF y Claude lo lee directo, sin que nadie tenga que
 // transcribirlo a mano (ver contactos.js: analizarManualCalidad).
