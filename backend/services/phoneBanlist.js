@@ -21,13 +21,15 @@ function loadFromDisk() {
 
 const cache = loadFromDisk(); // { [telefonoNormalizado]: { motivo, agente, bannedAt } }
 
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que outboundRateLimit.js/
+// incidentesNOA.js/contactos.js/colocaciones.js (corregidos tras el incidente
+// del 30-oct-2026): un baneo es justo el tipo de dato que nunca debe poder
+// perderse por un reinicio del proceso a los <1000ms de banear a alguien —
+// en Postgres queda respaldado, pero el archivo es lo único que existe en
+// modo local/sin DATABASE_URL.
 function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[phoneBanlist] Error guardando en disco:', e.message); }
-  }, 1000);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[phoneBanlist] Error guardando en disco:', e.message); }
 }
 
 let tableReady = !pool;

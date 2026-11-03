@@ -21,13 +21,13 @@ function loadFromDisk() {
 // { [identificador]: { count, intentos: [{ palabra, ts }] } }
 const cache = loadFromDisk();
 
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que ipBanlist.js/
+// phoneBanlist.js/outboundRateLimit.js (corregidos tras el incidente del
+// 30-oct-2026): un strike de ataque perdido por un reinicio justo después de
+// registrarlo le regala a quien ataca un reset gratis de su contador.
 function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[attackStrikes] Error guardando en disco:', e.message); }
-  }, 1000);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[attackStrikes] Error guardando en disco:', e.message); }
 }
 
 // Registra un intento para el identificador (IP o teléfono normalizado).

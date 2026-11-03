@@ -38,13 +38,13 @@ let indice = [];
 try { if (fs.existsSync(INDEX_FILE)) indice = JSON.parse(fs.readFileSync(INDEX_FILE, 'utf8')); }
 catch (e) { console.error('[embeddings] No se pudo leer el índice:', e.message); }
 
-let guardarTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que incidentesNOA.js
+// (corregido tras el incidente del 30-oct-2026). Relevante en especial hoy:
+// la memoria semántica se acaba de encender (REFLEXION_MEMORIA=true), así
+// que esto va a escribir seguido desde ahora.
 function guardarIndice() {
-  clearTimeout(guardarTimer);
-  guardarTimer = setTimeout(() => {
-    try { fs.mkdirSync(path.dirname(INDEX_FILE), { recursive: true }); fs.writeFileSync(INDEX_FILE, JSON.stringify(indice)); }
-    catch (e) { console.error('[embeddings] Error guardando el índice:', e.message); }
-  }, 500);
+  try { fs.mkdirSync(path.dirname(INDEX_FILE), { recursive: true }); fs.writeFileSync(INDEX_FILE, JSON.stringify(indice)); }
+  catch (e) { console.error('[embeddings] Error guardando el índice:', e.message); }
 }
 
 async function embeber(texto) {

@@ -23,6 +23,7 @@ const fs = require('fs');
 const path = require('path');
 const monitoringControl = require('./monitoringControl');
 const kapso = require('./kapso');
+const phoneBanlist = require('./phoneBanlist');
 
 // Normaliza a E.164 (+52XXXXXXXXXX) — tiene que coincidir EXACTO con el
 // `phone` que arma el webhook de WhatsApp (server-lite.js, From de Twilio)
@@ -123,6 +124,14 @@ function yaContactadoHoy(agente, to) { return !!contactoDiario[claveContactoDiar
 function marcarContactadoHoy(agente, to) { contactoDiario[claveContactoDiario(agente, to)] = Date.now(); guardarContactoDiario(); }
 
 async function enviarPlantilla(agente, to, contentSid, variables, { urgente } = {}) {
+  // El baneo (phoneBanlist) hasta hoy solo se revisaba en mensajes ENTRANTES
+  // — nunca antes de que SOFIA le escribiera a alguien por su cuenta. Un
+  // número baneado por intento de ataque/fuga de prompt seguía recibiendo
+  // difusiones proactivas todos los días. Arreglado 03-nov-2026.
+  if (phoneBanlist.estaBaneado(to)) {
+    console.warn(`[whatsappProactivo] 🚫 ${to} está baneado — se omite plantilla saliente`);
+    return { status: 'baneado', to };
+  }
   if (yaContactadoHoy(agente, to)) {
     console.warn(`[whatsappProactivo] 🔁 ${agente} ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
     return { status: 'ya_contactado_hoy', to };
@@ -314,6 +323,10 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
 // que no choca con el "nunca se repite sola" de las plantillas normales, ni
 // bloquea que una orden real le vuelva a preguntar disponibilidad después.
 async function enviarPlantillaSinCandado(agente, to, contentSid, variables) {
+  if (phoneBanlist.estaBaneado(to)) {
+    console.warn(`[whatsappProactivo] 🚫 ${to} está baneado — se omite plantilla saliente`);
+    return { status: 'baneado', to };
+  }
   if (yaContactadoHoy(agente, to)) {
     console.warn(`[whatsappProactivo] 🔁 ${agente} ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
     return { status: 'ya_contactado_hoy', to };

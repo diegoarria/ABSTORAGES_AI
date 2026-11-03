@@ -32,13 +32,12 @@ Object.entries(BANEOS_MANUALES).forEach(([ip, datos]) => {
   if (!cache[ip]) cache[ip] = { ...datos, bannedAt: new Date().toISOString() };
 });
 
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que phoneBanlist.js/
+// attackStrikes.js (corregidos tras el incidente del 30-oct-2026): un baneo
+// de IP nunca debe poder perderse por un reinicio a los <1000ms de banear.
 function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[ipBanlist] Error guardando en disco:', e.message); }
-  }, 1000);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[ipBanlist] Error guardando en disco:', e.message); }
 }
 
 let tableReady = !pool;

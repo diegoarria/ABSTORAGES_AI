@@ -199,6 +199,7 @@ async function dispararPorRuta({ origen, destino, fecha, tipo_unidad, tipo_carga
     try {
       const r = await whatsappProactivo.preguntarDisponibilidad(p, { ruta: `${origen} → ${destino}`, origen, destino, tipo_unidad: tipo_unidad || 'caja seca', tipo_carga, fecha_carga: fecha, empresa: cliente, prioridad: perfil?.prioridad, exigencia_calidad: perfil?.exigencia_calidad });
       if (r?.status === 'rate_limited' || r?.status === 'paused') break;
+      if (r?.status === 'baneado') continue;
       enviados++;
     } catch (e) { fallidos++; console.error(`[difusionGeneral] Error mandando a ${p.nombre}:`, e.message); }
     await new Promise(res => setTimeout(res, pausaMs));
@@ -239,6 +240,7 @@ async function ejecutarRonda(lista, etiquetaFeed, tipoActividad) {
       const r = await whatsappProactivo.enviarPlantillaSinCandado('sofia', p.telefono, CONTENT_SID, variables);
       if (r?.status === 'rate_limited') { sinCredito = lista.length - enviados - fallidos; break; }
       if (r?.status === 'paused') break;
+      if (r?.status === 'baneado') continue;
       enviados++;
       const textoEnviado = variante
         ? variante.texto.replace('{nombre}', titulo(p.nombre))

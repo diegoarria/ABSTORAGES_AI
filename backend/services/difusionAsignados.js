@@ -145,7 +145,7 @@ async function ejecutarRonda() {
       const r = await whatsappProactivo.enviarPlantillaSinCandado('sofia', p.telefono, contentSid, variables);
       if (r?.status === 'rate_limited') { sinCredito = lista.length - enviados - fallidos; break; }
       if (r?.status === 'paused') break;
-      if (r?.status === 'ya_contactado_hoy') continue; // ya se le escribió hoy por otro motivo — no cuenta como falla
+      if (r?.status === 'ya_contactado_hoy' || r?.status === 'baneado') continue; // ya se le escribió hoy por otro motivo, o está baneado — ninguno cuenta como falla ni como enviado
       enviados++;
       whatsappProactivo.registrarEnMemoria?.('sofia', p.telefono, textoEnviado);
       contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: 'Ronda diaria a proveedores con planner asignado', canal: 'whatsapp-plantilla' }).catch(() => {});

@@ -22,13 +22,11 @@ function cargar() {
 }
 
 let cache = cargar();
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que incidentesNOA.js
+// (su gemelo, ya corregido tras el incidente del 30-oct-2026).
 function guardarDisco() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[noaRiskFeedback] Error guardando:', e.message); }
-  }, 500);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[noaRiskFeedback] Error guardando:', e.message); }
 }
 
 function registrarEpisodio({ folio, desde, maxSeveridad, maxScore, tipos }) {

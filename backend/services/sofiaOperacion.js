@@ -331,7 +331,30 @@ async function enviarRecordatorioDisponibilidad(d, { previa }) {
 // siguientes hasta lograrlo o hasta agotar el margen.
 const GRACIA_DIAS_VENCIMIENTO = 2;
 
+// Candado de re-entrada — tick() corre cada 60s sin esperar a que el chequeo
+// anterior termine (setInterval normal, no awaited). Antes tickDisponibilidades
+// era síncrona en la práctica (el envío era fire-and-forget, sin await), así
+// que terminaba casi al instante y esto nunca importaba. Al arreglar el bug
+// de "se marca recordada aunque el mensaje no haya salido" (03-nov-2026) se
+// volvió una función que de verdad espera cada envío uno por uno — si hay
+// varias disponibilidades pendientes el mismo chequeo y la corrida tarda más
+// de 60s, sin este candado una segunda pasada en paralelo vería las mismas
+// promesas todavía como "pendiente" (el estado no se actualiza hasta que el
+// envío de la primera pasada termina) y mandaría el mensaje DOS VECES a la
+// misma persona.
+let tickDisponibilidadesEnCurso = false;
+
 async function tickDisponibilidades() {
+  if (tickDisponibilidadesEnCurso) { console.warn('[sofiaOperacion] tickDisponibilidades ya estaba corriendo — se omite esta pasada para no duplicar envíos'); return; }
+  tickDisponibilidadesEnCurso = true;
+  try {
+    await tickDisponibilidadesInterno();
+  } finally {
+    tickDisponibilidadesEnCurso = false;
+  }
+}
+
+async function tickDisponibilidadesInterno() {
   const hoy = colocaciones.fechaMTY();
   const mañana = colocaciones.fechaMTY(Date.now() + 24 * 60 * 60 * 1000);
   for (const d of colocaciones.disponibilidades()) {

@@ -291,10 +291,15 @@ const actualizarPlanner = (id, t) => actualizarCampoProveedor(id, 'planner_asign
 
 // Todos los proveedores asignados a un planner (coincidencia exacta,
 // insensible a mayúsculas) — para cuando el equipo pide "dame los de Gabriel".
-function porPlanner(planner) {
+// Pasa por listarPorAgente (mismo camino que usa difusionAsignados.js) para
+// que funcione igual en Postgres (producción, USA_DB) y en archivo (local)
+// — antes filtraba directo sobre `cache`, que en modo Postgres nunca se
+// llena de verdad y hubiera regresado vacío o datos viejos sin avisar.
+async function porPlanner(planner) {
   const p = String(planner || '').trim().toLowerCase();
   if (!p) return [];
-  return cache.filter(c => String(c.planner_asignado || '').trim().toLowerCase() === p);
+  const bd = await listarPorAgente('SOFIA', { tipo: 'proveedor' });
+  return bd.filter(c => String(c.planner_asignado || '').trim().toLowerCase() === p);
 }
 
 // ── Manual de calidad de un cliente, subido en PDF — se procesa solo ────────

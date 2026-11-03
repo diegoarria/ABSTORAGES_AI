@@ -15,13 +15,13 @@ function loadFromDisk() {
 // Cache en memoria (siempre activo, sirve de fallback y acelera lecturas)
 const cache = loadFromDisk();
 
-let saveTimer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que outboundRateLimit.js/
+// contactos.js/colocaciones.js (corregidos tras el incidente del 30-oct-2026):
+// un lead capturado y perdido por un reinicio del proceso es negocio real
+// perdido, no un dato recuperable.
 function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(LEADS_FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[leads] Error guardando en disco:', e.message); }
-  }, 1000);
+  try { fs.writeFileSync(LEADS_FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[leads] Error guardando en disco:', e.message); }
 }
 
 async function saveToDb(entry) {

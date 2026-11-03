@@ -15,14 +15,15 @@ function cargar() {
 }
 
 let cache = cargar();
-let saveTimer = null;
-
+// Síncrona e inmediata (sin debounce) — mismo criterio que incidentesNOA.js
+// (corregido tras el incidente del 30-oct-2026). Importante en especial
+// aquí: este registro es lo que evita procesar el mismo mensaje de grupo
+// dos veces (2Chat lo entrega una vez por cada canal/agente miembro) — si
+// se pierde una marca por un reinicio, se puede reprocesar un mensaje viejo
+// y disparar una respuesta o una llamada duplicada.
 function guardarDisco() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
-    catch (e) { console.error('[groupMessages] Error guardando:', e.message); }
-  }, 500);
+  try { fs.writeFileSync(FILE, JSON.stringify(cache, null, 2)); }
+  catch (e) { console.error('[groupMessages] Error guardando:', e.message); }
 }
 
 function registrar(entrada) {

@@ -20,16 +20,20 @@ try {
   if (fs.existsSync(FILE)) db = { ...db, ...JSON.parse(fs.readFileSync(FILE, 'utf8')) };
 } catch (e) { console.error('[colocaciones] No se pudo leer el archivo, se arranca vacío:', e.message); }
 
-let timer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que outboundRateLimit.js,
+// incidentesNOA.js y contactos.js (corregidos tras el incidente del
+// 30-oct-2026): un debounce aquí pierde el cambio si el proceso se reinicia
+// justo después de marcar una disponibilidad como "recordada"/"vencida", un
+// hito de un folio, o cualquier otro estado — y este archivo es el más
+// central de todos (colocaciones, disponibilidades, ofertas), así que es
+// justo donde menos se puede dar el lujo de perder una escritura. Se
+// mantiene el patrón atómico .tmp + rename.
 function guardar() {
-  clearTimeout(timer);
-  timer = setTimeout(() => {
-    try {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-      fs.writeFileSync(FILE + '.tmp', JSON.stringify(db, null, 2));
-      fs.renameSync(FILE + '.tmp', FILE);
-    } catch (e) { console.error('[colocaciones] Error guardando:', e.message); }
-  }, 300);
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(FILE + '.tmp', JSON.stringify(db, null, 2));
+    fs.renameSync(FILE + '.tmp', FILE);
+  } catch (e) { console.error('[colocaciones] Error guardando:', e.message); }
 }
 
 const tel10 = t => String(t || '').replace(/\D/g, '').slice(-10);

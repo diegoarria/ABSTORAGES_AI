@@ -20,13 +20,14 @@ const VIGENCIA_DIAS = 21;
 
 let db = {};
 try { if (fs.existsSync(FILE)) db = JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch (e) { console.error('[folioContexto] No se pudo leer:', e.message); }
-let timer = null;
+// Síncrona e inmediata (sin debounce) — mismo criterio que colocaciones.js
+// (corregido tras el incidente del 30-oct-2026): notas/indicaciones del
+// equipo sobre un folio perdidas por un reinicio son justo el tipo de dato
+// que las 3 IA necesitan para no inventar ni repetir preguntas ya
+// contestadas.
 function guardar() {
-  clearTimeout(timer);
-  timer = setTimeout(() => {
-    try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(FILE + '.tmp', JSON.stringify(db, null, 2)); fs.renameSync(FILE + '.tmp', FILE); }
-    catch (e) { console.error('[folioContexto] Error guardando:', e.message); }
-  }, 300);
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(FILE + '.tmp', JSON.stringify(db, null, 2)); fs.renameSync(FILE + '.tmp', FILE); }
+  catch (e) { console.error('[folioContexto] Error guardando:', e.message); }
 }
 
 const claveFolio = f => String(f || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
