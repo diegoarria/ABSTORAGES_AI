@@ -295,16 +295,43 @@ function textoFecha(iso) {
 }
 const primerNombre = n => String(n || '').trim().split(/\s+/)[0].toLowerCase().replace(/^./, c => c.toUpperCase());
 
-function enviarRecordatorioDisponibilidad(d, { previa }) {
+// Devuelve true solo si el mensaje salió de verdad — false si se omitió por
+// cualquier motivo (candado de 1 contacto/día, pausa, límite diario, sin
+// plantilla). El llamador usa esto para decidir si de verdad puede marcar
+// la promesa como "ya recordada" o si debe dejarla pendiente para
+// reintentar — antes se marcaba "recordada" sin importar si el mensaje
+// salió, así que un día donde el proveedor ya había recibido otro mensaje
+// proactivo (por cualquier otro motivo) se daba por avisado sin estarlo.
+async function enviarRecordatorioDisponibilidad(d, { previa }) {
   const fechaTxt = textoFecha(d.fecha);
-  whatsappProactivo.enviarSeguimientoDisponibilidad(primerNombre(d.nombre), d.telefono, fechaTxt, d.ruta)
-    .then(r => { if (!r) push({ title: `${previa ? 'Mañana' : 'Hoy'} ${d.nombre || 'un proveedor'} prometió unidad`, body: `Sin plantilla de seguimiento configurada: escríbele tú${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id + (previa ? '-previa' : ''), url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true }); })
-    .catch(e => console.error('[sofiaOperacion] Error en seguimiento de disponibilidad:', e.message));
-  feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${previa ? 'Un día antes' : 'Hoy es el día'}: SOFIA le escribió a ${d.nombre || 'un proveedor'} para confirmar la unidad prometida del ${fechaTxt}${d.ruta ? ' (' + d.ruta + ')' : ''}` });
-  push({ title: `${previa ? 'Mañana tienes' : 'Hoy tienes'} unidad prometida — ${d.nombre || 'proveedor'}`, body: `${d.nombre || 'Un proveedor'} dijo que ${previa ? 'mañana' : 'hoy'} tendría unidad${d.ruta ? ' ' + d.ruta : ''}${d.unidad ? ' (' + d.unidad + ')' : ''}. SOFIA le pidió confirmar.`, tag: 'disp-' + (previa ? 'previa-' : 'hoy-') + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD' });
+  let enviado = false;
+  try {
+    const r = await whatsappProactivo.enviarSeguimientoDisponibilidad(primerNombre(d.nombre), d.telefono, fechaTxt, d.ruta);
+    enviado = !!r && !['ya_contactado_hoy', 'rate_limited', 'paused'].includes(r.status);
+    if (!enviado) {
+      const motivo = !r ? 'sin plantilla configurada' : r.status === 'ya_contactado_hoy' ? 'ya se le había escrito hoy por otro motivo' : r.status === 'rate_limited' ? 'tope diario de envíos alcanzado' : 'SOFIA está pausada';
+      push({ title: `${previa ? 'Mañana' : 'Hoy'} ${d.nombre || 'un proveedor'} prometió unidad — no se pudo avisar`, body: `Motivo: ${motivo}. Se reintenta en el próximo chequeo${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id + (previa ? '-previa' : ''), url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true });
+    }
+  } catch (e) {
+    console.error('[sofiaOperacion] Error en seguimiento de disponibilidad:', e.message);
+  }
+  if (enviado) {
+    feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${previa ? 'Un día antes' : 'Hoy es el día'}: SOFIA le escribió a ${d.nombre || 'un proveedor'} para confirmar la unidad prometida del ${fechaTxt}${d.ruta ? ' (' + d.ruta + ')' : ''}` });
+    push({ title: `${previa ? 'Mañana tienes' : 'Hoy tienes'} unidad prometida — ${d.nombre || 'proveedor'}`, body: `${d.nombre || 'Un proveedor'} dijo que ${previa ? 'mañana' : 'hoy'} tendría unidad${d.ruta ? ' ' + d.ruta : ''}${d.unidad ? ' (' + d.unidad + ')' : ''}. SOFIA le pidió confirmar.`, tag: 'disp-' + (previa ? 'previa-' : 'hoy-') + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD' });
+  }
+  return enviado;
 }
 
-function tickDisponibilidades() {
+// Días de gracia tras la fecha prometida antes de darla por vencida sin
+// avisar — cubre el caso real de que la fecha caiga en un día en que SOFIA
+// no contacta a nadie (ej. domingo, ver horarioContacto.js DIAS): antes de
+// este arreglo, si "hoy" nunca coincidía con un día de contacto permitido,
+// la promesa pasaba directo de "pendiente" a "vencida" al día siguiente SIN
+// que nadie se enterara nunca. Con el margen, sigue intentando los días
+// siguientes hasta lograrlo o hasta agotar el margen.
+const GRACIA_DIAS_VENCIMIENTO = 2;
+
+async function tickDisponibilidades() {
   const hoy = colocaciones.fechaMTY();
   const mañana = colocaciones.fechaMTY(Date.now() + 24 * 60 * 60 * 1000);
   for (const d of colocaciones.disponibilidades()) {
@@ -313,19 +340,28 @@ function tickDisponibilidades() {
     // chequear y se quedaba viva para siempre en el reporte. Ahora se vence
     // sin importar en cuál de los dos estados esté.
     if (!['pendiente', 'recordada'].includes(d.estado)) continue;
-    if (d.fecha && d.fecha < hoy) { colocaciones.actualizarDisponibilidad(d.id, { estado: 'vencida' }); continue; }
+    if (d.fecha && d.fecha < hoy) {
+      const diasPasados = Math.round((new Date(hoy + 'T00:00:00Z') - new Date(d.fecha + 'T00:00:00Z')) / 86400000);
+      if (d.estado === 'pendiente' && diasPasados <= GRACIA_DIAS_VENCIMIENTO && horario.permitido(false)) {
+        const enviado = await enviarRecordatorioDisponibilidad(d, { previa: false });
+        if (enviado) colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
+        continue; // dentro del margen de gracia — se reintenta en el siguiente chequeo si no salió, no se vence todavía
+      }
+      colocaciones.actualizarDisponibilidad(d.id, { estado: 'vencida' });
+      continue;
+    }
     if (d.estado !== 'pendiente' || !d.fecha) continue; // ya se le recordó, o no hay fecha que vigilar — nada más que hacer
 
     if (d.fecha === mañana && !d.recordatorioPreviaEn && horario.permitido(false)) {
-      colocaciones.actualizarDisponibilidad(d.id, { recordatorioPreviaEn: new Date().toISOString() });
-      enviarRecordatorioDisponibilidad(d, { previa: true });
+      const enviado = await enviarRecordatorioDisponibilidad(d, { previa: true });
+      if (enviado) colocaciones.actualizarDisponibilidad(d.id, { recordatorioPreviaEn: new Date().toISOString() });
       continue;
     }
 
     if (d.fecha !== hoy) continue;
     if (!horario.permitido(false)) continue; // dentro de horario de contacto
-    colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
-    enviarRecordatorioDisponibilidad(d, { previa: false });
+    const enviado = await enviarRecordatorioDisponibilidad(d, { previa: false });
+    if (enviado) colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
   }
 }
 
@@ -585,7 +621,7 @@ function bloqueBusquedasAbiertas() {
 
 function tick() {
   if (agentPause.estaPausado('sofia')) return;
-  try { tickDisponibilidades(); } catch (e) { console.error('[sofiaOperacion] Error en disponibilidades:', e.message); }
+  tickDisponibilidades().catch(e => console.error('[sofiaOperacion] Error en disponibilidades:', e.message));
   for (const c of colocaciones.todas()) {
     try {
       if (c.estado === 'buscando') tickBusqueda(c);
