@@ -123,7 +123,9 @@ async function llamarProveedor(proveedor, orden) {
   let contactoConocido = null;
   try { contactoConocido = await contactos.buscarPorTelefono(proveedor.telefono, 'sofia'); }
   catch (e) { console.error('[Vapi] Error consultando historial de contacto:', e.message); }
-  const presentacionPlanner = contactoConocido?.planner_asignado ? `, asistente de ${contactoConocido.planner_asignado}` : '';
+  // "SOFIA" como planner significa que ella lo maneja directo, no que es
+  // asistente de sí misma — en ese caso no se agrega la frase.
+  const presentacionPlanner = (contactoConocido?.planner_asignado && contactoConocido.planner_asignado !== 'SOFIA') ? `, asistente de ${contactoConocido.planner_asignado}` : '';
 
   const primerMensaje =
     `${ESLOGAN}. Hola ${proveedor.nombre}, soy SOFIA${presentacionPlanner}. ` +

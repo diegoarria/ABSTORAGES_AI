@@ -502,7 +502,7 @@ function bloqueContactoConocido(contacto, agente) {
     `**${contacto.nombre_completo}**${contacto.empresa ? ` — ${contacto.empresa}` : ''} (${contacto.tipo || 'contacto'}). ` +
     `Último contacto: ${new Date(contacto.fecha_ultimo_contacto).toLocaleDateString('es-MX')}.\n` +
     (esNOA ? TRATO_NOA_BD : contacto.tipo === 'proveedor' ? TRATO_PROVEEDOR_BD : contacto.tipo === 'cliente' ? TRATO_CLIENTE_BD : '') +
-    (contacto.planner_asignado ? `**Planner asignado a este proveedor: ${contacto.planner_asignado}.** Preséntate como "asistente de ${contacto.planner_asignado}" la primera vez que le escribas en una conversación nueva (ej. "Hola, soy SOFIA de ABSTORAGES, asistente de ${contacto.planner_asignado}"). En el resto de la conversación ya no hace falta repetirlo cada mensaje, solo si él pregunta con quién trabaja o similar.\n\n` : '') +
+    (contacto.planner_asignado && contacto.planner_asignado !== 'SOFIA' ? `**Planner asignado a este proveedor: ${contacto.planner_asignado}.** Preséntate como "asistente de ${contacto.planner_asignado}" la primera vez que le escribas en una conversación nueva (ej. "Hola, soy SOFIA de ABSTORAGES, asistente de ${contacto.planner_asignado}"). En el resto de la conversación ya no hace falta repetirlo cada mensaje, solo si él pregunta con quién trabaja o similar.\n\n` : '') +
     (contacto.tipo === 'cliente' ? bloqueDatosCliente(contacto) : '') +
     (contacto.perfil_relacion ? `\n**🧠 Así es tratar con esta persona (generado de su historial real — úsalo para un trato personalizado, nunca lo repitas textual ni lo menciones de forma robótica):**\n${contacto.perfil_relacion}\n\n` : '') +
     (contacto.notas ? `**Nota importante guardada sobre esta persona — síguela siempre**: ${contacto.notas}\n\n` : '\n') +
