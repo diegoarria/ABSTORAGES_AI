@@ -670,11 +670,13 @@ async function buscarFolioNOA(folio) {
   return r?.datos || [];
 }
 
-// ── Folios sin proveedor asignado, próximos a cargar — para la ronda diaria
-// de disponibilidad de SOFIA (sofiaScheduler.js). Reutiliza el mismo filtro
-// de "Estatus Operaciones contiene Proceso" que foliosActivosNOA porque es
-// el único indicador de "folio vivo" que expone el TMS — la falta de
-// proveedor asignado se detecta en JS, no hay un estatus explícito para eso.
+// ── Folios sin proveedor asignado, próximos a cargar. Reutiliza el mismo
+// filtro de "Estatus Operaciones contiene Proceso" que foliosActivosNOA
+// porque es el único indicador de "folio vivo" que expone el TMS — la falta
+// de proveedor asignado se detecta en JS, no hay un estatus explícito para
+// eso. Sin llamadores hoy (la ronda diaria que la usaba, sofiaScheduler.js,
+// se eliminó para siempre el 03-nov-2026) — se deja por si hace falta
+// retomar este dato de otra forma más adelante.
 async function foliosPorAsignar(horasVentana = 72) {
   const campos = [
     'Folio de servicio', 'Cliente',

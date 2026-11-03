@@ -1,8 +1,9 @@
 // ── María — vigilancia proactiva del TMS para clientes nuevos ──────────────
 // Pedido explícito del usuario (23-oct-2026): que María se anticipe a lo que
 // pasa en el TMS en vez de esperar a que alguien le escriba. Mismo patrón que
-// ya usan NOA (noaScheduler.js) y SOFIA (sofiaScheduler.js) contra el TMS —
-// María era la única de las 3 sin nada proactivo del lado del TMS.
+// ya usa NOA (noaScheduler.js) contra el TMS — María era la única de las 3
+// sin nada proactivo del lado del TMS. (SOFIA tenía su propio scheduler,
+// sofiaScheduler.js, eliminado para siempre el 03-nov-2026.)
 //
 // Cómo funciona: cada CHEQUEO_MS trae la lista de clientes del TMS y la
 // compara contra la última "foto" guardada en disco (por RFC, la llave más
