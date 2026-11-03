@@ -258,10 +258,27 @@ async function avisarReclamoPago(agente, destinatariosClaves, proveedor, detalle
 // usuario, 30-sep-2026) — con el candado normal, el segundo envío se bloquearía
 // como "ya se le mandó esta plantilla antes" y el seguimiento del día nunca saldría.
 async function enviarSeguimientoDisponibilidad(nombre, telefono, fechaTexto, ruta) {
-  if (!CONTENT_SID_SEGUIMIENTO_DISP) { console.warn('[whatsappProactivo] Plantilla de seguimiento de disponibilidad aún no configurada — se omite'); return null; }
   if (!telefonoValido(telefono)) return null;
   const rutaTxt = ruta || 'tus rutas';
-  const r = await enviarPlantillaSinCandado('sofia', telefono, CONTENT_SID_SEGUIMIENTO_DISP, { '1': nombre || 'ahí', '2': fechaTexto, '3': rutaTxt });
+  let r;
+  if (CONTENT_SID_SEGUIMIENTO_DISP) {
+    r = await enviarPlantillaSinCandado('sofia', telefono, CONTENT_SID_SEGUIMIENTO_DISP, { '1': nombre || 'ahí', '2': fechaTexto, '3': rutaTxt });
+  } else {
+    // Relleno temporal (03-nov-2026) — la plantilla dedicada
+    // (sofia_seguimiento_disponibilidad) todavía no está sometida/aprobada
+    // en Meta. Mientras tanto, se reutiliza la plantilla de disponibilidad
+    // ya aprobada (CONTENT_SID_DISPONIBILIDAD) metiendo la fecha/ruta
+    // prometidas en sus mismas variables — no queda en silencio esperando
+    // a que alguien le escriba a mano. En cuanto el usuario someta y
+    // apruebe la plantilla dedicada y la ponga en
+    // KAPSO_TEMPLATE_SEGUIMIENTO_DISPONIBILIDAD, se usa esa en su lugar,
+    // sin tocar código otra vez.
+    if (!CONTENT_SID_DISPONIBILIDAD) { console.warn('[whatsappProactivo] Ni la plantilla de seguimiento ni la de disponibilidad están configuradas — se omite'); return null; }
+    const [origen, destino] = rutaTxt.split('→').map(s => (s || '').trim());
+    r = await enviarPlantillaSinCandado('sofia', telefono, CONTENT_SID_DISPONIBILIDAD, {
+      '1': nombre || 'ahí', '2': 'caja seca', '3': origen || rutaTxt, '4': destino || '—', '5': fechaTexto,
+    });
+  }
   registrarEnMemoria('sofia', telefono, `Hola ${nombre || ''}, me comentaste que tendrías unidad disponible el ${fechaTexto} para ${rutaTxt}. ¿Sigue en pie? Cuéntame por este medio. — SOFIA, ABSTORAGES Logistics Solutions`);
   return r;
 }
