@@ -2433,6 +2433,17 @@ app.post('/api/push/subscribe-native', express.json(), (req, res) => {
   res.json({ ok: true });
 });
 
+// ─── Difusión única de presentación de planner (04-nov-2026) ───────────────
+// Disparo manual, protegido por el mismo middleware de sesión que el resto
+// del portal — un solo POST manda la plantilla "presentacion_sofia_planner"
+// a los 78 proveedores con planner humano, una sola vez cada uno (candado
+// permanente ya incorporado en difusionPresentacion.js).
+app.post('/api/difusion-presentacion/disparar', async (req, res) => {
+  const difusionPresentacion = require('./backend/services/difusionPresentacion');
+  const r = await difusionPresentacion.dispararManual().catch(e => ({ ok: false, motivo: e.message }));
+  res.json(r);
+});
+
 // ─── BROADCAST / CAMPAÑAS WHATSAPP ───────────────────────────────────────────
 app.get('/api/broadcast/templates', (req, res) => {
   res.json(broadcast.getTemplates());
