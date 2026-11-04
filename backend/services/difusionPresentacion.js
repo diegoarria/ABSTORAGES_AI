@@ -44,7 +44,11 @@ async function dispararManual() {
       const nombre = titulo(p.nombre);
       const variables = { '1': nombre, '2': p.planner };
       const textoEnviado = `¡Hola ${nombre}! Soy SOFIA, de ABSTORAGES. Te escribo para presentarme, a partir de ahora voy a ser la asistente de ${p.planner}, y juntos vamos a coordinar contigo tus cargas y preguntarte disponibilidad de unidades.\n\nCualquier duda sobre rutas o un servicio en curso, escríbeme directo por aquí.`;
-      const r = await whatsappProactivo.enviarPlantilla('sofia', p.telefono, CONTENT_SID, variables);
+      // ignorarCapDiario: este mensaje de presentación debe salir aunque la
+      // ronda de disponibilidad de las 6 AM ya le haya escrito hoy mismo —
+      // el candado permanente (yaSeEnvio, dentro de enviarPlantilla) sigue
+      // protegiendo de que se repita dos veces.
+      const r = await whatsappProactivo.enviarPlantilla('sofia', p.telefono, CONTENT_SID, variables, { ignorarCapDiario: true });
       if (r?.status === 'rate_limited') { sinCredito = lista.length - enviados - duplicados - fallidos; detalle.push({ ...p, status: 'rate_limited' }); break; }
       if (r?.status === 'paused') { detalle.push({ ...p, status: 'paused' }); break; }
       if (r?.status === 'ya_contactado_hoy' || r?.status === 'baneado') { detalle.push({ ...p, status: r.status }); continue; }

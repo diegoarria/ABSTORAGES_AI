@@ -123,7 +123,7 @@ function claveContactoDiario(agente, to) { return `${agente}|${(to || '').replac
 function yaContactadoHoy(agente, to) { return !!contactoDiario[claveContactoDiario(agente, to)]; }
 function marcarContactadoHoy(agente, to) { contactoDiario[claveContactoDiario(agente, to)] = Date.now(); guardarContactoDiario(); }
 
-async function enviarPlantilla(agente, to, contentSid, variables, { urgente } = {}) {
+async function enviarPlantilla(agente, to, contentSid, variables, { urgente, ignorarCapDiario } = {}) {
   // El baneo (phoneBanlist) hasta hoy solo se revisaba en mensajes ENTRANTES
   // — nunca antes de que SOFIA le escribiera a alguien por su cuenta. Un
   // número baneado por intento de ataque/fuga de prompt seguía recibiendo
@@ -132,7 +132,12 @@ async function enviarPlantilla(agente, to, contentSid, variables, { urgente } = 
     console.warn(`[whatsappProactivo] 🚫 ${to} está baneado — se omite plantilla saliente`);
     return { status: 'baneado', to };
   }
-  if (yaContactadoHoy(agente, to)) {
+  // ignorarCapDiario: pedido explícito del usuario (04-nov-2026) para la
+  // difusión única de presentación de planner — es un mensaje crítico de
+  // una sola vez por proveedor (ver yaSeEnvio más abajo, que sí sigue
+  // aplicando), no debe quedar bloqueado solo porque la ronda diaria de
+  // disponibilidad ya le escribió hoy mismo a las 6 AM.
+  if (!ignorarCapDiario && yaContactadoHoy(agente, to)) {
     console.warn(`[whatsappProactivo] 🔁 ${agente} ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
     return { status: 'ya_contactado_hoy', to };
   }
