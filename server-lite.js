@@ -3689,7 +3689,11 @@ app.get('/api/historial/sesiones', adminUOpsOCliente, async (req, res) => {
 
     const q = (req.query.q || '').trim().toLowerCase();
 
-    let enriquecidas = sesiones.map(s => {
+    // Sesiones fusionadas (memory.mergeInto) quedan congeladas en disco solo
+    // como respaldo — sin esto, la migración de teléfonos del 04-nov-2026
+    // duplicaba cada proveedor en esta lista (la vieja +521 inerte y la real
+    // +52 con la conversación viva).
+    let enriquecidas = sesiones.filter(s => !s.meta?.mergedInto).map(s => {
       const lead = porSesion[s.id] || {};
       return {
         sessionId: s.id,
