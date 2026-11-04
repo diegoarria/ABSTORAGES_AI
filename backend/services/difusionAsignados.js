@@ -1,14 +1,12 @@
 // ── Ronda diaria a los proveedores con planner asignado ─────────────────────
-// Pedido explícito del usuario (03-nov-2026): todos los días, sin falla, a
-// los ~99 proveedores que ya tienen un planner asignado (Abigail/Gabriel/
-// Claudia/Yamilet o "SOFIA" para los que ella maneja directo) — usando la
-// plantilla nueva con el nombre del planner para los primeros 4, y la
-// plantilla nueva sin planner para los de SOFIA. Mientras esas plantillas
-// nuevas no estén aprobadas por Meta (KAPSO_TEMPLATE_DISPONIBILIDAD_PLANNER /
-// KAPSO_TEMPLATE_DISPONIBILIDAD_DIRECTA vacías), cae de vuelta a la plantilla
-// general ya aprobada (disponibilidad_general_sofia) como relleno temporal —
-// en cuanto el usuario someta y apruebe las nuevas y ponga el nombre real en
-// esas env vars, esta ronda las usa solas, sin tocar código otra vez.
+// Pedido explícito del usuario (03-nov-2026, plantillas confirmadas y
+// activadas 04-nov-2026): todos los días a las 6:00 AM Monterrey, sin falla,
+// a los ~99 proveedores que ya tienen un planner asignado (78 con
+// Abigail/Gabriel/Claudia/Yamilet usando disponibilidad_sofia_planner, y 21
+// que SOFIA maneja directo en su propia cuenta usando
+// disponibilidad_sofia_general_v5 — ver SID_CON_PLANNER/SID_SIN_PLANNER más
+// abajo). Si alguna de las dos llegara a dejar de estar aprobada, cae de
+// vuelta sola a la plantilla general rotativa como relleno temporal.
 //
 // A diferencia de las 3 rondas automáticas eliminadas para siempre el mismo
 // día (difusionGeneral.js — Top 100 y piloto por horario — y
@@ -24,12 +22,10 @@ const notifier = require('./notifier');
 const fs = require('fs');
 const path = require('path');
 
-// Horario SIN DEFINIR TODAVÍA por el usuario (podría terminar siendo de
-// madrugada o muy temprano) — 5:00 AM Monterrey como placeholder razonable
-// mientras decide. Cambiar con SOFIA_DIFUSION_ASIGNADOS_HORA/MINUTO en el
-// entorno, sin tocar código — solo hace falta redeploy para que tome el
-// nuevo valor.
-const HORA   = Number(process.env.SOFIA_DIFUSION_ASIGNADOS_HORA || 5);
+// Horario definitivo (04-nov-2026): 6:00 AM Monterrey, todos los días.
+// Cambiar con SOFIA_DIFUSION_ASIGNADOS_HORA/MINUTO en el entorno si se
+// necesita ajustar sin tocar código — solo hace falta redeploy.
+const HORA   = Number(process.env.SOFIA_DIFUSION_ASIGNADOS_HORA || 6);
 const MINUTO = Number(process.env.SOFIA_DIFUSION_ASIGNADOS_MINUTO || 0);
 const VENTANA_MIN = Number(process.env.SOFIA_DIFUSION_ASIGNADOS_VENTANA_MIN || 180); // tolerancia amplia: el horario aún no está decidido
 const PAUSA_ENTRE_ENVIOS_MS = Number(process.env.SOFIA_DIFUSION_ASIGNADOS_PAUSA_MS || 3000);
@@ -54,10 +50,13 @@ const VARIANTES_GENERAL = [0, 1, 2, 3].map(i => ({
   texto: TEXTO_VARIANTE[i],
 }));
 
-// Plantillas nuevas — vacías hasta que el usuario las someta a Meta y pegue
-// el nombre/ID real aquí. Mientras tanto se usa la general de arriba.
-const SID_CON_PLANNER = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_PLANNER || null;
-const SID_SIN_PLANNER = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_DIRECTA || null;
+// Plantillas aprobadas por Meta (04-nov-2026): disponibilidad_sofia_planner
+// para los 78 proveedores con planner humano asignado (Abigail/Gabriel/
+// Claudia/Yamilet), disponibilidad_sofia_general_v5 para los 21 que SOFIA
+// maneja en su propia cuenta. Se puede sobreescribir por entorno sin tocar
+// código vía KAPSO_TEMPLATE_DISPONIBILIDAD_PLANNER / _DIRECTA.
+const SID_CON_PLANNER = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_PLANNER || 'disponibilidad_sofia_planner';
+const SID_SIN_PLANNER = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_DIRECTA || 'disponibilidad_sofia_general_v5';
 
 const ESTADO_FILE = path.join(__dirname, '../../data/difusion-asignados-estado.json');
 function leerEstado() {
@@ -185,7 +184,7 @@ function iniciar() {
   if (!HABILITADO) { console.log('[difusionAsignados] Desactivado (SOFIA_DIFUSION_ASIGNADOS=false)'); return; }
   setInterval(() => correrSiToca().catch(e => console.error('[difusionAsignados]', e.message)), CHEQUEO_MS);
   correrSiToca().catch(() => {}); // por si el server arranca ya pasada la hora
-  console.log(`[difusionAsignados] Activo — proveedores con planner asignado, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey, horario aún provisional)`);
+  console.log(`[difusionAsignados] Activo — proveedores con planner asignado, a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
 module.exports = { iniciar, correrSiToca, dispararManual, proveedoresAsignados, ejecutarRonda };
