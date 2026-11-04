@@ -3772,10 +3772,12 @@ app.get('/api/historial/sesiones/:id', adminUOps, async (req, res) => {
   const historial = memory.getFullHistory(req.params.id);
   if (!historial.length) return res.status(404).json({ error: 'Sesión no encontrada o sin mensajes' });
   const ipInfo = await sessionIp.obtener(req.params.id).catch(() => null);
+  const { contextBlock } = memory.buildContext(req.params.id);
   res.json({
     sessionId: req.params.id,
     agente: detectarAgente(req.params.id),
     historial,
+    contextoPrevio: contextBlock || null,
     ip: ipInfo?.ip || null,
     ipPrimerMensaje: ipInfo?.first_seen || ipInfo?.firstSeen || null,
   });
