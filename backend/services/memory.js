@@ -137,16 +137,38 @@ function agregarHecho(id, hecho) {
 function mergeInto(fromId, intoId) {
   if (!fromId || !intoId || fromId === intoId) return null;
   const from = getSession(fromId);
-  if (from.meta?.mergedInto === intoId) return getSession(intoId); // ya fusionada, no repetir
+  if (from.meta?.mergedInto === intoId && from.meta?.summaryFusionado) return getSession(intoId); // ya fusionada, no repetir
   const into = getSession(intoId);
-  into.history = [...into.history, ...from.history].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  // Deduplicado por ts+role+content — hace que fusionar sea seguro de
+  // repetir (ej. la reparación de `summary` de abajo, que vuelve a llamar
+  // mergeInto sobre sesiones ya fusionadas antes) sin duplicar mensajes.
+  const vistos = new Set();
+  into.history = [...into.history, ...from.history]
+    .sort((a, b) => (a.ts || 0) - (b.ts || 0))
+    .filter(m => {
+      const clave = `${m.ts}|${m.role}|${m.content}`;
+      if (vistos.has(clave)) return false;
+      vistos.add(clave);
+      return true;
+    });
   const hechosFusionados = [...(from.hechos || []), ...(into.hechos || [])];
   into.hechos = [...new Set(hechosFusionados.map(h => h.toLowerCase()))].map(h => hechosFusionados.find(x => x.toLowerCase() === h)).slice(-MAX_HECHOS);
   into.meta = { ...from.meta, ...into.meta }; // lo de intoId (si ya existía) pisa lo de fromId
   delete into.meta.canonicalId; // intoId es el id canónico, no apunta a sí mismo
   delete into.meta.mergedInto;
+  // BUG real encontrado 04-nov-2026 (reportado por el usuario): esta función
+  // nunca fusionaba `summary` — el campo donde guardarContextoRequerimiento()
+  // (whatsappProactivo.js) guarda "ya le preguntaste a este proveedor
+  // disponibilidad para la ruta X, NUNCA se lo vuelvas a pedir". Si ese
+  // resumen se había guardado en la sesión vieja mal formateada (fromId) y
+  // la sesión real (intoId) nunca tuvo uno propio, la fusión anterior lo
+  // perdía por completo — SOFIA seguía preguntando "¿para qué ruta?" a
+  // proveedores a los que ya se les había dicho. Se usa el de `into` solo si
+  // ya tiene algo propio (una conversación real pudo haber generado su
+  // propio resumen después); si no, se toma el de `from`.
+  into.summary = into.summary || from.summary || '';
   saveSession(intoId, into);
-  from.meta = { ...from.meta, mergedInto: intoId, mergedAt: Date.now() };
+  from.meta = { ...from.meta, mergedInto: intoId, mergedAt: Date.now(), summaryFusionado: true };
   saveSession(fromId, from);
   return into;
 }
