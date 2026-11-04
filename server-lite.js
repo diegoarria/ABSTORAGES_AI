@@ -2433,6 +2433,16 @@ app.post('/api/push/subscribe-native', express.json(), (req, res) => {
   res.json({ ok: true });
 });
 
+// ─── Migración única: fusiona sesiones de memoria mal formateadas (04-nov-2026) ──
+// Ver memory.js/migrarSesionesKapsoSinUno — corrige el bug de las sesiones
+// "wa_sofia_+521..." que no coincidían con la sesión real de Kapso. Se
+// dispara una sola vez; correrla de nuevo no hace nada (mergeInto es
+// idempotente).
+app.post('/api/admin/migrar-sesiones-kapso', (req, res) => {
+  const r = memory.migrarSesionesKapsoSinUno();
+  res.json({ ok: true, total: r.length, resultado: r });
+});
+
 // ─── Difusión única de presentación de planner (04-nov-2026) ───────────────
 // Disparo manual, protegido por el mismo middleware de sesión que el resto
 // del portal — un solo POST manda la plantilla "presentacion_sofia_planner"

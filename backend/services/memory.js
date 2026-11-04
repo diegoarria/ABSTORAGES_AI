@@ -181,4 +181,33 @@ function listSessions() {
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, agregarHecho, listSessions, deleteSession, mergeInto };
+// Migración única (04-nov-2026) — ver el bug real documentado en
+// whatsappProactivo.js/normalizarE164: antes de este fix, todo mensaje
+// proactivo (difusiones, recordatorios, seguimientos) de SOFIA/MARÍA se
+// guardaba con el "1" móvil estilo Twilio (wa_sofia_+521XXXXXXXXXX), pero
+// la sesión REAL que usa /webhook/kapso cuando la persona responde es
+// wa_sofia_+52XXXXXXXXXX (sin el "1"). Esto fusiona cada archivo viejo mal
+// nombrado dentro de su sesión real correcta, para que todo el historial
+// de lo que SOFIA/MARÍA ya dijeron vuelva a aparecer en la conversación.
+// Idempotente: mergeInto ya evita re-fusionar si se corre dos veces.
+function migrarSesionesKapsoSinUno() {
+  ensureDir();
+  const archivos = fs.readdirSync(DATA_DIR).filter(f => /^wa_(sofia|maria)_\+521\d{10}\.json$/.test(f));
+  const resultado = [];
+  for (const f of archivos) {
+    const m = f.match(/^wa_(sofia|maria)_\+521(\d{10})\.json$/);
+    if (!m) continue;
+    const [, agente, diez] = m;
+    const fromId = `wa_${agente}_+521${diez}`;
+    const intoId = `wa_${agente}_+52${diez}`;
+    try {
+      mergeInto(fromId, intoId);
+      resultado.push({ fromId, intoId, ok: true });
+    } catch (e) {
+      resultado.push({ fromId, intoId, ok: false, error: e.message });
+    }
+  }
+  return resultado;
+}
+
+module.exports = { getSession, addMessage, getHistory, getFullHistory, buildContext, updateMeta, saveSummary, agregarHecho, listSessions, deleteSession, mergeInto, migrarSesionesKapsoSinUno };

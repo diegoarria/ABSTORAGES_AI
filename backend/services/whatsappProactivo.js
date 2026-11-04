@@ -31,11 +31,21 @@ const phoneBanlist = require('./phoneBanlist');
 function normalizarE164(telefono) {
   const raw = String(telefono || '').replace(/\D/g, '');
   if (!raw) return null;
-  // Twilio entrega los celulares mexicanos entrantes como +521XXXXXXXXXX (con
-  // el "1" móvil). Si aquí se guardara sin ese "1", la sesión de memoria de lo
-  // que mandamos NO coincidiría con la de la respuesta, y la IA contestaría
-  // como si no hubiera mandado nada (pasó con Aziel el 24-sep-2026).
-  if (raw.length === 10 || ((raw.startsWith('52') || raw.startsWith('521')) && raw.length >= 12)) return `+521${raw.slice(-10)}`;
+  // BUG REAL encontrado 04-nov-2026 (reportado por el usuario: los mensajes
+  // de difusión no aparecían en el historial del chat del portal, aunque sí
+  // habían salido por Kapso). Esta función insertaba el "1" móvil al estilo
+  // Twilio (+521XXXXXXXXXX), pero /webhook/kapso arma la sesión con el
+  // número EXACTO que manda Meta/Kapso — SIN ese "1" (+52XXXXXXXXXX, ver
+  // server-lite.js línea ~1579: phone = '+' + dígitos de `from`, tal cual).
+  // Como todo el envío proactivo de esta función pasa por Kapso (no por
+  // Twilio), guardar con el "1" escribía en una sesión de memoria distinta
+  // a la real — SOFIA/MARÍA literalmente no tenían registro de lo que le
+  // habían mandado a nadie por difusión. Corregido para igualar el formato
+  // real de Kapso; si el número viejo venía guardado con el "1" (de datos
+  // de antes de la migración a Kapso, oct-2026), se le quita aquí.
+  if (raw.length === 10) return `+52${raw}`;
+  if (raw.startsWith('521') && raw.length === 13) return `+52${raw.slice(3)}`;
+  if (raw.startsWith('52') && raw.length === 12) return `+${raw}`;
   return `+${raw}`;
 }
 

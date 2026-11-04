@@ -15,17 +15,21 @@ const outboundRateLimit = require('./outboundRateLimit');
 const monitoringControl = require('./monitoringControl');
 const kapso = require('./kapso');
 
-// Tiene que coincidir EXACTO con el `phone` que arma el webhook de WhatsApp
-// (server-lite.js, From de Twilio) para que sea la misma sesión cuando la
-// persona responda.
+// Tiene que coincidir EXACTO con el `phone` que arma /webhook/kapso
+// (server-lite.js: phone = '+' + dígitos de `from`, tal cual los manda
+// Meta/Kapso, SIN el "1" móvil que Twilio sí agregaba) para que sea la
+// misma sesión cuando la persona responda.
 function normalizarE164(telefono) {
   const raw = String(telefono || '').replace(/\D/g, '');
   if (!raw) return null;
-  // Twilio entrega los celulares mexicanos entrantes como +521XXXXXXXXXX (con
-  // el "1" móvil). Si aquí se guardara sin ese "1", la sesión de memoria de lo
-  // que mandamos NO coincidiría con la de la respuesta, y la IA contestaría
-  // como si no hubiera mandado nada (pasó con Aziel el 24-sep-2026).
-  if (raw.length === 10 || ((raw.startsWith('52') || raw.startsWith('521')) && raw.length >= 12)) return `+521${raw.slice(-10)}`;
+  // BUG REAL encontrado 04-nov-2026 — ver el mismo comentario en
+  // whatsappProactivo.js: esta función seguía agregando el "1" al estilo
+  // Twilio después de la migración a Kapso (oct-2026), así que los mensajes
+  // proactivos de MARÍA se guardaban en una sesión de memoria distinta a la
+  // real. Corregido para igualar el formato real de Kapso.
+  if (raw.length === 10) return `+52${raw}`;
+  if (raw.startsWith('521') && raw.length === 13) return `+52${raw.slice(3)}`;
+  if (raw.startsWith('52') && raw.length === 12) return `+${raw}`;
   return `+${raw}`;
 }
 
