@@ -2745,6 +2745,19 @@ app.post('/api/disponibilidades/:id/editar', soloAdmin, (req, res) => {
   res.json({ ok: true, disponibilidad: d });
 });
 
+// Marca una promesa como "ya recordada" SIN mandar ningún mensaje — para
+// cuando el proveedor ya recibió el recordatorio por fuera de lo normal
+// (ej. el incidente de reenvíos del 05-nov-2026) y no hace falta mandarle
+// otro más.
+app.post('/api/disponibilidades/:id/marcar-recordado', soloAdmin, (req, res) => {
+  const existente = colocaciones.disponibilidades().find(d => d.id === req.params.id);
+  if (!existente) return res.status(404).json({ error: 'No encontrada' });
+  const d = colocaciones.actualizarDisponibilidad(req.params.id, {
+    estado: 'recordada', recordatorioEn: new Date().toISOString(), recordatorioPreviaEn: new Date().toISOString(),
+  });
+  res.json({ ok: true, disponibilidad: d });
+});
+
 // Dashboard de disponibilidad por ruta — pedido explícito del usuario
 // (27-oct-2026): filtras por ruta y te dice qué proveedores tienen
 // disponibilidad YA, con calificación y perfil de relación, en vez de
