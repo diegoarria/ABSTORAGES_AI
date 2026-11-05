@@ -302,24 +302,45 @@ const primerNombre = n => String(n || '').trim().split(/\s+/)[0].toLowerCase().r
 // reintentar — antes se marcaba "recordada" sin importar si el mensaje
 // salió, así que un día donde el proveedor ya había recibido otro mensaje
 // proactivo (por cualquier otro motivo) se daba por avisado sin estarlo.
+// Devuelve { enviado, reintentable }. `reintentable` distingue dos tipos de
+// "no se mandó": un motivo CONOCIDO y limpio (pausado/tope diario/ya
+// contactado hoy/baneado — ahí sí es seguro reintentar en el siguiente
+// chequeo, de verdad no salió nada) vs una EXCEPCIÓN (timeout, error de red
+// con Kapso, respuesta rara) — ahí NO se sabe si el mensaje de verdad salió
+// o no, así que no se reintenta.
+//
+// BUG REAL encontrado 05-nov-2026 (reportado por el usuario en caliente: a
+// un proveedor se le mandó el mismo recordatorio de disponibilidad decenas
+// de veces en minutos, uno por cada chequeo de 60s): antes, CUALQUIER falla
+// —incluida una excepción no identificada— dejaba `enviado=false` sin marcar
+// nada, así que la promesa seguía "pendiente" para siempre y el siguiente
+// chequeo volvía a intentar mandar la plantilla de verdad. Si la causa real
+// de la excepción era que el mensaje SÍ había salido por Kapso pero la
+// confirmación HTTP falló (timeout, respuesta no-JSON, etc.), esto
+// producía un reenvío real en cada pasada, sin límite, hasta que alguien
+// se diera cuenta y pausara al agente a mano.
 async function enviarRecordatorioDisponibilidad(d, { previa }) {
   const fechaTxt = textoFecha(d.fecha);
   let enviado = false;
+  let reintentable = true;
   try {
     const r = await whatsappProactivo.enviarSeguimientoDisponibilidad(primerNombre(d.nombre), d.telefono, fechaTxt, d.ruta);
-    enviado = !!r && !['ya_contactado_hoy', 'rate_limited', 'paused'].includes(r.status);
+    enviado = !!r && !['ya_contactado_hoy', 'rate_limited', 'paused', 'baneado'].includes(r.status);
     if (!enviado) {
-      const motivo = !r ? 'sin plantilla configurada' : r.status === 'ya_contactado_hoy' ? 'ya se le había escrito hoy por otro motivo' : r.status === 'rate_limited' ? 'tope diario de envíos alcanzado' : 'SOFIA está pausada';
+      const motivo = !r ? 'sin plantilla configurada' : r.status === 'ya_contactado_hoy' ? 'ya se le había escrito hoy por otro motivo' : r.status === 'rate_limited' ? 'tope diario de envíos alcanzado' : r.status === 'baneado' ? 'número baneado' : 'SOFIA está pausada';
       push({ title: `${previa ? 'Mañana' : 'Hoy'} ${d.nombre || 'un proveedor'} prometió unidad — no se pudo avisar`, body: `Motivo: ${motivo}. Se reintenta en el próximo chequeo${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id + (previa ? '-previa' : ''), url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true });
     }
   } catch (e) {
-    console.error('[sofiaOperacion] Error en seguimiento de disponibilidad:', e.message);
+    // No se sabe si salió o no — NUNCA reintentar a ciegas aquí, ver nota arriba.
+    console.error('[sofiaOperacion] Error en seguimiento de disponibilidad (NO se reintenta — no se sabe si ya salió):', e.message);
+    reintentable = false;
+    push({ title: `Error mandando recordatorio de disponibilidad a ${d.nombre || 'un proveedor'}`, body: `${e.message} — revisar manualmente si de verdad llegó (no se va a reintentar solo).`, tag: 'disp-error-' + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true });
   }
   if (enviado) {
     feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${previa ? 'Un día antes' : 'Hoy es el día'}: SOFIA le escribió a ${d.nombre || 'un proveedor'} para confirmar la unidad prometida del ${fechaTxt}${d.ruta ? ' (' + d.ruta + ')' : ''}` });
     push({ title: `${previa ? 'Mañana tienes' : 'Hoy tienes'} unidad prometida — ${d.nombre || 'proveedor'}`, body: `${d.nombre || 'Un proveedor'} dijo que ${previa ? 'mañana' : 'hoy'} tendría unidad${d.ruta ? ' ' + d.ruta : ''}${d.unidad ? ' (' + d.unidad + ')' : ''}. SOFIA le pidió confirmar.`, tag: 'disp-' + (previa ? 'previa-' : 'hoy-') + d.id, url: '/colocaciones.html', tipo: 'DISPONIBILIDAD' });
   }
-  return enviado;
+  return { enviado, reintentable };
 }
 
 // Días de gracia tras la fecha prometida antes de darla por vencida sin
@@ -354,6 +375,17 @@ async function tickDisponibilidades() {
   }
 }
 
+// Freno de seguridad estructural, independiente de la causa exacta del bug
+// del 05-nov-2026 (ver nota en enviarRecordatorioDisponibilidad): pase lo
+// que pase en el resto de la lógica, NINGUNA promesa puede intentar un
+// recordatorio más de una vez cada 5 minutos. Con el tick cada 60s, esto
+// bloquea de raíz cualquier bucle de reenvío real, incluso si apareciera
+// otra causa distinta a la ya corregida.
+const COOLDOWN_INTENTO_RECORDATORIO_MS = 5 * 60 * 1000;
+function dentroDeCooldown(d) {
+  return !!d.ultimoIntentoRecordatorioEn && (Date.now() - new Date(d.ultimoIntentoRecordatorioEn).getTime()) < COOLDOWN_INTENTO_RECORDATORIO_MS;
+}
+
 async function tickDisponibilidadesInterno() {
   const hoy = colocaciones.fechaMTY();
   const mañana = colocaciones.fechaMTY(Date.now() + 24 * 60 * 60 * 1000);
@@ -363,11 +395,17 @@ async function tickDisponibilidadesInterno() {
     // chequear y se quedaba viva para siempre en el reporte. Ahora se vence
     // sin importar en cuál de los dos estados esté.
     if (!['pendiente', 'recordada'].includes(d.estado)) continue;
+    if (dentroDeCooldown(d)) continue;
     if (d.fecha && d.fecha < hoy) {
       const diasPasados = Math.round((new Date(hoy + 'T00:00:00Z') - new Date(d.fecha + 'T00:00:00Z')) / 86400000);
       if (d.estado === 'pendiente' && diasPasados <= GRACIA_DIAS_VENCIMIENTO && horario.permitido(false)) {
-        const enviado = await enviarRecordatorioDisponibilidad(d, { previa: false });
-        if (enviado) colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
+        colocaciones.actualizarDisponibilidad(d.id, { ultimoIntentoRecordatorioEn: new Date().toISOString() });
+        const { enviado, reintentable } = await enviarRecordatorioDisponibilidad(d, { previa: false });
+        // Se marca como recordada si de verdad salió, O si falló por algo que
+        // no es seguro reintentar (excepción — ver nota en la función). Solo
+        // se deja "pendiente" de verdad cuando el motivo es limpio y conocido
+        // (pausado/tope/baneado/ya contactado hoy).
+        if (enviado || !reintentable) colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
         continue; // dentro del margen de gracia — se reintenta en el siguiente chequeo si no salió, no se vence todavía
       }
       colocaciones.actualizarDisponibilidad(d.id, { estado: 'vencida' });
@@ -376,15 +414,17 @@ async function tickDisponibilidadesInterno() {
     if (d.estado !== 'pendiente' || !d.fecha) continue; // ya se le recordó, o no hay fecha que vigilar — nada más que hacer
 
     if (d.fecha === mañana && !d.recordatorioPreviaEn && horario.permitido(false)) {
-      const enviado = await enviarRecordatorioDisponibilidad(d, { previa: true });
-      if (enviado) colocaciones.actualizarDisponibilidad(d.id, { recordatorioPreviaEn: new Date().toISOString() });
+      colocaciones.actualizarDisponibilidad(d.id, { ultimoIntentoRecordatorioEn: new Date().toISOString() });
+      const { enviado, reintentable } = await enviarRecordatorioDisponibilidad(d, { previa: true });
+      if (enviado || !reintentable) colocaciones.actualizarDisponibilidad(d.id, { recordatorioPreviaEn: new Date().toISOString() });
       continue;
     }
 
     if (d.fecha !== hoy) continue;
     if (!horario.permitido(false)) continue; // dentro de horario de contacto
-    const enviado = await enviarRecordatorioDisponibilidad(d, { previa: false });
-    if (enviado) colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
+    colocaciones.actualizarDisponibilidad(d.id, { ultimoIntentoRecordatorioEn: new Date().toISOString() });
+    const { enviado, reintentable } = await enviarRecordatorioDisponibilidad(d, { previa: false });
+    if (enviado || !reintentable) colocaciones.actualizarDisponibilidad(d.id, { estado: 'recordada', recordatorioEn: new Date().toISOString() });
   }
 }
 
