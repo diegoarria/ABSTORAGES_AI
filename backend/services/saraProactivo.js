@@ -9,11 +9,31 @@
 // llegaron a tener una plantilla viva y aprobada bajo el WABA actual); los
 // nombres de plantilla reales de Kapso están en KAPSO_TEMPLATE_* más abajo.
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const memory = require('./memory');
 const agentPause = require('./agentPause');
 const outboundRateLimit = require('./outboundRateLimit');
 const monitoringControl = require('./monitoringControl');
 const kapso = require('./kapso');
+const phoneBanlist = require('./phoneBanlist');
+
+// MARÍA no tenía NINGUNA de las protecciones que SOFIA sí tiene en
+// whatsappProactivo.js (baneo, candado de "1 contacto al día") — se
+// descubrió al revisar a fondo el incidente de spam de SOFIA del
+// 05-nov-2026. Mismo criterio, duplicado aquí a propósito (igual que
+// normalizarE164 ya estaba duplicado entre los dos archivos).
+const FILE_CONTACTO_DIARIO = path.join(__dirname, '../../data/maria-contacto-diario.json');
+let contactoDiario = {};
+try { contactoDiario = JSON.parse(fs.readFileSync(FILE_CONTACTO_DIARIO, 'utf8')); } catch {}
+function guardarContactoDiario() {
+  try { fs.writeFileSync(FILE_CONTACTO_DIARIO, JSON.stringify(contactoDiario)); }
+  catch (e) { console.error('[saraProactivo] Error guardando candado diario:', e.message); }
+}
+function fechaMTY() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date()); }
+function claveContactoDiario(to) { return `${(to || '').replace(/\D/g, '').slice(-10)}|${fechaMTY()}`; }
+function yaContactadoHoy(to) { return !!contactoDiario[claveContactoDiario(to)]; }
+function marcarContactadoHoy(to) { contactoDiario[claveContactoDiario(to)] = Date.now(); guardarContactoDiario(); }
 
 // Tiene que coincidir EXACTO con el `phone` que arma /webhook/kapso
 // (server-lite.js: phone = '+' + dígitos de `from`, tal cual los manda
@@ -50,6 +70,14 @@ const CONTENT_SID_VENTA_CERRADA      = process.env.KAPSO_TEMPLATE_VENTA_CERRADA 
 const CONTENT_SID_UNIDAD_CONFIRMADA  = process.env.KAPSO_TEMPLATE_UNIDAD_CONFIRMADA  || 'unidad_confirmada_maria';
 
 async function enviarPlantilla(to, contentSid, variables) {
+  if (phoneBanlist.estaBaneado(to)) {
+    console.warn(`[saraProactivo] 🚫 ${to} está baneado — se omite plantilla saliente`);
+    return { status: 'baneado', to };
+  }
+  if (yaContactadoHoy(to)) {
+    console.warn(`[saraProactivo] 🔁 MARÍA ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
+    return { status: 'ya_contactado_hoy', to };
+  }
   if (agentPause.estaPausado('maria')) {
     console.warn(`[saraProactivo] MARÍA pausada — se omite plantilla a ${to}`);
     return { status: 'paused', to };
@@ -60,6 +88,12 @@ async function enviarPlantilla(to, contentSid, variables) {
     return { status: 'rate_limited', to };
   }
   monitoringControl.reportarContactoSaliente({ agente: 'maria', canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
+  // Se marca ANTES de esperar la respuesta de Kapso — así, si la llamada
+  // truena después de que el mensaje ya salió de verdad (timeout, respuesta
+  // rara), un reintento del llamador no manda un segundo mensaje real el
+  // mismo día. Mismo criterio que el freno agregado a sofiaOperacion.js
+  // tras el incidente de spam del 05-nov-2026.
+  marcarContactadoHoy(to);
   return kapso.enviarPlantilla(to, 'maria', contentSid, variables);
 }
 
