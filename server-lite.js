@@ -102,6 +102,7 @@ const noaRiskFeedback = require('./backend/services/noaRiskFeedback');
 const mariaTmsWatch = require('./backend/services/mariaTmsWatch');
 const difusionGeneral = require('./backend/services/difusionGeneral');
 const difusionAsignados = require('./backend/services/difusionAsignados');
+const difusionAsignadosManana = require('./backend/services/difusionAsignadosManana');
 const difusionClientes = require('./backend/services/difusionClientes');
 const cadenciaSeguimiento = require('./backend/services/cadenciaSeguimiento');
 const db          = require('./backend/db/db');
@@ -4917,6 +4918,7 @@ app.listen(PORT, async () => {
   hitosCliente.iniciar();
   mariaTmsWatch.iniciar();
   difusionAsignados.iniciar();
+  difusionAsignadosManana.iniciar();
   difusionClientes.iniciar();
   sofiaOperacion.iniciar({ sendPush });
   kpisSofia.iniciar();
