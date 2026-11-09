@@ -23,6 +23,7 @@ const ordersStore = require('./ordersStore');
 const saraProactivo = require('./saraProactivo');
 const folioContexto = require('./folioContexto');
 const difusionGeneral = require('./difusionGeneral');
+const avisoPlannerDisponibilidad = require('./avisoPlannerDisponibilidad');
 let _ultimoAvisoTarifa = new Map(); // teléfono → ts, evita mandar 5 correos si el proveedor insiste en varios mensajes seguidos
 
 const OLA_TAM         = Number(process.env.SOFIA_ESCALERA_TAMANO || 3);
@@ -209,7 +210,10 @@ function procesarSenales({ telefono, nombre, respuesta }) {
     const df = json(respuesta, 'DISPONIBILIDAD_FUTURA');
     if (df) {
       const d = colocaciones.agregarDisponibilidad({ telefono, nombre, fecha: df.fecha, ruta: df.ruta, unidad: df.unidad, detalle: df.detalle });
-      if (d) feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible${d.fecha ? ' el ' + textoFecha(d.fecha) : ' próximamente (sin fecha confirmada)'}${d.ruta ? ' (' + d.ruta + ')' : ''} — ${d.fecha ? 'SOFIA le escribirá ese día para confirmar' : 'el equipo le dará seguimiento'}`, metadata: { id: d.id } });
+      if (d) {
+        feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} tendrá unidad disponible${d.fecha ? ' el ' + textoFecha(d.fecha) : ' próximamente (sin fecha confirmada)'}${d.ruta ? ' (' + d.ruta + ')' : ''} — ${d.fecha ? 'SOFIA le escribirá ese día para confirmar' : 'el equipo le dará seguimiento'}`, metadata: { id: d.id } });
+        avisoPlannerDisponibilidad.avisarPlanner(d).catch(e => console.error('[sofiaOperacion] Error avisando a planner:', e.message));
+      }
     }
 
     // Un proveedor ofrece una ruta por su cuenta (con o sin orden activa con
@@ -224,6 +228,7 @@ function procesarSenales({ telefono, nombre, respuesta }) {
       // vez de depender de que alguien lea el correo a tiempo.
       const d = colocaciones.agregarDisponibilidad({ telefono, nombre: quien, fecha: dr.fecha === 'hoy' ? '' : dr.fecha, ruta: dr.ruta, unidad: dr.unidad, detalle: null });
       feed({ tipo: 'DISPONIBILIDAD_FUTURA', mensaje: `${quien} ofrece ruta ${dr.ruta}${dr.fecha && dr.fecha !== 'hoy' ? ' el ' + textoFecha(dr.fecha) : ' (hoy)'}${dr.unidad ? ' — ' + dr.unidad : ''} — se avisó al equipo por correo y ya está en el dashboard de disponibilidad`, metadata: { id: d?.id } });
+      if (d) avisoPlannerDisponibilidad.avisarPlanner(d).catch(e => console.error('[sofiaOperacion] Error avisando a planner:', e.message));
       notifier.notificarDisponibilidadRuta({ nombre: quien, telefono, ruta: dr.ruta, unidad: dr.unidad, fecha: dr.fecha })
         .catch(e => console.error('[sofiaOperacion] Error avisando disponibilidad de ruta:', e.message));
     }
