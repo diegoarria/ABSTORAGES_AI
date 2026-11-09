@@ -285,8 +285,15 @@ async function enviarSeguimientoDisponibilidad(nombre, telefono, fechaTexto, rut
   if (!telefonoValido(telefono)) return null;
   const rutaTxt = ruta || 'tus rutas';
   let r;
+  // ignorarCapDiario (09-nov-2026): este recordatorio es un mensaje crítico
+  // de una sola vez por promesa — pedido explícito del usuario tras el
+  // incidente de Oscar, donde chocaba contra el candado de "1 contacto al
+  // día" (ya le había llegado la difusión general de las 6am) y se quedaba
+  // reintentando cada 5 minutos para siempre, mandando un correo de alerta
+  // repetido cada vez sin nunca lograr avisarle de verdad. Mismo criterio
+  // que difusionPresentacion.js.
   if (CONTENT_SID_SEGUIMIENTO_DISP) {
-    r = await enviarPlantillaSinCandado('sofia', telefono, CONTENT_SID_SEGUIMIENTO_DISP, { '1': nombre || 'ahí', '2': fechaTexto, '3': rutaTxt });
+    r = await enviarPlantillaSinCandado('sofia', telefono, CONTENT_SID_SEGUIMIENTO_DISP, { '1': nombre || 'ahí', '2': fechaTexto, '3': rutaTxt }, { ignorarCapDiario: true });
   } else {
     // Relleno temporal (03-nov-2026) — la plantilla dedicada
     // (sofia_seguimiento_disponibilidad) todavía no está sometida/aprobada
@@ -301,9 +308,15 @@ async function enviarSeguimientoDisponibilidad(nombre, telefono, fechaTexto, rut
     const [origen, destino] = rutaTxt.split('→').map(s => (s || '').trim());
     r = await enviarPlantillaSinCandado('sofia', telefono, CONTENT_SID_DISPONIBILIDAD, {
       '1': nombre || 'ahí', '2': 'caja seca', '3': origen || rutaTxt, '4': destino || '—', '5': fechaTexto,
-    });
+    }, { ignorarCapDiario: true });
   }
-  registrarEnMemoria('sofia', telefono, `Hola ${nombre || ''}, me comentaste que tendrías unidad disponible el ${fechaTexto} para ${rutaTxt}. ¿Sigue en pie? Cuéntame por este medio. — SOFIA, ABSTORAGES Logistics Solutions`);
+  // Solo se registra en la memoria de la conversación si de verdad se mandó
+  // — antes se registraba siempre, aunque el envío hubiera sido bloqueado
+  // (ej. 'ya_contactado_hoy'), dejando en la memoria de SOFIA algo que
+  // nunca le llegó de verdad al proveedor.
+  if (r && !['ya_contactado_hoy', 'rate_limited', 'paused', 'baneado'].includes(r.status)) {
+    registrarEnMemoria('sofia', telefono, `Hola ${nombre || ''}, me comentaste que tendrías unidad disponible el ${fechaTexto} para ${rutaTxt}. ¿Sigue en pie? Cuéntame por este medio. — SOFIA, ABSTORAGES Logistics Solutions`);
+  }
   return r;
 }
 
@@ -337,12 +350,12 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
 // Nunca toca el candado de las demás plantillas: no lo lee ni lo marca, así
 // que no choca con el "nunca se repite sola" de las plantillas normales, ni
 // bloquea que una orden real le vuelva a preguntar disponibilidad después.
-async function enviarPlantillaSinCandado(agente, to, contentSid, variables) {
+async function enviarPlantillaSinCandado(agente, to, contentSid, variables, { ignorarCapDiario } = {}) {
   if (phoneBanlist.estaBaneado(to)) {
     console.warn(`[whatsappProactivo] 🚫 ${to} está baneado — se omite plantilla saliente`);
     return { status: 'baneado', to };
   }
-  if (yaContactadoHoy(agente, to)) {
+  if (!ignorarCapDiario && yaContactadoHoy(agente, to)) {
     console.warn(`[whatsappProactivo] 🔁 ${agente} ya contactó a ${to} hoy — se omite para no mandar más de un mensaje al día.`);
     return { status: 'ya_contactado_hoy', to };
   }

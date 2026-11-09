@@ -328,7 +328,17 @@ async function enviarRecordatorioDisponibilidad(d, { previa }) {
     enviado = !!r && !['ya_contactado_hoy', 'rate_limited', 'paused', 'baneado'].includes(r.status);
     if (!enviado) {
       const motivo = !r ? 'sin plantilla configurada' : r.status === 'ya_contactado_hoy' ? 'ya se le había escrito hoy por otro motivo' : r.status === 'rate_limited' ? 'tope diario de envíos alcanzado' : r.status === 'baneado' ? 'número baneado' : 'SOFIA está pausada';
-      push({ title: `${previa ? 'Mañana' : 'Hoy'} ${d.nombre || 'un proveedor'} prometió unidad — no se pudo avisar`, body: `Motivo: ${motivo}. Se reintenta en el próximo chequeo${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id + (previa ? '-previa' : ''), url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true });
+      // Alerta deduplicada — el "no se pudo avisar" ES "urgente", y urgente
+      // manda correo (server-lite.js sendPush). Antes se mandaba un correo
+      // nuevo en CADA intento fallido (uno cada 5 min con el freno ya
+      // puesto) — bug real reportado por el usuario el 09-nov-2026 con el
+      // caso de Oscar: una bandeja llena de correos idénticos e inútiles.
+      // Ahora solo se manda una vez cada 30 min por promesa como máximo.
+      const yaAvisadoHaceRato = d.ultimaAlertaFalloEn && (Date.now() - new Date(d.ultimaAlertaFalloEn).getTime()) < 30 * 60 * 1000;
+      if (!yaAvisadoHaceRato) {
+        colocaciones.actualizarDisponibilidad(d.id, { ultimaAlertaFalloEn: new Date().toISOString() });
+        push({ title: `${previa ? 'Mañana' : 'Hoy'} ${d.nombre || 'un proveedor'} prometió unidad — no se pudo avisar`, body: `Motivo: ${motivo}. Se reintenta en el próximo chequeo${d.ruta ? ' (' + d.ruta + ')' : ''}.`, tag: 'disp-' + d.id + (previa ? '-previa' : ''), url: '/colocaciones.html', tipo: 'DISPONIBILIDAD', urgente: true });
+      }
     }
   } catch (e) {
     // No se sabe si salió o no — NUNCA reintentar a ciegas aquí, ver nota arriba.
