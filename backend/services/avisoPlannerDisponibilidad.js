@@ -29,7 +29,8 @@ const TELEFONOS_PLANNER = {
   'Yamilet Gamez': '+528118001081',
 };
 
-const CONTENT_SID = process.env.KAPSO_TEMPLATE_AVISO_PLANNER || null;
+// Aprobada por Meta (10-nov-2026) con el nombre "disponibilidad_planner".
+const CONTENT_SID = process.env.KAPSO_TEMPLATE_AVISO_PLANNER || 'disponibilidad_planner';
 
 async function avisarPlanner(d) {
   if (!CONTENT_SID) return; // plantilla todavía no sometida/aprobada en Meta

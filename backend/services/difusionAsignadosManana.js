@@ -28,11 +28,12 @@ const CHEQUEO_MS = 15 * 60 * 1000;
 
 const HABILITADO = process.env.SOFIA_DIFUSION_ASIGNADOS_MANANA !== 'false';
 
-// Plantillas nuevas — vacías hasta que el usuario las someta a Meta y pegue
-// el nombre/ID real aquí. A diferencia de difusionAsignados.js, aquí NO hay
-// relleno temporal con una plantilla general: el texto "mañana" es distinto
-// al de "hoy", reusar la de hoy diría algo falso.
-const SID_CON_PLANNER = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_PLANNER_MANANA || null;
+// Plantilla "con planner" aprobada por Meta (10-nov-2026): disponibilidad_sofia_planner_manana.
+// La "sin planner" (21 proveedores que maneja SOFIA directo) todavía no
+// tiene nombre confirmado — queda en null (la ronda la omite para ese
+// grupo) hasta que se agregue aquí, sin relleno temporal: el texto de
+// "mañana" es distinto al de "hoy", reusar la de hoy diría algo falso.
+const SID_CON_PLANNER = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_PLANNER_MANANA || 'disponibilidad_sofia_planner_manana';
 const SID_SIN_PLANNER = process.env.KAPSO_TEMPLATE_DISPONIBILIDAD_DIRECTA_MANANA || null;
 
 const ESTADO_FILE = path.join(__dirname, '../../data/difusion-asignados-manana-estado.json');
@@ -71,8 +72,8 @@ async function proveedoresAsignados() {
 
 async function ejecutarRonda() {
   if (agentPause.estaPausado('sofia')) return { ok: false, motivo: 'pausado' };
-  if (!SID_CON_PLANNER || !SID_SIN_PLANNER) {
-    console.warn('[difusionAsignadosManana] Plantillas de "mañana" aún no configuradas — se omite la ronda');
+  if (!SID_CON_PLANNER && !SID_SIN_PLANNER) {
+    console.warn('[difusionAsignadosManana] Ninguna plantilla de "mañana" está configurada — se omite la ronda');
     return { ok: false, motivo: 'plantillas_no_configuradas' };
   }
   let lista;
@@ -81,10 +82,11 @@ async function ejecutarRonda() {
 
   feed({ tipo: 'DIFUSION_ASIGNADOS_MANANA', mensaje: `Ronda 9PM — preguntando disponibilidad de mañana a ${lista.length} proveedores, uno tras otro` });
 
-  let enviados = 0, sinCredito = 0, fallidos = 0;
+  let enviados = 0, sinCredito = 0, fallidos = 0, sinPlantilla = 0;
   for (const p of lista) {
     try {
       const esSofia = p.planner === 'SOFIA';
+      if (esSofia && !SID_SIN_PLANNER) { sinPlantilla++; continue; } // plantilla "sin planner" aún no confirmada
       let contentSid, variables, textoEnviado;
       const nombre = titulo(p.nombre);
       if (esSofia) {
@@ -92,6 +94,7 @@ async function ejecutarRonda() {
         variables = { '1': nombre };
         textoEnviado = `Hola ${nombre}, soy SOFIA de ABSTORAGES. ¿Qué unidades tendrás disponibles mañana? Cuéntame qué ruta o rutas tienes para apartarte la unidad desde hoy y buscar conectarte con nuestros clientes.`;
       } else {
+        if (!SID_CON_PLANNER) { sinPlantilla++; continue; } // plantilla "con planner" aún no confirmada
         contentSid = SID_CON_PLANNER;
         variables = { '1': nombre, '2': p.planner };
         textoEnviado = `Hola ${nombre}, soy SOFIA, asistente de ${p.planner} en ABSTORAGES. ¿Qué unidades tendrás disponibles mañana? Cuéntame la ruta para apartártela desde hoy y buscar conectarte con nuestros clientes.`;
@@ -110,7 +113,7 @@ async function ejecutarRonda() {
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }
 
-  const resumen = `Ronda 9PM (disponibilidad de mañana): ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
+  const resumen = `Ronda 9PM (disponibilidad de mañana): ${enviados} enviados de ${lista.length}${sinPlantilla ? ` · ${sinPlantilla} omitidos por falta de plantilla` : ''}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}.`;
   feed({ tipo: 'DIFUSION_ASIGNADOS_MANANA', mensaje: resumen });
   notifier.notificarAlerta({ title: 'SOFIA — Ronda 9PM (disponibilidad de mañana)', body: resumen, tipo: 'DIFUSION_ASIGNADOS_MANANA' }).catch(() => {});
   console.log(`[difusionAsignadosManana] ${resumen}`);
