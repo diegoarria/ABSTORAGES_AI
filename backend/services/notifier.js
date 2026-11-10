@@ -402,6 +402,21 @@ async function notificarAlerta({ title, body, tipo }) {
   }
 }
 
+// Prueba directa de credenciales de Gmail — a diferencia de notificarAlerta
+// (que atrapa el error de sendMail y solo lo loguea), esta SÍ propaga el
+// error real para poder diagnosticar por API en vez de tener que leer logs
+// de Railway (10-nov-2026, incidente de credenciales 535 BadCredentials).
+async function probarCorreo() {
+  if (!gmailTransport) return { ok: false, motivo: 'GMAIL_USER/GMAIL_PASS no configurados o con placeholder — modo stub' };
+  await gmailTransport.sendMail({
+    from: `ABSTORAGES AI <${GMAIL_USER}>`,
+    to: ALERT_EMAILS.join(', '),
+    subject: 'Prueba de correo — ABSTORAGES AI',
+    html: `<p>Prueba manual disparada a las ${new Date().toLocaleString('es-MX', { timeZone: 'America/Monterrey' })}.</p>`,
+  });
+  return { ok: true, enviadoA: ALERT_EMAILS };
+}
+
 // ── Alerta de intento de sacarle tarifa/precio/costo a MARÍA — directo al
 // equipo comercial (Guadalupe, Fabiola) + Rafael, Gabriel y Diego. Pedido
 // explícito del usuario (19-oct-2026): MARÍA jamás da precios, así que cuando
@@ -695,4 +710,4 @@ async function notificarProveedorNuevo({ nombre, telefono, empresa, unidades, ru
   } catch (e) { console.error('[Gmail] ❌ Error enviando aviso de proveedor nuevo:', e.message); }
 }
 
-module.exports = { notificarRespuestaSofia, notificarRespuestaSara, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta, notificarProveedorNuevo, notificarIntentoTarifa };
+module.exports = { notificarRespuestaSofia, notificarRespuestaSara, notificarKPIsSofia, notificarLead, notificarResumen, notificarAsignacion, notificarLlamada, notificarLlamadaIniciada, notificarAlerta, notificarRondaDisponibilidad, notificarListaDisponibilidad, notificarDisponibilidadRuta, notificarProveedorNuevo, notificarIntentoTarifa, probarCorreo };

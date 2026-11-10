@@ -3341,6 +3341,15 @@ app.post('/api/admin/test-whatsapp-libre', soloAdmin, async (req, res) => {
 // destinatario específico — para confirmar en vivo que una plantilla ya
 // aprobada por Meta de verdad manda el mensaje, sin tener que esperar a
 // que el flujo real (leads/incidentes/folios) la dispare sola.
+// Prueba rápida de correo — para diagnosticar problemas de credenciales de
+// Gmail sin tener que esperar a que dispare una alerta real (10-nov-2026).
+// A diferencia de notifier.notificarAlerta (que atrapa el error y solo lo
+// loguea), esta ruta SÍ regresa el error real de Gmail en la respuesta.
+app.post('/api/admin/test-email', soloAdmin, async (req, res) => {
+  const r = await notifier.probarCorreo().catch(e => ({ ok: false, error: e.message }));
+  res.json(r);
+});
+
 app.post('/api/admin/test-plantilla', soloAdmin, async (req, res) => {
   try {
     const { to, contentSid, variables, agente } = req.body || {};
