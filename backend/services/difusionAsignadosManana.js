@@ -70,6 +70,29 @@ async function proveedoresAsignados() {
     .map(c => ({ id: c.id, nombre: c.nombre_completo, empresa: c.empresa, telefono: c.telefono, planner: c.planner_asignado }));
 }
 
+// Simulación — arma la lista completa (proveedor, plantilla exacta,
+// variables exactas, texto que registraría en memoria) SIN llamar a Kapso
+// ni mandar nada real. Pedido explícito del usuario (10-nov-2026): antes de
+// soltar una plantilla nueva a los 99 de una sola vez, poder revisarla.
+async function simularRonda() {
+  let lista;
+  try { lista = await proveedoresAsignados(); } catch (e) { return { ok: false, motivo: 'error_lista', error: e.message }; }
+  const plan = [];
+  let sinPlantilla = 0;
+  for (const p of lista) {
+    const esSofia = p.planner === 'SOFIA';
+    const nombre = titulo(p.nombre);
+    if (esSofia) {
+      if (!SID_SIN_PLANNER) { sinPlantilla++; continue; }
+      plan.push({ telefono: p.telefono, nombre: p.nombre, planner: p.planner, contentSid: SID_SIN_PLANNER, variables: { '1': nombre }, textoEjemplo: `Hola ${nombre}, soy SOFIA de ABSTORAGES. ¿Qué unidades tendrás disponibles mañana? Cuéntame qué ruta o rutas tienes para apartarte la unidad desde hoy y buscar conectarte con nuestros clientes.` });
+    } else {
+      if (!SID_CON_PLANNER) { sinPlantilla++; continue; }
+      plan.push({ telefono: p.telefono, nombre: p.nombre, planner: p.planner, contentSid: SID_CON_PLANNER, variables: { '1': nombre, '2': p.planner }, textoEjemplo: `Hola ${nombre}, soy SOFIA, asistente de ${p.planner} en ABSTORAGES. ¿Qué unidades tendrás disponibles mañana? Cuéntame la ruta para apartártela desde hoy y buscar conectarte con nuestros clientes.` });
+    }
+  }
+  return { ok: true, total: lista.length, seMandarian: plan.length, sinPlantilla, plan };
+}
+
 async function ejecutarRonda() {
   if (agentPause.estaPausado('sofia')) return { ok: false, motivo: 'pausado' };
   if (!SID_CON_PLANNER && !SID_SIN_PLANNER) {
@@ -145,4 +168,4 @@ function iniciar() {
   console.log(`[difusionAsignadosManana] Activo — proveedores con planner asignado, preguntando disponibilidad de mañana a partir de las ${HORA}:${String(MINUTO).padStart(2, '0')} (Monterrey)`);
 }
 
-module.exports = { iniciar, correrSiToca, dispararManual, proveedoresAsignados, ejecutarRonda };
+module.exports = { iniciar, correrSiToca, dispararManual, proveedoresAsignados, ejecutarRonda, simularRonda };

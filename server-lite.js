@@ -2444,6 +2444,14 @@ app.post('/api/admin/migrar-sesiones-kapso', (req, res) => {
   res.json({ ok: true, total: r.length, resultado: r });
 });
 
+// ─── Simulación de la ronda 9PM — sin mandar nada real (10-nov-2026) ───────
+// Arma la lista completa con la plantilla y variables exactas por
+// proveedor, para revisar antes de soltarla a los 99 de una vez.
+app.get('/api/difusion-asignados-manana/simular', soloAdmin, async (req, res) => {
+  const r = await difusionAsignadosManana.simularRonda().catch(e => ({ ok: false, motivo: e.message }));
+  res.json(r);
+});
+
 // ─── Difusión única de presentación de planner (04-nov-2026) ───────────────
 // Disparo manual, protegido por el mismo middleware de sesión que el resto
 // del portal — un solo POST manda la plantilla "presentacion_sofia_planner"
