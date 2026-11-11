@@ -103,6 +103,7 @@ const mariaTmsWatch = require('./backend/services/mariaTmsWatch');
 const difusionGeneral = require('./backend/services/difusionGeneral');
 const difusionAsignados = require('./backend/services/difusionAsignados');
 const difusionAsignadosManana = require('./backend/services/difusionAsignadosManana');
+const respuestaNocheTracker = require('./backend/services/respuestaNocheTracker');
 const difusionClientes = require('./backend/services/difusionClientes');
 const cadenciaSeguimiento = require('./backend/services/cadenciaSeguimiento');
 const db          = require('./backend/db/db');
@@ -1099,6 +1100,9 @@ async function manejarMensajeKapso(phone, texto) {
   if (emergencyShutdown.estaActivo()) { console.log(`[Kapso-IN] apagado de emergencia activo, ignorando mensaje de ${phone}`); return; }
   if (phoneBanlist.estaBaneado(phone)) { console.log(`[Kapso-IN] teléfono baneado, ignorando mensaje de ${phone}`); return; }
   if (Date.now() < MANTENIMIENTO_HASTA.getTime()) { console.log(`[Kapso-IN] SOFIA en mantenimiento forzado, ignorando mensaje de ${phone}`); return; }
+  // Cualquier respuesta real cuenta para que la ronda de las 6AM de mañana
+  // se lo salte si ya contestó la de las 9PM (ver respuestaNocheTracker.js).
+  respuestaNocheTracker.marcarRespuesta(phone);
 
   const session = `wa_sofia_${phone}`;
   const { contextBlock, history } = memory.buildContext(session);

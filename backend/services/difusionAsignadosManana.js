@@ -16,6 +16,7 @@ const contactos = require('./contactos');
 const whatsappProactivo = require('./whatsappProactivo');
 const agentPause = require('./agentPause');
 const actividadBus = require('./actividadBus');
+const respuestaNocheTracker = require('./respuestaNocheTracker');
 const notifier = require('./notifier');
 const fs = require('fs');
 const path = require('path');
@@ -132,6 +133,10 @@ async function ejecutarRonda() {
       enviados++;
       whatsappProactivo.registrarEnMemoria?.('sofia', p.telefono, textoEnviado);
       contactos.upsertContacto({ agente: 'sofia', telefono: p.telefono, resumen_interaccion: 'Ronda 9PM — disponibilidad de mañana', canal: 'whatsapp-plantilla' }).catch(() => {});
+      // Pedido explícito del usuario (10-nov-2026): si contesta a este
+      // mensaje, la ronda de las 6AM de mañana ya no debe volver a
+      // escribirle — ver respuestaNocheTracker.js.
+      respuestaNocheTracker.marcarEnvioNoche(p.telefono);
     } catch (e) { fallidos++; console.error(`[difusionAsignadosManana] Error mandando a ${p.nombre}:`, e.message); }
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }

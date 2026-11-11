@@ -19,6 +19,7 @@ const whatsappProactivo = require('./whatsappProactivo');
 const agentPause = require('./agentPause');
 const actividadBus = require('./actividadBus');
 const notifier = require('./notifier');
+const respuestaNocheTracker = require('./respuestaNocheTracker');
 const fs = require('fs');
 const path = require('path');
 
@@ -113,9 +114,13 @@ async function ejecutarRonda() {
 
   feed({ tipo: 'DIFUSION_ASIGNADOS', mensaje: `Ronda diaria a proveedores con planner asignado — empezando con ${lista.length} proveedores, uno tras otro` });
 
-  let enviados = 0, sinCredito = 0, fallidos = 0;
+  let enviados = 0, sinCredito = 0, fallidos = 0, yaContestoAnoche = 0;
   for (const p of lista) {
     try {
+      // Pedido explícito del usuario (10-nov-2026): si ya contestó la
+      // difusión de las 9PM de anoche, no se le vuelve a escribir en la de
+      // las 6AM — se espera hasta la ronda de las 9PM de hoy.
+      if (respuestaNocheTracker.yaRespondioALaNoche(p.telefono)) { yaContestoAnoche++; continue; }
       const esSofia = p.planner === 'SOFIA';
       let contentSid, variables, textoEnviado;
       if (esSofia) {
@@ -152,7 +157,7 @@ async function ejecutarRonda() {
     await new Promise(res => setTimeout(res, PAUSA_ENTRE_ENVIOS_MS));
   }
 
-  const resumen = `Ronda diaria a proveedores con planner: ${enviados} enviados de ${lista.length}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}${!SID_CON_PLANNER || !SID_SIN_PLANNER ? ' · usando plantilla general (las nuevas con/sin planner aún no están configuradas)' : ''}.`;
+  const resumen = `Ronda diaria a proveedores con planner: ${enviados} enviados de ${lista.length}${yaContestoAnoche ? ` · ${yaContestoAnoche} saltados (ya habían contestado la ronda de las 9PM)` : ''}${sinCredito ? ` · ${sinCredito} sin enviar por tope diario` : ''}${fallidos ? ` · ${fallidos} con error` : ''}${!SID_CON_PLANNER || !SID_SIN_PLANNER ? ' · usando plantilla general (las nuevas con/sin planner aún no están configuradas)' : ''}.`;
   feed({ tipo: 'DIFUSION_ASIGNADOS', mensaje: resumen });
   notifier.notificarAlerta({ title: 'SOFIA — Ronda diaria a proveedores con planner', body: resumen, tipo: 'DIFUSION_ASIGNADOS' }).catch(() => {});
   console.log(`[difusionAsignados] ${resumen}`);
