@@ -185,7 +185,18 @@ async function preguntarDisponibilidad(proveedor, orden) {
   const fecha = orden.fecha_carga || 'por confirmar';
   const toneladas = orden.peso_toneladas || '';
   const tipoCarga = orden.tipo_carga || orden.descripcion_carga || '';
-  const resultado = await enviarPlantilla('sofia', proveedor.telefono, CONTENT_SID_DISPONIBILIDAD, {
+  // BUG REAL encontrado 18-nov-2026 (caso real: difusión urgente Bonafont
+  // Monterrey→Toluca, 9 de 11 proveedores bloqueados): esto usaba
+  // enviarPlantilla(), que tiene el candado PERMANENTE de "nunca repetir
+  // esta plantilla a este número" — pero esta función se llama con una
+  // orden/ruta DISTINTA cada vez (es la misma plantilla de Meta, con
+  // variables distintas). El candado permanente no tiene sentido aquí: un
+  // proveedor al que ya se le preguntó por una carga en octubre quedaba
+  // bloqueado para siempre, aunque la carga de hoy sea completamente
+  // distinta. Se usa enviarPlantillaSinCandado — el límite real que sí debe
+  // aplicar (no más de 1 contacto al día, salvo que la orden sea urgente)
+  // sigue vigente vía ignorarCapDiario.
+  const resultado = await enviarPlantillaSinCandado('sofia', proveedor.telefono, CONTENT_SID_DISPONIBILIDAD, {
     '1': proveedor.nombre || 'ahí', '2': tipoUnidad, '3': org, '4': dst, '5': fecha,
   }, { urgente: orden.prioridad === 'top5', ignorarCapDiario: !!orden.ignorarCapDiario });
   registrarEnMemoria('sofia', proveedor.telefono,
@@ -350,7 +361,7 @@ async function enviarEstatusFolio(agente, telefono, nombre, folio, resumen) {
 // Nunca toca el candado de las demás plantillas: no lo lee ni lo marca, así
 // que no choca con el "nunca se repite sola" de las plantillas normales, ni
 // bloquea que una orden real le vuelva a preguntar disponibilidad después.
-async function enviarPlantillaSinCandado(agente, to, contentSid, variables, { ignorarCapDiario } = {}) {
+async function enviarPlantillaSinCandado(agente, to, contentSid, variables, { ignorarCapDiario, urgente } = {}) {
   if (phoneBanlist.estaBaneado(to)) {
     console.warn(`[whatsappProactivo] 🚫 ${to} está baneado — se omite plantilla saliente`);
     return { status: 'baneado', to };
@@ -360,7 +371,7 @@ async function enviarPlantillaSinCandado(agente, to, contentSid, variables, { ig
     return { status: 'ya_contactado_hoy', to };
   }
   if (agentPause.estaPausado(agente)) return { status: 'paused', to };
-  const limite = outboundRateLimit.registrarYVerificar(agente);
+  const limite = outboundRateLimit.registrarYVerificar(agente, { urgente });
   if (!limite.permitido) return { status: 'rate_limited', to };
   monitoringControl.reportarContactoSaliente({ agente, canal: 'whatsapp_plantilla', destinatario: to, detalle: { contentSid } });
   marcarContactadoHoy(agente, to);
