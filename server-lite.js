@@ -2451,6 +2451,39 @@ app.post('/api/admin/migrar-sesiones-kapso', (req, res) => {
 // ─── Simulación de la ronda 9PM — sin mandar nada real (10-nov-2026) ───────
 // Arma la lista completa con la plantilla y variables exactas por
 // proveedor, para revisar antes de soltarla a los 99 de una vez.
+// ─── Difusión urgente a una lista puntual de proveedores (18-nov-2026) ─────
+// Pedido explícito del usuario — ej. carga Bonafont Monterrey→Toluca: una
+// lista elegida a mano (no la ronda automática de los 99), para un folio/ruta
+// específico, con posible urgencia real. Usa el mismo mecanismo que SOFIA ya
+// usa automáticamente cuando busca unidad para un folio
+// (whatsappProactivo.preguntarDisponibilidad) — plantilla aprobada, nunca
+// revela el cliente al proveedor (solo "USO INTERNO" en el contexto que
+// SOFIA ve), y guarda el contexto para que si contesta "sí tengo" SOFIA ya
+// sepa ruta/unidad/fecha sin volver a preguntar.
+app.post('/api/admin/difusion-urgente', soloAdmin, async (req, res) => {
+  const { proveedores, ruta, tipo_unidad, fecha_carga, cliente, ignorarCapDiario } = req.body || {};
+  if (!Array.isArray(proveedores) || !proveedores.length || !ruta) {
+    return res.status(400).json({ error: 'proveedores (array de {nombre, telefono}) y ruta son requeridos' });
+  }
+  const orden = { ruta, tipo_unidad: tipo_unidad || 'caja seca', fecha_carga: fecha_carga || 'hoy', empresa: cliente || null, ignorarCapDiario: ignorarCapDiario !== false };
+  const resultado = [];
+  for (const p of proveedores) {
+    const telefono = String(p.telefono || '').replace(/\D/g, '');
+    if (!telefono || telefono.length < 10) { resultado.push({ nombre: p.nombre, telefono: p.telefono, status: 'telefono_invalido' }); continue; }
+    const tel10 = telefono.slice(-10);
+    const telE164 = `+52${tel10}`;
+    try {
+      const r = await whatsappProactivo.preguntarDisponibilidad({ nombre: p.nombre, telefono: telE164 }, orden);
+      resultado.push({ nombre: p.nombre, telefono: telE164, status: r?.status || (r ? 'ok' : 'sin_plantilla') });
+    } catch (e) {
+      resultado.push({ nombre: p.nombre, telefono: telE164, status: 'error', error: e.message });
+    }
+    await new Promise(r => setTimeout(r, 2500));
+  }
+  const enviados = resultado.filter(r => r.status === 'ok').length;
+  res.json({ ok: true, enviados, total: resultado.length, resultado });
+});
+
 app.get('/api/difusion-asignados-manana/simular', soloAdmin, async (req, res) => {
   const r = await difusionAsignadosManana.simularRonda().catch(e => ({ ok: false, motivo: e.message }));
   res.json(r);

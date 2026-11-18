@@ -187,7 +187,7 @@ async function preguntarDisponibilidad(proveedor, orden) {
   const tipoCarga = orden.tipo_carga || orden.descripcion_carga || '';
   const resultado = await enviarPlantilla('sofia', proveedor.telefono, CONTENT_SID_DISPONIBILIDAD, {
     '1': proveedor.nombre || 'ahí', '2': tipoUnidad, '3': org, '4': dst, '5': fecha,
-  }, { urgente: orden.prioridad === 'top5' });
+  }, { urgente: orden.prioridad === 'top5', ignorarCapDiario: !!orden.ignorarCapDiario });
   registrarEnMemoria('sofia', proveedor.telefono,
     `Hola ${proveedor.nombre || ''}, soy SOFIA de ABSTORAGES. Buscamos unidad ${tipoUnidad} para la ruta ${org} → ${dst}, salida ${fecha}${toneladas ? `, ${toneladas} ton` : ''}${tipoCarga ? ` de ${tipoCarga}` : ''}. ¿Tienes disponibilidad? Contáctanos por este medio.`);
   guardarContextoRequerimiento('sofia', proveedor.telefono, {
