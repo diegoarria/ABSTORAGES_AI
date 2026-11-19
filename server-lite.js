@@ -2995,6 +2995,23 @@ app.delete('/api/contactos/:id', soloAdmin, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Baneo manual por teléfono (18-nov-2026) — pedido explícito del usuario
+// para un proveedor que quedó mal con un cliente (nunca se detectó por las
+// reglas automáticas de phoneBanlist.js, que solo banean por intento de
+// fuga/ataque). Banea el número para las 3 IA (nunca más se le contesta,
+// ni se le vuelve a escribir) y, si existe en la Base de Datos, lo borra.
+app.post('/api/admin/banear-telefono', soloAdmin, async (req, res) => {
+  const { telefono, motivo } = req.body || {};
+  if (!telefono) return res.status(400).json({ error: 'telefono requerido' });
+  try {
+    await phoneBanlist.banear({ telefono, motivo: motivo || `Baneado manualmente por ${req.user?.nombre || req.user?.email || 'admin'}`, agente: 'manual' });
+    const contacto = await contactos.buscarPorTelefono(telefono, 'sofia') || await contactos.buscarPorTelefono(telefono, 'maria') || await contactos.buscarPorTelefono(telefono, 'noa');
+    let borrado = false;
+    if (contacto) borrado = !!(await contactos.eliminarContacto(contacto.id));
+    res.json({ ok: true, baneado: true, contactoEncontrado: !!contacto, borrado });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── Colocaciones de SOFIA: ofertas, aprobación, ranking, sugerencias, KPIs ───
 app.get('/api/colocaciones', adminUOps, (req, res) => {
   const lista = colocaciones.todas().sort((a, b) => new Date(b.creada) - new Date(a.creada)).slice(0, 100)
